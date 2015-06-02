@@ -17,15 +17,15 @@ often or should I equip some other item in that slot.
 ### Phase three
 * Write it in some readable format to a file for display inside AO.
 
-### Phase three
+### Phase four
 * Graphs displaying damage over time.
 
-### Phase four
+### Phase five
 * Window on top of AO displaying some info live to the player.
 
-### Phase five
+### Phase six
 * *?*
 
-### Phase six
+### Phase seven
 * Profit
 
