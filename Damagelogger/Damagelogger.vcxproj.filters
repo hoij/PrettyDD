@@ -26,18 +26,33 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="player.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="parse.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="line.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Me hit by monster.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Other hit by nano.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Other hit by other.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test_damage.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="You hit other.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

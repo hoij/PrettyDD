@@ -6,17 +6,32 @@
 class Player {
 
 	// Player needs to store the last line, possible even further back in order to know if executed nano was
-	// successfull and store that info.
+	// successfull and then store that info. Maybe it can store the last executed nano unless it's possible
+	// to execute two nanos at once (with different cooldowns) and have second one execute first?
 
 public:
 	Player::Player();
 	Player(std::string name);
 	~Player();
+	Player& operator+=(const Player& p);
+	
+	struct nano_cast_info { // For each nano
+		std::string name;
+		int count = 0;
+		int landed = 0;
+		int resisted = 0;
+		int countered = 0;
+		int max = 0;
+		int min = 0;
+	} nano_casted;
+	void add_nano_casted(nano_cast_info& nano);
 
-	std::vector<std::string> last_nano_cast_line;
-
+	std::vector<std::string> last_nano_cast_line;  // remove
 	std::string name;
+
 	struct stats {
+		// Include some info on deflects per special/normal etc?
+
 		// temp stats just for testing
 		std::string type;
 		int amount = 0;
@@ -35,66 +50,92 @@ public:
 		int melee_damage = 0;
 		int melee_cnt = 0;
 
-		int misses = 0;
-		int evasions = 0;
 		int hits_taken = 0;
+		int misses = 0;  // Target
+		int evasions = 0;  // Self
+		int target_deflects = 0;
+		int self_deflects = 0;
+
 
 		// Specials:
-		int aimed_shot = 0;
+		int aimed_shot_total = 0;
 		int aimed_shot_cnt = 0;
 		int aimed_shot_damage = 0;
+		int aimed_shot_max = 0;
+		int aimed_shot_min = 0;
 		int aimed_shot_mean_time = 0;
-		int backstab = 0;
+		int backstab_total = 0;
 		int backstab_cnt = 0;
 		int backstab_damage = 0;
+		int backstab_max = 0;
+		int backstab_min = 0;
 		int backstab_mean_time = 0;
-		int brawling = 0;
+		int brawling_total = 0;
 		int brawling_cnt = 0;
 		int brawling_misses = 0;
 		int brawling_damage = 0;
+		int brawling_max = 0;
+		int brawling_min = 0;
 		int brawling_mean_time = 0;
-		int burst = 0;
+		int burst_total = 0;
 		int burst_cnt = 0;
 		int bust_misses = 0;
 		int burst_damage = 0;
+		int burst_max = 0;
+		int burst_min = 0;
 		int burst_mean_time = 0;
-		int dimach = 0;
+		int dimach_total = 0;
 		int dimach_cnt = 0;
-		int dimach_misses = 0; // is this possible?
+		int dimach_misses = 0;  // is this possible?
 		int dimach_damage = 0;
+		int dimach_max = 0;
+		int dimach_min = 0;
 		int dimach_mean_time = 0;
-		int fling_shot = 0;
+		int fling_shot_total = 0;
 		int fling_shot_cnt = 0;
 		int fling_shot_misses = 0;
 		int fling_shot_damage = 0;
+		int fling_shot_max = 0;
+		int fling_shot_min = 0;
 		int fling_shot_mean_time = 0;
-		int fast_attack = 0;
+		int fast_attack_total = 0;
 		int fast_attack_cnt = 0;
 		int fast_attack_misses = 0;
 		int fast_attack_damage = 0;
+		int fast_attack_max = 0;
+		int fast_attack_min = 0;
 		int fast_attack_mean_time = 0;
-		int full_auto = 0;
+		int full_auto_total = 0;
 		int full_auto_cnt = 0;
-		int full_auto_misses = 0; // Does full auto also give the nr of bullets that hit?
+		//int full_auto_bullets_hit = 0;  // Not available, afaik. Or maybe it's not a damage log message.
+		int full_auto_misses = 0;
 		int full_auto_damage = 0;
+		int full_auto_max = 0;
+		int full_auto_min = 0;
 		int full_auto_mean_time = 0;
-		int sneak_attack = 0;
+		int sneak_attack_total = 0;
 		int sneak_attack_cnt = 0;
 		int sneak_attack_damage = 0;
+		int sneak_attack_max = 0;
+		int sneak_attack_min = 0;
 		int sneak_attack_mean_time = 0;
-		int bow_special = 0; // Correct name?
+		int bow_special_total = 0;  // Correct name?
 		int bow_special_cnt = 0;
-		int bow_special_misses = 0; // Possible?
+		int bow_special_misses = 0;  // Possible?
 		int bow_special_damage = 0;
+		int bow_special_max = 0;
+		int bow_special_min = 0;
 		int bow_special_mean_time = 0;
 
 		// Crits
-		int critical_hits = 0;
-		int critical_damage = 0;
+		int critical_total = 0;
+		int critical_cnt = 0;
+		int critical_max = 0;
+		int critical_min = 0;
 		int critical_hit_mean_time = 0;
 
 		// Heal and nano
-		int dmg_taken = 0;
+		int damage_taken = 0;
 		int heal_given = 0;
 		int heal_given_potential = 0;
 		int heal_received = 0;
@@ -111,15 +152,17 @@ public:
 		int research = 0;
 
 		// Nano programs casted
-		int nano_cast_cnt = 0; // Total count
-		struct nano_cast_info { // For each nano
-			std::string nano;
-			int count = 0;
-		} nano_cast_info;
+		int nano_program_cast_cnt = 0; // Total count
+		std::string last_nano_casted;
 		std::vector<struct nano_cast_info> nanos_casted;
-	} stats;
 
-private:
+		// Nano damage from casting (nukes and dots unless I can separate them but excluding perks)
+		int nano_damage_cast_total = 0;
+		int nano_damage_cast_cnt = 0;
+		int nano_damage_cast_damage_max = 0;
+		int nano_damage_cast_damage_min = 0;
+
+	} stats;
 
 };
 

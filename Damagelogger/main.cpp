@@ -14,41 +14,45 @@ int main(void) {
 	vector<Player> players;
 
 	if (logstream.is_open()) {
-		logstream.seekg(0, logstream.end);
+		// Go to the end of the file
+		//logstream.seekg(0, logstream.end);
+		//logstream.close();
 
 		// Copying a log file with all examples for testing purposes
-		logstream.close();
-		ifstream inlogstream("test_damage.txt");
-		ofstream outlogstream("log.txt");
-		while (getline(inlogstream, line)) {
-			outlogstream << line << endl;
-		}
-		outlogstream.close();
-		inlogstream.close();
-		ifstream logstream("log.txt");
-		//
+		//ifstream inlogstream("test_damage.txt");
+		//ofstream outlogstream("log.txt");
+		//while (getline(inlogstream, line)) {
+		//	outlogstream << line << endl;
+		//}
+		//outlogstream.close();
+		//inlogstream.close();
 
-		vector<string> previous_words;
+		//ifstream logstream("log.txt");
+
 		while (true) {
 			while (getline(logstream, line)) {
 				cout << line << endl;
-				vector<string> words;
-				split(line, ',', words); // Split the line and store it in words
-				if (!words.size() == 0) {
-					parse(previous_words, words, players);
-					previous_words = words;
-				}
+				parse(line, players);
 			}
-			if (!logstream.eof())
+			if (!logstream.eof()) {  // Why did I check for this?
+				cout << "Error: Not EOF!" << endl;
 				break;
+			}
 			logstream.clear();
-			this_thread::sleep_for(std::chrono::milliseconds(500));
+			this_thread::sleep_for(std::chrono::milliseconds(250));
+
+			// Listen for user input to quit. Use SDL?
+
 		}
+		cout << "Closing the logstream" << endl;
 		logstream.close();
 	}
 	else {
 		cout << "Could not open the file." << endl;
 	}
+
+	for (auto& p : players)
+		cout << p.name << endl;
 
 	getchar();
 	return 0;

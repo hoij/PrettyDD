@@ -75,6 +75,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt" />
+    <Text Include="Me hit by monster.txt" />
+    <Text Include="Other hit by nano.txt" />
+    <Text Include="Other hit by other.txt" />
+    <Text Include="test_damage.txt" />
+    <Text Include="You hit other.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,7 +24,7 @@ often or should I equip some other item in that slot.
 * Window on top of AO displaying some info live to the player.
 
 ### Phase six
-* *?*
+*  *?*
 
 ### Phase seven
 * Profit

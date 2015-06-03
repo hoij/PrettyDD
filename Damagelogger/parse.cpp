@@ -14,43 +14,52 @@ using namespace std;
 // After some perk actions there is a line telling which perk was performed
 //	and if it was successfull or not. Can use that to get stats on perks.
 
-int parse(vector<string> &previous_words, vector<string> &words, vector<Player> &players) {
+int parse(std::string line, vector<Player>& players) {
 	double amount = 1;
-	string word;
 	Player dealer;
 	Player receiver;
-	cleanup(words);
 
-	//for (auto it = words.begin(); it != words.end(); it++)
-	//	cout << *it << endl;
+	// Split the line and store it in words
+	vector<string> words;
+	split(line, ',', words);
 
-	// find name of dealer, receiver, damage (heal) done, and type of damage
-	find_values(previous_words, words, dealer, receiver);
-	cout << "Dealer: " << dealer.name << "\t" << "Amount: " << dealer.stats.amount << "\t" << "Type: " << dealer.stats.type << endl;
-	cout << "Receiver: " << receiver.name << "\t" << "Amount: " << receiver.stats.amount << "\t" << "Type: " << receiver.stats.type << endl << endl;
+	if (!words.size() == 0) {
+		cleanup(words);
 
-	Player *real_dealer = nullptr;
-	Player *real_receiver = nullptr;
-	find_player(players, dealer, real_dealer);
-	find_player(players, receiver, real_receiver);
+		//for (auto it = words.begin(); it != words.end(); it++)
+		//	cout << *it << endl;
 
-	//add_to_players(players, dealer, receiver);
-	return 0;
-}
+		// find name of dealer, receiver, damage (or heal) done, and type of damage
+		find_values(words, dealer, receiver);
 
-int find_player(std::vector<Player> &players, Player &temp_player, Player *real_player) {
-	for (auto it = players.begin(); it != players.end(); it++) // look for the temp player
-		if (it->name == temp_player.name)
-			real_player = &(*it);
-	if (real_player == nullptr) { // i.e. no match was found - create new player
-		Player player(temp_player.name);
-		players.push_back(player);
-		real_player = &player;
+		// Debug prints
+		cout << "Dealer: " << dealer.name << "\t" << "Amount: " <<
+			dealer.stats.amount << "\t" << "Type: " <<
+			dealer.stats.type << endl;
+		cout << "Receiver: " << receiver.name << "\t" << "Amount: " <<
+			receiver.stats.amount << "\t" << "Type: " <<
+			receiver.stats.type << endl << endl;
+
+		add_to_player(players, dealer);
+		add_to_player(players, receiver);
 	}
 	return 0;
 }
 
-int find_amount(const std::vector<std::string> &words, Player &dealer, Player &receiver) {
+void add_to_player(std::vector<Player>& players, Player& player) {
+	bool found = false;
+	for (auto& p : players) {
+		if (p.name == player.name) {
+			found = true;
+			p += player;
+		}
+	}
+	if (!found) {
+		players.push_back(player);
+	}
+}
+
+int find_amount(const std::vector<std::string>& words, Player& dealer, Player& receiver) {
 	std::smatch d;
 	if (regex_search(words[4], d, regex("(?:for )(\\d+)"))) {
 		dealer.stats.amount = std::stoi(d[1]);
@@ -59,7 +68,7 @@ int find_amount(const std::vector<std::string> &words, Player &dealer, Player &r
 	return 0;
 }
 
-int find_type(const std::vector<std::string> &words, Player &dealer, Player &receiver) {
+int find_type(const std::vector<std::string>& words, Player& dealer, Player& receiver) {
 	// Used to find damage type. Heals handled separately.
 	std::smatch t;
 	if (!regex_search(words[4], t, regex("(?:points of )(.*?)(?= damage)"))) // Looks for regular and special damage
@@ -71,7 +80,7 @@ int find_type(const std::vector<std::string> &words, Player &dealer, Player &rec
 	return 0;
 }
 
-int find_values(const vector<string> &previous_words, const vector<string> &words, Player &dealer, Player &receiver) {
+int find_values(const vector<string>& words, Player& dealer, Player& receiver) {
 	// Skriv hur varje löses, merga de som är liknande?
 	std::smatch m;
 
@@ -240,9 +249,9 @@ int find_values(const vector<string> &previous_words, const vector<string> &word
 		// ["#0000000042000014#","You gave health","",1425998482]You healed Letter for 3741 points of health.
 		// ["#0000000042000018#","Me Cast Nano","",1425998482]Nano program executed successfully.
 		regex_search(words[4], m, regex("(?:Program:\\s)(.*?)(?=\\.)"));
-		dealer.stats.nano_cast_info.nano = m[1];
-		dealer.stats.nano_cast_info.count += 1;
-		cout << "Nano casted: " << dealer.stats.nano_cast_info.nano << ". Count: " << dealer.stats.nano_cast_info.count << endl;
+		dealer.nano_casted.name = m[1];
+		dealer.nano_casted.count += 1;
+		cout << "Nano casted: " << dealer.nano_casted.name << ". Count: " << dealer.nano_casted.count << endl;
 		
 		// Need to check if the nano was executed succesfully or countered or fumbled or resisted
 		// This info comes in the next line(s).
@@ -307,7 +316,7 @@ int find_values(const vector<string> &previous_words, const vector<string> &word
 	return 0;
 }
 
-void cleanup(vector<string> &words) {
+void cleanup(vector<string>& words) {
 	// Remove quotation marks etc.
 	words[0].erase(0, 3);
 	words[0].erase(16, 2);
@@ -317,7 +326,7 @@ void cleanup(vector<string> &words) {
 	words[2].erase(words[2].length() - 1, words[2].length());
 }
 
-vector<string> &split(string &s, char delim, vector<string> &words) {
+vector<string>& split(string& s, char delim, vector<string>& words) {
 	stringstream ss(s);
 	string word;
 	while (getline(ss, word, delim)) {
