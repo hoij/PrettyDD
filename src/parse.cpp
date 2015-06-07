@@ -15,7 +15,6 @@ using namespace std;
 //	and if it was successfull or not. Can use that to get stats on perks.
 
 int parse(std::string line, vector<Player>& players) {
-	double amount = 1;
 	Player dealer;
 	Player receiver;
 
