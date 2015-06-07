@@ -10,7 +10,7 @@ using namespace std;
 
 int main(void) {
 	string line;
-	ifstream logstream("../log.txt");
+	ifstream logstream("../../test/log.txt");
 	vector<Player> players;
 
 	if (logstream.is_open()) {
@@ -29,14 +29,15 @@ int main(void) {
 
 		//ifstream logstream("log.txt");
 
-		while (true) {
+		bool is_running = true;
+		while (is_running) {
 			while (getline(logstream, line)) {
 				cout << line << endl;
 				parse(line, players);
 			}
 			if (!logstream.eof()) {  // Why did I check for this?
 				cout << "Error: Not EOF!" << endl;
-				break;
+				is_running = false;
 			}
 			logstream.clear();
 			this_thread::sleep_for(std::chrono::milliseconds(250));
@@ -48,7 +49,7 @@ int main(void) {
 		logstream.close();
 	}
 	else {
-		cout << "Could not open the file." << endl;
+		cout << "Could not open the log file." << endl;
 	}
 
 	for (auto& p : players)
