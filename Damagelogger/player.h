@@ -10,7 +10,7 @@ class Player {
 	// to execute two nanos at once (with different cooldowns) and have second one execute first?
 
 public:
-	Player::Player();
+	Player();
 	Player(std::string name);
 	~Player();
 	Player& operator+=(const Player& p);
@@ -24,6 +24,7 @@ public:
 		int max = 0;
 		int min = 0;
 	} nano_casted;
+
 	void add_nano_casted(nano_cast_info& nano);
 
 	std::vector<std::string> last_nano_cast_line;  // remove
