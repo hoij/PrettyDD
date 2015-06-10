@@ -8,6 +8,8 @@ Player::~Player(){}
 
 Player& Player::operator+=(const Player& p) {
 	// Add stuff from p to this
+	this->stats.aimed_shot_cnt = p.stats.aimed_shot_cnt;
+	// etc...
 	return *this;
 }
 
