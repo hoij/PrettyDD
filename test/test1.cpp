@@ -8,6 +8,11 @@ using std::cout;
 using std::endl;
 
 
+// This is a fixture
+// More test can be added by
+// TEST_F(MyTest, testName) {
+//   // actual testing
+// }
 class MyTest : public testing::Test {
 protected:
 	MyTest() {}
@@ -19,12 +24,18 @@ protected:
 	virtual void TearDown() {
 		cout << "Running TearDown" << endl;
 	}
-	static const int i = 3;
-
 };
 
 
-TEST_F(MyTest, i_equals_3) {
-	EXPECT_THAT(i, testing::Eq(3));
+class TestSubject {
+public:
+  int getI() {return i;}
+private:
+  int i = 3;
+};
+
+TEST(test_cases, i_equals_3) {
+  TestSubject ts;
+  EXPECT_EQ(3, ts.getI());
 }
 
