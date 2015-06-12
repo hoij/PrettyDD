@@ -12,10 +12,10 @@ often or should I equip some other item in that slot.
   * Hits/misses in percentage per type of damage/special etc.
 
 ### Phase two
-* Throw in some statistics to show if the data is statistically significant.
+* Write it in some readable format to a file for display inside AO.
 
 ### Phase three
-* Write it in some readable format to a file for display inside AO.
+* Throw in some statistics to show if the data is statistically significant.
 
 ### Phase four
 * Graphs displaying damage over time.
