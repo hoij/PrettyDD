@@ -52,8 +52,8 @@ int main(void) {
 		cout << "Could not open the log file." << endl;
 	}
 
-	for (auto& p : players)
-		cout << p.name << endl;
+	//for (auto& p : players)
+	//	cout << p.get_name() << endl;
 
 	getchar();
 	return 0;
