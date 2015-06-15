@@ -4,14 +4,13 @@ Player::Player() {}
 
 Player::Player(std::string name) : name(name) {}
 
-Player::Player(line_info& li, std::string player_type) {
+Player::Player(LineInfo& li, std::string player_type) {
     if (player_type == "dealer")
         name = li.dealer_name;
     else if (player_type == "receiver")
         name = li.receiver_name;
     add(li, player_type);
 }
-
 
 Player::~Player(){}
 
@@ -24,7 +23,7 @@ Player& Player::operator+=(const Player& p) {
 	return *this;
 }
 
-void Player::add(line_info& li, std::string player_type) {
+void Player::add(LineInfo& li, std::string player_type) {
     if (li.type == "damage") {
         if (player_type == "dealer") {
             add_damage_dealt(li);
@@ -36,10 +35,25 @@ void Player::add(line_info& li, std::string player_type) {
     else if (li.type == "heal") {
 
     }
+    else if (li.type == "nano_cast") {
+        // Only add the nano when a message about the success/fail has arrived.
+        // In that case the nano will not be mentioned by name.
+        if (li.nanoProgram->getName() != "") {
+            last_nano_casted = *li.nanoProgram;
+        }
+        else {
+            // If nano casted successfully/resisted/countered/aborted/fumble/interrupt?
+            last_nano_casted.addStat(li.subtype, 1);
+            addNanoProgram(last_nano_casted);
+        }
+    }
+    else if (li.type == "") {
+
+    }
 
 }
 
-void Player::add_damage_dealt(line_info& li) {
+void Player::add_damage_dealt(LineInfo& li) {
     damage_dealt[li.subtype].total += li.amount;
     damage_dealt[li.subtype].count++;
     if (!li.crit) {
@@ -73,7 +87,7 @@ void Player::add_damage_dealt(line_info& li) {
     }
 }
 
-void Player::add_damage_received(line_info& li) {
+void Player::add_damage_received(LineInfo& li) {
     damage_received[li.subtype].total += li.amount;
     damage_received[li.subtype].count++;
     if (!li.crit) {
@@ -107,13 +121,13 @@ void Player::add_damage_received(line_info& li) {
 
 }
 
-void Player::add_nano_casted(struct nano_cast_info& nano) {
-	// Loop through nanos_casted and check if it has already been added
-	for (auto& nano_in_vec : nanos_casted) {
-		if (nano_in_vec.name == nano.name) {
-			nano_in_vec.count += 1;
+void Player::addNanoProgram(NanoProgram& np) {
+    // Loop through nanos_casted and check if it has already been added
+    for (auto& npInVec : nanoPrograms) {
+        if (npInVec.getName() == np.getName()) {
+            npInVec += np;
             return;
         }
-	}
-	nanos_casted.push_back(nano);
+    }
+    nanoPrograms.push_back(np);
 }

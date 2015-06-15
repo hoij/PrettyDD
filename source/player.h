@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "line_info.h"
+#include "nano_program.h"
 
 class Player {
 
@@ -13,30 +15,7 @@ class Player {
 	// to execute two nanos at once (with different cooldowns) and have second one execute first?
 
 public:
-	struct nano_cast_info { // For each nano
-		std::string name;
-		int count = 0;
-		int landed = 0;
-		int resisted = 0;
-		int countered = 0;
-		int max = 0;
-		int min = 0;
-	};
-
-    struct line_info {
-        std::string dealer_name;
-        std::string receiver_name;
-        std::string type;
-        std::string subtype;
-        int amount = 0;
-        bool crit = false;
-        bool deflect = false;
-        bool miss = false;
-        int heal_received_potential = 0;
-        int heal_given_potential = 0;
-        nano_cast_info nanos;
-    };
-
+    // Make a class in a separate file out of this:
 	struct damage_type {
         damage_type() {}
 
@@ -57,18 +36,18 @@ public:
 
 	Player();
 	Player(std::string name);
-	Player(line_info& li, std::string player_type);
+	Player(LineInfo& li, std::string player_type);
 	~Player();
 	Player& operator+=(const Player& p);
 
     std::string& get_name() {return name;}
     void set_name(std::string name) {name = name;}
 
-    void add(line_info& li, std::string player_type);
+    void add(LineInfo& li, std::string player_type);
 
-    void add_damage_dealt(line_info& li);
-    void add_damage_received(line_info& li);
-    void add_nano_casted(nano_cast_info& nano);
+    void add_damage_dealt(LineInfo& li);
+    void add_damage_received(LineInfo& li);
+    void addNanoProgram(NanoProgram& nanoProgram);
 
     // Write functions for:
 	// add_damage_dealt()
@@ -84,9 +63,9 @@ public:
 
 private:
     std::string name;
-    std::string last_nano_casted;
+    NanoProgram last_nano_casted;
 
-	std::vector<struct nano_cast_info> nanos_casted;
+	std::vector<NanoProgram> nanoPrograms;
 
     std::map<std::string, damage_type> damage_dealt; /* = {
 
