@@ -5,111 +5,45 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <limits>
 #include "line_info.h"
 #include "nano_program.h"
+#include "heal.h"
+#include "damage.h"
 
 class Player {
-
-	// Player needs to store the last line, possible even further back in order to know if executed nano was
-	// successfull and then store that info. Maybe it can store the last executed nano unless it's possible
-	// to execute two nanos at once (with different cooldowns) and have second one execute first?
-
 public:
-    // Make a class in a separate file out of this:
-	struct damage_type {
-        damage_type() {}
-
-        int total = 0;
-        int count = 0;
-        int regular_max = 0;
-        int regular_min = -1;
-        int crit_total = 0;
-		int crit_count = 0;
-		int crit_max = 0;
-		int crit_min = -1;
-        int deflects = 0;
-        int misses = 0;
-
-        // Not used at the moment:
-        int mean_time = 0;
-    };
-
 	Player();
 	Player(std::string name);
-	Player(LineInfo& li, std::string player_type);
+	Player(std::string name, LineInfo& li);
 	~Player();
 	Player& operator+=(const Player& p);
 
     std::string& get_name() {return name;}
     void set_name(std::string name) {name = name;}
-
-    void add(LineInfo& li, std::string player_type);
-
-    void add_damage_dealt(LineInfo& li);
-    void add_damage_received(LineInfo& li);
-    void addNanoProgram(NanoProgram& nanoProgram);
-
-    // Write functions for:
-	// add_damage_dealt()
-	// add_damage_received()
-	// add_heal_given()
-	// add_heal_received()
-	//
-	// Good idea?
-
-    // Temp, remove
-    int get_stats(std::string type) {return stats[type];}
-    std::string type;
+    void add(LineInfo& li);
 
 private:
+    void addDamage(LineInfo& li);
+    void addHeal(LineInfo& li);
+    void addNanoProgram(NanoProgram& nanoProgram);
+
     std::string name;
     NanoProgram last_nano_casted;
 
 	std::vector<NanoProgram> nanoPrograms;
 
-    std::map<std::string, damage_type> damage_dealt; /* = {
+    //////////
+    // I could have one vector of players for each player with all
+    // data related to that player.
+    //////////
 
-        //Why even initialize?
-        //What happens if i retreive a nonexisting key?
+    // Damage info per target.
+    std::map<std::string, std::map<std::string, Damage>> damage;
 
-        {"energy", damage_type()},
-		{"projectile", damage_type()},
-		{"nano", damage_type()},
-		{"chemical", damage_type()},
-		{"poison", damage_type()},
-		{"radiation", damage_type()},
-		{"aimed_shot", damage_type()},
-		{"backstab", damage_type()},
-		{"Brawling", damage_type()},
-		{"Burst", damage_type()},
-		{"Dimach", damage_type()},
-		{"Fling Shot", damage_type()},
-		{"fast_attack", damage_type()},
-		{"full_auto", damage_type()},
-		{"sneak_attack", damage_type()},
-		{"bow_special", damage_type()},
-        {"melee_damage", damage_type()}
-    };
-    */
-    std::map<std::string, damage_type> damage_received; /*= {
-        {"energy_damage", damage_type()},
-		{"projectile_damage", damage_type()},
-		{"nano_damage", damage_type()},
-		{"chemical_damage", damage_type()},
-		{"radiation_damage", damage_type()},
-		{"aimed_shot", damage_type()},
-		{"backstab", damage_type()},
-		{"brawling", damage_type()},
-		{"burst", damage_type()},
-		{"dimach", damage_type()},
-		{"fling_shot", damage_type()},
-		{"fast_attack", damage_type()},
-		{"full_auto", damage_type()},
-		{"sneak_attack", damage_type()},
-		{"bow_special", damage_type()},
-        {"melee_damage", damage_type()}
-    };
-*/
+    // Heal info per target.
+    std::map<std::string, Heal> heals;
+
     std::map<std::string, int> xp = {
 		{"xp", 0},
 		{"xp_lost", 0},
@@ -132,22 +66,9 @@ private:
 
     // Make separate maps for these stats?
 	std::map <std::string, int> stats = {
-        {"amount", 0}, // Temp, remove
-
-		// Crits
-		{"critical_total", 0},
-		{"critical_cnt", 0},
-		{"critical_max", 0},
-		{"critical_min", 0},
-		{"critical_hit_mean_time", 0},
-
-		// Heal and nano
-		{"damage_taken", 0},
-		{"heal_given", 0},
-		{"heal_given_potential", 0},
-		{"heal_received", 0},
-		{"heal_received_potential", 0},
-		{"nano_given", 0},
+        // Nano
+        {"nano_given", 0},
+        {"nano_received", 0},
 
 		// Nano programs casted
 		{"nano_program_cast_cnt", 0}, // Total count

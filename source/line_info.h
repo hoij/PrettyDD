@@ -21,8 +21,6 @@ public:
     bool crit = false;
     bool deflect = false;
     bool miss = false;
-    int heal_received_potential = 0;
-    int heal_given_potential = 0;
     NanoProgram* nanoProgram;
 };
 

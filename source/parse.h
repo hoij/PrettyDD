@@ -6,6 +6,9 @@
 #include "player.h"
 #include "line_info.h"
 
+bool isCrit(const std::vector<std::string>& words);
+
+bool isDeflect(const std::vector<std::string>& words);
 
 int parse(std::string line, std::vector<Player>& players);
 

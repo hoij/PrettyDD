@@ -4,40 +4,34 @@ Player::Player() {}
 
 Player::Player(std::string name) : name(name) {}
 
-Player::Player(LineInfo& li, std::string player_type) {
-    if (player_type == "dealer")
-        name = li.dealer_name;
-    else if (player_type == "receiver")
-        name = li.receiver_name;
-    add(li, player_type);
+Player::Player(std::string name, LineInfo& li) : name(name) {
+    add(li);
 }
 
 Player::~Player(){}
 
 Player& Player::operator+=(const Player& p) {
 	// Add stuff from p to this
-	damage_dealt = p.damage_dealt;
+	//damage_dealt = p.damage_dealt;
+	//damage_received = p.damage_received;
+	//heal_dealt = p.heal_dealt;
+    //heal_received = p.heal_received;
     last_nano_casted = p.last_nano_casted;
 
 	// etc...
 	return *this;
 }
 
-void Player::add(LineInfo& li, std::string player_type) {
+void Player::add(LineInfo& li) {
     if (li.type == "damage") {
-        if (player_type == "dealer") {
-            add_damage_dealt(li);
-        }
-        else if (player_type == "receiver") {
-            add_damage_received(li);
-        }
+        addDamage(li);
     }
     else if (li.type == "heal") {
-
+        addHeal(li);
     }
     else if (li.type == "nano_cast") {
-        // Only add the nano when a message about the success/fail has arrived.
-        // In that case the nano will not be mentioned by name.
+    // Only add the nano when a message about the success/fail has arrived.
+    // In that case the nano will not be mentioned by name.
         if (li.nanoProgram->getName() != "") {
             last_nano_casted = *li.nanoProgram;
         }
@@ -47,78 +41,24 @@ void Player::add(LineInfo& li, std::string player_type) {
             addNanoProgram(last_nano_casted);
         }
     }
-    else if (li.type == "") {
-
-    }
-
 }
 
-void Player::add_damage_dealt(LineInfo& li) {
-    damage_dealt[li.subtype].total += li.amount;
-    damage_dealt[li.subtype].count++;
-    if (!li.crit) {
-        if (li.amount > damage_dealt[li.subtype].regular_max) {
-            damage_dealt[li.subtype].regular_max = li.amount;
-        }
-        if (li.amount < damage_dealt[li.subtype].regular_min) {
-            damage_dealt[li.subtype].regular_min = li.amount;
-        }
-        else if (damage_dealt[li.subtype].regular_min == -1 &&
-                 li.amount != 0) {
-            damage_dealt[li.subtype].regular_min = li.amount;
-        }
-        if (li.deflect)
-            damage_dealt[li.subtype].deflects++;
-        if (li.miss)
-            damage_dealt[li.subtype].misses++;
-    }
-    else {
-        damage_dealt[li.subtype].crit_count++;
-        damage_dealt[li.subtype].crit_total += li.amount;
-        if (li.amount > damage_dealt[li.subtype].crit_max) {
-            damage_dealt[li.subtype].crit_max = li.amount;
-        }
-        if (li.amount < damage_dealt[li.subtype].crit_min) {
-            damage_dealt[li.subtype].crit_min = li.amount;
-        }
-        else if (damage_dealt[li.subtype].crit_min == -1) {
-            damage_dealt[li.subtype].crit_min = li.amount;
-        }
+void Player::addHeal(LineInfo& li) {
+    // There will alywas be a receiver.
+    heals[li.receiver_name].add(li, "receiver");
+    if (li.subtype == "potential") {
+        // But only a dealer in case the subtype is "potential".
+        heals[li.dealer_name].add(li, "dealer");
     }
 }
 
-void Player::add_damage_received(LineInfo& li) {
-    damage_received[li.subtype].total += li.amount;
-    damage_received[li.subtype].count++;
-    if (!li.crit) {
-        if (li.amount > damage_received[li.subtype].regular_max) {
-            damage_received[li.subtype].regular_max = li.amount;
-        }
-        if (li.amount < damage_received[li.subtype].regular_min) {
-            damage_received[li.subtype].regular_min = li.amount;
-        }
-        else if (damage_received[li.subtype].regular_min == -1) {
-            damage_received[li.subtype].regular_min = li.amount;
-        }
-        if (li.deflect)
-            damage_received[li.subtype].deflects++;
-        if (li.miss)
-            damage_received[li.subtype].misses++;
-    }
-    else {
-        damage_received[li.subtype].crit_count++;
-        damage_received[li.subtype].crit_total += li.amount;
-        if (li.amount > damage_received[li.subtype].crit_max) {
-            damage_received[li.subtype].crit_max = li.amount;
-        }
-        if (li.amount < damage_received[li.subtype].crit_min) {
-            damage_received[li.subtype].crit_min = li.amount;
-        }
-        else if (damage_received[li.subtype].crit_min == -1) {
-            damage_received[li.subtype].crit_min = li.amount;
-        }
-    }
-
+void Player::addDamage(LineInfo& li) {
+    damage[li.receiver_name][li.subtype].add(li, "receiver");
+    // Instead of adding the dealer damage here, it could be calculated
+    // when presenting the stats?
+    // Still need to add to the dealer when something hits "You". In order to
+    // track who dealt the hit.
+    damage[li.dealer_name][li.subtype].add(li, "dealer");
 }
 
 void Player::addNanoProgram(NanoProgram& np) {
