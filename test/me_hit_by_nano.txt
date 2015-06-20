@@ -1,0 +1,9 @@
+["#0000000042000008#","You hit other","",1434407032]Your reflect shield hit Ptysia for 78 points of damage.
+["#0000000042000002#","Me hit by nano","",1434407032]You were attacked with nanobots from Ptysia for 881 points of energy damage.
+["#0000000040000001#","System","",1434407032]Ptysia forces your NCU to run Constant Barrage...
+["#0000000040000001#","System","",1434407033]Attacked by Ptysia!
+
+["#0000000040000001#","System","",1434407043]Ptysia forces your NCU to run Izgimmer's Double...
+["#0000000042000002#","Me hit by nano","",1434407043]You were attacked with nanobots from Ptysia for 3578 points of radiation damage.
+["#0000000042000002#","Me hit by nano","",1434407043]You were attacked with nanobots from Ptysia for 3260 points of radiation damage.
+

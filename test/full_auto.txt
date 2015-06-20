@@ -1,0 +1,8 @@
+["#0000000040000001#","System","",1434406044]You hit with 29 bullets...
+["#0000000042000006#","Me hit by monster","",1434406044]Someone's reflect shield hit you for 121 points of damage.
+["#0000000042000006#","Me hit by monster","",1434406044]Someone's damage shield hit you for 132 points of damage.
+["#000000004200000a#","Other hit by other","",1434406044]Someone absorbed 8198 points of energy damage.
+["#0000000042000008#","You hit other","",1434406044]You hit Balas for 2002 points of Full Auto damage.
+["#0000000042000006#","Me hit by monster","",1434406044]Someone's reflect shield hit you for 121 points of damage.
+["#0000000042000006#","Me hit by monster","",1434406044]Someone's damage shield hit you for 132 points of damage.
+
