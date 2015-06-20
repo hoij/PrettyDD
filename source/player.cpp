@@ -41,6 +41,13 @@ void Player::add(LineInfo& li) {
             addNanoProgram(last_nano_casted);
         }
     }
+    else if (li.type == "xp") {
+        addXp(li);
+    }
+}
+
+void Player::addXp(LineInfo& li) {
+    xp.add(li);
 }
 
 void Player::addHeal(LineInfo& li) {

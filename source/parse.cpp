@@ -63,16 +63,18 @@ void add_to_players(std::vector<Player>& players, LineInfo& li) {
 
 int find_amount(const std::vector<std::string>& words) {
 	std::smatch d;
-	if (regex_search(words[4], d, regex("(?:for )(\\d+)"))) {
+	if (regex_search(words[4], d, regex("(\\d+)( points)"))) {
         return std::stoi(d[1]);
     }
+    else if (regex_search(words[4], d, regex("\\d+")))
+        // For XP/SK/Reserach but might match some other line I've missed.
+        return std::stoi(d[0]);
     else
         return -1;
 }
 
 std::string find_subtype(const std::vector<std::string>& words) {
-	// Used to find damage and heal type.
-
+	// Finds damage and heal subtype.
 	std::smatch t;
 	if (regex_search(words[4], t, regex("(?:points of )(.*?)(?= damage)")))	{
 	 	// Looks for regular and special damage
@@ -125,26 +127,33 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 
 	if (words[1] == "Other hit by other" || words[1] == "Your pet hit by other") {
         /*
-		["#000000004200000a#","Other hit by other","",1425326282]Sheila Marlene hit Predator Rogue for 461 points of melee damage.
-		["#000000004200000a#","Other hit by other","",1425326285]Sgtcuddle hit Predator Rogue for 1434 points of energy damage.
-		["#000000004200000a#","Other hit by other","",1425326287]Sgtcuddle hit Predator Rogue for 4302 points of Burst damage.
-		["#000000004200000a#","Other hit by other","",1425326293]Sgtcuddle hit Predator Rogue for 15000 points of Full Auto damage.
-		["#000000004200000a#","Other hit by other","",1434406034]Balas's reflect shield hit Junebop for 161 points of damage.
-		["#000000004200000a#","Other hit by other","",1425997610]Letter hit Reet of Paradise for 1586 points of melee damage.Critical hit!
+        ["#000000004200000a#","Other hit by other","",1425326282]Sheila Marlene hit Predator Rogue for 461 points of melee damage.
+        ["#000000004200000a#","Other hit by other","",1425326285]Sgtcuddle hit Predator Rogue for 1434 points of energy damage.
+        ["#000000004200000a#","Other hit by other","",1425326287]Sgtcuddle hit Predator Rogue for 4302 points of Burst damage.
+        ["#000000004200000a#","Other hit by other","",1425326293]Sgtcuddle hit Predator Rogue for 15000 points of Full Auto damage.
+        ["#000000004200000a#","Other hit by other","",1434406471]Rezipped hit Imgonnakillu for 4123 points of Aimed Shot damage.
+        ["#000000004200000a#","Other hit by other","",1434406034]Balas's reflect shield hit Junebop for 161 points of damage.
+        ["#000000004200000a#","Other hit by other","",1425997610]Letter hit Reet of Paradise for 1586 points of melee damage.Critical hit!
+        ["#000000004200000a#","Other hit by other","",1434359748]Cratdat hit Ensign - Ilari'Ra for 801 points of projectile damage. Glancing hit.
+		// Make it handle absorb:
+		["#000000004200000a#","Other hit by other","",1434406044]Someone absorbed 8198 points of energy damage.
 
 		Fix so it can handle glancing hits:
-		["#000000004200000a#","Other hit by other","",1434359748]Cratdat hit Ensign - Ilari'Ra for 801 points of projectile damage. Glancing hit.
         ["#0000000042000009#","Your pet hit by other","",1425996728]Letter hit Guard for 623 points of melee damage.
 		["#0000000042000009#","Your pet hit by other","",1425996758]Letter hit Guard for 1268 points of melee damage.Critical hit!
 		["#0000000042000009#","Your pet hit by other","",1425996734]Guard hit Letter for 1639 points of melee damage.Critical hit!
 		*/
 		regex_search(words[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));
 		lineInfo.dealer_name = m[0];
-		regex_search(words[4], m, regex("(?:hit )"	// Find "hit ", but do not include it in the results
-										"(.*?)"			// match everything following, non-greedy
-														// i.e. until first occurrence, of
-										"(?= for)"));	// " for"
-		lineInfo.receiver_name = m[1];
+		if (regex_search(words[4], m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
+										"(.*?)"			    // match everything following, non-greedy
+                                                            // i.e. until first occurrence, of
+										"(?= for)"))) {	// " for"
+            lineInfo.receiver_name = m[1];
+        }
+        else if (regex_search(words[4], m, regex("(.*?)(?= absorbed )"))) {
+            lineInfo.receiver_name = m[1];
+        }
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(words);
 		lineInfo.amount = find_amount(words);
@@ -394,12 +403,13 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		// Can gain and lose
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "xp";
-		lineInfo.subtype = "shadowknowledge";
-		if (regex_search(words[4], m, regex("(?:gained\\s)(\\d+)")))
-			lineInfo.amount = stoi(m[1]);
+        lineInfo.amount = find_amount(words);
+		if (regex_search(words[4], m, regex("(?:gained\\s)(\\d+)"))) {
+            lineInfo.subtype = "sk";
+        }
 		else {
 			regex_search(words[4], m, regex("(?:lost\\s)(\\d+)"));
-			lineInfo.amount = -stoi(m[1]);
+            lineInfo.subtype = "sk lost";
 		}
 	}
 	else if (words[1] == "Me got XP") {
@@ -410,23 +420,27 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		std::smatch xp;
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "xp";
-		regex_search(words[4], xp, regex("\\d+"));
-		lineInfo.amount = stoi(xp[0]);
+		lineInfo.amount = find_amount(words);
 		if (regex_search(words[4], m, regex("(?:new\\s)(.*?)(?=\\.)"))) {
 			lineInfo.subtype = m[1];
 		}
 		else {
 			lineInfo.subtype = "xp";
 		}
-		lineInfo.amount = stoi(xp[0]);
 	}
 	else if (words[1] == "Research") {
 		// ["#000000004200001c#","Research","",1425326289]139139 of your XP were allocated to your personal research.<br>
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "xp";
-		regex_search(words[4], m, regex("\\d+"));
-		lineInfo.amount = stoi(m[0]);
+		lineInfo.amount = find_amount(words);
 		lineInfo.subtype = "research";
+	}
+	else if (words[1] == "Victory Points") {
+        // Check what this message looks like.
+        // Maybe it's a system message.
+	}
+	else if (words[1] == "System") {
+
 	}
 	else
 		cout << "No match for " << words[1] << endl;  // Write this to a log file (include the full damage log line)

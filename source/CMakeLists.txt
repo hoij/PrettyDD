@@ -5,4 +5,5 @@ add_executable(PrettyDD main.cpp
 	nano_program.cpp nano_program.h
 	line_info.cpp line_info.h
 	heal.h
-	damage.h)
+	damage.h
+	xp.h)

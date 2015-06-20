@@ -10,6 +10,7 @@
 #include "nano_program.h"
 #include "heal.h"
 #include "damage.h"
+#include "xp.h"
 
 class Player {
 public:
@@ -27,10 +28,11 @@ private:
     void addDamage(LineInfo& li);
     void addHeal(LineInfo& li);
     void addNanoProgram(NanoProgram& nanoProgram);
+    void addXp(LineInfo& li);
 
     std::string name;
-    NanoProgram last_nano_casted;
 
+    NanoProgram last_nano_casted;
 	std::vector<NanoProgram> nanoPrograms;
 
     //////////
@@ -39,20 +41,15 @@ private:
     //////////
 
     // Damage info per target.
+    //       player                damage type  stats
     std::map<std::string, std::map<std::string, Damage>> damage;
 
     // Heal info per target.
     std::map<std::string, Heal> heals;
 
-    std::map<std::string, int> xp = {
-		{"xp", 0},
-		{"xp_lost", 0},
-		{"axp", 0},
-		{"axp_lost", 0},
-		{"sk", 0},
-		{"sk_lost", 0},
-		{"research", 0}
-    };
+    // XP info
+    XP xp;
+
 
     std::map<std::string, int> overall = {
         {"critical_total", 0},

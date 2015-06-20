@@ -10,7 +10,7 @@ using namespace std;
 
 int main(void) {
 	string line;
-	ifstream logstream("../../test/log.txt");
+	ifstream logstream("../../test/test_damage.txt");
 	vector<Player> players;
 
 	if (logstream.is_open()) {
