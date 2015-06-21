@@ -45,7 +45,7 @@ public:
                     received.potentialMin = li.amount;
                 }
                 if (li.amount > dealt.potentialMax) {
-                    dealt.potentialMax = li.amount;
+                    received.potentialMax = li.amount;
                 }
             }
         }

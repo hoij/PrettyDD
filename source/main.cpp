@@ -3,6 +3,8 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <vector>
+#include "player.h"
 #include "parse.h"
 
 using namespace std;

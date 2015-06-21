@@ -24,6 +24,8 @@ int find_amount(const std::vector<std::string>& words);
 
 std::string find_subtype(const std::vector<std::string>& words);
 
+void renameSpecial(LineInfo& li);
+
 int find_values(const std::vector<std::string>& words, LineInfo& li);
 
 void cleanup(std::vector<std::string>& words);
