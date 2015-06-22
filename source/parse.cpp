@@ -162,17 +162,22 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
         ["#000000004200000a#","Other hit by other","",1183504118]Something hit Enfodruid for 1 points of damage by damage shield.
 		*/
-		regex_search(words[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));
-		lineInfo.dealer_name = m[0];
 		if (regex_search(words[4], m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
 										"(.*?)"			    // match everything following, non-greedy
                                                             // i.e. until first occurrence, of
-										"(?= for)"))) {	// " for"
+										"(?= for)"))) {	    // " for"
             lineInfo.receiver_name = m[1];
         }
         else if (regex_search(words[4], m, regex("(.*?)(?= absorbed )"))) {
             lineInfo.receiver_name = m[1];
         }
+		if (regex_search(words[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
+            lineInfo.dealer_name = m[0];
+            }
+        else if (lineInfo.receiver_name == "Someone") {
+            lineInfo.dealer_name = "Unknown";  // There will be no dealer in this case.
+        }
+
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(words);
 		lineInfo.amount = find_amount(words);
@@ -183,9 +188,15 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
         // Can this crit?
 		// ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
 		// ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
-		if (!regex_search(words[4], m, regex("(?:from )(.*?)(?= for)")))
-			regex_search(words[4], m, regex("(?:of )(.*?)(?= damage)"));
-		lineInfo.dealer_name = m[1];
+		if (regex_search(words[4], m, regex("(?:from )(.*?)(?= for)")) ||
+			regex_search(words[4], m, regex("(?:of )(.*?)(?= damage)"))) {
+			if (m[1] == "unknown") {
+                lineInfo.dealer_name = "Unknown";
+			}
+            else {
+                lineInfo.dealer_name = m[1];
+            }
+		}
 		regex_search(words[4], m, regex("(.*?)(?= was)"));
 		lineInfo.receiver_name = m[0];
 		lineInfo.type = "damage";
@@ -285,9 +296,15 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		lineInfo.amount = find_amount(words);
 	}
 	else if (words[1] == "Me hit by player") {
+		/*
+		["#0000000042000007#","Me hit by player","",1434406040]Player Balas hit you for 854 points of projectile damage.
+        ["#0000000042000007#","Me hit by player","",1434406024]Balas hit you for 949 points of Aimed Shot damage.
+        */
 		lineInfo.receiver_name = "You";
-		// need to get example lines
-		// need to find player name
+		if (regex_search(words[4], m, regex("(?:Player )(.*?)(?= hit you for )")) ||
+            regex_search(words[4], m, regex("(.*?)(?= hit you for )"))) {
+            lineInfo.dealer_name = m[1];
+		}
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(words);
 		lineInfo.amount = find_amount(words);
@@ -311,18 +328,21 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 	}
 	else if (words[1] == "Other misses") {
         /*
-		There is an extra comma in this line. Might mess something up.
 		["#0000000042000013#","Other misses","",1425326282]Predator Rogue tried to hit you, but missed!
+		// Find my own version:
+		["#0000000042000013#","Other misses","",1180557880]Keepone tries to attack you with FastAttack, but misses!
 		*/
-		regex_search(words[4], m, regex("(.*?)(?= tried to attack| tries to attack)"));
-		lineInfo.dealer_name = m[0];
-		regex_search(words[4], m, regex("(?:hit )(.*)"));
         // The log line is split at "," so everything following the "," is in
         // words[5]
-		if (m[1] == "you")
-			lineInfo.receiver_name = "You";
-		else
-			lineInfo.receiver_name = m[1];
+
+   		if (regex_search(words[4], m, regex("(.*?)(?: tried to hit )(.*)")) ||
+            regex_search(words[4], m, regex("(.*?)(?: tries to attack )(.*?)(?: with )"))) {
+            lineInfo.dealer_name = m[1];
+            lineInfo.receiver_name = m[2];
+            if (lineInfo.receiver_name == "you") {
+                lineInfo.receiver_name = "You";
+            }
+        }
         lineInfo.miss = true;
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(words);
@@ -330,17 +350,14 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 	}
 	else if (words[1] == "Your misses") {
         /*
-        Brawl is named differently here compared to when it does damage. It's then called "Brawling".
 		["#0000000042000012#","Your misses","",1425666157]You try to attack Peal Thunder with Brawl, but you miss!
 		["#0000000042000012#","Your misses","",1426199923]You tried to hit Stim Fiend, but missed!
 		*/
 		lineInfo.dealer_name = "You";
-		if (!regex_search(words[4], m, regex("(?:attack )(.*?)(?= with)"))) {
-            regex_search(words[4], m, regex("(?:hit )(.*)"));
-            // The log line is split at "," so everything following the "," is in
-            // words[5]
+		if (regex_search(words[4], m, regex("(?:attack )(.*?)(?= with )")) ||
+            regex_search(words[4], m, regex("(?:hit )(.*)"))) {
+            lineInfo.receiver_name = m[1];
         }
-		lineInfo.receiver_name = m[1];
 		lineInfo.miss = true;
 		lineInfo.type = "damage";
         lineInfo.subtype = find_subtype(words);
@@ -512,19 +529,19 @@ void renameSpecial(LineInfo& li) {
     // I can either rename these here, or when I get the data from a player,
     // I can get both "Brawl" and "Brawling" for example.
     if(li.subtype == "FastAttack") {
-        li.subtype == "Fast Attack";
+        li.subtype = "Fast Attack";
     }
     else if (li.subtype == "FlingShot") {
-        li.subtype == "Fling Shot";
+        li.subtype = "Fling Shot";
     }
     else if(li.subtype == "Brawl") {
-        li.subtype == "Brawling";
+        li.subtype = "Brawling";
     }
     else if(li.subtype == "FullAuto") {
-        li.subtype == "Full Auto";
+        li.subtype = "Full Auto";
     }
     else if(li.subtype == "AimedShot") {
-        li.subtype == "Aimed Shot";
+        li.subtype = "Aimed Shot";
     }
 }
 
