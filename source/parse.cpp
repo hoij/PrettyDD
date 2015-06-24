@@ -5,8 +5,16 @@
 #include <regex>
 #include <algorithm>
 #include "parse.h"
+#include "logger.h"
+#include "log_line.h"
 
-using namespace std;
+
+using std::cout;
+using std::endl;
+using std::regex_search;
+using std::regex;
+
+
 /*
 TODO:
 Make adding nano to a player work.
@@ -19,96 +27,101 @@ Save all nanobots damage in an additional category?
 
 */
 
-int parse(std::string line, vector<Player>& players) {
-    LineInfo lineInfo;
+int parse(std::string line, std::vector<Player>& players) {
+    LogLine logLine;
 
-	// Split the line and store it in words
-	vector<string> words;
-	split(line, ',', words);
+	// Split the line and store it in a vector
+    if (logLine.format(line)) {  // If successfull format
 
-	if (!words.size() == 0) {
-		cleanup(words);
+        // find name of dealer, receiver, amount of damage/heal/nano, type and
+        // subtype etc.
+        find_values(logLine);
 
-		// find name of dealer, receiver, amount of damage/heal/nano, type and
-		// subtype etc.
-		find_values(words, lineInfo);
+        // Debug prints
+        std::cout << "Dealer: " << logLine.getInfo().dealer_name << "\t" << "Receiver: "<<
+            logLine.getInfo().receiver_name << "\t" << "Amount: " <<
+            logLine.getInfo().amount << "\t" << "Type: " <<
+            logLine.getInfo().type << "\t" << "Subtype: " <<
+            logLine.getInfo().subtype << std::endl;
 
-		// Debug prints
-		cout << "Dealer: " << lineInfo.dealer_name << "\t" << "Receiver: "<<
-            lineInfo.receiver_name << "\t" << "Amount: " <<
-			lineInfo.amount << "\t" << "Type: " <<
-			lineInfo.type << "\t" << "Subtype: " << lineInfo.subtype << endl;
+        add_to_players(players, logLine);
 
-		add_to_players(players, lineInfo);
-	}
-	return 0;
+        return 0;
+    }
+    else {
+        return 1;
+    }
 }
 
-void add_to_players(std::vector<Player>& players, LineInfo& li) {
-    // Move to player_manager
+void add_to_players(std::vector<Player>& players, LogLine& ll) {
+    // Move this function to player_manager
     bool dealer_found = false;
     bool receiver_found = false;
+    LineInfo& li = ll.getInfo();
 	for (auto& p : players) {
 		if (p.get_name() == li.dealer_name) {
-			p.add(li);
+			p.add(ll);
 			dealer_found = true;
 		}
-		else if (p.get_name() == li.receiver_name) {
-			p.add(li);
+		else if (p.get_name() == li.dealer_name) {
+			p.add(ll);
 			receiver_found = true;
 		}
 	}
 	if(!dealer_found && li.dealer_name != "") {
-        Player p(li.dealer_name, li);
+        Player p(li.dealer_name, ll);
         players.push_back(p);
     }
 	if(!receiver_found && li.receiver_name != "") {
-        Player p(li.receiver_name, li);
+        Player p(li.receiver_name, ll);
         players.push_back(p);
     }
 }
 
-int find_amount(const std::vector<std::string>& words) {
+int find_amount(LogLine& logLine) {
+    const std::vector<std::string>& splitLine = logLine.getSplitLine();
 	std::smatch d;
-	if (regex_search(words[4], d, regex("(\\d+)( points)"))) {
+	if (regex_search(splitLine[4], d, regex("(\\d+)( points)"))) {
         return std::stoi(d[1]);
     }
-    else if (regex_search(words[4], d, regex("\\d+\\s"))) {
+    else if (regex_search(splitLine[4], d, regex("\\d+\\s"))) {
         // For XP/SK/Reserach but might match some other line I've missed.
         return std::stoi(d[0]);
     }
     else {
-        return -1;
+        errorLog.write("Amount not found in the following line: ");
+        errorLog.write(logLine.getOriginalLine());
+        return 0;
     }
 }
 
-std::string find_subtype(const std::vector<std::string>& words) {
+std::string find_subtype(const std::vector<std::string>& splitLine) {
 	// Finds damage and heal subtype.
     //  ["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
 
 	std::smatch t;
-	if (regex_search(words[4], t, regex("(?:points of )(.*?)(?= damage)")))	{
+	if (regex_search(splitLine[4], t, regex("(?:points of )(.*?)(?= damage)")))	{
 	 	// Looks for regular and special damage
 	 	return t[1];
 	}
-	else if (regex_search(words[4], t, regex("(?: )(.* shield)(?= hit)"))) {
+	else if (regex_search(splitLine[4], t, regex("(?: )(.* shield)(?= hit)"))) {
         // Looks for reflect or shield damage
         return t[1];
 	}
-	else if (regex_search(words[4], t, regex("(?: with )(.*)"))) {
+	else if (regex_search(splitLine[4], t, regex("(?: with )(.*)"))) {
         // Looks for special damage in case of a miss.
         return t[1];
 	}
-	else if (regex_search(words[4], t, regex(" tried to hit "))) {
+	else if (regex_search(splitLine[4], t, regex(" tried to hit "))) {
         return "regular miss";
 	}
-	else if (regex_search(words[4], t, regex(" got healed "))) {
+	else if (regex_search(splitLine[4], t, regex(" got healed "))) {
         return "potential";
 	}
-	else if (regex_search(words[4], t, regex(" were healed "))) {
+	else if (regex_search(splitLine[4], t, regex(" were healed "))) {
         return "actual";
 	}
-	else if (regex_search(words[4], t, regex("(?: damaged by )(.*?)( for )"))) {
+	else if (regex_search(splitLine[4], t, regex("(?: damaged by )(.*?)( for )"))) {
         return t[1];
 	}
 	else {
@@ -116,23 +129,23 @@ std::string find_subtype(const std::vector<std::string>& words) {
     }
 }
 
-bool isCrit(const std::vector<std::string>& words) {
+bool isCrit(const std::vector<std::string>& splitLine) {
     std::smatch m;
-    if (regex_search(words[4], m, regex("damage.Critical hit!")))
+    if (regex_search(splitLine[4], m, regex("damage.Critical hit!")))
         return true;
     else
         return false;
 }
 
-bool isDeflect(const std::vector<std::string>& words) {
+bool isDeflect(const std::vector<std::string>& splitLine) {
     std::smatch m;
-    if (regex_search(words[4], m, regex("damage. Glancing hit.")))
+    if (regex_search(splitLine[4], m, regex("damage. Glancing hit.")))
         return true;
     else
         return false;
 }
 
-int find_values(const vector<string>& words, LineInfo& lineInfo) {
+int find_values(LogLine& logLine) {
 	// Solve each individually, merge similar?
 
 	// Combine searches into one regex where possible.
@@ -140,8 +153,10 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 	// Fix so all cases can use find_subtype() and find_amout()
 
 	std::smatch m;
+	const std::vector<std::string>& splitLine = logLine.getSplitLine();
+	LineInfo& lineInfo = logLine.getInfo();
 
-	if (words[1] == "Other hit by other" || words[1] == "Your pet hit by other") {
+	if (splitLine[1] == "Other hit by other" || splitLine[1] == "Your pet hit by other") {
         /*
         ["#000000004200000a#","Other hit by other","",1425326282]Sheila Marlene hit Predator Rogue for 461 points of melee damage.
         ["#000000004200000a#","Other hit by other","",1425326285]Sgtcuddle hit Predator Rogue for 1434 points of energy damage.
@@ -162,16 +177,16 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
         ["#000000004200000a#","Other hit by other","",1183504118]Something hit Enfodruid for 1 points of damage by damage shield.
 		*/
-		if (regex_search(words[4], m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
+		if (regex_search(splitLine[4], m, regex("(?:hit )"	// Find "hit ", but do not include it in the results
 										"(.*?)"			    // match everything following, non-greedy
                                                             // i.e. until first occurrence, of
 										"(?= for)"))) {	    // " for"
             lineInfo.receiver_name = m[1];
         }
-        else if (regex_search(words[4], m, regex("(.*?)(?= absorbed )"))) {
+        else if (regex_search(splitLine[4], m, regex("(.*?)(?= absorbed )"))) {
             lineInfo.receiver_name = m[1];
         }
-		if (regex_search(words[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
+		if (regex_search(splitLine[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
             lineInfo.dealer_name = m[0];
             }
         else if (lineInfo.receiver_name == "Someone") {
@@ -179,17 +194,17 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
         }
 
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
-		lineInfo.crit = isCrit(words);
-		lineInfo.deflect = isDeflect(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
+		lineInfo.crit = isCrit(splitLine);
+		lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "Other hit by nano") {
+	else if (splitLine[1] == "Other hit by nano") {
         // Can this crit?
 		// ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
 		// ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
-		if (regex_search(words[4], m, regex("(?:from )(.*?)(?= for)")) ||
-			regex_search(words[4], m, regex("(?:of )(.*?)(?= damage)"))) {
+		if (regex_search(splitLine[4], m, regex("(?:from )(.*?)(?= for)")) ||
+			regex_search(splitLine[4], m, regex("(?:of )(.*?)(?= damage)"))) {
 			if (m[1] == "unknown") {
                 lineInfo.dealer_name = "Unknown";
 			}
@@ -197,13 +212,13 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
                 lineInfo.dealer_name = m[1];
             }
 		}
-		regex_search(words[4], m, regex("(.*?)(?= was)"));
+		regex_search(splitLine[4], m, regex("(.*?)(?= was)"));
 		lineInfo.receiver_name = m[0];
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
 	}
-	else if (words[1] == "You hit other") {
+	else if (splitLine[1] == "You hit other") {
 		/*
 		["#0000000042000008#","You hit other","",1425326282]You hit Predator Rogue for 2357 points of poison damage.
 		["#0000000042000008#","You hit other","",1425326284]You hit Predator Rogue for 2329 points of chemical damage.
@@ -215,25 +230,25 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		["#0000000042000008#","You hit other","",1425326284]Your damage shield hit Predator Rogue for 163 points of damage.
 		*/
 		lineInfo.dealer_name = "You";
-		regex_search(words[4], m, regex("(?:hit )(.*?)(?= for)"));
+		regex_search(splitLine[4], m, regex("(?:hit )(.*?)(?= for)"));
 		lineInfo.receiver_name = m[1];
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
-		lineInfo.crit = isCrit(words);
-        lineInfo.deflect = isDeflect(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
+		lineInfo.crit = isCrit(splitLine);
+        lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "You hit other with nano") {
+	else if (splitLine[1] == "You hit other with nano") {
 		// ["#0000000042000005#","You hit other with nano","",1425993792]You hit Kyr'Ozch Hive Medic with nanobots for 798 points of projectile damage.
 		lineInfo.dealer_name = "You";
-		regex_search(words[4], m, regex("(?:hit )(.*?)(?= with)"));
+		regex_search(splitLine[4], m, regex("(?:hit )(.*?)(?= with)"));
 		lineInfo.receiver_name = m[1];
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
 		// Need to save that it was nanobot damage. Or do I? Is nanobots always == perks?
 	}
-	else if (words[1] == "Me got health"){
+	else if (splitLine[1] == "Me got health"){
 		/*
 		["#0000000042000015#","Me got health","",1425326282]You were healed for 193 points.
 		["#0000000042000015#","Me got health","",1425995902]You got healed by Starphoenix for 3359 points of health.
@@ -250,25 +265,25 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		//   There will only be a "You were healed..." message.
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "heal";
-		lineInfo.subtype = find_subtype(words);
-        lineInfo.amount = find_amount(words);
+		lineInfo.subtype = find_subtype(splitLine);
+        lineInfo.amount = find_amount(logLine);
 		if (lineInfo.subtype == "potential") { // Potential heal
-			regex_search(words[4], m, regex("(?:by )(.*?)(?= for)"));
+			regex_search(splitLine[4], m, regex("(?:by )(.*?)(?= for)"));
 			lineInfo.dealer_name = m[1];
 		}
     }
-	else if (words[1] == "You gave health") {
+	else if (splitLine[1] == "You gave health") {
         /*
 		["#0000000042000014#","You gave health","",1425998482]You healed Letter for 3741 points of health.
 		*/
 		lineInfo.dealer_name = "You";
-		regex_search(words[4], m, regex("(?:healed )(.*?)(?= for)"));
+		regex_search(splitLine[4], m, regex("(?:healed )(.*?)(?= for)"));
 		lineInfo.receiver_name = m[1];
-		lineInfo.amount = find_amount(words);
+		lineInfo.amount = find_amount(logLine);
 		lineInfo.type = "heal";
 		lineInfo.subtype = "potential"; // Find out if the subtype here is actual or potential.
 	}
-	else if (words[1] == "Me hit by monster") {
+	else if (splitLine[1] == "Me hit by monster") {
         /*
 		["#0000000042000006#","Me hit by monster","",1425326284]Predator Rogue hit you for 306 points of melee damage.
 		["#0000000042000006#","Me hit by monster","",1425326287]Predator Rogue hit you for 717 points of melee damage.Critical hit!
@@ -276,42 +291,42 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
         ["#0000000042000006#","Me hit by monster","",1434406044]Someone's damage shield hit you for 132 points of damage.
 		["#0000000042000006#","Me hit by monster","",1434359357]Assembler Leader hit you for 1966 points of melee damage. Glancing hit.
         */
-		regex_search(words[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // Match as few chars as possible untill " hit".
+		regex_search(splitLine[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // Match as few chars as possible untill " hit".
 		lineInfo.dealer_name = m[0];
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
-        lineInfo.deflect = isDeflect(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
+        lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "Me hit by nano") {
+	else if (splitLine[1] == "Me hit by nano") {
 		/*
 		["#0000000042000002#","Me hit by nano","",1425326283]You were attacked with nanobots from Predator Rogue for 875 points of poison damage.
 		*/
-		regex_search(words[4], m, regex("(?:from )(.*?)(?= for)"));
+		regex_search(splitLine[4], m, regex("(?:from )(.*?)(?= for)"));
 		lineInfo.dealer_name = m[1];
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
 	}
-	else if (words[1] == "Me hit by player") {
+	else if (splitLine[1] == "Me hit by player") {
 		/*
 		["#0000000042000007#","Me hit by player","",1434406040]Player Balas hit you for 854 points of projectile damage.
         ["#0000000042000007#","Me hit by player","",1434406024]Balas hit you for 949 points of Aimed Shot damage.
         */
 		lineInfo.receiver_name = "You";
-		if (regex_search(words[4], m, regex("(?:Player )(.*?)(?= hit you for )")) ||
-            regex_search(words[4], m, regex("(.*?)(?= hit you for )"))) {
+		if (regex_search(splitLine[4], m, regex("(?:Player )(.*?)(?= hit you for )")) ||
+            regex_search(splitLine[4], m, regex("(.*?)(?= hit you for )"))) {
             lineInfo.dealer_name = m[1];
 		}
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
-		lineInfo.crit = isCrit(words);
-        lineInfo.deflect = isDeflect(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
+		lineInfo.crit = isCrit(splitLine);
+        lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "Me hit by monster") {
+	else if (splitLine[1] == "Me hit by monster") {
         /*
         ["#0000000042000006#","Me hit by monster","",1425326284]Predator Rogue hit you for 306 points of melee damage.
         ["#0000000042000006#","Me hit by monster","",1425326287]Predator Rogue hit you for 717 points of melee damage.Critical hit!
@@ -321,22 +336,22 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		*/
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
-		lineInfo.crit = isCrit(words);
-        lineInfo.deflect = isDeflect(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
+		lineInfo.crit = isCrit(splitLine);
+        lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "Other misses") {
+	else if (splitLine[1] == "Other misses") {
         /*
 		["#0000000042000013#","Other misses","",1425326282]Predator Rogue tried to hit you, but missed!
 		// Find my own version:
 		["#0000000042000013#","Other misses","",1180557880]Keepone tries to attack you with FastAttack, but misses!
 		*/
         // The log line is split at "," so everything following the "," is in
-        // words[5]
+        // splitLine[5]
 
-   		if (regex_search(words[4], m, regex("(.*?)(?: tried to hit )(.*)")) ||
-            regex_search(words[4], m, regex("(.*?)(?: tries to attack )(.*?)(?: with )"))) {
+   		if (regex_search(splitLine[4], m, regex("(.*?)(?: tried to hit )(.*)")) ||
+            regex_search(splitLine[4], m, regex("(.*?)(?: tries to attack )(.*?)(?: with )"))) {
             lineInfo.dealer_name = m[1];
             lineInfo.receiver_name = m[2];
             if (lineInfo.receiver_name == "you") {
@@ -345,37 +360,37 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
         }
         lineInfo.miss = true;
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
+		lineInfo.subtype = find_subtype(splitLine);
         renameSpecial(lineInfo);  // Specials in misses have a different name
 	}
-	else if (words[1] == "Your misses") {
+	else if (splitLine[1] == "Your misses") {
         /*
 		["#0000000042000012#","Your misses","",1425666157]You try to attack Peal Thunder with Brawl, but you miss!
 		["#0000000042000012#","Your misses","",1426199923]You tried to hit Stim Fiend, but missed!
 		*/
 		lineInfo.dealer_name = "You";
-		if (regex_search(words[4], m, regex("(?:attack )(.*?)(?= with )")) ||
-            regex_search(words[4], m, regex("(?:hit )(.*)"))) {
+		if (regex_search(splitLine[4], m, regex("(?:attack )(.*?)(?= with )")) ||
+            regex_search(splitLine[4], m, regex("(?:hit )(.*)"))) {
             lineInfo.receiver_name = m[1];
         }
 		lineInfo.miss = true;
 		lineInfo.type = "damage";
-        lineInfo.subtype = find_subtype(words);
+        lineInfo.subtype = find_subtype(splitLine);
         renameSpecial(lineInfo);  // Specials in misses have a different name
 	}
-	else if (words[1] == "Me hit by environment") {
+	else if (splitLine[1] == "Me hit by environment") {
 		/* Need to get my own example line
 		["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
 		*/
 		lineInfo.receiver_name = "You";
 		lineInfo.dealer_name = "Environment";
 		lineInfo.type = "damage";
-		lineInfo.subtype = find_subtype(words);
-		lineInfo.amount = find_amount(words);
-		lineInfo.crit = isCrit(words);
-        lineInfo.deflect = isDeflect(words);
+		lineInfo.subtype = find_subtype(splitLine);
+		lineInfo.amount = find_amount(logLine);
+		lineInfo.crit = isCrit(splitLine);
+        lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "Me Cast Nano") {
+	else if (splitLine[1] == "Me Cast Nano") {
         /*
         ["#0000000042000018#","Me Cast Nano","",1425326300]Executing Nano Program: Improved Mongo Crush!.
         ["#0000000042000018#","Me Cast Nano","",1425326300]Nano program executed successfully.
@@ -404,83 +419,83 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
         */
         lineInfo.type = "nano_cast";
         lineInfo.dealer_name = "You";
-		if (regex_search(words[4], m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
+		if (regex_search(splitLine[4], m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
             lineInfo.nanoProgram->setName(m[1]);
             lineInfo.subtype = "execute";
         }
-        else if (words[4] == "Nano program executed successfully.") {
+        else if (splitLine[4] == "Nano program executed successfully.") {
             lineInfo.subtype = "land";
         }
-        else if (words[4] == "Target resisted.") {
+        else if (splitLine[4] == "Target resisted.") {
             lineInfo.subtype = "resist";
         }
-        else if (words[4] == "Nano program aborted.") {
+        else if (splitLine[4] == "Nano program aborted.") {
             lineInfo.subtype = "abort";
         }
-        else if (words[4] == "Your target countered the nano program.") {
+        else if (splitLine[4] == "Your target countered the nano program.") {
             lineInfo.subtype = "counter";
         }
-        else if (words[4] == "You fumbled.") {  // Find one of these log messages
+        else if (splitLine[4] == "You fumbled.") {  // Find one of these log messages
             lineInfo.subtype = "fumble";
         }
         lineInfo.nanoProgram->addStat(lineInfo.subtype, 1);
         cout << "Nano casted: " << lineInfo.nanoProgram->getName() << endl;
 	}
-	else if (words[1] == "Your pet hit by nano") {
+	else if (splitLine[1] == "Your pet hit by nano") {
 		lineInfo.type = "damage";
-        lineInfo.subtype = find_subtype(words);
-        lineInfo.amount = find_amount(words);
-        lineInfo.crit = isCrit(words);
+        lineInfo.subtype = find_subtype(splitLine);
+        lineInfo.amount = find_amount(logLine);
+        lineInfo.crit = isCrit(splitLine);
 	}
-	else if (words[1] == "Your pet hit by monster") {
+	else if (splitLine[1] == "Your pet hit by monster") {
         /* Find my own log line, also find one of these when it this "you" and "other".
         ["#0000000042000011#","Your pet hit by monster","",1191516331]Your pet Vios was damaged by a toxic substance for 25 points of damage.
 
         There must be other variations of this type too. Find them.
         */
-        regex_search(words[4], m, regex("(?:Your pet )(.*?)( was damaged by a )"));
+        regex_search(splitLine[4], m, regex("(?:Your pet )(.*?)( was damaged by a )"));
         lineInfo.receiver_name = m[1];
         lineInfo.dealer_name = "Environment";
         lineInfo.type = "damage";
-        lineInfo.subtype = find_subtype(words);
-        lineInfo.amount = find_amount(words);
-        lineInfo.crit = isCrit(words);
-        lineInfo.deflect = isDeflect(words);
+        lineInfo.subtype = find_subtype(splitLine);
+        lineInfo.amount = find_amount(logLine);
+        lineInfo.crit = isCrit(splitLine);
+        lineInfo.deflect = isDeflect(splitLine);
 	}
-	else if (words[1] == "Me got SK") {
+	else if (splitLine[1] == "Me got SK") {
 		// ["#000000004200000c#","Me got SK","",1425993638]You gained 200 points of Shadowknowledge.
 		// ["#000000004200000c#","Me got SK","",1425994822]You lost 200 points of Shadowknowledge
 		// Can gain and lose
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "xp";
-        lineInfo.amount = find_amount(words);
-		if (regex_search(words[4], m, regex("gained"))) {
+        lineInfo.amount = find_amount(logLine);
+		if (regex_search(splitLine[4], m, regex("gained"))) {
             lineInfo.subtype = "sk";
         }
-		else if (regex_search(words[4], m, regex("lost"))) {
+		else if (regex_search(splitLine[4], m, regex("lost"))) {
             lineInfo.subtype = "sk lost";
 		}
 	}
-	else if (words[1] == "Me got XP") {
+	else if (splitLine[1] == "Me got XP") {
 		// ["#000000004200000b#","Me got XP","",1426200654]You lost 9822 xp.
 		// ["#000000004200000b#","Me got XP","",1425993638]You gained 2562 new Alien Experience Points.
 		// ["#000000004200000b#","Me got XP","",1426199427]You received 247 xp.
 		std::smatch xp;
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "xp";
-		lineInfo.amount = find_amount(words);
-        if (regex_search(words[4], m, regex("gained"))) {
+		lineInfo.amount = find_amount(logLine);
+        if (regex_search(splitLine[4], m, regex("gained"))) {
             lineInfo.subtype = "aixp";
         }
-        else if (regex_search(words[4], m, regex("received"))) {
+        else if (regex_search(splitLine[4], m, regex("received"))) {
             lineInfo.subtype = "xp";
 		}
-		else if (regex_search(words[4], m, regex("lost"))) {
+		else if (regex_search(splitLine[4], m, regex("lost"))) {
             // Find out what an aixp loss looks like
             lineInfo.subtype = "xp lost";
         }
 	}
-	else if (words[1] == "Research") {
+	else if (splitLine[1] == "Research") {
         /*
         There is also global research. Ignore it for now.
 		["#000000004200001c#","Research","",1425326289]139139 of your XP were allocated to your personal research.<br>
@@ -488,39 +503,39 @@ int find_values(const vector<string>& words, LineInfo& lineInfo) {
 		lineInfo.receiver_name = "You";
 		lineInfo.type = "xp";
         lineInfo.subtype = "research";
-		lineInfo.amount = find_amount(words);
+		lineInfo.amount = find_amount(logLine);
 	}
-	else if (words[1] == "You gave nano") {
+	else if (splitLine[1] == "You gave nano") {
         /*
 		["#0000000042000017#","You gave nano","",1425734907]You increased nano on Sayet for 2102 points.
 		*/
 		lineInfo.dealer_name = "You";
-		regex_search(words[4], m, regex("(?:nano on )(.*?)(?= for)"));
+		regex_search(splitLine[4], m, regex("(?:nano on )(.*?)(?= for)"));
 		lineInfo.receiver_name = m[1];
 		lineInfo.type = "nano";
-		lineInfo.amount = find_amount(words);
+		lineInfo.amount = find_amount(logLine);
 	}
-	else if (words[1] == "Me got nano") {
+	else if (splitLine[1] == "Me got nano") {
         /* Find my own log line, remember to replace in the log file.
         ["#0000000042000016#","Me got nano","",1180555427]You got nano from Jspe80 for 288 points.
         */
         lineInfo.receiver_name = "You";
-        regex_search(words[4], m, regex("(?:You got nano from )(.*?)(?= for)"));
+        regex_search(splitLine[4], m, regex("(?:You got nano from )(.*?)(?= for)"));
         lineInfo.dealer_name = m[1];
         lineInfo.type = "nano";
-        lineInfo.amount = find_amount(words);
+        lineInfo.amount = find_amount(logLine);
 	}
-    else if (words[1] == "Victory Points") {
+    else if (splitLine[1] == "Victory Points") {
         // Check what this message looks like.
         // Maybe it's a system message.
 	}
-	else if (words[1] == "System") {
+	else if (splitLine[1] == "System") {
 
 	}
-	else
-		cout << "No match for " << words[1] << endl;  // Write this to a log file (include the full damage log line)
-                                                      // Write a function for error log output.
-
+	else {
+        errorLog.write("No match for the following line: ");
+        errorLog.write(logLine.getOriginalLine());
+    }
 	return 0;
 }
 
@@ -545,26 +560,3 @@ void renameSpecial(LineInfo& li) {
     }
 }
 
-void cleanup(vector<string>& words) {
-	// Remove quotation marks etc.
-	words[0].erase(0, 3);
-	words[0].erase(16, 2);
-	words[1].erase(0, 1);
-	words[1].erase(words[1].length() - 1, words[1].length());
-	words[2].erase(0, 1);
-	words[2].erase(words[2].length() - 1, words[2].length());
-}
-
-vector<string>& split(string& s, char delim, vector<string>& words) {
-	stringstream ss(s);
-	string word;
-	while (getline(ss, word, delim)) {
-		if (!word.empty()) {
-			if (delim != ']')
-				split(word, ']', words);
-			else
-				words.push_back(word);
-		}
-	}
-	return words;
-}

@@ -4,8 +4,8 @@ Player::Player() {}
 
 Player::Player(std::string name) : name(name) {}
 
-Player::Player(std::string name, LineInfo& li) : name(name) {
-    add(li);
+Player::Player(std::string name, LogLine& logLine) : name(name) {
+    add(logLine);
 }
 
 Player::~Player(){}
@@ -22,7 +22,8 @@ Player& Player::operator+=(const Player& p) {
 	return *this;
 }
 
-void Player::add(LineInfo& li) {
+void Player::add(LogLine& logLine) {
+    LineInfo& li = logLine.getInfo();
     if (li.type == "damage") {
         addDamage(li);
     }

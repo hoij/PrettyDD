@@ -6,4 +6,6 @@ add_executable(PrettyDD main.cpp
 	line_info.cpp line_info.h
 	heal.h
 	damage.h
-	xp.h)
+	xp.h
+	logger.cpp logger.h
+	log_line.cpp log_line.h)

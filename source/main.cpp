@@ -2,18 +2,28 @@
 #include <fstream>
 #include <string>
 #include <chrono>
+#include <ctime>
 #include <thread>
 #include <vector>
 #include "player.h"
 #include "parse.h"
+#include "logger.h"
 
-using namespace std;
 
+std::string currentTime() {
+    std::chrono::time_point<std::chrono::system_clock> time_p = std::chrono::system_clock::now();
+    std::time_t time = std::chrono::system_clock::to_time_t(time_p);  // Time since 1970
+    return std::ctime(&time);  // ctime converts to string of todays date
+}
 
 int main(void) {
-	string line;
-	ifstream logstream("../../test/test_damage.txt");
-	vector<Player> players;
+    errorLog.write("");
+    errorLog.write("Program started at: ", false);
+    errorLog.write(currentTime());
+
+	std::string line;
+	std::ifstream logstream("../../test/test_damage.txt");
+	std::vector<Player> players;
 
 	if (logstream.is_open()) {
 		// Go to the end of the file
@@ -34,29 +44,29 @@ int main(void) {
 		bool is_running = true;
 		while (is_running) {
 			while (getline(logstream, line)) {
-				cout << line << endl;
+				std::cout << line << std::endl;
 				parse(line, players);
 			}
 			if (!logstream.eof()) {  // Why did I check for this?
-				cout << "Error: Not EOF!" << endl;
+				std::cout << "Error: Not EOF!" << std::endl;
 				is_running = false;
 			}
 			logstream.clear();
-			this_thread::sleep_for(std::chrono::milliseconds(250));
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 			// Listen for user input to quit. Use SDL?
+			// Or listen to commands from within AO.
 
 		}
-		cout << "Closing the logstream" << endl;
-		logstream.close();
 	}
 	else {
-		cout << "Could not open the log file." << endl;
+		std::cerr << "Could not open the log file." << std::endl;
 	}
 
-	//for (auto& p : players)
-	//	cout << p.get_name() << endl;
+    errorLog.write("");
+	errorLog.write("Program ended at: ", false);
+    errorLog.write(currentTime());
 
-	getchar();
+	std::getchar();
 	return 0;
 }

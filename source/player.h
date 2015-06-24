@@ -11,18 +11,20 @@
 #include "heal.h"
 #include "damage.h"
 #include "xp.h"
+#include "log_line.h"
+
 
 class Player {
 public:
 	Player();
 	Player(std::string name);
-	Player(std::string name, LineInfo& li);
+	Player(std::string name, LogLine& logLine);
 	~Player();
 	Player& operator+=(const Player& p);
 
     std::string& get_name() {return name;}
     void set_name(std::string name) {name = name;}
-    void add(LineInfo& li);
+    void add(LogLine& logLine);
 
 private:
     void addDamage(LineInfo& li);

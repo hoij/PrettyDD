@@ -8,8 +8,7 @@
 
 class NanoProgram;
 
-class LineInfo {
-public:
+struct LineInfo {
     LineInfo();
     ~LineInfo();
 
