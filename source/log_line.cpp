@@ -1,4 +1,5 @@
 #include "log_line.h"
+#include "logger.h"
 #include "sstream"
 
 LogLine::LogLine(std::string& line) {
@@ -6,13 +7,16 @@ LogLine::LogLine(std::string& line) {
 }
 
 bool LogLine::format(std::string& line) {
+    originalLine = line;
     split(line, ',', splitLine);
     if (splitLine.size() >= 3) {  // At least some kind of safety check.
         cleanup(splitLine);
-        originalLine = line;
+        formatted = true;
         return true;
     }
     else {
+        errorLog.write("Could not format the following line: ");
+        errorLog.write(line);
         return false;
     }
 }

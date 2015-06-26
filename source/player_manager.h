@@ -4,19 +4,20 @@
 
 #include <vector>
 #include "player.h"
+#include "log_line.h"
 
-class Player_Manager {
+class PlayerManager {
 public:
-    Player_Manager();
-    ~Player_Manager();
+    PlayerManager() {}
+    ~PlayerManager() {}
 
-    void add_player();
-    void remove_player();
-    Player& find_player() const;
+    void createPlayer(std::string name, LogLine& logLine);
+    Player* getPlayer(std::string name);
+    void removePlayer();
+    void addToPlayers(LogLine& logLine);
 
 private:
     std::vector<Player> players;
-
 };
 
 

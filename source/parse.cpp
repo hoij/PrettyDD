@@ -27,7 +27,7 @@ Save all nanobots damage in an additional category?
 
 */
 
-int parse(std::string line, std::vector<Player>& players) {
+LogLine parse(std::string line) {
     LogLine logLine;
 
 	// Split the line and store it in a vector
@@ -43,39 +43,8 @@ int parse(std::string line, std::vector<Player>& players) {
             logLine.getInfo().amount << "\t" << "Type: " <<
             logLine.getInfo().type << "\t" << "Subtype: " <<
             logLine.getInfo().subtype << std::endl;
-
-        add_to_players(players, logLine);
-
-        return 0;
     }
-    else {
-        return 1;
-    }
-}
-
-void add_to_players(std::vector<Player>& players, LogLine& ll) {
-    // Move this function to player_manager
-    bool dealer_found = false;
-    bool receiver_found = false;
-    LineInfo& li = ll.getInfo();
-	for (auto& p : players) {
-		if (p.get_name() == li.dealer_name) {
-			p.add(ll);
-			dealer_found = true;
-		}
-		else if (p.get_name() == li.dealer_name) {
-			p.add(ll);
-			receiver_found = true;
-		}
-	}
-	if(!dealer_found && li.dealer_name != "") {
-        Player p(li.dealer_name, ll);
-        players.push_back(p);
-    }
-	if(!receiver_found && li.receiver_name != "") {
-        Player p(li.receiver_name, ll);
-        players.push_back(p);
-    }
+    return logLine;
 }
 
 int find_amount(LogLine& logLine) {

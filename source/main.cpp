@@ -6,6 +6,8 @@
 #include <thread>
 #include <vector>
 #include "player.h"
+#include "player_manager.h"
+#include "log_line.h"
 #include "parse.h"
 #include "logger.h"
 
@@ -21,9 +23,9 @@ int main(void) {
     errorLog.write("Program started at: ", false);
     errorLog.write(currentTime());
 
+    PlayerManager pm;
 	std::string line;
 	std::ifstream logstream("../../test/test_damage.txt");
-	std::vector<Player> players;
 
 	if (logstream.is_open()) {
 		// Go to the end of the file
@@ -45,7 +47,10 @@ int main(void) {
 		while (is_running) {
 			while (getline(logstream, line)) {
 				std::cout << line << std::endl;
-				parse(line, players);
+				LogLine parsedLine = parse(line);
+				if (parsedLine.isFormatted()) {
+                    pm.addToPlayers(parsedLine);
+                }
 			}
 			if (!logstream.eof()) {  // Why did I check for this?
 				std::cout << "Error: Not EOF!" << std::endl;
