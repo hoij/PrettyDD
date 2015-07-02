@@ -8,3 +8,12 @@ LineInfo::LineInfo() {
 LineInfo::~LineInfo() {
     delete nanoProgram;
 }
+
+LineInfo::LineInfo(const LineInfo& li) {
+    *nanoProgram = *(li.nanoProgram);
+}
+
+LineInfo& LineInfo::operator=(LineInfo li) {
+    *nanoProgram = *(li.nanoProgram);
+    return *this;
+}

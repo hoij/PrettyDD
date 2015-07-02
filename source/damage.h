@@ -78,8 +78,6 @@ void addDamageReceived(LineInfo& li) {
 
 private:
 	struct damageInfo {
-        damageInfo() {}
-
         int total = 0;
         int count = 0;
         int regular_max = -1;

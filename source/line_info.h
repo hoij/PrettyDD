@@ -12,6 +12,9 @@ struct LineInfo {
     LineInfo();
     ~LineInfo();
 
+    LineInfo(const LineInfo& li);
+    LineInfo& operator=(LineInfo li);
+
     std::string dealer_name;
     std::string receiver_name;
     std::string type;

@@ -8,4 +8,5 @@ add_executable(PrettyDD main.cpp
 	damage.h
 	xp.h
 	logger.cpp logger.h
-	log_line.cpp log_line.h)
+	log_line.cpp log_line.h
+	stats.cpp stats.h)

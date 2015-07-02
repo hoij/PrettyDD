@@ -6,10 +6,18 @@
 #include "player.h"
 #include "log_line.h"
 
+class Player;
+
 class PlayerManager {
 public:
     PlayerManager() {}
     ~PlayerManager() {}
+    PlayerManager& operator=(PlayerManager& pm) {
+        for (Player& p : pm.players) {
+            players.push_back(p);
+        }
+        return *this;
+    }
 
     void createPlayer(std::string name, LogLine& logLine);
     Player* getPlayer(std::string name);
