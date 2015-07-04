@@ -9,6 +9,17 @@
 
 class Damage {
 public:
+
+Damage& operator+=(const Damage& rhs) {
+    dealt += rhs.dealt;
+    received += rhs.received;
+    return *this;
+}
+
+friend Damage operator+(Damage lhs, const Damage& rhs) {
+    return lhs += rhs;
+}
+
 void add(LineInfo& li, std::string playerType) {
     if (playerType == "dealer") {
         addDamageDealt(li);
@@ -22,11 +33,11 @@ void addDamageDealt(LineInfo& li) {
     dealt.total += li.amount;
     dealt.count++;
     if (!li.crit) {
-        if (li.amount > dealt.regular_max) {
-            dealt.regular_max = li.amount;
+        if (li.amount > dealt.regularMax) {
+            dealt.regularMax = li.amount;
         }
-        if (li.amount < dealt.regular_min) {
-            dealt.regular_min = li.amount;
+        if (li.amount < dealt.regularMin) {
+            dealt.regularMin = li.amount;
         }
         if (li.deflect) {
             dealt.deflects++;
@@ -36,13 +47,13 @@ void addDamageDealt(LineInfo& li) {
         }
     }
     else {
-        dealt.crit_count++;
-        dealt.crit_total += li.amount;
-        if (li.amount > dealt.crit_max) {
-            dealt.crit_max = li.amount;
+        dealt.critCount++;
+        dealt.critTotal += li.amount;
+        if (li.amount > dealt.critMax) {
+            dealt.critMax = li.amount;
         }
-        if (li.amount < dealt.crit_min) {
-            dealt.crit_min = li.amount;
+        if (li.amount < dealt.critMin) {
+            dealt.critMin = li.amount;
         }
     }
 }
@@ -51,11 +62,11 @@ void addDamageReceived(LineInfo& li) {
     received.total += li.amount;
     received.count++;
     if (!li.crit) {
-        if (li.amount > received.regular_max) {
-            received.regular_max = li.amount;
+        if (li.amount > received.regularMax) {
+            received.regularMax = li.amount;
         }
-        if (li.amount < received.regular_min) {
-            received.regular_min = li.amount;
+        if (li.amount < received.regularMin) {
+            received.regularMin = li.amount;
         }
         if (li.deflect) {
             received.deflects++;
@@ -65,32 +76,75 @@ void addDamageReceived(LineInfo& li) {
         }
     }
     else {
-        received.crit_count++;
-        received.crit_total += li.amount;
-        if (li.amount > received.crit_max) {
-            received.crit_max = li.amount;
+        received.critCount++;
+        received.critTotal += li.amount;
+        if (li.amount > received.critMax) {
+            received.critMax = li.amount;
         }
-        if (li.amount < received.crit_min) {
-            received.crit_min = li.amount;
+        if (li.amount < received.critMin) {
+            received.critMin = li.amount;
         }
     }
 }
 
+int getTotalDealt() {return dealt.total;}
+int getCountDealt() {return dealt.count;}
+int getRegularMaxDealt() {return dealt.regularMax;}
+int getRegularMinDealt() {return dealt.regularMin;}
+int getCritTotalDealt() {return dealt.critTotal;}
+int getCritCountDealt() {return dealt.critCount;}
+int getCritMaxDealt() {return dealt.critMax;}
+int getCritMinDealt() {return dealt.critMin;}
+int getDeflectsDealt() {return dealt.deflects;}
+int getMissesDealt() {return dealt.misses;}
+
+int getTotalReceived() {return received.total;}
+int getCountReceived() {return received.count;}
+int getRegularMaxReceived() {return received.regularMax;}
+int getRegularMinReceived() {return received.regularMin;}
+int getCritTotalReceived() {return received.critTotal;}
+int getCritCountReceived() {return received.critCount;}
+int getCritMaxReceived() {return received.critMax;}
+int getCritMinReceived() {return received.critMin;}
+int getDeflectsReceived() {return received.deflects;}
+int getMissesReceived() {return received.misses;}
+
 private:
 	struct damageInfo {
+        // Why even have this struct?
+        damageInfo& operator+=(const damageInfo& rhs) {
+            total += rhs.total;
+            count += rhs.count;
+            if (rhs.regularMax > regularMax) {
+                regularMax = rhs.regularMax;
+            }
+            if (rhs.regularMin < regularMin) {
+                regularMin = rhs.regularMin;
+            }
+            critTotal += rhs.critTotal;
+            if (rhs.critMax > critMax) {
+                critMax = rhs.critMax;
+            }
+            if (rhs.critMin < critMin) {
+                critMin = rhs.critMin;
+            }
+            deflects += rhs.deflects;
+            misses += rhs.misses;
+            return *this;
+        }
+
         int total = 0;
         int count = 0;
-        int regular_max = -1;
-        int regular_min = std::numeric_limits<int>::max();
-        int crit_total = 0;
-		int crit_count = 0;
-		int crit_max = -1;
-		int crit_min = std::numeric_limits<int>::max();
+        int regularMax = -1;
+        int regularMin = std::numeric_limits<int>::max();
+        int critTotal = 0;
+		int critCount = 0;
+		int critMax = -1;
+		int critMin = std::numeric_limits<int>::max();
         int deflects = 0;
         int misses = 0;
-
         // Not used at the moment:
-        int mean_time = 0;
+        int meanTime = 0;
     };
 
     damageInfo dealt;

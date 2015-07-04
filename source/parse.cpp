@@ -19,12 +19,11 @@ using std::regex;
 TODO:
 Make adding nano to a player work.
 
+Give the option to set player name so it can handle damage to self.
+Like from the Rage nano or a self nuke.
+
 After some perk actions there is a line telling which perk was performed
-    and if it was successfull or not. Can use that to get stats on perks?
-
-Save all nanobots damage in an additional category?
-    Separate persk from nukes if possible. (think they look the same).
-
+and if it was successfull or not. Can use that to get stats on perks?
 */
 
 LogLine parse(std::string line) {
@@ -65,9 +64,10 @@ int find_amount(LogLine& logLine) {
 }
 
 std::string find_subtype(const std::vector<std::string>& splitLine) {
-	// Finds damage and heal subtype.
-    //  ["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
-
+    /*
+	Finds damage and heal subtype.
+    ["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
+    */
 	std::smatch t;
 	if (regex_search(splitLine[4], t, regex("(?:points of )(.*?)(?= damage)")))	{
 	 	// Looks for regular and special damage
@@ -169,9 +169,11 @@ int find_values(LogLine& logLine) {
 		lineInfo.deflect = isDeflect(splitLine);
 	}
 	else if (splitLine[1] == "Other hit by nano") {
-        // Can this crit?
-		// ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
-		// ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
+        /*
+        Can this crit?
+		["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
+		["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
+		*/
 		if (regex_search(splitLine[4], m, regex("(?:from )(.*?)(?= for)")) ||
 			regex_search(splitLine[4], m, regex("(?:of )(.*?)(?= damage)"))) {
 			if (m[1] == "unknown") {
@@ -186,6 +188,7 @@ int find_values(LogLine& logLine) {
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(splitLine);
 		lineInfo.amount = find_amount(logLine);
+		lineInfo.nanobots = true;
 	}
 	else if (splitLine[1] == "You hit other") {
 		/*
@@ -215,7 +218,7 @@ int find_values(LogLine& logLine) {
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(splitLine);
 		lineInfo.amount = find_amount(logLine);
-		// Need to save that it was nanobot damage. Or do I? Is nanobots always == perks?
+		lineInfo.nanobots = true;
 	}
 	else if (splitLine[1] == "Me got health"){
 		/*
@@ -278,6 +281,7 @@ int find_values(LogLine& logLine) {
 		lineInfo.type = "damage";
 		lineInfo.subtype = find_subtype(splitLine);
 		lineInfo.amount = find_amount(logLine);
+		lineInfo.nanobots = true;
 	}
 	else if (splitLine[1] == "Me hit by player") {
 		/*

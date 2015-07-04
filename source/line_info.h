@@ -23,6 +23,7 @@ struct LineInfo {
     bool crit = false;
     bool deflect = false;
     bool miss = false;
+    bool nanobots = false;
     NanoProgram* nanoProgram;
 };
 

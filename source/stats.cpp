@@ -25,7 +25,7 @@ void Stats::add(LogLine& logLine) {
     }
     else if (li.type == "nano_cast") {
     // Only add the nano when a message about the success/fail has arrived.
-    // In that case the nano will not be mentioned by name.
+    // Because in that case, the nano will not be mentioned by name.
         if (li.nanoProgram->getName() != "") {
             last_nano_casted = *li.nanoProgram;
         }
@@ -54,12 +54,12 @@ void Stats::addHeal(LineInfo& li) {
 }
 
 void Stats::addDamage(LineInfo& li) {
-    damage[li.receiver_name][li.subtype].add(li, "receiver");
+    damage[li.receiver_name][li.subtype][li.nanobots].add(li, "receiver");
     // Instead of adding the dealer damage here, it could be calculated
     // when presenting the stats?
     // Still need to add to the dealer when something hits "You". In order to
     // track who dealt the hit.
-    damage[li.dealer_name][li.subtype].add(li, "dealer");
+    damage[li.dealer_name][li.subtype][li.nanobots].add(li, "dealer");
 }
 
 void Stats::addNanoProgram(NanoProgram& np) {
@@ -71,4 +71,85 @@ void Stats::addNanoProgram(NanoProgram& np) {
         }
     }
     nanoPrograms.push_back(np);
+}
+
+Damage Stats::getTotalDamage() {
+    return getTotalRegularDamage() + getTotalNanobotsDamage();
+}
+
+Damage Stats::sumDamage(bool nanobots) {
+    Damage d;
+    for (auto& player : damage) {
+        for (auto& type : player.second) {
+            d += type.second[nanobots];
+        }
+    }
+    return d;
+}
+
+Damage Stats::getTotalRegularDamage() {
+    return sumDamage(false);
+}
+
+Damage Stats::getTotalNanobotsDamage() {
+    return sumDamage(true);
+}
+
+Damage Stats::getTotalPerDamageType(const std::string damageType) {
+    return getTotalRegularPerDamageType(damageType, false) +
+           getTotalNanobotsPerDamageType(damageType, true);
+}
+
+Damage Stats::sumDamageType(const std::string damageType, bool nanobots) {
+    // Will need to ingore "You" or the sum will be wrong.
+    // Best if I can stop it from being added completely?
+    Damage d;
+    for (auto& player : damage) {
+        d += player.second[damageType][nanobots];
+    }
+    return d;
+}
+
+Damage Stats::getTotalRegularPerDamageType(const std::string damageType, bool nanobots) {
+    return sumDamageType(damageType, nanobots);
+}
+
+Damage Stats::getTotalNanobotsPerDamageType(const std::string damageType, bool nanobots) {
+    return sumDamageType(damageType, nanobots);
+}
+
+const std::map<std::string, std::map<std::string, std::map<bool, Damage>>>& Stats::getDamage() {
+    return damage;
+}
+
+Heal Stats::getTotalHeals() {
+    Heal h;
+    for (auto& player : heals) {
+        h += player.second;
+    }
+    return h;
+}
+
+const std::map<std::string, Heal>& Stats::getHeals() {
+    return heals;
+}
+
+const std::vector<NanoProgram>& Stats::getNanoPrograms() {
+    return nanoPrograms;
+}
+
+const XP& Stats::getXp() {
+    return xp;
+}
+
+Nano Stats::getTotalNano() {
+    Nano n;
+    for (auto& player : nano) {
+        n += player.second;
+    }
+    return n;
+}
+
+const std::map<std::string, Nano>& Stats::getNano() {
+    return nano;
 }

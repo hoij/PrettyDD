@@ -48,6 +48,8 @@ int main(void) {
 			while (getline(logstream, line)) {
 				std::cout << line << std::endl;
 				LogLine parsedLine = parse(line);
+				// Make the parser listen to vicinity/org etc. messages as well
+				// in order to read commands
 				if (parsedLine.isFormatted()) {
                     pm.addToPlayers(parsedLine);
                 }
@@ -58,10 +60,6 @@ int main(void) {
 			}
 			logstream.clear();
 			std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-			// Listen for user input to quit. Use SDL?
-			// Or listen to commands from within AO.
-
 		}
 	}
 	else {

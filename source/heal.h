@@ -8,6 +8,12 @@
 
 class Heal {
 public:
+    Heal& operator+=(Heal& rhs) {
+        dealt += rhs.dealt;
+        received += rhs.received;
+        return *this;
+    }
+
     void add(LineInfo& li, std::string playerType) {
         if (playerType == "dealer") {
             dealt.count++;
@@ -53,6 +59,26 @@ public:
 
 private:
     struct healInfo {
+        healInfo& operator+=(healInfo& rhs) {
+            count += rhs.count;
+            actual += rhs.actual;
+            potential += rhs.potential;
+            if (rhs.actualMin < actualMin) {
+                actualMin = rhs.actualMin;
+            }
+            if (rhs.actualMax > actualMax) {
+                actualMax = rhs.actualMax;
+            }
+            if (rhs.potentialMin < potentialMin) {
+                potentialMin = rhs.potentialMin;
+            }
+            if (rhs.potentialMax > potentialMax) {
+                potentialMax = rhs.potentialMax;
+            }
+
+            return *this;
+        }
+
         int count = 0;
         int actual = 0;
         int potential = 0;
