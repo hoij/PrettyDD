@@ -6,10 +6,13 @@
 #include <thread>
 #include <vector>
 #include "player.h"
-#include "player_manager.h"
+#include "player_vector.h"
 #include "log_line.h"
-#include "parse.h"
 #include "logger.h"
+#include "parse.h"
+#include "configuration.h"
+
+#include "write_stats_to_file.h"
 
 
 std::string currentTime() {
@@ -23,8 +26,10 @@ int main(void) {
     errorLog.write("Program started at: ", false);
     errorLog.write(currentTime());
 
-    PlayerManager pm;
-	std::string line;
+    PlayerVector pv;
+    if(!config.read()) {
+        return 1;
+    }
 	std::ifstream logstream("../../test/test_damage.txt");
 
 	if (logstream.is_open()) {
@@ -43,15 +48,24 @@ int main(void) {
 
 		//ifstream logstream("log.txt");
 
+        std::string line;
 		bool is_running = true;
 		while (is_running) {
 			while (getline(logstream, line)) {
 				std::cout << line << std::endl;
 				LogLine parsedLine = parse(line);
-				// Make the parser listen to vicinity/org etc. messages as well
-				// in order to read commands
 				if (parsedLine.isFormatted()) {
-                    pm.addToPlayers(parsedLine);
+                    // Maybe call these isData or isCommand and check those in
+                    // the if statements.
+                    if(parsedLine.isFitForPlayerAddition()) {
+                        pv.addToPlayers(parsedLine);
+                    }
+                    else if (parsedLine.isCommand()) {
+                        // write an new class/header for this that deals with input
+                        if (parsedLine.getCommand() == "dd") {
+                            writeDamageOverview(pv);
+                        }
+                    }
                 }
 			}
 			if (!logstream.eof()) {  // Why did I check for this?

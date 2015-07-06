@@ -7,6 +7,7 @@
 #include "parse.h"
 #include "logger.h"
 #include "log_line.h"
+#include "configuration.h"
 
 
 using std::cout;
@@ -503,9 +504,26 @@ int find_values(LogLine& logLine) {
         // Maybe it's a system message.
 	}
 	else if (splitLine[1] == "System") {
+        logLine.setUnfitForPlayerAddition();
 
 	}
+	else if (splitLine[1] == "Vicinity" ||
+             splitLine[1] == "Team" ||
+             splitLine[0] == "00000003000011fc"
+             /* Add raid? */) {
+        /*
+        ["#0000000040000002#","Vicinity","Sgtcuddle",1436181663]test
+        ["Team","Team","Sgtcuddle",1436182391]test
+        ["#00000003000011fc#","Pantheon","Sgtcuddle",1436182488]test
+        */
+        logLine.setUnfitForPlayerAddition();  // Change this to flag the the line is a command (if true).
+        if (splitLine[2] == config.getProgramOwnerName() &&
+            splitLine[4] == "dd") {
+            logLine.setCommand(splitLine[4]);
+        }
+	}
 	else {
+        logLine.setUnfitForPlayerAddition();
         errorLog.write("No match for the following line: ");
         errorLog.write(logLine.getOriginalLine());
     }

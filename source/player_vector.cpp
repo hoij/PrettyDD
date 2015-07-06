@@ -1,9 +1,9 @@
-#include "player_manager.h"
+#include "player_vector.h"
 #include "line_info.h"
 #include "logger.h"
 
 
-void PlayerManager::addToPlayers(LogLine& logLine) {
+void PlayerVector::addToPlayers(LogLine& logLine) {
     // Adds the info found in a log line to dealer and receiver.
     // If no player is found, it creates a new one.
     LineInfo& li = logLine.getInfo();
@@ -28,22 +28,34 @@ void PlayerManager::addToPlayers(LogLine& logLine) {
     }
     // For development purposes only
     // Just to capture anything I might have missed.
-    if (li.dealer_name == "" || li.receiver_name == "") {
-        errorLog.write("Could not find dealer or receiver name in the following line (Note: This may be normal): ");
+    if (li.dealer_name == "" && li.receiver_name == "") {
+        errorLog.write("Could not find dealer and receiver name in the following line (Note: This may be normal): ");
+        errorLog.write(logLine.getOriginalLine());
+    }
+    else if (li.dealer_name == "") {
+        errorLog.write("Could not find dealer name in the following line (Note: This may be normal): ");
+        errorLog.write(logLine.getOriginalLine());
+    }
+    else if (li.receiver_name == "") {
+        errorLog.write("Could not find receiver name in the following line (Note: This may be normal): ");
         errorLog.write(logLine.getOriginalLine());
     }
 }
 
-void PlayerManager::createPlayer(std::string name, LogLine& logLine) {
+void PlayerVector::createPlayer(std::string name, LogLine& logLine) {
     Player p(name, logLine);
     players.push_back(p);
 }
 
-Player* PlayerManager::getPlayer(std::string name) {
+Player* PlayerVector::getPlayer(std::string name) {
     for (Player& p : players) {
         if (p.get_name() == name) {
             return &p;
         }
     }
     return nullptr;
+}
+
+std::vector<Player>& PlayerVector::getPlayers() {
+    return players;
 }

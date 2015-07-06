@@ -4,6 +4,7 @@
 
 #include <string>
 #include <limits>
+#include <ostream>
 #include "line_info.h"
 
 
@@ -18,6 +19,20 @@ Damage& operator+=(const Damage& rhs) {
 
 friend Damage operator+(Damage lhs, const Damage& rhs) {
     return lhs += rhs;
+}
+
+friend std::ostream& operator<<(std::ostream& os, Damage& d) {
+    os << d.getTotalDealt() << " " <<
+          d.getCountDealt() << " " <<
+          d.getRegularMaxDealt() << " " <<
+          d.getRegularMinDealt() << " " <<
+          d.getCritTotalDealt() << " " <<
+          d.getCritCountDealt() << " " <<
+          d.getCritMaxDealt() << " " <<
+          d.getCritMinDealt() << " " <<
+          d.getDeflectsDealt() << " " <<
+          d.getMissesDealt() << std::endl;
+    return os;
 }
 
 void add(LineInfo& li, std::string playerType) {

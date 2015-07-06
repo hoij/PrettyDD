@@ -1,5 +1,5 @@
-#ifndef PLAYER_MANAGER_H
-#define PLAYER_MANAGER_H
+#ifndef PLAYER_VECTOR_H
+#define PLAYER_VECTOR_H
 
 
 #include <vector>
@@ -8,11 +8,11 @@
 
 class Player;
 
-class PlayerManager {
+class PlayerVector {
 public:
-    PlayerManager() {}
-    ~PlayerManager() {}
-    PlayerManager& operator=(PlayerManager& pm) {
+    PlayerVector() {}
+    ~PlayerVector() {}
+    PlayerVector& operator=(PlayerVector& pm) {
         for (Player& p : pm.players) {
             players.push_back(p);
         }
@@ -21,6 +21,7 @@ public:
 
     void createPlayer(std::string name, LogLine& logLine);
     Player* getPlayer(std::string name);
+    std::vector<Player>& getPlayers();
     void removePlayer();
     void addToPlayers(LogLine& logLine);
 
@@ -29,4 +30,4 @@ private:
 };
 
 
-#endif // PLAYER_MANAGER_H
+#endif // PLAYER_VECTOR_H

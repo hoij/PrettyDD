@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 #include "line_info.h"
-#include "player_manager.h"
+#include "player_vector.h"
 #include "stats.h"
 
 
@@ -24,9 +24,10 @@ public:
     void set_name(std::string name);
     void add(LogLine& logLine);
 
+    Stats stats;
+
 private:
     std::string name;
-    Stats stats;
 };
 
 

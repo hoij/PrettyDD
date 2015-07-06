@@ -44,3 +44,12 @@ std::vector<std::string>& LogLine::split(std::string& s, char delim, std::vector
 	}
 	return splitLine;
 }
+
+void LogLine::setUnfitForPlayerAddition() {
+    fitForPlayerAddition = false;
+}
+
+void LogLine::setCommand(std::string cmd) {
+    command = cmd;
+    isLineACommand = true;
+}
