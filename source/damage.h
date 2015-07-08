@@ -5,6 +5,7 @@
 #include <string>
 #include <limits>
 #include <ostream>
+#include <iomanip>
 #include "line_info.h"
 
 
@@ -12,8 +13,8 @@ class Damage {
 public:
 
 Damage& operator+=(const Damage& rhs) {
-    dealt += rhs.dealt;
-    received += rhs.received;
+    dealtOnYou += rhs.dealtOnYou;
+    receivedFromYou += rhs.receivedFromYou;
     return *this;
 }
 
@@ -21,17 +22,56 @@ friend Damage operator+(Damage lhs, const Damage& rhs) {
     return lhs += rhs;
 }
 
-friend std::ostream& operator<<(std::ostream& os, Damage& d) {
-    os << d.getTotalDealt() << " " <<
-          d.getCountDealt() << " " <<
-          d.getRegularMaxDealt() << " " <<
-          d.getRegularMinDealt() << " " <<
-          d.getCritTotalDealt() << " " <<
-          d.getCritCountDealt() << " " <<
-          d.getCritMaxDealt() << " " <<
-          d.getCritMinDealt() << " " <<
-          d.getDeflectsDealt() << " " <<
-          d.getMissesDealt() << std::endl;
+std::ostream& writeDamageDealtToYou(std::ostream& os) {
+    os << std::right <<
+          std::setw(8) << getTotalDealt() <<
+          std::setw(8) << getCountDealt() <<
+          std::setw(8) << ((getRegularMaxDealt() == -1) ?
+                            0 : getRegularMaxDealt()) <<
+          std::setw(8) << ((getRegularMinDealt() == std::numeric_limits<int>::max()) ?
+                            0 : getRegularMinDealt()) <<
+          std::setw(8) << getCritTotalDealt() <<
+          std::setw(8) << getCritCountDealt() <<
+          std::setw(8) << ((getCritMaxDealt() == -1) ?
+                            0 : getCritMaxDealt()) <<
+          std::setw(8) << ((getCritMinDealt() == std::numeric_limits<int>::max()) ?
+                            0 : getCritMinDealt()) <<
+          std::setw(8) << getDeflectsDealt() <<
+          std::setw(8) << getMissesDealt() << std::endl;
+    return os;
+}
+
+std::ostream& writeDamageReceivedFromYou(std::ostream& os) {
+    os << std::right <<
+          std::setw(8) << getTotalReceived() <<
+          std::setw(8) << getCountReceived() <<
+          std::setw(8) << ((getRegularMaxReceived() == -1) ?
+                            0 : getRegularMaxReceived()) <<
+          std::setw(8) << ((getRegularMinReceived() == std::numeric_limits<int>::max()) ?
+                            0 : getRegularMinReceived()) <<
+          std::setw(8) << getCritTotalReceived() <<
+          std::setw(8) << getCritCountReceived() <<
+          std::setw(8) << ((getCritMaxReceived() == -1) ?
+                            0 : getCritMaxReceived()) <<
+          std::setw(8) << ((getCritMinReceived() == std::numeric_limits<int>::max()) ?
+                            0 : getCritMinReceived()) <<
+          std::setw(8) << getDeflectsReceived() <<
+          std::setw(8) << getMissesReceived() << std::endl;
+    return os;
+}
+
+static std::ostream& writeHeadings(std::ostream& os) {
+    os << std::right <<
+          std::setw(8) << "Total" <<
+          std::setw(8) << "Count" <<
+          std::setw(8) << "RegMax" <<
+          std::setw(8) << "RegMin" <<
+          std::setw(8) << "Crit" <<
+          std::setw(8) << "Crits" <<
+          std::setw(8) << "CritMax" <<
+          std::setw(8) << "CritMin" <<
+          std::setw(8) << "Deflects" <<
+          std::setw(8) << "Misses";
     return os;
 }
 
@@ -45,84 +85,84 @@ void add(LineInfo& li, std::string playerType) {
 }
 
 void addDamageDealt(LineInfo& li) {
-    dealt.total += li.amount;
-    dealt.count++;
+    dealtOnYou.total += li.amount;
+    dealtOnYou.count++;
     if (!li.crit) {
-        if (li.amount > dealt.regularMax) {
-            dealt.regularMax = li.amount;
+        if (li.amount > dealtOnYou.regularMax) {
+            dealtOnYou.regularMax = li.amount;
         }
-        if (li.amount < dealt.regularMin) {
-            dealt.regularMin = li.amount;
+        if (li.amount < dealtOnYou.regularMin) {
+            dealtOnYou.regularMin = li.amount;
         }
         if (li.deflect) {
-            dealt.deflects++;
+            dealtOnYou.deflects++;
         }
         if (li.miss) {
-            dealt.misses++;
+            dealtOnYou.misses++;
         }
     }
     else {
-        dealt.critCount++;
-        dealt.critTotal += li.amount;
-        if (li.amount > dealt.critMax) {
-            dealt.critMax = li.amount;
+        dealtOnYou.critCount++;
+        dealtOnYou.critTotal += li.amount;
+        if (li.amount > dealtOnYou.critMax) {
+            dealtOnYou.critMax = li.amount;
         }
-        if (li.amount < dealt.critMin) {
-            dealt.critMin = li.amount;
+        if (li.amount < dealtOnYou.critMin) {
+            dealtOnYou.critMin = li.amount;
         }
     }
 }
 
 void addDamageReceived(LineInfo& li) {
-    received.total += li.amount;
-    received.count++;
+    receivedFromYou.total += li.amount;
+    receivedFromYou.count++;
     if (!li.crit) {
-        if (li.amount > received.regularMax) {
-            received.regularMax = li.amount;
+        if (li.amount > receivedFromYou.regularMax) {
+            receivedFromYou.regularMax = li.amount;
         }
-        if (li.amount < received.regularMin) {
-            received.regularMin = li.amount;
+        if (li.amount < receivedFromYou.regularMin) {
+            receivedFromYou.regularMin = li.amount;
         }
         if (li.deflect) {
-            received.deflects++;
+            receivedFromYou.deflects++;
         }
         if (li.miss) {
-            received.misses++;
+            receivedFromYou.misses++;
         }
     }
     else {
-        received.critCount++;
-        received.critTotal += li.amount;
-        if (li.amount > received.critMax) {
-            received.critMax = li.amount;
+        receivedFromYou.critCount++;
+        receivedFromYou.critTotal += li.amount;
+        if (li.amount > receivedFromYou.critMax) {
+            receivedFromYou.critMax = li.amount;
         }
-        if (li.amount < received.critMin) {
-            received.critMin = li.amount;
+        if (li.amount < receivedFromYou.critMin) {
+            receivedFromYou.critMin = li.amount;
         }
     }
 }
 
-int getTotalDealt() {return dealt.total;}
-int getCountDealt() {return dealt.count;}
-int getRegularMaxDealt() {return dealt.regularMax;}
-int getRegularMinDealt() {return dealt.regularMin;}
-int getCritTotalDealt() {return dealt.critTotal;}
-int getCritCountDealt() {return dealt.critCount;}
-int getCritMaxDealt() {return dealt.critMax;}
-int getCritMinDealt() {return dealt.critMin;}
-int getDeflectsDealt() {return dealt.deflects;}
-int getMissesDealt() {return dealt.misses;}
+int getTotalDealt() const {return dealtOnYou.total;}
+int getCountDealt() const {return dealtOnYou.count;}
+int getRegularMaxDealt() const {return dealtOnYou.regularMax;}
+int getRegularMinDealt() const {return dealtOnYou.regularMin;}
+int getCritTotalDealt() const {return dealtOnYou.critTotal;}
+int getCritCountDealt() const {return dealtOnYou.critCount;}
+int getCritMaxDealt() const {return dealtOnYou.critMax;}
+int getCritMinDealt() const {return dealtOnYou.critMin;}
+int getDeflectsDealt() const {return dealtOnYou.deflects;}
+int getMissesDealt() const {return dealtOnYou.misses;}
 
-int getTotalReceived() {return received.total;}
-int getCountReceived() {return received.count;}
-int getRegularMaxReceived() {return received.regularMax;}
-int getRegularMinReceived() {return received.regularMin;}
-int getCritTotalReceived() {return received.critTotal;}
-int getCritCountReceived() {return received.critCount;}
-int getCritMaxReceived() {return received.critMax;}
-int getCritMinReceived() {return received.critMin;}
-int getDeflectsReceived() {return received.deflects;}
-int getMissesReceived() {return received.misses;}
+int getTotalReceived() const {return receivedFromYou.total;}
+int getCountReceived() const {return receivedFromYou.count;}
+int getRegularMaxReceived() const {return receivedFromYou.regularMax;}
+int getRegularMinReceived() const {return receivedFromYou.regularMin;}
+int getCritTotalReceived() const {return receivedFromYou.critTotal;}
+int getCritCountReceived() const {return receivedFromYou.critCount;}
+int getCritMaxReceived() const {return receivedFromYou.critMax;}
+int getCritMinReceived() const {return receivedFromYou.critMin;}
+int getDeflectsReceived() const {return receivedFromYou.deflects;}
+int getMissesReceived() const {return receivedFromYou.misses;}
 
 private:
 	struct damageInfo {
@@ -137,6 +177,7 @@ private:
                 regularMin = rhs.regularMin;
             }
             critTotal += rhs.critTotal;
+            critCount += rhs.critCount;
             if (rhs.critMax > critMax) {
                 critMax = rhs.critMax;
             }
@@ -162,8 +203,8 @@ private:
         int meanTime = 0;
     };
 
-    damageInfo dealt;
-    damageInfo received;
+    damageInfo dealtOnYou;
+    damageInfo receivedFromYou;
 };
 
 

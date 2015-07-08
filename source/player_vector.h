@@ -12,9 +12,12 @@ class PlayerVector {
 public:
     PlayerVector() {}
     ~PlayerVector() {}
-    PlayerVector& operator=(PlayerVector& pm) {
-        for (Player& p : pm.players) {
-            players.push_back(p);
+    PlayerVector& operator=(PlayerVector& pv) {
+        if (this != &pv) {
+            for (Player& p : pv.players) {
+                players.push_back(p);
+            }
+            return *this;
         }
         return *this;
     }

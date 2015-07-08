@@ -6,8 +6,10 @@ void NanoProgram::createProgram(const LineInfo& li) {
 }
 
 NanoProgram& NanoProgram::operator=(const NanoProgram& np) {
-    name = np.getName();
-    stats = np.getStats();
+    if (this != &np) {
+        name = np.getName();
+        stats = np.getStats();
+    }
     return *this;
 }
 

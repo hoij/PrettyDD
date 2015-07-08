@@ -11,11 +11,11 @@ void PlayerVector::addToPlayers(LogLine& logLine) {
     bool receiverFound = false;
 
 	for (Player& p : players) {
-		if (p.get_name() == li.dealer_name) {
+		if (p.getName() == li.dealer_name) {
 			p.add(logLine);
 			dealerFound = true;
 		}
-		else if (p.get_name() == li.receiver_name) {
+		else if (p.getName() == li.receiver_name) {
 			p.add(logLine);
 			receiverFound = true;
 		}
@@ -49,7 +49,7 @@ void PlayerVector::createPlayer(std::string name, LogLine& logLine) {
 
 Player* PlayerVector::getPlayer(std::string name) {
     for (Player& p : players) {
-        if (p.get_name() == name) {
+        if (p.getName() == name) {
             return &p;
         }
     }

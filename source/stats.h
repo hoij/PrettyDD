@@ -19,7 +19,7 @@ public:
     ~Stats();
     Stats& operator=(const Stats& s);
 
-    void add(LogLine& logLine);
+    void add(LogLine& logLine, std::string& name);
 
     ///////////////////////////////////////////////////////////////////////
     // Get the data from the stats.
@@ -59,7 +59,7 @@ public:
 
 
 private:
-    void addDamage(LineInfo& li);
+    void addDamage(LineInfo& li, std::string& ownerName);
     void addHeal(LineInfo& li);
     void addNanoProgram(NanoProgram& nanoProgram);
     void addXp(LineInfo& li);

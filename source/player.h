@@ -17,11 +17,11 @@ public:
 	Player(std::string name, LogLine& logLine);
 	~Player();
 	Player(const Player& p);
-	Player& operator=(Player& p);
+	Player& operator=(const Player& p);
 	//Player& operator+=(const Player& p);
 
-    std::string& get_name();
-    void set_name(std::string name);
+    std::string& getName();
+    void setName(std::string name);
     void add(LogLine& logLine);
 
     Stats stats;

@@ -18,9 +18,11 @@ Player::Player(const Player& p) {
     stats = p.stats;
 }
 
-Player& Player::operator=(Player& p) {
-    name = p.name;
-    stats = p.stats;
+Player& Player::operator=(const Player& p) {
+    if (this != &p) {
+        name = p.name;
+        stats = p.stats;
+    }
     return *this;
 }
 
@@ -29,14 +31,14 @@ Player& Player::operator=(Player& p) {
 //	return *this;
 //}
 
-std::string& Player::get_name() {
+std::string& Player::getName() {
     return name;
 }
 
-void Player::set_name(std::string name) {
-    name = name;
+void Player::setName(std::string name) {
+    this->name = name;
 }
 
 void Player::add(LogLine& logLine) {
-    stats.add(logLine);
+    stats.add(logLine, getName());
 }

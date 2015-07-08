@@ -15,10 +15,10 @@ Stats& Stats::operator=(const Stats& s) {
     return *this;
 }
 
-void Stats::add(LogLine& logLine) {
+void Stats::add(LogLine& logLine, std::string& ownerName) {
     LineInfo& li = logLine.getInfo();
     if (li.type == "damage") {
-        addDamage(li);
+        addDamage(li, ownerName);
     }
     else if (li.type == "heal") {
         addHeal(li);
@@ -53,13 +53,22 @@ void Stats::addHeal(LineInfo& li) {
     }
 }
 
-void Stats::addDamage(LineInfo& li) {
-    damage[li.receiver_name][li.subtype][li.nanobots].add(li, "receiver");
-    // Instead of adding the dealer damage here, it could be calculated
-    // when presenting the stats?
-    // Still need to add to the dealer when something hits "You". In order to
-    // track who dealt the hit.
-    damage[li.dealer_name][li.subtype][li.nanobots].add(li, "dealer");
+void Stats::addDamage(LineInfo& li, std::string& ownerName) {
+    // Only add the stats to the other player and never to the player
+    // owning the stats. This is to avoid the player having himself as a
+    // player in his damage list.
+
+    ////////////////
+    // Consequently it won't be possible to log self damage.
+    // But can that be detected anyway? Test in AO.
+    ////////////////
+
+    if (li.receiver_name != ownerName) {
+        damage[li.receiver_name][li.subtype][li.nanobots].add(li, "receiver");
+    }
+    if (li.dealer_name != ownerName) {
+        damage[li.dealer_name][li.subtype][li.nanobots].add(li, "dealer");
+    }
 }
 
 void Stats::addNanoProgram(NanoProgram& np) {
@@ -79,6 +88,9 @@ Damage Stats::getTotalDamage() {
 
 Damage Stats::sumDamage(bool nanobots) {
     Damage d;
+    // Need to ignore self i.e. the player in damage that has the same name as the player
+    // that has damage. Nice. Or stop it form being added in the first place.
+
     for (auto& player : damage) {
         for (auto& type : player.second) {
             d += type.second[nanobots];

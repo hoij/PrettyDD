@@ -64,6 +64,7 @@ int main(void) {
                         // write an new class/header for this that deals with input
                         if (parsedLine.getCommand() == "dd") {
                             writeDamageOverview(pv);
+                            writeDamageReceivedOverview(pv);
                         }
                     }
                 }
