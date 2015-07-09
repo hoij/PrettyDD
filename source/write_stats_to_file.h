@@ -9,9 +9,10 @@
 
 void writeDamageOverview(PlayerVector& pv);
 void writeDamageReceivedOverview(PlayerVector& pv);
-void writeDamageDetails(std::string playerName);
+void writeDamageOverviewPerOpponent(PlayerVector& pv, std::string& playerName);
+void writeDamageDetailsPerDamageType(PlayerVector& pv, std::string& playerName);
 void writeHealOverview();
-void writeHealDetails(std::string playerName);
+void writeHealDetails(std::string& playerName);
 void writeNanoProgramOverview();
 void writeNanoProgramDetails();
 void writeNanoOverview();

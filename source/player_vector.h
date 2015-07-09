@@ -17,7 +17,6 @@ public:
             for (Player& p : pv.players) {
                 players.push_back(p);
             }
-            return *this;
         }
         return *this;
     }
@@ -27,6 +26,7 @@ public:
     std::vector<Player>& getPlayers();
     void removePlayer();
     void addToPlayers(LogLine& logLine);
+    unsigned int getLongestNameLength();
 
 private:
     std::vector<Player> players;

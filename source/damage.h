@@ -12,6 +12,13 @@
 class Damage {
 public:
 
+//Damage& operator=(const Damage& d) {
+//    if (this != &d) {
+//        d.
+//    }
+//    return *this;
+//}
+
 Damage& operator+=(const Damage& rhs) {
     dealtOnYou += rhs.dealtOnYou;
     receivedFromYou += rhs.receivedFromYou;
@@ -23,55 +30,58 @@ friend Damage operator+(Damage lhs, const Damage& rhs) {
 }
 
 std::ostream& writeDamageDealtToYou(std::ostream& os) {
+    int width = 8;
     os << std::right <<
-          std::setw(8) << getTotalDealt() <<
-          std::setw(8) << getCountDealt() <<
-          std::setw(8) << ((getRegularMaxDealt() == -1) ?
+          std::setw(width) << getTotalDealt() <<
+          std::setw(width) << getCountDealt() <<
+          std::setw(width) << ((getRegularMaxDealt() == -1) ?
                             0 : getRegularMaxDealt()) <<
-          std::setw(8) << ((getRegularMinDealt() == std::numeric_limits<int>::max()) ?
+          std::setw(width) << ((getRegularMinDealt() == std::numeric_limits<int>::max()) ?
                             0 : getRegularMinDealt()) <<
-          std::setw(8) << getCritTotalDealt() <<
-          std::setw(8) << getCritCountDealt() <<
-          std::setw(8) << ((getCritMaxDealt() == -1) ?
+          std::setw(width) << getCritTotalDealt() <<
+          std::setw(width) << getCritCountDealt() <<
+          std::setw(width) << ((getCritMaxDealt() == -1) ?
                             0 : getCritMaxDealt()) <<
-          std::setw(8) << ((getCritMinDealt() == std::numeric_limits<int>::max()) ?
+          std::setw(width) << ((getCritMinDealt() == std::numeric_limits<int>::max()) ?
                             0 : getCritMinDealt()) <<
-          std::setw(8) << getDeflectsDealt() <<
-          std::setw(8) << getMissesDealt() << std::endl;
+          std::setw(width) << getDeflectsDealt() <<
+          std::setw(width) << getMissesDealt() << std::endl;
     return os;
 }
 
 std::ostream& writeDamageReceivedFromYou(std::ostream& os) {
+    int width = 8;
     os << std::right <<
-          std::setw(8) << getTotalReceived() <<
-          std::setw(8) << getCountReceived() <<
-          std::setw(8) << ((getRegularMaxReceived() == -1) ?
+          std::setw(width) << getTotalReceived() <<
+          std::setw(width) << getCountReceived() <<
+          std::setw(width) << ((getRegularMaxReceived() == -1) ?
                             0 : getRegularMaxReceived()) <<
-          std::setw(8) << ((getRegularMinReceived() == std::numeric_limits<int>::max()) ?
+          std::setw(width) << ((getRegularMinReceived() == std::numeric_limits<int>::max()) ?
                             0 : getRegularMinReceived()) <<
-          std::setw(8) << getCritTotalReceived() <<
-          std::setw(8) << getCritCountReceived() <<
-          std::setw(8) << ((getCritMaxReceived() == -1) ?
+          std::setw(width) << getCritTotalReceived() <<
+          std::setw(width) << getCritCountReceived() <<
+          std::setw(width) << ((getCritMaxReceived() == -1) ?
                             0 : getCritMaxReceived()) <<
-          std::setw(8) << ((getCritMinReceived() == std::numeric_limits<int>::max()) ?
+          std::setw(width) << ((getCritMinReceived() == std::numeric_limits<int>::max()) ?
                             0 : getCritMinReceived()) <<
-          std::setw(8) << getDeflectsReceived() <<
-          std::setw(8) << getMissesReceived() << std::endl;
+          std::setw(width) << getDeflectsReceived() <<
+          std::setw(width) << getMissesReceived() << std::endl;
     return os;
 }
 
 static std::ostream& writeHeadings(std::ostream& os) {
+    int width = 8;
     os << std::right <<
-          std::setw(8) << "Total" <<
-          std::setw(8) << "Count" <<
-          std::setw(8) << "RegMax" <<
-          std::setw(8) << "RegMin" <<
-          std::setw(8) << "Crit" <<
-          std::setw(8) << "Crits" <<
-          std::setw(8) << "CritMax" <<
-          std::setw(8) << "CritMin" <<
-          std::setw(8) << "Deflects" <<
-          std::setw(8) << "Misses";
+          std::setw(width) << "Total" <<
+          std::setw(width) << "Count" <<
+          std::setw(width) << "RegMax" <<
+          std::setw(width) << "RegMin" <<
+          std::setw(width) << "Crit" <<
+          std::setw(width) << "Crits" <<
+          std::setw(width) << "CritMax" <<
+          std::setw(width) << "CritMin" <<
+          std::setw(width) << "Deflects" <<
+          std::setw(width) << "Misses";
     return os;
 }
 

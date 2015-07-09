@@ -10,6 +10,5 @@ add_executable(PrettyDD main.cpp
 	nano.h
 	logger.cpp logger.h
 	log_line.cpp log_line.h
-	stats.cpp stats.h
 	write_stats_to_file.cpp write_stats_to_file.h
 	configuration.cpp configuration.h)

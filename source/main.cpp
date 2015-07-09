@@ -65,6 +65,8 @@ int main(void) {
                         if (parsedLine.getCommand() == "dd") {
                             writeDamageOverview(pv);
                             writeDamageReceivedOverview(pv);
+                            std::string p = "You";
+                            writeDamageOverviewPerOpponent(pv, p);
                         }
                     }
                 }

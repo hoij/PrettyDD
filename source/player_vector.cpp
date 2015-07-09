@@ -53,9 +53,20 @@ Player* PlayerVector::getPlayer(std::string name) {
             return &p;
         }
     }
+    errorLog.write("Could not find a player with the name " + name);
     return nullptr;
 }
 
 std::vector<Player>& PlayerVector::getPlayers() {
     return players;
+}
+
+unsigned int PlayerVector::getLongestNameLength() {
+    unsigned int longestNameLength = 0;
+    for (Player& p : players) {
+        if (p.getName().length() > longestNameLength) {
+            longestNameLength = p.getName().length();
+        }
+    }
+    return longestNameLength;
 }
