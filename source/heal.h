@@ -8,7 +8,7 @@
 
 class Heal {
 public:
-    Heal& operator+=(Heal& rhs) {
+    Heal& operator+=(const Heal& rhs) {
         dealt += rhs.dealt;
         received += rhs.received;
         return *this;
@@ -59,7 +59,7 @@ public:
 
 private:
     struct healInfo {
-        healInfo& operator+=(healInfo& rhs) {
+        healInfo& operator+=(const healInfo& rhs) {
             count += rhs.count;
             actual += rhs.actual;
             potential += rhs.potential;

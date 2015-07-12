@@ -7,19 +7,19 @@
 #include "player.h"
 
 
-void writeDamageOverview(PlayerVector& pv);
-void writeDamageReceivedOverview(PlayerVector& pv);
-void writeDamageOverviewPerOpponent(PlayerVector& pv, std::string& playerName);
-void writeDamageDetailsPerDamageType(PlayerVector& pv, std::string& playerName);
+void writeDamageDealtOverview(PlayerVector<Player>& pv);
+void writeDamageReceivedOverview(PlayerVector<Player>& pv);
+void writeDamageDealtPerOpponent(const Player* pp);
+void writeDamageDealtPerDamageType(Player&);
 void writeHealOverview();
-void writeHealDetails(std::string& playerName);
+void writeHealDetails(Player& p);
 void writeNanoProgramOverview();
 void writeNanoProgramDetails();
 void writeNanoOverview();
 void writeNanoDetails();
 
-bool compareTotalReceived(Player& p1, Player& p2);
-bool compareTotalDealt(Player& p1, Player& p2);
+bool compareTotalReceivedFromPlayer(Player& p1, Player& p2);
+bool compareTotalDealtToPlayer(Player& p1, Player& p2);
 
 
 #endif  // WRITE_STATS_TO_FILE_H

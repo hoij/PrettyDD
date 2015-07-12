@@ -1,9 +1,13 @@
+#ifndef NANO_H
+#define NANO_H
+
+
 #include <limits>
 
 
 class Nano {
 public:
-    Nano& operator+=(Nano& rhs) {
+    Nano& operator+=(const Nano& rhs) {
         dealt += rhs.dealt;
         received += rhs.received;
         return *this;
@@ -25,7 +29,7 @@ public:
 
 private:
     struct nanoInfo {
-        nanoInfo& operator+=(nanoInfo& rhs) {
+        nanoInfo& operator+=(const nanoInfo& rhs) {
             total += rhs.total;
             count += rhs.count;
             if (rhs.max > max) {
@@ -46,3 +50,6 @@ private:
     nanoInfo dealt;
     nanoInfo received;
 };
+
+
+#endif  // NANO_H

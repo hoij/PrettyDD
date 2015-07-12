@@ -1,60 +1,39 @@
 #include "player.h"
+#include <algorithm>
+
 
 Player::Player() {
 }
 
-Player::Player(std::string name) : name(name) {
-}
-
-Player::Player(std::string name, LogLine& logLine) : name(name) {
+Player::Player(std::string name, LogLine& logLine) : BasePlayer(name) {
     add(logLine);
 }
 
 Player::~Player(){
 }
 
-Player::Player(const Player& p) {
-    name = p.name;
+Player::Player(const Player& p) : BasePlayer(p.getName()) {
     last_nano_casted = p.last_nano_casted;
     nanoPrograms = p.nanoPrograms;
-    damage = p.damage;
-    heals = p.heals;
+    affectedPlayers = p.affectedPlayers;
     xp = p.xp;
 }
 
 Player& Player::operator=(const Player& p) {
     if (this != &p) {
-        name = p.name;
-        //stats = p.stats;
+        setName(p.getName());
         last_nano_casted = p.last_nano_casted;
         nanoPrograms = p.nanoPrograms;
-        damage = p.damage;
-        heals = p.heals;
+        affectedPlayers = p.affectedPlayers;
         xp = p.xp;
     }
     return *this;
 }
 
-//Player& Player::operator+=(const Player& p) {
-//    stats += p.stats;
-//	return *this;
-//}
-
-std::string& Player::getName() {
-    return name;
-}
-
-void Player::setName(std::string name) {
-    this->name = name;
-}
-
 void Player::add(LogLine& logLine) {
         LineInfo& li = logLine.getInfo();
-    if (li.type == "damage") {
-        addDamage(li);
-    }
-    else if (li.type == "heal") {
-        addHeal(li);
+    if (li.type == "damage" || li.type == "heal" || li.type == "nano") {
+        affectedPlayers.addToPlayers(logLine);
     }
     else if (li.type == "nano_cast") {
     // Only add the nano when a message about the success/fail has arrived.
@@ -77,33 +56,6 @@ void Player::addXp(LineInfo& li) {
     xp.add(li);
 }
 
-void Player::addHeal(LineInfo& li) {
-    // There will alywas be a receiver.
-    heals[li.receiver_name].add(li, "receiver");
-    if (li.subtype == "potential") {
-        // But only a dealer in case the subtype is "potential".
-        heals[li.dealer_name].add(li, "dealer");
-    }
-}
-
-void Player::addDamage(LineInfo& li) {
-    // Only add the stats to the other player and never to the player
-    // owning the stats. This is to avoid the player having himself as a
-    // player in his damage list.
-
-    ////////////////
-    // Consequently it won't be possible to log self damage.
-    // But can that be detected anyway? Test in AO.
-    ////////////////
-
-    if (li.receiver_name != getName()) {
-        damage[li.receiver_name][li.subtype][li.nanobots].add(li, "receiver");
-    }
-    if (li.dealer_name != getName()) {
-        damage[li.dealer_name][li.subtype][li.nanobots].add(li, "dealer");
-    }
-}
-
 void Player::addNanoProgram(NanoProgram& np) {
     // Adds a nano program if it hasn't already been added.
     for (auto& npInVec : nanoPrograms) {
@@ -116,77 +68,68 @@ void Player::addNanoProgram(NanoProgram& np) {
 }
 
 Damage Player::getTotalDamage() {
-    return getTotalRegularDamage() + getTotalNanobotsDamage();
+    return getTotalDamage(true) + getTotalDamage(false);
 }
 
-Damage Player::sumDamage(bool nanobots) {
+Damage Player::getTotalDamage(bool nanobots) {
     Damage d;
-    // Need to ignore self i.e. the player in damage that has the same name as the player
-    // that has damage. Nice. Or stop it form being added in the first place.
-
-    for (auto& player : damage) {
-        for (auto& type : player.second) {
-            d += type.second[nanobots];
+    for (AffectedPlayer& ap : affectedPlayers) {
+        if (ap.getName() != getName()) {
+            d += ap.getTotalDamage(nanobots);
         }
     }
     return d;
 }
 
-Damage Player::getTotalRegularDamage() {
-    return sumDamage(false);
+Damage Player::getTotalDamagePerDamageType(const std::string damageType) {
+    return getTotalDamagePerDamageType(damageType, false) +
+           getTotalDamagePerDamageType(damageType, true);
 }
 
-Damage Player::getTotalNanobotsDamage() {
-    return sumDamage(true);
-}
-
-Damage Player::getTotalPerDamageType(const std::string damageType) {
-    return getTotalRegularPerDamageType(damageType, false) +
-           getTotalNanobotsPerDamageType(damageType, true);
-}
-
-Damage Player::sumDamageType(const std::string damageType, bool nanobots) {
-    // Will need to ingore "You" or the sum will be wrong.
-    // Best if I can stop it from being added completely?
+Damage Player::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) {
     Damage d;
-    for (auto& player : damage) {
-        d += player.second[damageType][nanobots];
+    for (AffectedPlayer& ap : affectedPlayers) {
+        d += ap.getTotalDamagePerDamageType(damageType, nanobots);
     }
     return d;
 }
 
-Damage Player::getTotalRegularPerDamageType(const std::string damageType, bool nanobots) {
-    return sumDamageType(damageType, nanobots);
-}
-
-Damage Player::getTotalNanobotsPerDamageType(const std::string damageType, bool nanobots) {
-    return sumDamageType(damageType, nanobots);
-}
-
-const std::map<std::string, std::map<std::string, std::map<bool, Damage>>>& Player::getDamageMap() const {
-    return damage;
-}
-
-unsigned int Player::getLongestNameLengthInDamage() const {
-    unsigned int longestNameLength = 0;
-    for (auto& player : damage) {
-        if (player.first.length() > longestNameLength) {
-            longestNameLength = player.first.length();
-        }
+std::vector<std::pair<std::string, Damage>> Player::getTotalDamagePerAffectedPlayer() const {
+    std::vector<std::pair<std::string, Damage>> totalDamagePerAffectedPlayer;
+    for (const AffectedPlayer& ap : affectedPlayers) {
+        if (ap.getName() != getName()) {
+            totalDamagePerAffectedPlayer.push_back(
+                std::make_pair(ap.getName(), ap.getTotalDamage()));
+            }
     }
-    return longestNameLength;
+    std::sort(totalDamagePerAffectedPlayer.begin(),
+              totalDamagePerAffectedPlayer.end(),
+              compareTotalReceivedFromPlayer);
+    return totalDamagePerAffectedPlayer;
+}
+
+bool Player::compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,
+                                       std::pair<std::string, Damage>& p2) {
+    return p1.second.getTotalDealt() >
+           p2.second.getTotalDealt();
+}
+
+bool Player::compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
+                                       std::pair<std::string, Damage>& p2) {
+    return p1.second.getTotalReceived() >
+           p2.second.getTotalReceived();
+}
+
+unsigned int Player::getLongestAffectedPlayerNameLength() const {
+    return affectedPlayers.getLongestNameLength();
 }
 
 Heal Player::getTotalHeals() {
     Heal h;
-    for (auto& player : heals) {
-        h += player.second;
+    for (AffectedPlayer& ap : affectedPlayers) {
+        h += ap.getHeal();
     }
     return h;
-}
-
-const std::map<std::string, Heal>& Player::getHeals() {
-    return heals;
 }
 
 const std::vector<NanoProgram>& Player::getNanoPrograms() {
@@ -199,12 +142,12 @@ const XP& Player::getXp() {
 
 Nano Player::getTotalNano() {
     Nano n;
-    for (auto& player : nano) {
-        n += player.second;
+    for (AffectedPlayer& ap : affectedPlayers) {
+        n += ap.getNano();
     }
     return n;
 }
 
-const std::map<std::string, Nano>& Player::getNano() {
-    return nano;
+PlayerVector<AffectedPlayer>& Player::getAffectedPlayers()  {
+    return affectedPlayers;
 }

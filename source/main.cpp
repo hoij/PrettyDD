@@ -26,7 +26,7 @@ int main(void) {
     errorLog.write("Program started at: ", false);
     errorLog.write(currentTime());
 
-    PlayerVector pv;
+    PlayerVector<Player> pv;
     if(!config.read()) {
         return 1;
     }
@@ -63,10 +63,9 @@ int main(void) {
                     else if (parsedLine.isCommand()) {
                         // write an new class/header for this that deals with input
                         if (parsedLine.getCommand() == "dd") {
-                            writeDamageOverview(pv);
+                            writeDamageDealtOverview(pv);
                             writeDamageReceivedOverview(pv);
-                            std::string p = "You";
-                            writeDamageOverviewPerOpponent(pv, p);
+                            writeDamageDealtPerOpponent(pv.getPlayer("You"));
                         }
                     }
                 }
