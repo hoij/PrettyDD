@@ -27,6 +27,7 @@ int main(void) {
     errorLog.write(currentTime());
 
     PlayerVector<Player> pv;
+    Parser parser;
     if(!config.read()) {
         return 1;
     }
@@ -53,14 +54,14 @@ int main(void) {
 		while (is_running) {
 			while (getline(logstream, line)) {
 				std::cout << line << std::endl;
-				LogLine parsedLine = parse(line);
+				LogLine parsedLine = parser.parse(line);
 				if (parsedLine.isFormatted()) {
                     // Maybe call these isData or isCommand and check those in
                     // the if statements.
-                    if(parsedLine.isFitForPlayerAddition()) {
+                    if(parsedLine.hasPlayerStats()) {
                         pv.addToPlayers(parsedLine);
                     }
-                    else if (parsedLine.isCommand()) {
+                    else if (parsedLine.hasCommand()) {
                         // write an new class/header for this that deals with input
                         if (parsedLine.getCommand() == "dd") {
                             writeDamageDealtOverview(pv);

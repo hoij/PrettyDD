@@ -32,6 +32,7 @@ void LogLine::cleanup(std::vector<std::string>& splitLine) {
 }
 
 std::vector<std::string>& LogLine::split(std::string& s, char delim, std::vector<std::string>& splitLine) {
+    // This is shit. But it works.
 	std::stringstream ss(s);
 	std::string word;
 	while (getline(ss, word, delim)) {
@@ -45,11 +46,18 @@ std::vector<std::string>& LogLine::split(std::string& s, char delim, std::vector
 	return splitLine;
 }
 
-void LogLine::setUnfitForPlayerAddition() {
-    fitForPlayerAddition = false;
+const std::string& LogLine::getDescription() {
+    if (splitLine[0] == "00000003000011fc") {
+        // Special case when an org chat message is parsed.
+        // [1] contains the org name which is of no use when we only want to
+        // know if it is an org message.
+        return splitLine[0];
+    }
+    else {
+        return splitLine[1];
+    }
 }
 
-void LogLine::setCommand(std::string cmd) {
-    command = cmd;
-    isLineACommand = true;
+void LogLine::setHasPlayerStats(bool hasStats) {
+    info.hasStats = hasStats;
 }
