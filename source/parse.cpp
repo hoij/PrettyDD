@@ -102,13 +102,13 @@ int Parser::find_values(LogLine& logLine) {
 }
 
 int Parser::find_amount(const std::vector<std::string>& splitLine) {
-//    if (logLine.getDescription() == "Me Cast Nano" ||
-//        logLine.getDescription() == "System" ||
-//        logLine.getDescription() == "Vicinity" ||
-//        logLine.getDescription() == "Me Cast Nano" ||
-//        logLine.getDescription() == "00000003000011fc" ||) {
-//        return 0;
-//    }
+    //if (logLine.getDescription() == "Me Cast Nano" ||
+    //    logLine.getDescription() == "System" ||
+    //    logLine.getDescription() == "Vicinity" ||
+    //    logLine.getDescription() == "Me Cast Nano" ||
+    //    logLine.getDescription() == "00000003000011fc" ||) {
+    //    return 0;
+    //}
     std::smatch d;
     if (regex_search(splitLine[4], d, regex("(\\d+)( points)"))) {
         return std::stoi(d[1]);
@@ -202,51 +202,51 @@ void Parser::renameSpecial(LineInfo& li) {
 //////////////////////////////////////////
 
 LineInfo Parser::otherAndYourPetHitByOther(const std::vector<std::string>& splitLine) {
-        /*
-        ["#000000004200000a#","Other hit by other","",1425326282]Sheila Marlene hit Predator Rogue for 461 points of melee damage.
-        ["#000000004200000a#","Other hit by other","",1425326285]Sgtcuddle hit Predator Rogue for 1434 points of energy damage.
-        ["#000000004200000a#","Other hit by other","",1425326287]Sgtcuddle hit Predator Rogue for 4302 points of Burst damage.
-        ["#000000004200000a#","Other hit by other","",1425326293]Sgtcuddle hit Predator Rogue for 15000 points of Full Auto damage.
-        ["#000000004200000a#","Other hit by other","",1434406471]Rezipped hit Imgonnakillu for 4123 points of Aimed Shot damage.
-        ["#000000004200000a#","Other hit by other","",1434406034]Balas's reflect shield hit Junebop for 161 points of damage.
-        ["#000000004200000a#","Other hit by other","",1425997610]Letter hit Reet of Paradise for 1586 points of melee damage.Critical hit!
-        ["#000000004200000a#","Other hit by other","",1434359748]Cratdat hit Ensign - Ilari'Ra for 801 points of projectile damage. Glancing hit.
+    /*
+    ["#000000004200000a#","Other hit by other","",1425326282]Sheila Marlene hit Predator Rogue for 461 points of melee damage.
+    ["#000000004200000a#","Other hit by other","",1425326285]Sgtcuddle hit Predator Rogue for 1434 points of energy damage.
+    ["#000000004200000a#","Other hit by other","",1425326287]Sgtcuddle hit Predator Rogue for 4302 points of Burst damage.
+    ["#000000004200000a#","Other hit by other","",1425326293]Sgtcuddle hit Predator Rogue for 15000 points of Full Auto damage.
+    ["#000000004200000a#","Other hit by other","",1434406471]Rezipped hit Imgonnakillu for 4123 points of Aimed Shot damage.
+    ["#000000004200000a#","Other hit by other","",1434406034]Balas's reflect shield hit Junebop for 161 points of damage.
+    ["#000000004200000a#","Other hit by other","",1425997610]Letter hit Reet of Paradise for 1586 points of melee damage.Critical hit!
+    ["#000000004200000a#","Other hit by other","",1434359748]Cratdat hit Ensign - Ilari'Ra for 801 points of projectile damage. Glancing hit.
 
-        ["#000000004200000a#","Other hit by other","",1434406044]Someone absorbed 8198 points of energy damage.
+    ["#000000004200000a#","Other hit by other","",1434406044]Someone absorbed 8198 points of energy damage.
 
-        ["#0000000042000009#","Your pet hit by other","",1425996728]Letter hit Guard for 623 points of melee damage.
-        ["#0000000042000009#","Your pet hit by other","",1425996758]Letter hit Guard for 1268 points of melee damage.Critical hit!
-        ["#0000000042000009#","Your pet hit by other","",1425996734]Guard hit Letter for 1639 points of melee damage.Critical hit!
+    ["#0000000042000009#","Your pet hit by other","",1425996728]Letter hit Guard for 623 points of melee damage.
+    ["#0000000042000009#","Your pet hit by other","",1425996758]Letter hit Guard for 1268 points of melee damage.Critical hit!
+    ["#0000000042000009#","Your pet hit by other","",1425996734]Guard hit Letter for 1639 points of melee damage.Critical hit!
 
-        // These lines still exist?
-        ["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
-        ["#000000004200000a#","Other hit by other","",1183504118]Something hit Enfodruid for 1 points of damage by damage shield.
-		*/
+    // These lines still exist?
+    ["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
+    ["#000000004200000a#","Other hit by other","",1183504118]Something hit Enfodruid for 1 points of damage by damage shield.
+    */
 
-        LineInfo li;
-		std::smatch m;
-		if (regex_search(splitLine[4], m, regex("(?:hit )"	// Find "hit ", but do not include it in the results
-										"(.*?)"			    // match everything following, non-greedy
+    LineInfo li;
+    std::smatch m;
+    if (regex_search(splitLine[4], m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
+                                            "(.*?)"			// match everything following, non-greedy
                                                             // i.e. until first occurrence, of
-										"(?= for)"))) {	    // " for"
-            li.receiver_name = m[1];
+                                            "(?= for)"))) {	// " for"
+        li.receiver_name = m[1];
+    }
+    else if (regex_search(splitLine[4], m, regex("(.*?)(?= absorbed )"))) {
+        li.receiver_name = m[1];
+    }
+    if (regex_search(splitLine[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
+        li.dealer_name = m[0];
         }
-        else if (regex_search(splitLine[4], m, regex("(.*?)(?= absorbed )"))) {
-            li.receiver_name = m[1];
-        }
-		if (regex_search(splitLine[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
-            li.dealer_name = m[0];
-            }
-        else if (li.receiver_name == "Someone") {
-            li.dealer_name = "Unknown";  // There will be no dealer in this case.
-        }
+    else if (li.receiver_name == "Someone") {
+        li.dealer_name = "Unknown";  // There will be no dealer in this case.
+    }
 
-		li.type = "damage";
-		li.subtype = find_subtype(splitLine);
-		li.amount = find_amount(splitLine);
-		li.crit = isCrit(splitLine);
-		li.deflect = isDeflect(splitLine);
-		return li;
+    li.type = "damage";
+    li.subtype = find_subtype(splitLine);
+    li.amount = find_amount(splitLine);
+    li.crit = isCrit(splitLine);
+    li.deflect = isDeflect(splitLine);
+    return li;
 }
 
 LineInfo Parser::otherHitByNano(const std::vector<std::string>& splitLine) {

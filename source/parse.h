@@ -21,8 +21,8 @@ private:
     void renameSpecial(LineInfo& li);
     int find_values(LogLine& logLine);
 
-	typedef LineInfo (Parser::*pfunc)(const std::vector<std::string>& splitLine);
-	std::map<std::string, pfunc> funcMap;
+    typedef LineInfo (Parser::*pfunc)(const std::vector<std::string>& splitLine);
+    std::map<std::string, pfunc> funcMap;
 
     // Functions within the funcMap
     LineInfo otherAndYourPetHitByOther(const std::vector<std::string>& splitLine);
