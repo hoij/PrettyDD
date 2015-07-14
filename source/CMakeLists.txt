@@ -3,7 +3,7 @@ add_executable(PrettyDD main.cpp
 	player.cpp player.h
 	affected_player.cpp affected_player.h
 	player_vector.h
-	parse.cpp parse.h
+	parser.cpp parser.h
 	nano_program.cpp nano_program.h
 	line_info.cpp line_info.h
 	heal.h

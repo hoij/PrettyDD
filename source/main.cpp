@@ -9,7 +9,7 @@
 #include "player_vector.h"
 #include "log_line.h"
 #include "logger.h"
-#include "parse.h"
+#include "parser.h"
 #include "configuration.h"
 
 #include "write_stats_to_file.h"

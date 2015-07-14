@@ -1,5 +1,5 @@
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <string>
 #include <vector>
@@ -50,4 +50,4 @@ private:
     LineInfo chat(const std::vector<std::string>& splitLine);
 };
 
-#endif
+#endif  //  PARSER_H

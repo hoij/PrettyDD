@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <map>
 #include <stdexcept>
-#include "parse.h"
+#include "parser.h"
 #include "logger.h"
 #include "log_line.h"
 #include "configuration.h"
@@ -67,9 +67,6 @@ LogLine Parser::parse(std::string line) {
 
     // Split the line and store it in a vector
     if (logLine.format(line)) {  // If successfull format
-
-        // find name of dealer, receiver, amount of damage/heal/nano, type and
-        // subtype etc.
         find_values(logLine);
 
         // Debug prints
