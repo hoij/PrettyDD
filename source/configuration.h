@@ -11,7 +11,7 @@ public:
     bool read() {
         std::ifstream settings("settings.txt");
         if (settings.is_open()) {
-            getline(settings, programOwnerName);
+            getline(settings, playerRunningProgram);
             getline(settings, logFilePath);
             return true;
         }
@@ -20,15 +20,12 @@ public:
             return false;
         }
     }
-    std::string& getProgramOwnerName() {return programOwnerName;}
+    std::string& getplayerRunningProgram() {return playerRunningProgram;}
     std::string& getLogFilePath() {return logFilePath;}
 private:
-    std::string programOwnerName;
+    std::string playerRunningProgram;
     std::string logFilePath;
 };
-
-
-extern Configuration config;
 
 
 #endif  // CONFIGURATION_H

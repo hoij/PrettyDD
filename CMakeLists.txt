@@ -20,9 +20,9 @@ endif()
 
 
 
-
-add_subdirectory(source)
 add_subdirectory(external)
+add_subdirectory(source)
+
 
 
 option(tests_on "Build and run all tests." ON) # Makes boolean 'test' available.

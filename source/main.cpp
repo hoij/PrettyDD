@@ -26,11 +26,13 @@ int main(void) {
     errorLog.write("Program started at: ", false);
     errorLog.write(currentTime());
 
-    PlayerVector<Player> pv;
-    Parser parser;
+    Configuration config;
     if(!config.read()) {
         return 1;
     }
+    Parser parser(config.getplayerRunningProgram());
+    PlayerVector<Player> pv;
+
 	std::ifstream logstream("../../test/test_damage.txt");
 
 	if (logstream.is_open()) {

@@ -6,13 +6,17 @@
 #include "player.h"
 #include "line_info.h"
 
+#include <gtest/gtest_prod.h>
+
 
 class Parser {
 public:
-    Parser();
+    Parser(std::string playerRunningProgram);
+
     LogLine parse(std::string line);
 
 private:
+    //FRIEND_TEST(Parser, Constructor);
     void createFunctionMap();
     bool isCrit(const std::vector<std::string>& splitLine);
     bool isDeflect(const std::vector<std::string>& splitLine);
@@ -21,6 +25,7 @@ private:
     void renameSpecial(LineInfo& li);
     int find_values(LogLine& logLine);
 
+    std::string playerRunningProgram;
     typedef LineInfo (Parser::*pfunc)(const std::vector<std::string>& splitLine);
     std::map<std::string, pfunc> funcMap;
 

@@ -29,7 +29,8 @@ After some perk actions there is a line telling which perk was performed
 and if it was successfull or not. Can use that to get stats on perks?
 */
 
-Parser::Parser() {
+Parser::Parser(std::string playerRunningProgram) :
+    playerRunningProgram(playerRunningProgram) {
     createFunctionMap();
 }
 
@@ -659,6 +660,7 @@ LineInfo Parser::system(const std::vector<std::string>& splitLine) {
 }
 
 LineInfo Parser::chat(const std::vector<std::string>& splitLine) {
+    // Reads chat for commands made by the player running the program
     /* Add raid chat?
 
     ["#0000000040000002#","Vicinity","Sgtcuddle",1436181663]test
@@ -668,7 +670,7 @@ LineInfo Parser::chat(const std::vector<std::string>& splitLine) {
     LineInfo li;
     li.hasStats = false;
     std::smatch m;
-    if (splitLine[2] == config.getProgramOwnerName() &&
+    if (splitLine[2] == playerRunningProgram &&
         splitLine[4] == "dd") {
         li.hasCommand = true;
         li.command = splitLine[4];

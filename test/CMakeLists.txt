@@ -1,24 +1,22 @@
 set(GMOCK_DIR "${CMAKE_SOURCE_DIR}/external/gmock-1.7.0"
     CACHE PATH "The path to the GoogleMock test framework.")
 
-
 set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -w")
-
 
 include_directories(SYSTEM ${GMOCK_DIR}/gtest/include
                            ${GMOCK_DIR}/include)
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/source)
+include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/source")
 
 
-function(add_gmock_test target)
-# add_gmock_test(<target> <sources>...)
+function(add_gmock_test target lib_to_test)
+# add_gmock_test(<target> <lib_to_test> <sources>...)
 #
-#  Adds a Google Mock based test executable, <target>, built from <sources> and
-#  adds the test so that CTest will run it. Both the executable and the test
-#  will be named <target>.
+#  Adds a Google Mock based test executable, <target>, built from <lib_to_test>
+#  and <sources> and adds the test so that CTest will run it. Both the
+#  executable and the test will be named <target>.
 
 	add_executable(${target} ${ARGN})
-	target_link_libraries(${target} gmock_main)
+	target_link_libraries(${target} gmock_main ${lib_to_test})
 
 	add_test(${target} ${target})
 
@@ -29,7 +27,14 @@ function(add_gmock_test target)
 			   COMMENT "Running ${target}" VERBATIM)
 endfunction()
 
-add_gmock_test(tests test1.cpp)
+add_gmock_test(tests parserlib test1.cpp)
+#../source/parser.cpp ../source/line_info.cpp ../source/logger.cpp ../source/log_line.cpp ../source/nano_program.cpp ../source/configuration.cpp)
+
+
+
+
+#add_executable(tests parser.cpp)
+#target_link_libraries(tests parser)
 
 #Link some other files with the test here:
 #target_link_libraries(tests player)

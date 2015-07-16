@@ -9,7 +9,7 @@ Player::Player(std::string name, LogLine& logLine) : BasePlayer(name) {
     add(logLine);
 }
 
-Player::~Player(){
+Player::~Player() {
 }
 
 Player::Player(const Player& p) : BasePlayer(p.getName()) {
