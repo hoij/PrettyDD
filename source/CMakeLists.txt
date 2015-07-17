@@ -26,10 +26,10 @@ add_library(affected_playerlib affected_player.cpp)
 #add_library(player_vectorlib player_vector.h)
 add_library(parserlib
   parser.cpp
-  #formatted_line.cpp
+  formatted_line.cpp
   line_info.cpp
-  #logger.cpp
-  #nano_program.cpp
+  logger.cpp
+  nano_program.cpp
   )
 add_library(nano_programlib nano_program.cpp)
 add_library(line_infolib line_info.cpp)
