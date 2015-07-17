@@ -3,17 +3,18 @@
 
 
 #include <string>
-#include "nano_program.h"
 
 
 class NanoProgram;
 
-struct LineInfo {
+class LineInfo {
+public:
     LineInfo();
     ~LineInfo();
 
     LineInfo(const LineInfo& li);
     LineInfo& operator=(LineInfo li);
+    friend std::ostream& operator<<(std::ostream& os, const LineInfo& li);
 
     std::string dealer_name;
     std::string receiver_name;
@@ -28,6 +29,11 @@ struct LineInfo {
     bool hasCommand = false;
     bool hasStats = true;
     NanoProgram* nanoProgram;
+
+private:
+    inline std::string boolToString(bool b) const {
+        return b ? "true" : "false";
+    }
 };
 
 

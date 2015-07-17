@@ -14,7 +14,7 @@ add_executable(PrettyDD main.cpp
 	xp.h
 	nano.h
 	#logger.cpp logger.h
-	#log_line.cpp log_line.h
+	#formatted_line.cpp formatted_line.h
 	#write_stats_to_file.cpp write_stats_to_file.h
 	#configuration.cpp configuration.h
 	)
@@ -26,10 +26,11 @@ add_library(affected_playerlib affected_player.cpp)
 #add_library(player_vectorlib player_vector.h)
 add_library(parserlib
   parser.cpp
-  log_line.cpp
+  #formatted_line.cpp
   line_info.cpp
-  logger.cpp
-  nano_program.cpp)
+  #logger.cpp
+  #nano_program.cpp
+  )
 add_library(nano_programlib nano_program.cpp)
 add_library(line_infolib line_info.cpp)
 #add_library(heallib heal.h)
@@ -37,7 +38,7 @@ add_library(line_infolib line_info.cpp)
 #add_library(xplib xp.h)
 #add_library(nanolib nano.h)
 add_library(loggerlib logger.cpp)
-add_library(log_linelib log_line.cpp)
+add_library(formatted_linelib formatted_line.cpp)
 add_library(write_stats_to_filelib write_stats_to_file.cpp)
 add_library(configurationlib configuration.cpp)
 
@@ -53,7 +54,7 @@ target_link_libraries(PrettyDD
   #xplib
   #nanolib
   loggerlib
-  log_linelib
+  formatted_linelib
   write_stats_to_filelib
   configurationlib
   )

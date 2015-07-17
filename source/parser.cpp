@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include "parser.h"
 #include "logger.h"
-#include "log_line.h"
+#include "formatted_line.h"
 #include "configuration.h"
 
 
@@ -35,6 +35,9 @@ Parser::Parser(std::string playerRunningProgram) :
 }
 
 void Parser::createFunctionMap() {
+    // TODO: Merge similar.
+    // TODO: Combine multiple searches into one regex where possible.
+    // TODO: Fix so all cases can use findSubtype() and find_amout()
     funcMap["Other hit by other"] = &Parser::otherAndYourPetHitByOther;
     funcMap["Your pet hit by other"] = &Parser::otherAndYourPetHitByOther;
     funcMap["Other hit by nano"] = &Parser::otherHitByNano;
@@ -63,43 +66,28 @@ void Parser::createFunctionMap() {
     funcMap["00000003000011fc"] = &Parser::chat;
 }
 
-LogLine Parser::parse(std::string line) {
-    LogLine logLine;
-
-    // Split the line and store it in a vector
-    if (logLine.format(line)) {  // If successfull format
-        find_values(logLine);
-
-        // Debug prints
-        std::cout << "Dealer: " << logLine.getInfo().dealer_name << "\t" <<
-                     "Receiver: " << logLine.getInfo().receiver_name << "\t" <<
-                     "Amount: " << logLine.getInfo().amount << "\t" <<
-                     "Type: " << logLine.getInfo().type << "\t" <<
-                     "Subtype: " << logLine.getInfo().subtype << std::endl;
+LineInfo Parser::parse(FormattedLine& formattedLine) {
+    LineInfo lineInfo;
+    auto funcMapIterator = funcMap.find(formattedLine.getDescription());
+    if (funcMapIterator != funcMap.end()) {
+        lineInfo = (this->*funcMapIterator->second)(formattedLine);
     }
-    return logLine;
+    else {
+        // Might want to remove this error message as it could print a lot
+        // if the user choses to log many other messages not found in the map
+        errorLog.write("No match for description: ", false);
+        errorLog.write(formattedLine.getDescription());
+        errorLog.write("\tFull line: " + formattedLine.getOriginalLine());
+    }
+
+    // Debug prints
+    std::cout << lineInfo;
+    logWhenPlayerNamesNotFound(lineInfo, formattedLine);
+
+    return lineInfo;
 }
 
-int Parser::find_values(LogLine& logLine) {
-    // Solve each individually, merge similar?
-    // Combine searches into one regex where possible.
-    // Fix so all cases can use find_subtype() and find_amout()
-
-    try {
-        pfunc f = funcMap.at(logLine.getDescription());
-        // Write a setInfo method:
-        logLine.getInfo() = (this->*f)(logLine.getSplitLine());
-    }
-    catch(std::out_of_range& e) {
-        errorLog.write("Out of Range error: ", false);
-        errorLog.write(e.what());
-        errorLog.write("No match for the following line: ");
-        errorLog.write(logLine.getOriginalLine());
-    }
-    return 0;
-}
-
-int Parser::find_amount(const std::vector<std::string>& splitLine) {
+int Parser::findAmount(FormattedLine& formattedLine) {
     //if (logLine.getDescription() == "Me Cast Nano" ||
     //    logLine.getDescription() == "System" ||
     //    logLine.getDescription() == "Vicinity" ||
@@ -108,47 +96,45 @@ int Parser::find_amount(const std::vector<std::string>& splitLine) {
     //    return 0;
     //}
     std::smatch d;
-    if (regex_search(splitLine[4], d, regex("(\\d+)( points)"))) {
+    if (regex_search(formattedLine.getMessage(), d, regex("(\\d+)( points)"))) {
         return std::stoi(d[1]);
     }
-    else if (regex_search(splitLine[4], d, regex("\\d+\\s"))) {
+    else if (regex_search(formattedLine.getMessage(), d, regex("\\d+\\s"))) {
         // For XP/SK/Reserach but might match some other line I've missed.
         return std::stoi(d[0]);
     }
     else {
         errorLog.write("Amount not found in the following line: ");
-        for (const std::string& subLine : splitLine) {
-            errorLog.write(subLine);
-        }
+        errorLog.write(formattedLine.getOriginalLine());
         return 0;
     }
 }
 
-std::string Parser::find_subtype(const std::vector<std::string>& splitLine) {
+std::string Parser::findSubtype(FormattedLine& formattedLine) {
     // Finds damage and heal subtype.
     std::smatch t;
-    if (regex_search(splitLine[4], t, regex("(?:points of )(.*?)(?= damage)")))	{
+    if (regex_search(formattedLine.getMessage(), t, regex("(?:points of )(.*?)(?= damage)")))	{
         // Looks for regular and special damage
         return t[1];
     }
-    else if (regex_search(splitLine[4], t, regex("(?: )(.* shield)(?= hit)"))) {
+    else if (regex_search(formattedLine.getMessage(), t, regex("(?: )(.* shield)(?= hit)"))) {
         // Looks for reflect or shield damage
         return t[1];
     }
-    else if (regex_search(splitLine[4], t, regex("(?: with )(.*)"))) {
+    else if (regex_search(formattedLine.getMessage(), t, regex("(?: with )(.*)(?:, but )"))) {
         // Looks for special damage in case of a miss.
         return t[1];
     }
-    else if (regex_search(splitLine[4], t, regex(" tried to hit "))) {
+    else if (regex_search(formattedLine.getMessage(), t, regex(" tried to hit "))) {
         return "regular miss";
     }
-    else if (regex_search(splitLine[4], t, regex(" got healed "))) {
+    else if (regex_search(formattedLine.getMessage(), t, regex(" got healed "))) {
         return "potential";
     }
-    else if (regex_search(splitLine[4], t, regex(" were healed "))) {
+    else if (regex_search(formattedLine.getMessage(), t, regex(" were healed "))) {
         return "actual";
     }
-    else if (regex_search(splitLine[4], t, regex("(?: damaged by )(.*?)( for )"))) {
+    else if (regex_search(formattedLine.getMessage(), t, regex("(?: damaged by )(.*?)( for )"))) {
         return t[1];
     }
     else {
@@ -156,17 +142,17 @@ std::string Parser::find_subtype(const std::vector<std::string>& splitLine) {
     }
 }
 
-bool Parser::isCrit(const std::vector<std::string>& splitLine) {
+bool Parser::isCrit(FormattedLine& formattedLine) {
     std::smatch m;
-    if (regex_search(splitLine[4], m, regex("damage.Critical hit!")))
+    if (regex_search(formattedLine.getMessage(), m, regex("damage.Critical hit!")))
         return true;
     else
         return false;
 }
 
-bool Parser::isDeflect(const std::vector<std::string>& splitLine) {
+bool Parser::isDeflect(FormattedLine& formattedLine) {
     std::smatch m;
-    if (regex_search(splitLine[4], m, regex("damage. Glancing hit.")))
+    if (regex_search(formattedLine.getMessage(), m, regex("damage. Glancing hit.")))
         return true;
     else
         return false;
@@ -193,13 +179,31 @@ void Parser::renameSpecial(LineInfo& li) {
     }
 }
 
+void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLine& formattedLine) {
+    // TODO: Remove at some point.
+    // For development purposes only.
+    // Just to capture anything I might have missed.
+    if (lineInfo.dealer_name == "" && lineInfo.receiver_name == "") {
+        errorLog.write("Could not find dealer and receiver name in the following line (Note: This may be normal): ");
+        errorLog.write("\t" + formattedLine.getOriginalLine());
+    }
+    else if (lineInfo.dealer_name == "") {
+        errorLog.write("Could not find dealer name in the following line (Note: This may be normal): ");
+        errorLog.write("\t" + formattedLine.getOriginalLine());
+    }
+    else if (lineInfo.receiver_name == "") {
+        errorLog.write("Could not find receiver name in the following line (Note: This may be normal): ");
+        errorLog.write("\t" + formattedLine.getOriginalLine());
+    }
+}
+
 //////////////////////////////////////////
 //                                      //
 //  Functions within the function map:  //
 //                                      //
 //////////////////////////////////////////
 
-LineInfo Parser::otherAndYourPetHitByOther(const std::vector<std::string>& splitLine) {
+LineInfo Parser::otherAndYourPetHitByOther(FormattedLine& formattedLine) {
     /*
     ["#000000004200000a#","Other hit by other","",1425326282]Sheila Marlene hit Predator Rogue for 461 points of melee damage.
     ["#000000004200000a#","Other hit by other","",1425326285]Sgtcuddle hit Predator Rogue for 1434 points of energy damage.
@@ -223,16 +227,16 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::vector<std::string>& split
 
     LineInfo li;
     std::smatch m;
-    if (regex_search(splitLine[4], m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
+    if (regex_search(formattedLine.getMessage(), m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
                                             "(.*?)"			// match everything following, non-greedy
                                                             // i.e. until first occurrence, of
                                             "(?= for)"))) {	// " for"
         li.receiver_name = m[1];
     }
-    else if (regex_search(splitLine[4], m, regex("(.*?)(?= absorbed )"))) {
+    else if (regex_search(formattedLine.getMessage(), m, regex("(.*?)(?= absorbed )"))) {
         li.receiver_name = m[1];
     }
-    if (regex_search(splitLine[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
+    if (regex_search(formattedLine.getMessage(), m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
         li.dealer_name = m[0];
         }
     else if (li.receiver_name == "Someone") {
@@ -240,14 +244,14 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::vector<std::string>& split
     }
 
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
-    li.deflect = isDeflect(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
+    li.deflect = isDeflect(formattedLine);
     return li;
 }
 
-LineInfo Parser::otherHitByNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::otherHitByNano(FormattedLine& formattedLine) {
     /*
     Can this crit? Deflect?
     ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
@@ -255,8 +259,8 @@ LineInfo Parser::otherHitByNano(const std::vector<std::string>& splitLine) {
     */
     LineInfo li;
     std::smatch m;
-    if (regex_search(splitLine[4], m, regex("(?:from )(.*?)(?= for)")) ||
-        regex_search(splitLine[4], m, regex("(?:of )(.*?)(?= damage)"))) {
+    if (regex_search(formattedLine.getMessage(), m, regex("(?:from )(.*?)(?= for)")) ||
+        regex_search(formattedLine.getMessage(), m, regex("(?:of )(.*?)(?= damage)"))) {
         if (m[1] == "unknown") {
             li.dealer_name = "Unknown";
         }
@@ -264,16 +268,16 @@ LineInfo Parser::otherHitByNano(const std::vector<std::string>& splitLine) {
             li.dealer_name = m[1];
         }
     }
-    regex_search(splitLine[4], m, regex("(.*?)(?= was)"));
+    regex_search(formattedLine.getMessage(), m, regex("(.*?)(?= was)"));
     li.receiver_name = m[0];
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
     li.nanobots = true;
     return li;
 }
 
-LineInfo Parser::youHitOther(const std::vector<std::string>& splitLine) {
+LineInfo Parser::youHitOther(FormattedLine& formattedLine) {
     /*
     ["#0000000042000008#","You hit other","",1425326282]You hit Predator Rogue for 2357 points of poison damage.
     ["#0000000042000008#","You hit other","",1425326284]You hit Predator Rogue for 2329 points of chemical damage.
@@ -287,33 +291,33 @@ LineInfo Parser::youHitOther(const std::vector<std::string>& splitLine) {
     LineInfo li;
     std::smatch m;
     li.dealer_name = "You";
-    regex_search(splitLine[4], m, regex("(?:hit )(.*?)(?= for)"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:hit )(.*?)(?= for)"));
     li.receiver_name = m[1];
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
-    li.deflect = isDeflect(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
+    li.deflect = isDeflect(formattedLine);
     return li;
 }
 
-LineInfo Parser::youHitOtherWithNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::youHitOtherWithNano(FormattedLine& formattedLine) {
     /*
     ["#0000000042000005#","You hit other with nano","",1425993792]You hit Kyr'Ozch Hive Medic with nanobots for 798 points of projectile damage.
     */
     LineInfo li;
     std::smatch m;
     li.dealer_name = "You";
-    regex_search(splitLine[4], m, regex("(?:hit )(.*?)(?= with)"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:hit )(.*?)(?= with)"));
     li.receiver_name = m[1];
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
     li.nanobots = true;
     return li;
 }
 
-LineInfo Parser::meGotHealth(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meGotHealth(FormattedLine& formattedLine) {
     /*
     ["#0000000042000015#","Me got health","",1425326282]You were healed for 193 points.
     ["#0000000042000015#","Me got health","",1425995902]You got healed by Starphoenix for 3359 points of health.
@@ -332,31 +336,31 @@ LineInfo Parser::meGotHealth(const std::vector<std::string>& splitLine) {
     std::smatch m;
     li.receiver_name = "You";
     li.type = "heal";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
     if (li.subtype == "potential") { // Potential heal
-        regex_search(splitLine[4], m, regex("(?:by )(.*?)(?= for)"));
+        regex_search(formattedLine.getMessage(), m, regex("(?:by )(.*?)(?= for)"));
         li.dealer_name = m[1];
     }
     return li;
 }
 
-LineInfo Parser::youGaveHealth(const std::vector<std::string>& splitLine) {
+LineInfo Parser::youGaveHealth(FormattedLine& formattedLine) {
     /*
     ["#0000000042000014#","You gave health","",1425998482]You healed Letter for 3741 points of health.
     */
     LineInfo li;
     std::smatch m;
     li.dealer_name = "You";
-    regex_search(splitLine[4], m, regex("(?:healed )(.*?)(?= for)"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:healed )(.*?)(?= for)"));
     li.receiver_name = m[1];
-    li.amount = find_amount(splitLine);
+    li.amount = findAmount(formattedLine);
     li.type = "heal";
     li.subtype = "potential"; // Find out if the subtype here is actual or potential.
     return li;
 }
 
-LineInfo Parser::meHitByMonster(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meHitByMonster(FormattedLine& formattedLine) {
     /*
     ["#0000000042000006#","Me hit by monster","",1425326284]Predator Rogue hit you for 306 points of melee damage.
     ["#0000000042000006#","Me hit by monster","",1425326287]Predator Rogue hit you for 717 points of melee damage.Critical hit!
@@ -366,34 +370,34 @@ LineInfo Parser::meHitByMonster(const std::vector<std::string>& splitLine) {
     */
     LineInfo li;
     std::smatch m;
-    regex_search(splitLine[4], m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // Match as few chars as possible untill " hit".
+    regex_search(formattedLine.getMessage(), m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // Match as few chars as possible untill " hit".
     li.dealer_name = m[0];
     li.receiver_name = "You";
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
-    li.deflect = isDeflect(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
+    li.deflect = isDeflect(formattedLine);
     return li;
 }
 
-LineInfo Parser::meHitByNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meHitByNano(FormattedLine& formattedLine) {
     /*
     ["#0000000042000002#","Me hit by nano","",1425326283]You were attacked with nanobots from Predator Rogue for 875 points of poison damage.
     */
     LineInfo li;
     std::smatch m;
-    regex_search(splitLine[4], m, regex("(?:from )(.*?)(?= for)"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:from )(.*?)(?= for)"));
     li.dealer_name = m[1];
     li.receiver_name = "You";
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
     li.nanobots = true;
     return li;
 }
 
-LineInfo Parser::meHitByPlayer(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meHitByPlayer(FormattedLine& formattedLine) {
     /*
     ["#0000000042000007#","Me hit by player","",1434406040]Player Balas hit you for 854 points of projectile damage.
     ["#0000000042000007#","Me hit by player","",1434406024]Balas hit you for 949 points of Aimed Shot damage.
@@ -401,30 +405,28 @@ LineInfo Parser::meHitByPlayer(const std::vector<std::string>& splitLine) {
     LineInfo li;
     std::smatch m;
     li.receiver_name = "You";
-    if (regex_search(splitLine[4], m, regex("(?:Player )(.*?)(?= hit you for )")) ||
-        regex_search(splitLine[4], m, regex("(.*?)(?= hit you for )"))) {
+    if (regex_search(formattedLine.getMessage(), m, regex("(?:Player )(.*?)(?= hit you for )")) ||
+        regex_search(formattedLine.getMessage(), m, regex("(.*?)(?= hit you for )"))) {
         li.dealer_name = m[1];
     }
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
-    li.deflect = isDeflect(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
+    li.deflect = isDeflect(formattedLine);
     return li;
 }
 
-LineInfo Parser::otherMisses(const std::vector<std::string>& splitLine) {
+LineInfo Parser::otherMisses(FormattedLine& formattedLine) {
     /*
     ["#0000000042000013#","Other misses","",1425326282]Predator Rogue tried to hit you, but missed!
     // Find my own version:
     ["#0000000042000013#","Other misses","",1180557880]Keepone tries to attack you with FastAttack, but misses!
     */
-    // The log line is split at "," so everything following the "," is in
-    // splitLine[5]
     LineInfo li;
     std::smatch m;
-    if (regex_search(splitLine[4], m, regex("(.*?)(?: tried to hit )(.*)")) ||
-        regex_search(splitLine[4], m, regex("(.*?)(?: tries to attack )(.*?)(?: with )"))) {
+    if (regex_search(formattedLine.getMessage(), m, regex("(.*?)(?: tried to hit )(.*)(?:, but missed!)")) ||
+        regex_search(formattedLine.getMessage(), m, regex("(.*?)(?: tries to attack )(.*?)(?: with )"))) {
         li.dealer_name = m[1];
         li.receiver_name = m[2];
         if (li.receiver_name == "you") {
@@ -433,12 +435,12 @@ LineInfo Parser::otherMisses(const std::vector<std::string>& splitLine) {
     }
     li.miss = true;
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
+    li.subtype = findSubtype(formattedLine);
     renameSpecial(li);  // Specials in misses have a different name
     return li;
 }
 
-LineInfo Parser::yourMisses(const std::vector<std::string>& splitLine) {
+LineInfo Parser::yourMisses(FormattedLine& formattedLine) {
     /*
     ["#0000000042000012#","Your misses","",1425666157]You try to attack Peal Thunder with Brawl, but you miss!
     ["#0000000042000012#","Your misses","",1426199923]You tried to hit Stim Fiend, but missed!
@@ -446,18 +448,18 @@ LineInfo Parser::yourMisses(const std::vector<std::string>& splitLine) {
     LineInfo li;
     std::smatch m;
     li.dealer_name = "You";
-    if (regex_search(splitLine[4], m, regex("(?:attack )(.*?)(?= with )")) ||
-        regex_search(splitLine[4], m, regex("(?:hit )(.*)"))) {
+    if (regex_search(formattedLine.getMessage(), m, regex("(?:attack )(.*?)(?= with )")) ||
+        regex_search(formattedLine.getMessage(), m, regex("(?:hit )(.*)(?:, but missed!)"))) {
         li.receiver_name = m[1];
     }
     li.miss = true;
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
+    li.subtype = findSubtype(formattedLine);
     renameSpecial(li);  // Specials in misses have a different name
     return li;
 }
 
-LineInfo Parser::meHitByEnvironment(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meHitByEnvironment(FormattedLine& formattedLine) {
     /* Need to get my own example line
     ["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
     */
@@ -466,14 +468,14 @@ LineInfo Parser::meHitByEnvironment(const std::vector<std::string>& splitLine) {
     li.receiver_name = "You";
     li.dealer_name = "Environment";
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
-    li.deflect = isDeflect(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
+    li.deflect = isDeflect(formattedLine);
     return li;
 }
 
-LineInfo Parser::meCastNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meCastNano(FormattedLine& formattedLine) {
     /*
     ["#0000000042000018#","Me Cast Nano","",1425326300]Executing Nano Program: Improved Mongo Crush!.
     ["#0000000042000018#","Me Cast Nano","",1425326300]Nano program executed successfully.
@@ -504,23 +506,23 @@ LineInfo Parser::meCastNano(const std::vector<std::string>& splitLine) {
     std::smatch m;
     li.type = "nano_cast";
     li.dealer_name = "You";
-    if (regex_search(splitLine[4], m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
+    if (regex_search(formattedLine.getMessage(), m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
         li.nanoProgram->setName(m[1]);
         li.subtype = "execute";
     }
-    else if (splitLine[4] == "Nano program executed successfully.") {
+    else if (formattedLine.getMessage() == "Nano program executed successfully.") {
         li.subtype = "land";
     }
-    else if (splitLine[4] == "Target resisted.") {
+    else if (formattedLine.getMessage() == "Target resisted.") {
         li.subtype = "resist";
     }
-    else if (splitLine[4] == "Nano program aborted.") {
+    else if (formattedLine.getMessage() == "Nano program aborted.") {
         li.subtype = "abort";
     }
-    else if (splitLine[4] == "Your target countered the nano program.") {
+    else if (formattedLine.getMessage() == "Your target countered the nano program.") {
         li.subtype = "counter";
     }
-    else if (splitLine[4] == "You fumbled.") {  // Find one of these log messages
+    else if (formattedLine.getMessage() == "You fumbled.") {  // Find one of these log messages
         li.subtype = "fumble";
     }
     li.nanoProgram->addStat(li.subtype, 1);
@@ -528,18 +530,18 @@ LineInfo Parser::meCastNano(const std::vector<std::string>& splitLine) {
     return li;
 }
 
-LineInfo Parser::yourPetHitByNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::yourPetHitByNano(FormattedLine& formattedLine) {
     // Find example
     LineInfo li;
     std::smatch m;
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
     return li;
 }
 
-LineInfo Parser::yourPetHitByMonster(const std::vector<std::string>& splitLine) {
+LineInfo Parser::yourPetHitByMonster(FormattedLine& formattedLine) {
     /* Find my own log line, also find one of these when it this "you" and "other".
     ["#0000000042000011#","Your pet hit by monster","",1191516331]Your pet Vios was damaged by a toxic substance for 25 points of damage.
 
@@ -547,18 +549,18 @@ LineInfo Parser::yourPetHitByMonster(const std::vector<std::string>& splitLine) 
     */
     LineInfo li;
     std::smatch m;
-    regex_search(splitLine[4], m, regex("(?:Your pet )(.*?)( was damaged by a )"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:Your pet )(.*?)( was damaged by a )"));
     li.receiver_name = m[1];
     li.dealer_name = "Environment";
     li.type = "damage";
-    li.subtype = find_subtype(splitLine);
-    li.amount = find_amount(splitLine);
-    li.crit = isCrit(splitLine);
-    li.deflect = isDeflect(splitLine);
+    li.subtype = findSubtype(formattedLine);
+    li.amount = findAmount(formattedLine);
+    li.crit = isCrit(formattedLine);
+    li.deflect = isDeflect(formattedLine);
     return li;
 }
 
-LineInfo Parser::meGotSK(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meGotSK(FormattedLine& formattedLine) {
     /*
     ["#000000004200000c#","Me got SK","",1425993638]You gained 200 points of Shadowknowledge.
     ["#000000004200000c#","Me got SK","",1425994822]You lost 200 points of Shadowknowledge
@@ -567,17 +569,17 @@ LineInfo Parser::meGotSK(const std::vector<std::string>& splitLine) {
     std::smatch m;
     li.receiver_name = "You";
     li.type = "xp";
-    li.amount = find_amount(splitLine);
-    if (regex_search(splitLine[4], m, regex("gained"))) {
+    li.amount = findAmount(formattedLine);
+    if (regex_search(formattedLine.getMessage(), m, regex("gained"))) {
         li.subtype = "sk";
     }
-    else if (regex_search(splitLine[4], m, regex("lost"))) {
+    else if (regex_search(formattedLine.getMessage(), m, regex("lost"))) {
         li.subtype = "sk lost";
     }
     return li;
 }
 
-LineInfo Parser::megotXP(const std::vector<std::string>& splitLine) {
+LineInfo Parser::megotXP(FormattedLine& formattedLine) {
     /*
     ["#000000004200000b#","Me got XP","",1426200654]You lost 9822 xp.
     ["#000000004200000b#","Me got XP","",1425993638]You gained 2562 new Alien Experience Points.
@@ -588,21 +590,21 @@ LineInfo Parser::megotXP(const std::vector<std::string>& splitLine) {
     std::smatch xp;
     li.receiver_name = "You";
     li.type = "xp";
-    li.amount = find_amount(splitLine);
-    if (regex_search(splitLine[4], m, regex("gained"))) {
+    li.amount = findAmount(formattedLine);
+    if (regex_search(formattedLine.getMessage(), m, regex("gained"))) {
         li.subtype = "aixp";
     }
-    else if (regex_search(splitLine[4], m, regex("received"))) {
+    else if (regex_search(formattedLine.getMessage(), m, regex("received"))) {
         li.subtype = "xp";
     }
-    else if (regex_search(splitLine[4], m, regex("lost"))) {
+    else if (regex_search(formattedLine.getMessage(), m, regex("lost"))) {
         // Find out what an aixp loss looks like
         li.subtype = "xp lost";
     }
     return li;
 }
 
-LineInfo Parser::research(const std::vector<std::string>& splitLine) {
+LineInfo Parser::research(FormattedLine& formattedLine) {
     /*
     There is also global research. Ignore it for now.
     ["#000000004200001c#","Research","",1425326289]139139 of your XP were allocated to your personal research.<br>
@@ -612,54 +614,54 @@ LineInfo Parser::research(const std::vector<std::string>& splitLine) {
     li.receiver_name = "You";
     li.type = "xp";
     li.subtype = "research";
-    li.amount = find_amount(splitLine);
+    li.amount = findAmount(formattedLine);
     return li;
 }
 
-LineInfo Parser::youGaveNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::youGaveNano(FormattedLine& formattedLine) {
     /*
     ["#0000000042000017#","You gave nano","",1425734907]You increased nano on Sayet for 2102 points.
     */
     LineInfo li;
     std::smatch m;
     li.dealer_name = "You";
-    regex_search(splitLine[4], m, regex("(?:nano on )(.*?)(?= for)"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:nano on )(.*?)(?= for)"));
     li.receiver_name = m[1];
     li.type = "nano";
-    li.amount = find_amount(splitLine);
+    li.amount = findAmount(formattedLine);
     return li;
 }
 
-LineInfo Parser::meGotNano(const std::vector<std::string>& splitLine) {
+LineInfo Parser::meGotNano(FormattedLine& formattedLine) {
     /* Find my own log line, remember to replace in the log file.
     ["#0000000042000016#","Me got nano","",1180555427]You got nano from Jspe80 for 288 points.
     */
     LineInfo li;
     std::smatch m;
     li.receiver_name = "You";
-    regex_search(splitLine[4], m, regex("(?:You got nano from )(.*?)(?= for)"));
+    regex_search(formattedLine.getMessage(), m, regex("(?:You got nano from )(.*?)(?= for)"));
     li.dealer_name = m[1];
     li.type = "nano";
-    li.amount = find_amount(splitLine);
+    li.amount = findAmount(formattedLine);
     return li;
 }
 
-LineInfo Parser::victoryPoints(const std::vector<std::string>& splitLine) {
+LineInfo Parser::victoryPoints(FormattedLine& formattedLine) {
     // Check what this message looks like.
     // Maybe it's a system message.
-    (void)splitLine;
+    (void)formattedLine;
     LineInfo li;
     return li;
 }
 
-LineInfo Parser::system(const std::vector<std::string>& splitLine) {
-    (void)splitLine;
+LineInfo Parser::system(FormattedLine& formattedLine) {
+    (void)formattedLine;
     LineInfo li;
     li.hasStats = false;
     return li;
 }
 
-LineInfo Parser::chat(const std::vector<std::string>& splitLine) {
+LineInfo Parser::chat(FormattedLine& formattedLine) {
     // Reads chat for commands made by the player running the program
     /* Add raid chat?
 
@@ -670,10 +672,10 @@ LineInfo Parser::chat(const std::vector<std::string>& splitLine) {
     LineInfo li;
     li.hasStats = false;
     std::smatch m;
-    if (splitLine[2] == playerRunningProgram &&
-        splitLine[4] == "dd") {
+    if (formattedLine.getSender() == playerRunningProgram &&
+        formattedLine.getMessage() == "dd") {
         li.hasCommand = true;
-        li.command = splitLine[4];
+        li.command = formattedLine.getMessage();
     }
     return li;
 }

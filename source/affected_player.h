@@ -7,7 +7,7 @@
 #include <map>
 #include "base_player.h"
 #include "line_info.h"
-#include "log_line.h"
+#include "formatted_line.h"
 #include "heal.h"
 #include "damage.h"
 #include "nano.h"
@@ -16,12 +16,12 @@
 class AffectedPlayer : public BasePlayer {
 public:
 	AffectedPlayer();
-	AffectedPlayer(std::string name, LogLine& logLine);
+	AffectedPlayer(std::string name, LineInfo& lineInfo);
 	~AffectedPlayer();
 	AffectedPlayer(const AffectedPlayer& p);
 	AffectedPlayer& operator=(const AffectedPlayer& p);
 
-    void add(LogLine& logLine);
+    void add(LineInfo& lineInfo);
 
     Damage getTotalDamage() const;
     Damage getTotalDamage(bool nanobots) const;

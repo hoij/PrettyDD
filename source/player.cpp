@@ -5,8 +5,8 @@
 Player::Player() {
 }
 
-Player::Player(std::string name, LogLine& logLine) : BasePlayer(name) {
-    add(logLine);
+Player::Player(std::string name, LineInfo& lineInfo) : BasePlayer(name) {
+    add(lineInfo);
 }
 
 Player::~Player() {
@@ -30,30 +30,29 @@ Player& Player::operator=(const Player& p) {
     return *this;
 }
 
-void Player::add(LogLine& logLine) {
-        LineInfo& li = logLine.getInfo();
-    if (li.type == "damage" || li.type == "heal" || li.type == "nano") {
-        affectedPlayers.addToPlayers(logLine);
+void Player::add(LineInfo& lineInfo) {
+    if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
+        affectedPlayers.addToPlayers(lineInfo);
     }
-    else if (li.type == "nano_cast") {
+    else if (lineInfo.type == "nano_cast") {
     // Only add the nano when a message about the success/fail has arrived.
     // Because in that case, the nano will not be mentioned by name.
-        if (li.nanoProgram->getName() != "") {
-            last_nano_casted = *li.nanoProgram;
+        if (lineInfo.nanoProgram->getName() != "") {
+            last_nano_casted = *lineInfo.nanoProgram;
         }
         else {
             // If nano casted successfully/resisted/countered/aborted/fumble/interrupt?
-            last_nano_casted.addStat(li.subtype, 1);
+            last_nano_casted.addStat(lineInfo.subtype, 1);
             addNanoProgram(last_nano_casted);
         }
     }
-    else if (li.type == "xp") {
-        addXp(li);
+    else if (lineInfo.type == "xp") {
+        addXp(lineInfo);
     }
 }
 
-void Player::addXp(LineInfo& li) {
-    xp.add(li);
+void Player::addXp(LineInfo& lineInfo) {
+    xp.add(lineInfo);
 }
 
 void Player::addNanoProgram(NanoProgram& np) {

@@ -4,7 +4,7 @@
 
 #include <iterator>
 #include <vector>
-#include "log_line.h"
+#include "formatted_line.h"
 #include "line_info.h"
 #include "logger.h"
 
@@ -16,11 +16,11 @@ public:
     ~PlayerVector() {}
     PlayerVector<C>& operator=(C& pv);
 
-    void createPlayer(std::string name, LogLine& logLine);
+    void createPlayer(std::string name, LineInfo& lineInfo);
     const C* getPlayer(std::string name);
     std::vector<C>& getPlayers();
     void removePlayer();
-    void addToPlayers(LogLine& logLine);
+    void addToPlayers(LineInfo& lineInfo);
     unsigned int getLongestNameLength() const;
 
     typedef typename std::vector<C>::iterator PlayerVectorIterator;
@@ -46,49 +46,33 @@ PlayerVector<C>& PlayerVector<C>::operator=(C& pv) {
 }
 
 template<class C>
-void PlayerVector<C>::addToPlayers(LogLine& logLine) {
+void PlayerVector<C>::addToPlayers(LineInfo& lineInfo) {
     // Adds the info found in a log line to dealer and receiver.
     // If no player is found a new one is created.
-    LineInfo& li = logLine.getInfo();
     bool dealerFound = false;
     bool receiverFound = false;
 
 	for (C& p : players) {
-		if (p.getName() == li.dealer_name) {
-			p.add(logLine);
+		if (p.getName() == lineInfo.dealer_name) {
+			p.add(lineInfo);
 			dealerFound = true;
 		}
-		else if (p.getName() == li.receiver_name) {
-			p.add(logLine);
+		else if (p.getName() == lineInfo.receiver_name) {
+			p.add(lineInfo);
 			receiverFound = true;
 		}
 	}
-	if(!dealerFound && li.dealer_name != "") {
-        createPlayer(li.dealer_name, logLine);
+	if(!dealerFound && lineInfo.dealer_name != "") {
+        createPlayer(lineInfo.dealer_name, lineInfo);
     }
-	if(!receiverFound && li.receiver_name != "") {
-        createPlayer(li.receiver_name, logLine);
-    }
-
-    // For development purposes only
-    // Just to capture anything I might have missed.
-    if (li.dealer_name == "" && li.receiver_name == "") {
-        errorLog.write("Could not find dealer and receiver name in the following line (Note: This may be normal): ");
-        errorLog.write(logLine.getOriginalLine());
-    }
-    else if (li.dealer_name == "") {
-        errorLog.write("Could not find dealer name in the following line (Note: This may be normal): ");
-        errorLog.write(logLine.getOriginalLine());
-    }
-    else if (li.receiver_name == "") {
-        errorLog.write("Could not find receiver name in the following line (Note: This may be normal): ");
-        errorLog.write(logLine.getOriginalLine());
+	if(!receiverFound && lineInfo.receiver_name != "") {
+        createPlayer(lineInfo.receiver_name, lineInfo);
     }
 }
 
 template<class C>
-void PlayerVector<C>::createPlayer(std::string name, LogLine& logLine) {
-    C p(name, logLine);
+void PlayerVector<C>::createPlayer(std::string name, LineInfo& lineInfo) {
+    C p(name, lineInfo);
     players.push_back(p);
 }
 

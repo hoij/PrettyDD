@@ -13,46 +13,46 @@ class Parser {
 public:
     Parser(std::string playerRunningProgram);
 
-    LogLine parse(std::string line);
+    LineInfo parse(FormattedLine& formattedLine);
 
 private:
     //FRIEND_TEST(Parser, Constructor);
     void createFunctionMap();
-    bool isCrit(const std::vector<std::string>& splitLine);
-    bool isDeflect(const std::vector<std::string>& splitLine);
-    int find_amount(const std::vector<std::string>& splitLine);
-    std::string find_subtype(const std::vector<std::string>& splitLine);
+    bool isCrit(FormattedLine& formattedLine);
+    bool isDeflect(FormattedLine& formattedLine);
+    int findAmount(FormattedLine& formattedLine);
+    std::string findSubtype(FormattedLine& formattedLine);
     void renameSpecial(LineInfo& li);
-    int find_values(LogLine& logLine);
+    void logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLine& formattedLine);
 
     std::string playerRunningProgram;
-    typedef LineInfo (Parser::*pfunc)(const std::vector<std::string>& splitLine);
+    typedef LineInfo (Parser::*pfunc)(FormattedLine& formattedLine);
     std::map<std::string, pfunc> funcMap;
 
     // Functions within the funcMap
-    LineInfo otherAndYourPetHitByOther(const std::vector<std::string>& splitLine);
-    LineInfo otherHitByNano(const std::vector<std::string>& splitLine);
-    LineInfo youHitOther(const std::vector<std::string>& splitLine);
-    LineInfo youHitOtherWithNano(const std::vector<std::string>& splitLine);
-    LineInfo meGotHealth(const std::vector<std::string>& splitLine);
-    LineInfo youGaveHealth(const std::vector<std::string>& splitLine);
-    LineInfo meHitByMonster(const std::vector<std::string>& splitLine);
-    LineInfo meHitByEnvironment(const std::vector<std::string>& splitLine);
-    LineInfo meHitByPlayer(const std::vector<std::string>& splitLine);
-    LineInfo otherMisses(const std::vector<std::string>& splitLine);
-    LineInfo yourMisses(const std::vector<std::string>& splitLine);
-    LineInfo meHitByNano(const std::vector<std::string>& splitLine);
-    LineInfo meCastNano(const std::vector<std::string>& splitLine);
-    LineInfo yourPetHitByNano(const std::vector<std::string>& splitLine);
-    LineInfo yourPetHitByMonster(const std::vector<std::string>& splitLine);
-    LineInfo meGotSK(const std::vector<std::string>& splitLine);
-    LineInfo megotXP(const std::vector<std::string>& splitLine);
-    LineInfo research(const std::vector<std::string>& splitLine);
-    LineInfo youGaveNano(const std::vector<std::string>& splitLine);
-    LineInfo meGotNano(const std::vector<std::string>& splitLine);
-    LineInfo victoryPoints(const std::vector<std::string>& splitLine);
-    LineInfo system(const std::vector<std::string>& splitLine);
-    LineInfo chat(const std::vector<std::string>& splitLine);
+    LineInfo otherAndYourPetHitByOther(FormattedLine& formattedLine);
+    LineInfo otherHitByNano(FormattedLine& formattedLine);
+    LineInfo youHitOther(FormattedLine& formattedLine);
+    LineInfo youHitOtherWithNano(FormattedLine& formattedLine);
+    LineInfo meGotHealth(FormattedLine& formattedLine);
+    LineInfo youGaveHealth(FormattedLine& formattedLine);
+    LineInfo meHitByMonster(FormattedLine& formattedLine);
+    LineInfo meHitByEnvironment(FormattedLine& formattedLine);
+    LineInfo meHitByPlayer(FormattedLine& formattedLine);
+    LineInfo otherMisses(FormattedLine& formattedLine);
+    LineInfo yourMisses(FormattedLine& formattedLine);
+    LineInfo meHitByNano(FormattedLine& formattedLine);
+    LineInfo meCastNano(FormattedLine& formattedLine);
+    LineInfo yourPetHitByNano(FormattedLine& formattedLine);
+    LineInfo yourPetHitByMonster(FormattedLine& formattedLine);
+    LineInfo meGotSK(FormattedLine& formattedLine);
+    LineInfo megotXP(FormattedLine& formattedLine);
+    LineInfo research(FormattedLine& formattedLine);
+    LineInfo youGaveNano(FormattedLine& formattedLine);
+    LineInfo meGotNano(FormattedLine& formattedLine);
+    LineInfo victoryPoints(FormattedLine& formattedLine);
+    LineInfo system(FormattedLine& formattedLine);
+    LineInfo chat(FormattedLine& formattedLine);
 };
 
 #endif  //  PARSER_H

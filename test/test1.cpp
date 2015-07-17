@@ -4,7 +4,12 @@
 
 
 TEST(Parser, Construct) {
-  Parser parser("Sgtcuddle");
+    Parser parser("Sgtcuddle");
+}
+
+Test(Parser, otherAndYourPetHitByOther) {
+    Parser parser("");
+    //parser.parse();
 }
 
     //EXPECT_EQ(3, t.getI());

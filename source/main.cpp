@@ -7,7 +7,7 @@
 #include <vector>
 #include "player.h"
 #include "player_vector.h"
-#include "log_line.h"
+#include "formatted_line.h"
 #include "logger.h"
 #include "parser.h"
 #include "configuration.h"
@@ -51,28 +51,29 @@ int main(void) {
 
 		//ifstream logstream("log.txt");
 
-        std::string line;
+        std::string logLine;
 		bool is_running = true;
 		while (is_running) {
-			while (getline(logstream, line)) {
-				std::cout << line << std::endl;
-				LogLine parsedLine = parser.parse(line);
-				if (parsedLine.isFormatted()) {
-                    // Maybe call these isData or isCommand and check those in
-                    // the if statements.
-                    if(parsedLine.hasPlayerStats()) {
-                        pv.addToPlayers(parsedLine);
+			while (getline(logstream, logLine)) {
+				std::cout << logLine << std::endl;
+				FormattedLine formattedLine(logLine);
+                // TODO: Figure out some way to handling this check nicer.
+				if (formattedLine.isFormatted()) {
+                    LineInfo lineInfo = parser.parse(formattedLine);
+                    if(lineInfo.hasStats) {
+                        pv.addToPlayers(lineInfo);
+
                     }
-                    else if (parsedLine.hasCommand()) {
-                        // write an new class/header for this that deals with input
-                        if (parsedLine.getCommand() == "dd") {
+                    else if (lineInfo.hasCommand) {
+                        // write a new class/header for this that deals with input
+                        if (lineInfo.command == "dd") {
                             writeDamageDealtOverview(pv);
                             writeDamageReceivedOverview(pv);
                             writeDamageDealtPerOpponent(pv.getPlayer("You"));
                         }
                     }
                 }
-			}
+            }
 			if (!logstream.eof()) {  // Why did I check for this?
 				std::cout << "Error: Not EOF!" << std::endl;
 				is_running = false;

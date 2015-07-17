@@ -4,8 +4,8 @@
 AffectedPlayer::AffectedPlayer() {
 }
 
-AffectedPlayer::AffectedPlayer(std::string name, LogLine& logLine) : BasePlayer(name) {
-    add(logLine);
+AffectedPlayer::AffectedPlayer(std::string name, LineInfo& lineInfo) : BasePlayer(name) {
+    add(lineInfo);
 }
 
 AffectedPlayer::~AffectedPlayer(){
@@ -29,13 +29,12 @@ AffectedPlayer& AffectedPlayer::operator=(const AffectedPlayer& p) {
     return *this;
 }
 
-void AffectedPlayer::add(LogLine& logLine) {
-    LineInfo& li = logLine.getInfo();
-    if (li.type == "damage") {
-        addDamage(li);
+void AffectedPlayer::add(LineInfo& lineInfo) {
+    if (lineInfo.type == "damage") {
+        addDamage(lineInfo);
     }
-    else if (li.type == "heal") {
-        addHeal(li);
+    else if (lineInfo.type == "heal") {
+        addHeal(lineInfo);
     }
 }
 

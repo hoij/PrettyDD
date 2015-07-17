@@ -8,7 +8,7 @@
 #include "base_player.h"
 #include "affected_player.h"
 #include "line_info.h"
-#include "log_line.h"
+#include "formatted_line.h"
 #include "player_vector.h"
 #include "heal.h"
 #include "damage.h"
@@ -20,12 +20,12 @@
 class Player : public BasePlayer {
 public:
 	Player();
-	Player(std::string name, LogLine& logLine);
+	Player(std::string name, LineInfo& lineInfo);
 	~Player();
 	Player(const Player& p);
 	Player& operator=(const Player& p);
 
-    void add(LogLine& logLine);
+    void add(LineInfo& lineInfo);
 
     Damage getTotalDamage();
     Damage getTotalDamage(bool nanobots);
