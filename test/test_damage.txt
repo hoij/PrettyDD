@@ -34,6 +34,8 @@
 ["#000000004200000a#","Other hit by other","",1434406034]Balas's reflect shield hit Junebop for 161 points of damage.
 ["#000000004200000a#","Other hit by other","",1425997610]Letter hit Reet of Paradise for 1586 points of melee damage.Critical hit!
 ["#000000004200000a#","Other hit by other","",1434359748]Cratdat hit Ensign - Ilari'Ra for 801 points of projectile damage. Glancing hit.
+["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
+["#000000004200000a#","Other hit by other","",1183504118]Something hit Enfodruid for 1 points of damage by damage shield.
 ["#000000004200001c#","Research","",1425326289]139139 of your XP were allocated to your personal research.<br>
 ["#000000004200000b#","Me got XP","",1425993638]You gained 2562 new Alien Experience Points.
 ["#000000004200000b#","Me got XP","",1426199427]You received 300 xp.

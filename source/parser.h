@@ -16,7 +16,7 @@ public:
     LineInfo parse(FormattedLine& formattedLine);
 
 private:
-    FRIEND_TEST(Parser, otherAndYourPetHitByOther);
+    FRIEND_TEST(ParseTest, Damage);
     void createFunctionMap();
     bool isCrit(const std::string& message);
     bool isDeflect(const std::string& message);

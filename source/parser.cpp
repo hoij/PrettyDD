@@ -116,8 +116,13 @@ int Parser::findAmount(const std::string& message) {
 
 std::string Parser::findSubtype(const std::string& message) {
     // Finds damage and heal subtype.
+    /*
+        // These lines still exist?
+    ["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
+    ["#000000004200000a#","Other hit by other","",1183504118] Something hit Enfodruid for 1 points of damage by damage shield.
+    */
     std::smatch t;
-    if (regex_search(message, t, regex("(?:points of )(.*?)(?= damage)")))	{
+    if (regex_search(message, t, regex("(?:points of )(.*?)(?= damage\\.)"))) {
         // Looks for regular and special damage
         return t[1];
     }
@@ -125,7 +130,7 @@ std::string Parser::findSubtype(const std::string& message) {
         // Looks for reflect or shield damage
         return t[1];
     }
-    else if (regex_search(message, t, regex("(?: with )(.*)(?:, but )"))) {
+    else if (regex_search(message, t, regex("(?: with )(.*)(?=, but )"))) {
         // Looks for special damage in case of a miss.
         return t[1];
     }
@@ -139,6 +144,9 @@ std::string Parser::findSubtype(const std::string& message) {
         return "actual";
     }
     else if (regex_search(message, t, regex("(?: damaged by )(.*?)( for )"))) {
+        return t[1];
+    }
+    else if (regex_search(message, t, regex("(?: damage by )(.*?)(?=\\.)"))) {
         return t[1];
     }
     else {

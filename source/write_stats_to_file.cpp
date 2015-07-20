@@ -15,7 +15,7 @@
 void writeDamageDealtOverview(PlayerVector<Player>& pv) {
     std::ofstream file("damage_dealt_overview");
     if (file.is_open()) {
-        unsigned int longestNameLength;
+        unsigned int longestNameLength = 0;
         for (const Player& p : pv.getPlayers()) {
             if (p.getName().length() > longestNameLength) {
                 longestNameLength = p.getName().length();
