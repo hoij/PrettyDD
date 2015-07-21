@@ -54,7 +54,7 @@ void Parser::createFunctionMap() {
     funcMap["Your pet hit by nano"] = &Parser::yourPetHitByNano;
     funcMap["Your pet hit by monster"] = &Parser::yourPetHitByMonster;
     funcMap["Me got SK"] = &Parser::meGotSK;
-    funcMap["Me got XP"] = &Parser::megotXP;
+    funcMap["Me got XP"] = &Parser::meGotXP;
     funcMap["Research"] = &Parser::research;
     funcMap["You gave nano"] = &Parser::youGaveNano;
     funcMap["Me got nano"] = &Parser::meGotNano;
@@ -345,8 +345,6 @@ LineInfo Parser::youHitOtherWithNano(const std::string& message) {
 LineInfo Parser::meGotHealth(const std::string& message) {
     /*
     ["#0000000042000015#","Me got health","",1425326282]You were healed for 193 points.
-    ["#0000000042000015#","Me got health","",1425995902]You got healed by Starphoenix for 3359 points of health.
-    ["#0000000042000015#","Me got health","",1425995902]You were healed for 3359 points.
     ["#0000000042000015#","Me got health","",1425996008]You got healed by Starphoenix for 3173 points of health.
     ["#0000000042000015#","Me got health","",1425996008]You were healed for 1949 points.
     */
@@ -395,8 +393,11 @@ LineInfo Parser::meHitByMonster(const std::string& message) {
     */
     LineInfo li;
     std::smatch m;
-    regex_search(message, m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // Match as few chars as possible untill " hit".
+    regex_search(message, m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // The order here is important.
     li.dealer_name = m[0];
+    if (li.dealer_name == "Someone") {
+        li.dealer_name = "Unknown";
+    }
     li.receiver_name = "You";
     li.type = "damage";
     li.subtype = findSubtype(message);
@@ -527,10 +528,10 @@ LineInfo Parser::meCastNano(const std::string& message) {
     */
     LineInfo li;
     std::smatch m;
-    li.type = "nano_cast";
+    li.type = "nano cast";
     li.dealer_name = "You";
     if (regex_search(message, m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
-        li.nanoProgram->setName(m[1]);
+        li.nanoProgramName = m[1];
         li.subtype = "execute";
     }
     else if (message == "Nano program executed successfully.") {
@@ -548,8 +549,6 @@ LineInfo Parser::meCastNano(const std::string& message) {
     else if (message == "You fumbled.") {  // Find one of these log messages
         li.subtype = "fumble";
     }
-    li.nanoProgram->addStat(li.subtype, 1);
-    cout << "Nano casted: " << li.nanoProgram->getName() << endl;
     return li;
 }
 
@@ -602,7 +601,7 @@ LineInfo Parser::meGotSK(const std::string& message) {
     return li;
 }
 
-LineInfo Parser::megotXP(const std::string& message) {
+LineInfo Parser::meGotXP(const std::string& message) {
     /*
     ["#000000004200000b#","Me got XP","",1426200654]You lost 9822 xp.
     ["#000000004200000b#","Me got XP","",1425993638]You gained 2562 new Alien Experience Points.

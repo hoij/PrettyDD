@@ -1,10 +1,5 @@
 #include <ostream>
 #include "line_info.h"
-#include "nano_program.h"
-
-LineInfo::LineInfo() {
-    nanoProgram = new NanoProgram;
-}
 
 LineInfo::LineInfo(std::string dealer_name,
                    std::string receiver_name,
@@ -17,7 +12,8 @@ LineInfo::LineInfo(std::string dealer_name,
                    bool miss = false,
                    bool nanobots = false,
                    bool hasCommand = false,
-                   bool hasStats = true) :
+                   bool hasStats = true,
+                   std::string nanoProgramName = "") :
     dealer_name(dealer_name),
     receiver_name(receiver_name),
     type(type),
@@ -29,13 +25,8 @@ LineInfo::LineInfo(std::string dealer_name,
     miss(miss),
     nanobots(nanobots),
     hasCommand(hasCommand),
-    hasStats(hasStats)
-{
-    nanoProgram = new NanoProgram;
-}
-
-LineInfo::~LineInfo() {
-    delete nanoProgram;
+    hasStats(hasStats),
+    nanoProgramName(nanoProgramName) {
 }
 
 LineInfo::LineInfo(const LineInfo& li) {
@@ -52,9 +43,7 @@ LineInfo::LineInfo(const LineInfo& li) {
     nanobots = li.nanobots;
     hasCommand = li.hasCommand;
     hasStats = li.hasStats;
-    if (nanoProgram) {
-        *nanoProgram = *(li.nanoProgram);
-    }
+    nanoProgramName = li.nanoProgramName;
 }
 
 LineInfo& LineInfo::operator=(LineInfo li) {
@@ -71,9 +60,7 @@ LineInfo& LineInfo::operator=(LineInfo li) {
         nanobots = li.nanobots;
         hasCommand = li.hasCommand;
         hasStats = li.hasStats;
-        if (nanoProgram) {
-            *nanoProgram = *(li.nanoProgram);
-        }
+        nanoProgramName = li.nanoProgramName;
     }
     return *this;
 }
@@ -91,7 +78,7 @@ std::ostream& operator<<(std::ostream& os, const LineInfo& li) {
         ", nanobots = " << li.nanobots <<
         ", hasCommand = " << li.hasCommand <<
         ", hasStats = " << li.hasStats <<
-        //*nanoProgram = *(li.nanoProgram);
+        ", nanoProgramName = " << li.nanoProgramName <<
         std::endl;
         return os;
 }

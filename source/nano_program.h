@@ -4,16 +4,13 @@
 
 #include <string>
 #include <map>
-#include "line_info.h"
-
-class LineInfo;
 
 class NanoProgram {
 public:
-    //NanoProgram();
+    NanoProgram() {}
+    NanoProgram(std::string name);
+    NanoProgram(std::string name, std::string action);
     //~NanoProgram();
-
-    void createProgram(const LineInfo& li);
 
     NanoProgram& operator=(const NanoProgram& np);
 
@@ -21,12 +18,13 @@ public:
 
     const std::string& getName() const;
     void setName(std::string name);
-    const std::map<std::string, int>& getStats() const;
-    void addStat(std::string stat, int value);
+    const std::map<std::string, int>& getActions() const;
+    int getActionCount(std::string action);
+    void addAction(std::string action);
 
 private:
     std::string name;
-    std::map<std::string, int> stats;
+    std::map<std::string, int> actions;
     // In stats: execute == number of times executed;
 };
 

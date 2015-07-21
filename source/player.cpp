@@ -1,5 +1,5 @@
-#include "player.h"
 #include <algorithm>
+#include "player.h"
 
 
 Player::Player() {
@@ -13,7 +13,7 @@ Player::~Player() {
 }
 
 Player::Player(const Player& p) : BasePlayer(p.getName()) {
-    last_nano_casted = p.last_nano_casted;
+    nameOfLastNanoProgramCasted = p.nameOfLastNanoProgramCasted;
     nanoPrograms = p.nanoPrograms;
     affectedPlayers = p.affectedPlayers;
     xp = p.xp;
@@ -22,7 +22,7 @@ Player::Player(const Player& p) : BasePlayer(p.getName()) {
 Player& Player::operator=(const Player& p) {
     if (this != &p) {
         setName(p.getName());
-        last_nano_casted = p.last_nano_casted;
+        nameOfLastNanoProgramCasted = p.nameOfLastNanoProgramCasted;
         nanoPrograms = p.nanoPrograms;
         affectedPlayers = p.affectedPlayers;
         xp = p.xp;
@@ -34,16 +34,17 @@ void Player::add(LineInfo& lineInfo) {
     if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
         affectedPlayers.addToPlayers(lineInfo);
     }
-    else if (lineInfo.type == "nano_cast") {
+    else if (lineInfo.type == "nano cast") {
     // Only add the nano when a message about the success/fail has arrived.
     // Because in that case, the nano will not be mentioned by name.
-        if (lineInfo.nanoProgram->getName() != "") {
-            last_nano_casted = *lineInfo.nanoProgram;
+        if (lineInfo.nanoProgramName != "") {
+            nameOfLastNanoProgramCasted = lineInfo.nanoProgramName;
         }
         else {
-            // If nano casted successfully/resisted/countered/aborted/fumble/interrupt?
-            last_nano_casted.addStat(lineInfo.subtype, 1);
-            addNanoProgram(last_nano_casted);
+            // If nano casted successfully/resisted/countered/aborted/fumble
+
+            // TODO: Must the last nano casted be a real nano or can it be just a name?
+            addNanoProgram(nameOfLastNanoProgramCasted, lineInfo.subtype);
         }
     }
     else if (lineInfo.type == "xp") {
@@ -55,15 +56,15 @@ void Player::addXp(LineInfo& lineInfo) {
     xp.add(lineInfo);
 }
 
-void Player::addNanoProgram(NanoProgram& np) {
+void Player::addNanoProgram(std::string name, std::string subtype) {
     // Adds a nano program if it hasn't already been added.
     for (auto& npInVec : nanoPrograms) {
-        if (npInVec.getName() == np.getName()) {
-            npInVec += np;
+        if (npInVec.getName() == name) {
+            npInVec.addAction(subtype);
             return;
         }
     }
-    nanoPrograms.push_back(np);
+    nanoPrograms.push_back(NanoProgram(name, subtype));
 }
 
 Damage Player::getTotalDamage() {

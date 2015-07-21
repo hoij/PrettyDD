@@ -29,7 +29,6 @@ add_library(parserlib
   formatted_line.cpp
   line_info.cpp
   logger.cpp
-  nano_program.cpp
   )
 add_library(nano_programlib nano_program.cpp)
 add_library(line_infolib line_info.cpp)

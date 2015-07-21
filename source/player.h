@@ -50,14 +50,14 @@ private:
                                           std::pair<std::string, Damage>& p2);
     static bool compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
                                                std::pair<std::string, Damage>& p2);
-    void addNanoProgram(NanoProgram& nanoProgram);
+    void addNanoProgram(std::string name, std::string subtype);
     void addXp(LineInfo& li);
     Damage sumDamage(bool nanobots);
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
     PlayerVector<AffectedPlayer> affectedPlayers;
 
-    NanoProgram last_nano_casted;
+    std::string nameOfLastNanoProgramCasted;
 	std::vector<NanoProgram> nanoPrograms;
 
     XP xp;

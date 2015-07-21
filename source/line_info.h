@@ -5,12 +5,10 @@
 #include <string>
 
 
-class NanoProgram;
-
 class LineInfo {
 public:
-    LineInfo();
-    virtual ~LineInfo();
+    LineInfo() {}
+    virtual ~LineInfo() {}
 
     LineInfo(std::string dealer_name,
              std::string receiver_name,
@@ -23,7 +21,8 @@ public:
              bool miss,
              bool nanobots,
              bool hasCommand,
-             bool hasStats);
+             bool hasStats,
+             std::string nanoProgramName);
 
     LineInfo(const LineInfo& li);
     LineInfo& operator=(LineInfo li);
@@ -41,7 +40,7 @@ public:
     bool nanobots = false;
     bool hasCommand = false;
     bool hasStats = true;
-    NanoProgram* nanoProgram = nullptr;
+    std::string nanoProgramName;
 
 private:
     inline std::string boolToString(bool b) const {

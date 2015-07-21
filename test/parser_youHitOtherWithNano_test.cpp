@@ -7,7 +7,7 @@ TEST_P(ParseTest, Damage) {
     const ExtendedLineInfo& eli = GetParam();
     // TODO: Need a way of selecting which function in parser to use depending
     // on what I want to test.
-    LineInfo result = parser->otherHitByNano(eli.message);
+    LineInfo result = parser->youHitOtherWithNano(eli.message);
     EXPECT_EQ(eli.dealer_name, result.dealer_name);
     EXPECT_EQ(eli.receiver_name, result.receiver_name);
     EXPECT_EQ(eli.type, result.type);
@@ -22,23 +22,14 @@ TEST_P(ParseTest, Damage) {
 
 INSTANTIATE_TEST_CASE_P(otherHitByNano, ParseTest,
     testing::Values(
-        ExtendedLineInfo("Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.",
-                               "Sgtcuddle",
-                               "Predator Rogue",
+        ExtendedLineInfo("You hit Kyr'Ozch Hive Medic with nanobots for 798 points of projectile damage.",
+                               "You",
+                               "Kyr'Ozch Hive Medic",
                                "damage",
-                               "energy",
-                               1293,
-                               false,
-                               false,
-                               false,
-                               true),
-        ExtendedLineInfo("Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.",
-                               "Unknown",
-                               "Frozen Spinetooth",
-                               "damage",
-                               "unknown",
-                               445,
+                               "projectile",
+                               798,
                                false,
                                false,
                                false,
                                true)));
+
