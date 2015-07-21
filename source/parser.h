@@ -16,6 +16,8 @@ public:
     LineInfo parse(FormattedLine& formattedLine);
 
 private:
+    FRIEND_TEST(ParseTest, otherAndYourPetHitByOther);
+    FRIEND_TEST(ParseTest, otherHitByNano);
     FRIEND_TEST(ParseTest, Damage);
     void createFunctionMap();
     bool isCrit(const std::string& message);
