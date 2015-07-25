@@ -1,30 +1,39 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "parser_param_test.h"
+#include <tuple>
+#include "parser.h"
+#include "line_info.h"
 
 
-TEST_P(ParseTest, Damage) {
-    const ExtendedLineInfo& eli = GetParam();
-    LineInfo result = parser->chat(eli.message, "Sgtcuddle");
-    EXPECT_EQ(eli.dealer_name, result.dealer_name);
-    EXPECT_EQ(eli.receiver_name, result.receiver_name);
-    EXPECT_EQ(eli.type, result.type);
-    EXPECT_EQ(eli.subtype, result.subtype);
-    EXPECT_EQ(eli.amount, result.amount);
-    EXPECT_EQ(eli.crit, result.crit);
-    EXPECT_EQ(eli.deflect, result.deflect);
-    EXPECT_EQ(eli.miss, result.miss);
-    EXPECT_EQ(eli.nanobots, result.nanobots);
-    EXPECT_EQ(eli.hasStats, result.hasStats);
+class ParseChatTest : public ::testing::TestWithParam<std::tuple<std::string, std::string, std::string>> {
+public:
+    static void SetUpTestCase() {
+        parser = new Parser("Sgtcuddle");
+    }
+    static void TearDownTestCase() {
+        delete parser;
+    }
+
+static Parser* parser;
+};
+
+Parser* ParseChatTest::parser = nullptr;
+
+TEST_P(ParseChatTest, parseChat) {
+    std::string message;
+    std::string sender;
+    std::string expectedCommand;
+    std::tie(message, sender, expectedCommand) = GetParam();
+    LineInfo result = parser->chat(message, sender);
+    EXPECT_EQ(expectedCommand, result.command);
 }
 
-// TODO: This will need a different test fixture becuase it require
-// the senders names + the message.
-//INSTANTIATE_TEST_CASE_P(chat, ParseTest,
-//    testing::Values(
-//        ExtendedLineInfo("dd",
-//                         "",
-//                         "",
-//                         ",
-//                         "",
-//                         )));
+// TODO: This will need a different ExtendedLineInfo because it uses commands.
+INSTANTIATE_TEST_CASE_P(parseChat, ParseChatTest,
+    testing::Values(std::make_tuple("dd", "Sgtcuddle", "dd"),
+                    std::make_tuple("ddd", "Sgtcuddle", ""),
+                    std::make_tuple(" dd", "Sgtcuddle", ""),
+                    std::make_tuple("Look at this amazing dd", "Sgtcuddle", ""),
+                    std::make_tuple("dd", "SSgtcuddle", ""),
+                    std::make_tuple("dd", "Sgtcuddlee", ""),
+                    std::make_tuple("dd", " Sgtcuddle", ""),
+                    std::make_tuple("dd", "An album cover", "")));

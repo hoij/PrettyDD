@@ -11,7 +11,6 @@ LineInfo::LineInfo(std::string dealer_name,
                    bool deflect = false,
                    bool miss = false,
                    bool nanobots = false,
-                   bool hasCommand = false,
                    bool hasStats = true,
                    std::string nanoProgramName = "") :
     dealer_name(dealer_name),
@@ -24,7 +23,6 @@ LineInfo::LineInfo(std::string dealer_name,
     deflect(deflect),
     miss(miss),
     nanobots(nanobots),
-    hasCommand(hasCommand),
     hasStats(hasStats),
     nanoProgramName(nanoProgramName) {
 }
@@ -41,7 +39,6 @@ LineInfo::LineInfo(const LineInfo& li) {
     deflect = li.deflect;
     miss = li.miss;
     nanobots = li.nanobots;
-    hasCommand = li.hasCommand;
     hasStats = li.hasStats;
     nanoProgramName = li.nanoProgramName;
 }
@@ -58,7 +55,6 @@ LineInfo& LineInfo::operator=(LineInfo li) {
         deflect = li.deflect;
         miss = li.miss;
         nanobots = li.nanobots;
-        hasCommand = li.hasCommand;
         hasStats = li.hasStats;
         nanoProgramName = li.nanoProgramName;
     }
@@ -76,7 +72,6 @@ std::ostream& operator<<(std::ostream& os, const LineInfo& li) {
         ", deflect = " << li.deflect <<
         ", miss = " << li.miss <<
         ", nanobots = " << li.nanobots <<
-        ", hasCommand = " << li.hasCommand <<
         ", hasStats = " << li.hasStats <<
         ", nanoProgramName = " << li.nanoProgramName <<
         std::endl;

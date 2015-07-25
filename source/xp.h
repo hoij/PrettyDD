@@ -17,23 +17,35 @@ public:
         int min = std::numeric_limits<int>::max();
     };
 
-    info& operator[](std::string subtype) {
-        return stats[subtype];
-    }
-
     void add(LineInfo& li) {
-        stats[li.subtype].total += li.amount;
-        stats[li.subtype].count++;
-        if (li.amount < stats[li.subtype].min) {
-            stats[li.subtype].min = li.amount;
+        if (li.subtype == "gained") {
+            gained[li.type].total += li.amount;
+            gained[li.type].count++;
+            if (li.amount < gained[li.type].min) {
+                gained[li.type].min = li.amount;
+            }
+            if (li.amount > gained[li.type].max) {
+                gained[li.type].max = li.amount;
+            }
         }
-        if (li.amount > stats[li.subtype].max) {
-            stats[li.subtype].max = li.amount;
+        else if (li.subtype == "lost") {
+            lost[li.type].total += li.amount;
+            lost[li.type].count++;
+            if (li.amount < lost[li.type].min) {
+                lost[li.type].min = li.amount;
+            }
+            if (li.amount > lost[li.type].max) {
+                lost[li.type].max = li.amount;
+            }
+        }
+        else {
+            // TODO: Log error.
         }
     }
 
 private:
-    std::map<std::string, info> stats;
+    std::map<std::string, info> gained;
+    std::map<std::string, info> lost;
 };
 
 

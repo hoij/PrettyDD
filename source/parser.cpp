@@ -70,7 +70,7 @@ LineInfo Parser::parse(FormattedLine& formattedLine) {
         formattedLine.getDescription() == "00000003000011fc") {
             lineInfo = chat(formattedLine.getMessage(), formattedLine.getSender());
         }
-    else {
+    else {  // Get a function from the function map
         auto funcMapIterator = funcMap.find(formattedLine.getDescription());
         if (funcMapIterator != funcMap.end()) {
             lineInfo = (this->*funcMapIterator->second)(formattedLine.getMessage());
@@ -114,42 +114,153 @@ int Parser::findAmount(const std::string& message) {
     }
 }
 
-std::string Parser::findSubtype(const std::string& message) {
-    // Finds damage and heal subtype.
+std::string Parser::findDamageSubtype(const std::string& message) {
     /*
-        // These lines still exist?
+    // These lines still exist?
     ["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
     ["#000000004200000a#","Other hit by other","",1183504118] Something hit Enfodruid for 1 points of damage by damage shield.
     */
-    std::smatch t;
-    if (regex_search(message, t, regex("(?:points of )(.*?)(?= damage\\.)"))) {
+    std::smatch m;
+    if (regex_search(message, m, regex("(?:points of )(.*?)(?= damage\\.)"))) {
         // Looks for regular and special damage
-        return t[1];
+        return m[1];
     }
-    else if (regex_search(message, t, regex("(?: )(.* shield)(?= hit)"))) {
+    else if (regex_search(message, m, regex("(?: )(.* shield)(?= hit)"))) {
         // Looks for reflect or shield damage
-        return t[1];
+        return m[1];
     }
-    else if (regex_search(message, t, regex("(?: with )(.*)(?=, but )"))) {
+    else if (regex_search(message, m, regex("(?: with )(.*)(?=, but )"))) {
         // Looks for special damage in case of a miss.
-        return t[1];
+        return renameSpecial(m[1]);  // Specials in misses have a different name
     }
-    else if (regex_search(message, t, regex(" tried to hit "))) {
+    else if (regex_search(message, m, regex(" tried to hit "))) {
         return "regular miss";
     }
-    else if (regex_search(message, t, regex(" got healed "))) {
-        return "potential";
+    else if (regex_search(message, m, regex("(?: damaged by )(.*?)( for )"))) {
+        return m[1];
     }
-    else if (regex_search(message, t, regex(" were healed "))) {
-        return "actual";
-    }
-    else if (regex_search(message, t, regex("(?: damaged by )(.*?)( for )"))) {
-        return t[1];
-    }
-    else if (regex_search(message, t, regex("(?: damage by )(.*?)(?=\\.)"))) {
-        return t[1];
+    else if (regex_search(message, m, regex("(?: damage by )(.*?)(?=\\.)"))) {
+        return m[1];
     }
     else {
+        // TODO: Log error.
+        return "";
+    }
+}
+
+std::string Parser::findHealSubtype(const std::string& message) {
+    std::smatch m;
+    if (regex_search(message, m, regex(" got healed |You healed "))) {
+        return "potential";
+    }
+    else if (regex_search(message, m, regex(" were healed "))) {
+        return "actual";
+    }
+    else {
+        // TODO: Log error.
+        return "";
+    }
+}
+
+std::string Parser::findNanoCastSubtype(const std::string& message) {
+    std::smatch m;
+    if (regex_search(message, m, regex("Executing Nano Program:"))) {
+        return "execute";
+    }
+    else if (message == "Nano program executed successfully.") {
+        return "land";
+    }
+    else if (message == "Target resisted.") {
+        return "resist";
+    }
+    else if (message == "Nano program aborted.") {
+        return "abort";
+    }
+    else if (message == "Your target countered the nano program.") {
+        return "counter";
+    }
+    else if (message == "You fumbled.") {  // Find one of these log messages
+        return "fumble";
+    }
+    else {
+        // TODO: Log error.
+        return "";
+    }
+}
+
+std::string Parser::findSKSubtype(const std::string& message) {
+    std::smatch m;
+    if (regex_search(message, m, regex("gained"))) {
+        return "gained";
+    }
+    else if (regex_search(message, m, regex("lost"))) {
+        return "lost";
+    }
+    else {
+        // TODO: Log error.
+        return "";
+    }
+}
+
+std::string Parser::findXPSubtype(const std::string& message) {
+    std::smatch m;
+    if (regex_search(message, m, regex("received"))) {
+        return "gained";
+    }
+    else if (regex_search(message, m, regex("lost"))) {
+        // Find out what an aixp loss looks like
+        return "lost";
+    }
+    else {
+        // TODO: Log error.
+        return "";
+    }
+}
+
+std::string Parser::findAIXPSubtype(const std::string& message) {
+    std::smatch m;
+    if (regex_search(message, m, regex("gained"))) {
+        return "gained";
+    }
+    else if (regex_search(message, m, regex("lost"))) {
+        return "lost";
+    }
+    else {
+        // TODO: Log error.
+        return "";
+    }
+}
+
+std::string Parser::findSubtype(const std::string& message, const std::string type) {
+    if (type == "damage") {
+        return findDamageSubtype(message);
+    }
+    else if (type == "nano cast") {
+        return findNanoCastSubtype(message);
+    }
+    else if (type == "heal") {
+        return findHealSubtype(message);
+    }
+    else if (type == "sk") {
+        return findSKSubtype(message);
+    }
+    else if (type == "research") {
+        return ""; // No subtype for research.
+    }
+    else if (type == "xp") {
+        return findXPSubtype(message);
+    }
+    else if (type == "aixp") {
+        return findAIXPSubtype(message);
+    }
+    else if (type == "vp") {
+        return "";
+    }
+    else if (type == "nano") {
+        return ""; // No subtype for nano.
+    }
+    else {
+        // TODO: Log error.
         return "";
     }
 }
@@ -171,6 +282,7 @@ bool Parser::isDeflect(const std::string& message) {
 }
 
 std::string Parser::renameSpecial(std::string subtype) {
+    // TODO: Are there any more of these? Bow Special?
     // Misses writes specials to the log different so they have to be renamed.
     // I can either rename these here, or when I get the data from a player,
     // I can get both "Brawl" and "Brawling" for example.
@@ -188,9 +300,6 @@ std::string Parser::renameSpecial(std::string subtype) {
     }
     else if (subtype == "FullAuto") {
         return "Full Auto";
-    }
-    else if (subtype == "AimedShot") {
-        return "Aimed Shot";
     }
     else {
         errorLog.write("Tried to rename special called \"" + subtype, false);
@@ -246,6 +355,7 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     */
 
     LineInfo li;
+    li.type = "damage";
     std::smatch m;
     if (regex_search(message, m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
                                         "(.*?)"			// match everything following, non-greedy
@@ -267,9 +377,7 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     else if (li.receiver_name == "Someone") {
         li.dealer_name = "Unknown";  // There will be no dealer in this case.
     }
-
-    li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -283,6 +391,7 @@ LineInfo Parser::otherHitByNano(const std::string& message) {
     ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
     */
     LineInfo li;
+    li.type = "damage";
     std::smatch m;
     if (regex_search(message, m, regex("(?:from )(.*?)(?= for)")) ||
         regex_search(message, m, regex("(?:of )(.*?)(?= damage)"))) {
@@ -293,10 +402,14 @@ LineInfo Parser::otherHitByNano(const std::string& message) {
             li.dealer_name = m[1];
         }
     }
-    regex_search(message, m, regex("(.*?)(?= was)"));
-    li.receiver_name = m[0];
-    li.type = "damage";
-    li.subtype = findSubtype(message);
+    if (regex_search(message, m, regex("(.*?)(?= was attacked)"))) {
+        li.receiver_name = m[0];
+    }
+    else {
+        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.nanobots = true;
     return li;
@@ -314,12 +427,17 @@ LineInfo Parser::youHitOther(const std::string& message) {
     ["#0000000042000008#","You hit other","",1425326284]Your damage shield hit Predator Rogue for 163 points of damage.
     */
     LineInfo li;
-    std::smatch m;
-    li.dealer_name = "You";
-    regex_search(message, m, regex("(?:hit )(.*?)(?= for)"));
-    li.receiver_name = m[1];
     li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.dealer_name = "You";
+    std::smatch m;
+    if (regex_search(message, m, regex("(?:hit )(.*?)(?= for)"))) {
+        li.receiver_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -331,12 +449,12 @@ LineInfo Parser::youHitOtherWithNano(const std::string& message) {
     ["#0000000042000005#","You hit other with nano","",1425993792]You hit Kyr'Ozch Hive Medic with nanobots for 798 points of projectile damage.
     */
     LineInfo li;
-    std::smatch m;
+    li.type = "damage";
     li.dealer_name = "You";
+    std::smatch m;
     regex_search(message, m, regex("(?:hit )(.*?)(?= with)"));
     li.receiver_name = m[1];
-    li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.nanobots = true;
     return li;
@@ -356,30 +474,37 @@ LineInfo Parser::meGotHealth(const std::string& message) {
     // In the case of heal delta:
     //   There will only be a "You were healed..." message.
     LineInfo li;
-    std::smatch m;
-    li.receiver_name = "You";
     li.type = "heal";
-    li.subtype = findSubtype(message);
-    li.amount = findAmount(message);
-    if (li.subtype == "potential") { // Potential heal
-        regex_search(message, m, regex("(?:by )(.*?)(?= for)"));
+    li.receiver_name = "You";
+    std::smatch m;
+    if (regex_search(message, m, regex("(?:by )(.*?)(?= for )"))) {
+        // This can only happen when the heal is a potential heal.
         li.dealer_name = m[1];
     }
+    // else no dealer.
+    li.subtype = findSubtype(message, li.type);
+    li.amount = findAmount(message);
     return li;
 }
 
 LineInfo Parser::youGaveHealth(const std::string& message) {
+    // TODO: Find out if the subtype here is actual or potential. Pretty sure it's potential.
     /*
     ["#0000000042000014#","You gave health","",1425998482]You healed Letter for 3741 points of health.
     */
     LineInfo li;
+    li.type = "heal";
     std::smatch m;
     li.dealer_name = "You";
-    regex_search(message, m, regex("(?:healed )(.*?)(?= for)"));
-    li.receiver_name = m[1];
+    if (regex_search(message, m, regex("(?:healed )(.*?)(?= for)"))) {
+        li.receiver_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
-    li.type = "heal";
-    li.subtype = "potential"; // Find out if the subtype here is actual or potential.
     return li;
 }
 
@@ -392,15 +517,20 @@ LineInfo Parser::meHitByMonster(const std::string& message) {
     ["#0000000042000006#","Me hit by monster","",1434359357]Assembler Leader hit you for 1966 points of melee damage. Glancing hit.
     */
     LineInfo li;
-    std::smatch m;
-    regex_search(message, m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"));  // The order here is important.
-    li.dealer_name = m[0];
-    if (li.dealer_name == "Someone") {
-        li.dealer_name = "Unknown";
-    }
-    li.receiver_name = "You";
     li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.receiver_name = "You";
+    std::smatch m;
+    if (regex_search(message, m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))) {  // The order here is important.
+        li.dealer_name = m[0];
+        if (li.dealer_name == "Someone") {
+            li.dealer_name = "Unknown";
+        }
+    }
+    else {
+        errorLog.write("Could not find a dealer in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -412,12 +542,17 @@ LineInfo Parser::meHitByNano(const std::string& message) {
     ["#0000000042000002#","Me hit by nano","",1425326283]You were attacked with nanobots from Predator Rogue for 875 points of poison damage.
     */
     LineInfo li;
-    std::smatch m;
-    regex_search(message, m, regex("(?:from )(.*?)(?= for)"));
-    li.dealer_name = m[1];
-    li.receiver_name = "You";
     li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.receiver_name = "You";
+    std::smatch m;
+    if (regex_search(message, m, regex("(?:from )(.*?)(?= for)"))) {
+        li.dealer_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a dealer in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.nanobots = true;
     return li;
@@ -429,14 +564,14 @@ LineInfo Parser::meHitByPlayer(const std::string& message) {
     ["#0000000042000007#","Me hit by player","",1434406024]Balas hit you for 949 points of Aimed Shot damage.
     */
     LineInfo li;
+    li.type = "damage";
     std::smatch m;
     li.receiver_name = "You";
     if (regex_search(message, m, regex("(?:Player )(.*?)(?= hit you for )")) ||
         regex_search(message, m, regex("(.*?)(?= hit you for )"))) {
         li.dealer_name = m[1];
     }
-    li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -450,6 +585,7 @@ LineInfo Parser::otherMisses(const std::string& message) {
     ["#0000000042000013#","Other misses","",1180557880]Keepone tries to attack you with FastAttack, but misses!
     */
     LineInfo li;
+    li.type = "damage";
     std::smatch m;
     if (regex_search(message, m, regex("(.*?)(?: tried to hit )(.*)(?:, but missed!)")) ||
         regex_search(message, m, regex("(.*?)(?: tries to attack )(.*?)(?: with )"))) {
@@ -460,8 +596,7 @@ LineInfo Parser::otherMisses(const std::string& message) {
         }
     }
     li.miss = true;
-    li.type = "damage";
-    li.subtype = renameSpecial(findSubtype(message));  // Specials in misses have a different name
+    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
@@ -471,6 +606,7 @@ LineInfo Parser::yourMisses(const std::string& message) {
     ["#0000000042000012#","Your misses","",1426199923]You tried to hit Stim Fiend, but missed!
     */
     LineInfo li;
+    li.type = "damage";
     std::smatch m;
     li.dealer_name = "You";
     if (regex_search(message, m, regex("(?:attack )(.*?)(?= with )")) ||
@@ -478,8 +614,7 @@ LineInfo Parser::yourMisses(const std::string& message) {
         li.receiver_name = m[1];
     }
     li.miss = true;
-    li.type = "damage";
-    li.subtype = renameSpecial(findSubtype(message));  // Specials in misses have a different name
+    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
@@ -488,11 +623,10 @@ LineInfo Parser::meHitByEnvironment(const std::string& message) {
     ["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
     */
     LineInfo li;
-    std::smatch m;
+    li.type = "damage";
     li.receiver_name = "You";
     li.dealer_name = "Environment";
-    li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -527,37 +661,21 @@ LineInfo Parser::meCastNano(const std::string& message) {
     ["#0000000042000018#","Me Cast Nano","",1434562393]Nano program executed successfully.
     */
     LineInfo li;
-    std::smatch m;
     li.type = "nano cast";
+    std::smatch m;
     li.dealer_name = "You";
     if (regex_search(message, m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
         li.nanoProgramName = m[1];
-        li.subtype = "execute";
     }
-    else if (message == "Nano program executed successfully.") {
-        li.subtype = "land";
-    }
-    else if (message == "Target resisted.") {
-        li.subtype = "resist";
-    }
-    else if (message == "Nano program aborted.") {
-        li.subtype = "abort";
-    }
-    else if (message == "Your target countered the nano program.") {
-        li.subtype = "counter";
-    }
-    else if (message == "You fumbled.") {  // Find one of these log messages
-        li.subtype = "fumble";
-    }
+    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
 LineInfo Parser::yourPetHitByNano(const std::string& message) {
     // Find example
     LineInfo li;
-    std::smatch m;
     li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     return li;
@@ -570,12 +688,17 @@ LineInfo Parser::yourPetHitByMonster(const std::string& message) {
     There must be other variations of this type too. Find them.
     */
     LineInfo li;
-    std::smatch m;
-    regex_search(message, m, regex("(?:Your pet )(.*?)( was damaged by a )"));
-    li.receiver_name = m[1];
-    li.dealer_name = "Environment";
     li.type = "damage";
-    li.subtype = findSubtype(message);
+    li.dealer_name = "Environment";
+    std::smatch m;
+    if (regex_search(message, m, regex("(?:Your pet )(.*?)( was damaged by a )"))) {
+        li.receiver_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -588,16 +711,10 @@ LineInfo Parser::meGotSK(const std::string& message) {
     ["#000000004200000c#","Me got SK","",1425994822]You lost 200 points of Shadowknowledge
     */
     LineInfo li;
-    std::smatch m;
+    li.type = "sk";
     li.receiver_name = "You";
-    li.type = "xp";
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
-    if (regex_search(message, m, regex("gained"))) {
-        li.subtype = "sk";
-    }
-    else if (regex_search(message, m, regex("lost"))) {
-        li.subtype = "sk lost";
-    }
     return li;
 }
 
@@ -608,21 +725,16 @@ LineInfo Parser::meGotXP(const std::string& message) {
     ["#000000004200000b#","Me got XP","",1426199427]You received 247 xp.
     */
     LineInfo li;
-    std::smatch m;
-    std::smatch xp;
     li.receiver_name = "You";
-    li.type = "xp";
+    std::smatch m;
+    if (regex_search(message, m, regex("Alien Experience"))) {
+        li.type = "aixp";
+    }
+    else {
+        li.type = "xp";
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
-    if (regex_search(message, m, regex("gained"))) {
-        li.subtype = "aixp";
-    }
-    else if (regex_search(message, m, regex("received"))) {
-        li.subtype = "xp";
-    }
-    else if (regex_search(message, m, regex("lost"))) {
-        // Find out what an aixp loss looks like
-        li.subtype = "xp lost";
-    }
     return li;
 }
 
@@ -632,10 +744,9 @@ LineInfo Parser::research(const std::string& message) {
     ["#000000004200001c#","Research","",1425326289]139139 of your XP were allocated to your personal research.<br>
     */
     LineInfo li;
-    std::smatch m;
+    li.type = "research";
     li.receiver_name = "You";
-    li.type = "xp";
-    li.subtype = "research";
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -645,11 +756,17 @@ LineInfo Parser::youGaveNano(const std::string& message) {
     ["#0000000042000017#","You gave nano","",1425734907]You increased nano on Sayet for 2102 points.
     */
     LineInfo li;
+    li.type = "nano";
     std::smatch m;
     li.dealer_name = "You";
-    regex_search(message, m, regex("(?:nano on )(.*?)(?= for)"));
-    li.receiver_name = m[1];
-    li.type = "nano";
+    if (regex_search(message, m, regex("(?:nano on )(.*?)(?= for)"))) {
+        li.receiver_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -659,11 +776,17 @@ LineInfo Parser::meGotNano(const std::string& message) {
     ["#0000000042000016#","Me got nano","",1180555427]You got nano from Jspe80 for 288 points.
     */
     LineInfo li;
+    li.type = "nano";
     std::smatch m;
     li.receiver_name = "You";
-    regex_search(message, m, regex("(?:You got nano from )(.*?)(?= for)"));
-    li.dealer_name = m[1];
-    li.type = "nano";
+    if (regex_search(message, m, regex("(?:You got nano from )(.*?)(?= for)"))) {
+        li.dealer_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a dealer in: ");
+        errorLog.write("\t" + message);
+    }
+    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -671,8 +794,9 @@ LineInfo Parser::meGotNano(const std::string& message) {
 LineInfo Parser::victoryPoints(const std::string& message) {
     // Check what this message looks like.
     // Maybe it's a system message.
-    (void)message;
     LineInfo li;
+    li.type = "vp";
+    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
@@ -696,7 +820,6 @@ LineInfo Parser::chat(const std::string& message, const std::string& sender) {
     std::smatch m;
     if (sender == playerRunningProgram &&
         message == "dd") {
-        li.hasCommand = true;
         li.command = message;
     }
     return li;

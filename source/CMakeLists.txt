@@ -24,20 +24,26 @@ add_library(playerlib player.cpp)
 add_library(affected_playerlib affected_player.cpp)
 # CMake cant make libraries out of headers only
 #add_library(player_vectorlib player_vector.h)
-add_library(parserlib
-  parser.cpp
-  formatted_line.cpp
-  line_info.cpp
-  logger.cpp
-  )
-add_library(nano_programlib nano_program.cpp)
+add_library(loggerlib logger.cpp)
+add_library(formatted_linelib formatted_line.cpp)
 add_library(line_infolib line_info.cpp)
+
+#add_library(parserlib
+#  parser.cpp
+#  formatted_line.cpp
+#  line_info.cpp
+#  logger.cpp
+#  )
+
+add_library(parserlib parser.cpp)
+target_link_libraries(parserlib formatted_linelib line_infolib loggerlib)
+
+
+add_library(nano_programlib nano_program.cpp)
 #add_library(heallib heal.h)
 #add_library(damagelib damage.h)
 #add_library(xplib xp.h)
 #add_library(nanolib nano.h)
-add_library(loggerlib logger.cpp)
-add_library(formatted_linelib formatted_line.cpp)
 add_library(write_stats_to_filelib write_stats_to_file.cpp)
 add_library(configurationlib configuration.cpp)
 

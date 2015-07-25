@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "parser_param_test.h"
 
@@ -26,19 +25,19 @@ INSTANTIATE_TEST_CASE_P(meGotXP, ParseTest,
                          "",
                          "You",
                          "xp",
-                         "xp",
+                         "gained",
                          247),
         ExtendedLineInfo("You gained 2562 new Alien Experience Points.",
                          "",
                          "You",
-                         "xp",
                          "aixp",
+                         "gained",
                          2562),
         ExtendedLineInfo("You lost 9822 xp.",
                          "",
                          "You",
                          "xp",
-                         "xp lost",
+                         "lost",
                          9822)));
 
 

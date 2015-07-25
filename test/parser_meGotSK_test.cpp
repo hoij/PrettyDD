@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "parser_param_test.h"
 
@@ -25,14 +24,14 @@ INSTANTIATE_TEST_CASE_P(meGotSK, ParseTest,
         ExtendedLineInfo("You gained 200 points of Shadowknowledge.",
                          "",
                          "You",
-                         "xp",
                          "sk",
+                         "gained",
                          200),
         ExtendedLineInfo("You lost 200 points of Shadowknowledge",
                          "",
                          "You",
-                         "xp",
-                         "sk lost",
+                         "sk",
+                         "lost",
                          200)));
 
 

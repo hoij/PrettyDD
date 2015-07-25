@@ -20,7 +20,6 @@ public:
              bool deflect,
              bool miss,
              bool nanobots,
-             bool hasCommand,
              bool hasStats,
              std::string nanoProgramName);
 
@@ -38,7 +37,6 @@ public:
     bool deflect = false;
     bool miss = false;
     bool nanobots = false;
-    bool hasCommand = false;
     bool hasStats = true;
     std::string nanoProgramName;
 

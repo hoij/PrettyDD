@@ -17,12 +17,23 @@ public:
 
 private:
     FRIEND_TEST(ParseTest, Damage);
+    FRIEND_TEST(RenameSpecialTest, renameSpecials);
+    FRIEND_TEST(ParseChatTest, parseChat);
+
     void createFunctionMap();
+
     bool isCrit(const std::string& message);
     bool isDeflect(const std::string& message);
     int findAmount(const std::string& message);
-    std::string findSubtype(const std::string& message);
+    std::string findSubtype(const std::string& message, const std::string type);
+    std::string findDamageSubtype(const std::string& message);
+    std::string findHealSubtype(const std::string& message);
+    std::string findNanoCastSubtype(const std::string& message);
+    std::string findSKSubtype(const std::string& message);
+    std::string findXPSubtype(const std::string& message);
+    std::string findAIXPSubtype(const std::string& message);
     std::string renameSpecial(std::string subtype);
+
     void logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLine& formattedLine);
 
     std::string playerRunningProgram;

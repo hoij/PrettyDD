@@ -64,7 +64,7 @@ int main(void) {
                         pv.addToPlayers(lineInfo);
 
                     }
-                    else if (lineInfo.hasCommand) {
+                    else if (!lineInfo.command.empty()) {
                         // write a new class/header for this that deals with input
                         if (lineInfo.command == "dd") {
                             writeDamageDealtOverview(pv);

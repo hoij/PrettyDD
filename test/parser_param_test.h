@@ -1,7 +1,6 @@
 #ifndef PARSER_PARAM_TEST_H
 #define PARSER_PARAM_TEST_H
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <string>
 #include "parser.h"
@@ -36,7 +35,6 @@ public:
                                                                   deflect,
                                                                   miss,
                                                                   nanobots,
-                                                                  false,  // hasCommand
                                                                   hasStats,
                                                                   nanoProgramName),
                      message(message) {}

@@ -59,7 +59,6 @@ private:
 
     std::string nameOfLastNanoProgramCasted;
 	std::vector<NanoProgram> nanoPrograms;
-
     XP xp;
 };
 
