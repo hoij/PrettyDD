@@ -4,7 +4,6 @@
 
 #include <iterator>
 #include <vector>
-#include "formatted_line.h"
 #include "line_info.h"
 #include "logger.h"
 

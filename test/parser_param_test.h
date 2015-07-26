@@ -3,19 +3,20 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <tuple>
 #include "parser.h"
 #include "line_info.h"
+#include "formatted_line_stub.h"
 
 
 class ExtendedLineInfo : public LineInfo {
-// Extending LineInfo only with the string "message" in order to use
-// LineInfo as the parameter passed to the test (TestWithParam only accepts
-// one parameter).
-//
-// TODO: Write two different LineInfos for damage and command.
+// Extending LineInfo to create constructors for the test parameters.
+
+// TODO: Write two different LineInfos for damage, heal, xp, command, nano,
+// nano program?
 public:
-    ExtendedLineInfo(std::string message,
-                     std::string dealer_name,
+    ExtendedLineInfo() {}
+    ExtendedLineInfo(std::string dealer_name,
                      std::string receiver_name,
                      std::string type,
                      std::string subtype,
@@ -25,23 +26,24 @@ public:
                      bool miss = false,
                      bool nanobots = false,
                      bool hasStats = true,
-                     std::string nanoProgramName = "") : LineInfo(dealer_name,
-                                                                  receiver_name,
-                                                                  type,
-                                                                  subtype,
-                                                                  "",  // command
-                                                                  amount,
-                                                                  crit,
-                                                                  deflect,
-                                                                  miss,
-                                                                  nanobots,
-                                                                  hasStats,
-                                                                  nanoProgramName),
-                     message(message) {}
-    std::string message;
+                     std::string nanoProgramName = "") {
+
+                     this->dealer_name = dealer_name;
+                     this->receiver_name = receiver_name;
+                     this->type = type;
+                     this->subtype = subtype;
+                     this->command = "";  // command
+                     this->amount = amount;
+                     this->crit = crit;
+                     this->deflect = deflect;
+                     this->miss = miss;
+                     this->nanobots = nanobots;
+                     this->hasStats = hasStats;
+                     this->nanoProgramName = nanoProgramName;
+    }
 };
 
-class ParseTest : public ::testing::TestWithParam<ExtendedLineInfo> {
+class ParseTest : public ::testing::TestWithParam<std::tuple<FormattedLineStub, ExtendedLineInfo>> {
 public:
     static void SetUpTestCase() {
         parser = new Parser("");
@@ -52,6 +54,5 @@ public:
 
 static Parser* parser;
 };
-
 
 #endif  //PARSER_PARAM_TEST_H

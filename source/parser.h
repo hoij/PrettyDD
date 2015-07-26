@@ -13,10 +13,9 @@ class Parser {
 public:
     Parser(std::string playerRunningProgram);
 
-    LineInfo parse(FormattedLine& formattedLine);
+    LineInfo parse(FormattedLineInterface& formattedLine);
 
 private:
-    FRIEND_TEST(ParseTest, Damage);
     FRIEND_TEST(RenameSpecialTest, renameSpecials);
     FRIEND_TEST(ParseChatTest, parseChat);
 
@@ -34,7 +33,7 @@ private:
     std::string findAIXPSubtype(const std::string& message);
     std::string renameSpecial(std::string subtype);
 
-    void logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLine& formattedLine);
+    void logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine);
 
     std::string playerRunningProgram;
     typedef LineInfo (Parser::*pfunc)(const std::string& message);

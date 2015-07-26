@@ -36,7 +36,7 @@ Parser::Parser(std::string playerRunningProgram) :
 void Parser::createFunctionMap() {
     // TODO: Merge similar.
     // TODO: Combine multiple searches into one regex where possible.
-    // TODO: Fix so all cases can use findSubtype() and find_amout()
+    // TODO: Fix so all cases can use find_amout()
     funcMap["Other hit by other"] = &Parser::otherAndYourPetHitByOther;
     funcMap["Your pet hit by other"] = &Parser::otherAndYourPetHitByOther;
     funcMap["Other hit by nano"] = &Parser::otherHitByNano;
@@ -62,7 +62,7 @@ void Parser::createFunctionMap() {
     funcMap["System"] = &Parser::system;
 }
 
-LineInfo Parser::parse(FormattedLine& formattedLine) {
+LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
     LineInfo lineInfo;
 
     if (formattedLine.getDescription() == "Vicinity" ||
@@ -70,10 +70,13 @@ LineInfo Parser::parse(FormattedLine& formattedLine) {
         formattedLine.getDescription() == "00000003000011fc") {
             lineInfo = chat(formattedLine.getMessage(), formattedLine.getSender());
         }
-    else {  // Get a function from the function map
+    else {
+        // Call a matching function from the map of parsing functions.
         auto funcMapIterator = funcMap.find(formattedLine.getDescription());
         if (funcMapIterator != funcMap.end()) {
             lineInfo = (this->*funcMapIterator->second)(formattedLine.getMessage());
+            // findSubtype can be called on any line
+            lineInfo.subtype = findSubtype(formattedLine.getMessage(), lineInfo.type);
         }
         else {
             // Might want to remove this error message as it could print a lot
@@ -84,8 +87,6 @@ LineInfo Parser::parse(FormattedLine& formattedLine) {
         }
     }
 
-    // Debug prints
-    std::cout << lineInfo;
     logWhenPlayerNamesNotFound(lineInfo, formattedLine);
 
     return lineInfo;
@@ -308,7 +309,7 @@ std::string Parser::renameSpecial(std::string subtype) {
     }
 }
 
-void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLine& formattedLine) {
+void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine) {
     // TODO: Remove at some point.
     // For development purposes only.
     // Just to capture anything I might have missed.
@@ -377,7 +378,6 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     else if (li.receiver_name == "Someone") {
         li.dealer_name = "Unknown";  // There will be no dealer in this case.
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -409,7 +409,6 @@ LineInfo Parser::otherHitByNano(const std::string& message) {
         errorLog.write("Could not find a receiver in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.nanobots = true;
     return li;
@@ -437,7 +436,6 @@ LineInfo Parser::youHitOther(const std::string& message) {
         errorLog.write("Could not find a receiver in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -452,10 +450,15 @@ LineInfo Parser::youHitOtherWithNano(const std::string& message) {
     li.type = "damage";
     li.dealer_name = "You";
     std::smatch m;
-    regex_search(message, m, regex("(?:hit )(.*?)(?= with)"));
-    li.receiver_name = m[1];
-    li.subtype = findSubtype(message, li.type);
+    if (regex_search(message, m, regex("(?:hit )(.*?)(?= with)"))) {
+        li.receiver_name = m[1];
+    }
+    else {
+        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("\t" + message);
+    }
     li.amount = findAmount(message);
+    // TODO: Can this deflect?
     li.nanobots = true;
     return li;
 }
@@ -482,7 +485,6 @@ LineInfo Parser::meGotHealth(const std::string& message) {
         li.dealer_name = m[1];
     }
     // else no dealer.
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -503,7 +505,6 @@ LineInfo Parser::youGaveHealth(const std::string& message) {
         errorLog.write("Could not find a receiver in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -530,7 +531,6 @@ LineInfo Parser::meHitByMonster(const std::string& message) {
         errorLog.write("Could not find a dealer in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -552,7 +552,6 @@ LineInfo Parser::meHitByNano(const std::string& message) {
         errorLog.write("Could not find a dealer in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.nanobots = true;
     return li;
@@ -571,7 +570,6 @@ LineInfo Parser::meHitByPlayer(const std::string& message) {
         regex_search(message, m, regex("(.*?)(?= hit you for )"))) {
         li.dealer_name = m[1];
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -596,7 +594,6 @@ LineInfo Parser::otherMisses(const std::string& message) {
         }
     }
     li.miss = true;
-    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
@@ -614,7 +611,6 @@ LineInfo Parser::yourMisses(const std::string& message) {
         li.receiver_name = m[1];
     }
     li.miss = true;
-    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
@@ -626,7 +622,6 @@ LineInfo Parser::meHitByEnvironment(const std::string& message) {
     li.type = "damage";
     li.receiver_name = "You";
     li.dealer_name = "Environment";
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -667,7 +662,6 @@ LineInfo Parser::meCastNano(const std::string& message) {
     if (regex_search(message, m, regex("(?:Program:\\s)(.*?)(?=\\.)"))) {
         li.nanoProgramName = m[1];
     }
-    li.subtype = findSubtype(message, li.type);
     return li;
 }
 
@@ -675,7 +669,6 @@ LineInfo Parser::yourPetHitByNano(const std::string& message) {
     // Find example
     LineInfo li;
     li.type = "damage";
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     return li;
@@ -698,7 +691,6 @@ LineInfo Parser::yourPetHitByMonster(const std::string& message) {
         errorLog.write("Could not find a receiver in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -713,7 +705,6 @@ LineInfo Parser::meGotSK(const std::string& message) {
     LineInfo li;
     li.type = "sk";
     li.receiver_name = "You";
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -733,7 +724,6 @@ LineInfo Parser::meGotXP(const std::string& message) {
     else {
         li.type = "xp";
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -746,7 +736,6 @@ LineInfo Parser::research(const std::string& message) {
     LineInfo li;
     li.type = "research";
     li.receiver_name = "You";
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -766,7 +755,6 @@ LineInfo Parser::youGaveNano(const std::string& message) {
         errorLog.write("Could not find a receiver in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -786,7 +774,6 @@ LineInfo Parser::meGotNano(const std::string& message) {
         errorLog.write("Could not find a dealer in: ");
         errorLog.write("\t" + message);
     }
-    li.subtype = findSubtype(message, li.type);
     li.amount = findAmount(message);
     return li;
 }
@@ -796,7 +783,7 @@ LineInfo Parser::victoryPoints(const std::string& message) {
     // Maybe it's a system message.
     LineInfo li;
     li.type = "vp";
-    li.subtype = findSubtype(message, li.type);
+    (void)message;
     return li;
 }
 

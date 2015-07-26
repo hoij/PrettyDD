@@ -1,23 +1,24 @@
-#ifndef LOG_LINE_H
-#define LOG_LINE_H
+#ifndef FORMATTED_LINE_H
+#define FORMATTED_LINE_H
 
 
 #include <vector>
 #include <string>
-#include "line_info.h"
+#include "formatted_line_interface.h"
 
 
-class FormattedLine {
+class FormattedLine : public FormattedLineInterface{
 public:
+    FormattedLine() {};
     FormattedLine(std::string& line);
 
     const std::vector<std::string>& getFullLine() const {return formattedLine;}
     const std::string& getMessage() const {return formattedLine[4];}
     const std::string& getSender() const;
-    const std::string& getDescription();
+    const std::string& getDescription() const;
     const std::string& getOriginalLine() const {return originalLine;}
 
-    bool isFormatted() {return formatted;}
+    bool isFormatted() const {return formatted;}
 
 private:
     bool format(std::string& line);
@@ -31,4 +32,4 @@ private:
 };
 
 
-#endif  // LOG_LINE_H
+#endif  // FORMATTED_LINE_H

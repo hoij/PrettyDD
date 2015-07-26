@@ -10,19 +10,6 @@ public:
     LineInfo() {}
     virtual ~LineInfo() {}
 
-    LineInfo(std::string dealer_name,
-             std::string receiver_name,
-             std::string type,
-             std::string subtype,
-             std::string command,
-             int amount,
-             bool crit,
-             bool deflect,
-             bool miss,
-             bool nanobots,
-             bool hasStats,
-             std::string nanoProgramName);
-
     LineInfo(const LineInfo& li);
     LineInfo& operator=(LineInfo li);
     friend std::ostream& operator<<(std::ostream& os, const LineInfo& li);

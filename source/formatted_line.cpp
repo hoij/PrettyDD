@@ -59,7 +59,7 @@ const std::string& FormattedLine::getSender() const {
     return formattedLine[2];
 }
 
-const std::string& FormattedLine::getDescription() {
+const std::string& FormattedLine::getDescription() const {
     if (formattedLine[0] == "00000003000011fc") {
         // Special case when an org chat message is parsed.
         // [1] contains the org name which is of no use when we only want to
