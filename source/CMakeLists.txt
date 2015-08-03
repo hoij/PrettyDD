@@ -13,6 +13,7 @@ add_executable(PrettyDD main.cpp
 	damage.h
 	xp.h
 	nano.h
+	formatted_line_interface.h
 	#logger.cpp logger.h
 	#formatted_line.cpp formatted_line.h
 	#write_stats_to_file.cpp write_stats_to_file.h
@@ -26,6 +27,7 @@ add_library(affected_playerlib affected_player.cpp)
 #add_library(player_vectorlib player_vector.h)
 add_library(loggerlib logger.cpp)
 add_library(formatted_linelib formatted_line.cpp)
+target_link_libraries(formatted_linelib loggerlib)
 add_library(line_infolib line_info.cpp)
 
 #add_library(parserlib

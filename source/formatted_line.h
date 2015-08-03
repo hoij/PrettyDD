@@ -14,7 +14,8 @@ public:
 
     const std::string& getMessage() const {return formattedLine[4];}
     const std::string& getSender() const;
-    const std::string& getDescription() const;
+    const std::string& getDescription() const {return formattedLine[1];}
+    const std::string& getDescriptionCode() const {return formattedLine[0];}
     const std::string& getOriginalLine() const {return originalLine;}
 
     bool isFormatted() const {return formatted;}

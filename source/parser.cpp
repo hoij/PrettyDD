@@ -67,7 +67,8 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
 
     if (formattedLine.getDescription() == "Vicinity" ||
         formattedLine.getDescription() == "Team" ||
-        formattedLine.getDescription() == "00000003000011fc") {
+        formattedLine.getDescriptionCode() == "00000003000011fc") {
+            // Vicinity, team or org chat messages
             lineInfo = chat(formattedLine.getMessage(), formattedLine.getSender());
         }
     else {

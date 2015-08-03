@@ -44,7 +44,7 @@ function(add_gmock_parser_test target lib_to_test helper_lib)
 endfunction()
 
 
-add_library(parser_param_testlib parser_param_test.cpp)
+add_library(parser_param_testlib parser_param_test.cpp formatted_line_stub.h)
 
 #add_gmock_parser_test(parser_chat_test parserlib parser_param_testlib parser_chat_test.cpp)
 add_gmock_parser_test(parser_meCastNano_test parserlib parser_param_testlib parser_meCastNano_test.cpp)
@@ -72,3 +72,5 @@ add_gmock_parser_test(parser_yourPetHitByNano_test parserlib parser_param_testli
 
 add_gmock_test(parser_renameSpecial_test parserlib parser_renameSpecial_test.cpp)
 add_gmock_test(parser_chat_test parserlib parser_chat_test.cpp)
+
+add_gmock_test(formatted_line_test formatted_linelib formatted_line_test.cpp)

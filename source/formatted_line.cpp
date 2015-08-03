@@ -1,6 +1,6 @@
 #include "formatted_line.h"
 #include "logger.h"
-#include "sstream"
+#include <sstream>
 
 FormattedLine::FormattedLine(std::string& line) {
     format(line);
@@ -11,6 +11,7 @@ bool FormattedLine::format(std::string& line) {
     split(line, ',', formattedLine);
     if (formattedLine.size() == 6) {
         // Some log lines contain a comma, merge those lines back together
+        // TODO: Make it possible to have a line with any number of commas.
         formattedLine[4] = formattedLine[4] + "," + formattedLine[5];
         formattedLine.erase(formattedLine.begin() + 5);
     }
@@ -28,9 +29,16 @@ bool FormattedLine::format(std::string& line) {
 }
 
 void FormattedLine::cleanup(std::vector<std::string>& formattedLine) {
-	// Remove quotation marks etc.
-	formattedLine[0].erase(0, 3);
-	formattedLine[0].erase(16, 2);
+	// Remove quotation and hashtag marks.
+	if (formattedLine[0].length() == 21) {
+        formattedLine[0].erase(0, 3);
+        formattedLine[0].erase(16, 2);
+    }
+    else {
+        // Only quotation marks exists. Happens with "Team" chat messages
+        formattedLine[0].erase(0, 2);
+        formattedLine[0].erase(formattedLine[0].length() - 1, formattedLine[0].length());
+    }
 	formattedLine[1].erase(0, 1);
 	formattedLine[1].erase(formattedLine[1].length() - 1, formattedLine[1].length());
 	formattedLine[2].erase(0, 1);
@@ -58,16 +66,4 @@ const std::string& FormattedLine::getSender() const {
     // This string only contains something if the line is a chat line.
     // Otherwise it is empty.
     return formattedLine[2];
-}
-
-const std::string& FormattedLine::getDescription() const {
-    if (formattedLine[0] == "00000003000011fc") {
-        // Special case when an org chat message is parsed.
-        // [1] contains the org name which is of no use when we only want to
-        // know if it is an org message.
-        return formattedLine[0];
-    }
-    else {
-        return formattedLine[1];
-    }
 }
