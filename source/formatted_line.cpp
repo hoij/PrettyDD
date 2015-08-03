@@ -20,7 +20,7 @@ bool FormattedLine::format(std::string& line) {
         return true;
     }
     else {
-        // TODO: Raise excpetion
+        // TODO: Raise exceotion
         errorLog.write("Could not format the following line: ");
         errorLog.write(line);
         return false;
@@ -38,8 +38,9 @@ void FormattedLine::cleanup(std::vector<std::string>& formattedLine) {
 }
 
 std::vector<std::string>& FormattedLine::split(std::string& s, char delim, std::vector<std::string>& formattedLine) {
-    // This is shit. But it works.
     // First char passed in must be a comma ","
+    // This is shit. But it works.
+    // TODO: Make it less shitty.
 	std::stringstream ss(s);
 	std::string word;
 	while (getline(ss, word, delim)) {

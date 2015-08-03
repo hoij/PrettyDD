@@ -12,7 +12,6 @@ public:
     FormattedLine() {};
     FormattedLine(std::string& line);
 
-    const std::vector<std::string>& getFullLine() const {return formattedLine;}
     const std::string& getMessage() const {return formattedLine[4];}
     const std::string& getSender() const;
     const std::string& getDescription() const;
