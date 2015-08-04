@@ -21,7 +21,7 @@ bool FormattedLine::format(std::string& line) {
         return true;
     }
     else {
-        // TODO: Raise exceotion
+        // TODO: Raise exception
         errorLog.write("Could not format the following line: ");
         errorLog.write(line);
         return false;
@@ -60,10 +60,4 @@ std::vector<std::string>& FormattedLine::split(std::string& s, char delim, std::
 		}
 	}
 	return formattedLine;
-}
-
-const std::string& FormattedLine::getSender() const {
-    // This string only contains something if the line is a chat line.
-    // Otherwise it is empty.
-    return formattedLine[2];
 }
