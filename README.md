@@ -9,23 +9,14 @@ often or should I equip some other item in that slot.
 * Log data on:
   * All damage types.
   * Nanos casted/received (land rate etc.)
-  * Hits/misses in percentage per type of damage/special etc.
+  * Hits/misses per type of damage/special etc.
 
 ### Phase two
 * Write it in some readable format to a file for display inside AO.
 
-### Phase three
+### Maybes
 * Throw in some statistics to show if the data is statistically significant.
-
-### Phase four
 * Graphs displaying damage over time.
 
-### Phase five
+### Very maybe
 * Window on top of AO displaying some info live to the player.
-
-### Phase six
-*  *?*
-
-### Phase seven
-* Profit
-
