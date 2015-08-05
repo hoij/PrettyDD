@@ -7,7 +7,6 @@
 #include <map>
 #include "base_player.h"
 #include "line_info.h"
-#include "formatted_line.h"
 #include "heal.h"
 #include "damage.h"
 #include "nano.h"

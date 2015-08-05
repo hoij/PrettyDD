@@ -8,7 +8,6 @@
 #include "base_player.h"
 #include "affected_player.h"
 #include "line_info.h"
-#include "formatted_line.h"
 #include "player_vector.h"
 #include "heal.h"
 #include "damage.h"
