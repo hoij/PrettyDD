@@ -1,12 +1,14 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <string>
-#include <vector>
-#include "player.h"
+
+#include "formatted_line_interface.h"
 #include "line_info.h"
+#include "player.h"
 
 #include <gtest/gtest_prod.h>
+#include <string>
+#include <vector>
 
 
 class Parser {
@@ -64,5 +66,6 @@ private:
     LineInfo system(const std::string& message);
     LineInfo chat(const std::string& message, const std::string& sender);
 };
+
 
 #endif  //  PARSER_H

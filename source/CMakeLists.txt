@@ -38,7 +38,7 @@ add_library(line_infolib line_info.cpp)
 #  )
 
 add_library(parserlib parser.cpp)
-target_link_libraries(parserlib formatted_linelib line_infolib loggerlib)
+target_link_libraries(parserlib line_infolib loggerlib)
 
 
 add_library(nano_programlib nano_program.cpp)

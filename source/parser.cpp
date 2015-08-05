@@ -1,15 +1,13 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <regex>
-#include <algorithm>
-#include <map>
-#include <stdexcept>
-#include "parser.h"
-#include "logger.h"
-#include "formatted_line.h"
 #include "configuration.h"
+#include "logger.h"
+#include "parser.h"
+
+#include <algorithm>
+#include <iostream>
+#include <map>
+#include <regex>
+#include <sstream>
+#include <stdexcept>
 
 
 using std::cout;
@@ -17,16 +15,6 @@ using std::endl;
 using std::regex_search;
 using std::regex;
 
-/*
-TODO:
-Make adding nano to a player work.
-
-Give the option to set player name so it can handle damage to self.
-Like from the Rage nano or a self nuke.
-
-After some perk actions there is a line telling which perk was performed
-and if it was successfull or not. Can use that to get stats on perks?
-*/
 
 Parser::Parser(std::string playerRunningProgram) :
     playerRunningProgram(playerRunningProgram) {
@@ -82,9 +70,9 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
         else {
             // Might want to remove this error message as it could print a lot
             // if the user choses to log many other messages not found in the map
-            errorLog.write("No match for description: ", false);
+            errorLog.write("Warning: No match for description: ", false);
             errorLog.write(formattedLine.getDescription());
-            errorLog.write("\tFull line: " + formattedLine.getOriginalLine());
+            errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
         }
     }
 
@@ -315,16 +303,16 @@ void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterfa
     // For development purposes only.
     // Just to capture anything I might have missed.
     if (lineInfo.dealer_name == "" && lineInfo.receiver_name == "") {
-        errorLog.write("Could not find dealer and receiver name in the following line (Note: This may be normal): ");
-        errorLog.write("\t" + formattedLine.getOriginalLine());
+        errorLog.write("Warning: Could not find dealer and receiver name in the following line (Note: This may be normal): ");
+        errorLog.write("Warning: " + formattedLine.getOriginalLine());
     }
     else if (lineInfo.dealer_name == "") {
-        errorLog.write("Could not find dealer name in the following line (Note: This may be normal): ");
-        errorLog.write("\t" + formattedLine.getOriginalLine());
+        errorLog.write("Warning: Could not find dealer name in the following line (Note: This may be normal): ");
+        errorLog.write("Warning: " + formattedLine.getOriginalLine());
     }
     else if (lineInfo.receiver_name == "") {
-        errorLog.write("Could not find receiver name in the following line (Note: This may be normal): ");
-        errorLog.write("\t" + formattedLine.getOriginalLine());
+        errorLog.write("Warning: Could not find receiver name in the following line (Note: This may be normal): ");
+        errorLog.write("Warning: " + formattedLine.getOriginalLine());
     }
 }
 
