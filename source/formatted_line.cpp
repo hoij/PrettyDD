@@ -1,63 +1,117 @@
 #include "formatted_line.h"
 #include "logger.h"
-#include <sstream>
+
+#include <regex>
+#include <stdexcept>
+
+
+using std::regex;
+using std::regex_search;
 
 FormattedLine::FormattedLine(std::string& line) {
     format(line);
 }
 
-bool FormattedLine::format(std::string& line) {
+bool FormattedLine::format(std::string line) {
+    // Splits the log line into five parts and stores the original line.
     originalLine = line;
-    split(line, ',', formattedLine);
-    if (formattedLine.size() == 6) {
-        // Some log lines contain a comma, merge those lines back together
-        // TODO: Make it possible to have a line with any number of commas.
-        formattedLine[4] = formattedLine[4] + "," + formattedLine[5];
-        formattedLine.erase(formattedLine.begin() + 5);
+    try {
+        // Each find function has to be called in this exact order as they
+        // rely on the previous function removing it's match plus garbage from
+        // the string. Doing it this way simplifies the regexs'.
+        //
+        // Example lines:
+        // ["#00000003000011fc#","Pantheon [YOLO]","Sgtcuddle",1436182498]test
+        // ["Team","Team","Sgtcuddle",1436182391]test
+        formattedLine.push_back(findDescriptionCode(line));
+        formattedLine.push_back(findDescription(line));
+        formattedLine.push_back(findSender(line));
+        formattedLine.push_back(findTime(line));
+        formattedLine.push_back(line);  // The remaining string contains the message
     }
-    if (formattedLine.size() >= 3) {  // At least some kind of safety check.
-        cleanup(formattedLine);
-        formatted = true;
-        return true;
+    catch (const std::invalid_argument& e) {
+        // Only one catch statement because if any of the calls above fail
+        // there is no point in running the rest.
+        formatted = false;
+        errorLog.write("Error: ", false);
+        errorLog.write(e.what());
+        errorLog.write("Error: Full line: " + line);
     }
-    else {
-        // TODO: Raise exception
-        errorLog.write("Could not format the following line: ");
-        errorLog.write(line);
-        return false;
-    }
+    return formatted;
 }
 
-void FormattedLine::cleanup(std::vector<std::string>& formattedLine) {
-	// Remove quotation and hashtag marks.
-	if (formattedLine[0].length() == 21) {
-        formattedLine[0].erase(0, 3);
-        formattedLine[0].erase(16, 2);
+std::string FormattedLine::findDescriptionCode(std::string& s) {
+    std::smatch m;
+    std::string descriptionCode;
+    // Match everything between ["# and #"
+    // Org names can contain both [] and a comma.
+    // But they can't contain " and # afaik (or maybe they just aren't used).
+    if (regex_search(s, m, regex("(?:^\\[\"#)(.*?)(?=#\")"))) {
+        descriptionCode = m[1];
+        // Erase the match plus the surrounding chars ["# and #","
+        s.erase(0, m[1].length() + 3 + 4);
+    }
+    // Match everything between [" and "
+    else if (regex_search(s, m, regex("(?:^\\[\")(.*?)(?=\")"))) {
+        descriptionCode = m[1];
+        // Erase the match plus the surrounding chars [" and ","
+        s.erase(0, m[1].length() + 2 + 3);
     }
     else {
-        // Only quotation marks exists. Happens with "Team" chat messages
-        formattedLine[0].erase(0, 2);
-        formattedLine[0].erase(formattedLine[0].length() - 1, formattedLine[0].length());
+        throw std::invalid_argument("Description code not found in: " + s);
     }
-	formattedLine[1].erase(0, 1);
-	formattedLine[1].erase(formattedLine[1].length() - 1, formattedLine[1].length());
-	formattedLine[2].erase(0, 1);
-	formattedLine[2].erase(formattedLine[2].length() - 1, formattedLine[2].length());
+    return descriptionCode;
 }
 
-std::vector<std::string>& FormattedLine::split(std::string& s, char delim, std::vector<std::string>& formattedLine) {
-    // First char passed in must be a comma ","
-    // This is shit. But it works.
-    // TODO: Make it less shitty.
-	std::stringstream ss(s);
-	std::string word;
-	while (getline(ss, word, delim)) {
-		if (!word.empty()) {
-			if (delim != ']')
-				split(word, ']', formattedLine);
-			else
-				formattedLine.push_back(word);
-		}
-	}
-	return formattedLine;
+std::string FormattedLine::findDescription(std::string& s) {
+    std::smatch m;
+    std::string description;
+    // Match everything from the start of the string until ","
+    // Assuming here that no org or character have a name containing ","
+    // (which might be untrue)
+    // The string should at this stage look like:
+    // Pantheon [YOLO]","Sgtcuddle",1436182498]test
+    if (regex_search(s, m, regex("(^.*?)(?=\",\")"))) {
+        description = m[1];
+         // Erase the match plus the next three chars (",").
+        s.erase(0, m[0].length() + 3);
+    }
+    else {
+        throw std::invalid_argument("Description not found in: " + s);
+    }
+    return description;
+}
+
+std::string FormattedLine::findSender(std::string& s) {
+    // Sender is only present in chat messages so it's perfectly fine for it
+    // to not be found.
+    std::smatch m;
+    std::string sender;
+    // Match everything from the start of the string until ",
+    // The string should at this stage look like:
+    // Sgtcuddle",1436182498]test
+    if (regex_search(s, m, regex("(^.*?)(?=\",)"))) {
+        sender = m[1];
+         // Erase the match plus the next two chars (",).
+        s.erase(0, m[0].length() + 2);
+    }
+    return sender;
+}
+
+std::string FormattedLine::findTime(std::string& s) {
+    std::smatch m;
+    std::string time;
+    // Match everything from the start of the string until ]
+    // The string should at this stage look like:
+    // 1436182498]test
+    if (regex_search(s, m, regex("(^\\d*?)(?=\\])"))) {
+        time = m[1];
+         // Erase the match plus ]
+        s.erase(0, m[0].length() + 1);
+    }
+    else {
+        // This should not happen unless the line is empty or wrong.
+        throw std::invalid_argument("Time not found in: " + s);
+    }
+    return time;
 }

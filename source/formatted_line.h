@@ -2,14 +2,14 @@
 #define FORMATTED_LINE_H
 
 
-#include <vector>
-#include <string>
 #include "formatted_line_interface.h"
+
+#include <string>
+#include <vector>
 
 
 class FormattedLine : public FormattedLineInterface{
 public:
-    FormattedLine() {};
     FormattedLine(std::string& line);
 
     const std::string& getMessage() const {return formattedLine[4];}
@@ -22,12 +22,13 @@ public:
     bool isFormatted() const {return formatted;}
 
 private:
-    bool format(std::string& line);
-    std::vector<std::string>& split(std::string& line, char delim,
-                                    std::vector<std::string>& formattedLine);
-    void cleanup(std::vector<std::string>& formattedLine);
+    bool format(std::string line);
+    std::string findDescriptionCode(std::string& s);
+    std::string findDescription(std::string& s);
+    std::string findSender(std::string& s);
+    std::string findTime(std::string& s);
 
-    bool formatted = false;
+    bool formatted = true;
     std::string originalLine;
     std::vector<std::string> formattedLine;
 };
