@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "parser_param_test.h"
+
+#include <gtest/gtest.h>
 
 
 INSTANTIATE_TEST_CASE_P(meHitByMonster, ParseTest,
@@ -48,3 +49,47 @@ INSTANTIATE_TEST_CASE_P(meHitByMonster, ParseTest,
                              false,
                              true))));
 
+INSTANTIATE_TEST_CASE_P(meHitByEnvironment, ParseTest,
+    testing::Values(
+        std::make_tuple(
+            FormattedLineStub("Me hit by environment",
+                              "You were damaged by a toxic substance for 123 points of damage."),
+            ExtendedLineInfo("Environment",
+                             "You",
+                             "damage",
+                             "a toxic substance",
+                             123))));
+
+INSTANTIATE_TEST_CASE_P(meHitByNano, ParseTest,
+    testing::Values(
+        std::make_tuple(
+            FormattedLineStub("Me hit by nano",
+                              "You were attacked with nanobots from Predator Rogue for 875 points of poison damage."),
+            ExtendedLineInfo("Predator Rogue",
+                             "You",
+                             "damage",
+                             "poison",
+                             875,
+                             false,
+                             false,
+                             false,
+                             true))));
+
+INSTANTIATE_TEST_CASE_P(meHitByPlayer, ParseTest,
+    testing::Values(
+        std::make_tuple(
+            FormattedLineStub("Me hit by player",
+                              "Player Balas hit you for 854 points of projectile damage."),
+            ExtendedLineInfo("Balas",
+                             "You",
+                             "damage",
+                             "projectile",
+                             854)),
+        std::make_tuple(
+            FormattedLineStub("Me hit by player",
+                              "Balas hit you for 949 points of Aimed Shot damage."),
+            ExtendedLineInfo("Balas",
+                             "You",
+                             "damage",
+                             "Aimed Shot",
+                             949))));

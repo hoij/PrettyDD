@@ -1,7 +1,9 @@
+#include "line_info.h"
+#include "parser.h"
+
 #include <gtest/gtest.h>
 #include <tuple>
-#include "parser.h"
-#include "line_info.h"
+
 
 
 // TODO: Make this test case test through the public parser->parse

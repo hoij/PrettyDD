@@ -1,6 +1,7 @@
+#include "parser.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
-#include "parser.h"
 
 
 class RenameSpecialTest : public ::testing::Test {
