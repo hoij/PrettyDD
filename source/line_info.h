@@ -7,12 +7,7 @@
 
 class LineInfo {
 public:
-    LineInfo() {}
     virtual ~LineInfo() {}
-
-    LineInfo(const LineInfo& li);
-    LineInfo& operator=(LineInfo li);
-    friend std::ostream& operator<<(std::ostream& os, const LineInfo& li);
 
     std::string dealer_name;
     std::string receiver_name;
@@ -26,11 +21,6 @@ public:
     bool nanobots = false;
     bool hasStats = true;
     std::string nanoProgramName;
-
-private:
-    inline std::string boolToString(bool b) const {
-        return b ? "true" : "false";
-    }
 };
 
 
