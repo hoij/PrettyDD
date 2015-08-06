@@ -41,6 +41,7 @@ bool FormattedLine::format(std::string line) {
 }
 
 std::string FormattedLine::findDescriptionCode(std::string& s) {
+    // Needs to be the first function to call when extracting info.
     std::smatch m;
     std::string descriptionCode;
     // Match everything between ["# and #"
@@ -64,13 +65,13 @@ std::string FormattedLine::findDescriptionCode(std::string& s) {
 }
 
 std::string FormattedLine::findDescription(std::string& s) {
+    // The string should at this stage look like:
+    // Pantheon [YOLO]","Sgtcuddle",1436182498]test
     std::smatch m;
     std::string description;
     // Match everything from the start of the string until ","
     // Assuming here that no org or character have a name containing ","
     // (which might be untrue)
-    // The string should at this stage look like:
-    // Pantheon [YOLO]","Sgtcuddle",1436182498]test
     if (regex_search(s, m, regex("(^.*?)(?=\",\")"))) {
         description = m[1];
          // Erase the match plus the next three chars (",").
@@ -85,11 +86,11 @@ std::string FormattedLine::findDescription(std::string& s) {
 std::string FormattedLine::findSender(std::string& s) {
     // Sender is only present in chat messages so it's perfectly fine for it
     // to not be found.
+    // The string should at this stage look like:
+    // Sgtcuddle",1436182498]test
     std::smatch m;
     std::string sender;
     // Match everything from the start of the string until ",
-    // The string should at this stage look like:
-    // Sgtcuddle",1436182498]test
     if (regex_search(s, m, regex("(^.*?)(?=\",)"))) {
         sender = m[1];
          // Erase the match plus the next two chars (",).
@@ -99,11 +100,11 @@ std::string FormattedLine::findSender(std::string& s) {
 }
 
 std::string FormattedLine::findTime(std::string& s) {
+    // The string should at this stage look like:
+    // 1436182498]test
     std::smatch m;
     std::string time;
     // Match everything from the start of the string until ]
-    // The string should at this stage look like:
-    // 1436182498]test
     if (regex_search(s, m, regex("(^\\d*?)(?=\\])"))) {
         time = m[1];
          // Erase the match plus ]
