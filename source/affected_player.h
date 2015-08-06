@@ -2,14 +2,15 @@
 #define AFFECTED_PLAYER_H
 
 
+#include "base_player.h"
+#include "damage.h"
+#include "heal.h"
+#include "line_info.h"
+#include "nano.h"
+
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include "base_player.h"
-#include "line_info.h"
-#include "heal.h"
-#include "damage.h"
-#include "nano.h"
 
 
 class AffectedPlayer : public BasePlayer {

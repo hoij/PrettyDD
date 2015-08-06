@@ -7,7 +7,7 @@
 #include "formatted_line_interface.h"
 
 
-class FormattedLineStub : public FormattedLineInterface{
+class FormattedLineStub : public FormattedLineInterface {
 public:
     FormattedLineStub() {}
     FormattedLineStub(std::string description, std::string message) {

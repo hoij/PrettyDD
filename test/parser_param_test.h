@@ -11,9 +11,6 @@
 
 class ExtendedLineInfo : public LineInfo {
 // Extending LineInfo to create constructors for the test parameters.
-
-// TODO: Write two different LineInfos for damage, heal, xp, command, nano,
-// nano program?
 public:
     ExtendedLineInfo() {}
     ExtendedLineInfo(std::string dealer_name,

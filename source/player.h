@@ -2,18 +2,19 @@
 #define PLAYER_H
 
 
+#include "affected_player.h"
+#include "base_player.h"
+#include "damage.h"
+#include "heal.h"
+#include "line_info.h"
+#include "nano.h"
+#include "nano_program.h"
+#include "player_vector.h"
+#include "xp.h"
+
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include "base_player.h"
-#include "affected_player.h"
-#include "line_info.h"
-#include "player_vector.h"
-#include "heal.h"
-#include "damage.h"
-#include "nano_program.h"
-#include "xp.h"
-#include "nano.h"
 
 
 class Player : public BasePlayer {
