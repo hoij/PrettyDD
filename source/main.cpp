@@ -62,7 +62,6 @@ int main(void) {
                     LineInfo lineInfo = parser.parse(formattedLine);
                     if(lineInfo.hasStats) {
                         pv.addToPlayers(lineInfo);
-
                     }
                     else if (!lineInfo.command.empty()) {
                         // write a new class/header for this that deals with input
