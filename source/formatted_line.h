@@ -8,7 +8,7 @@
 #include <vector>
 
 
-class FormattedLine : public FormattedLineInterface{
+class FormattedLine : public FormattedLineInterface {
 public:
     FormattedLine(std::string& line);
 
