@@ -2,14 +2,14 @@
 #define PARSER_H
 
 
-#include "formatted_line_interface.h"
-#include "line_info.h"
-#include "player.h"
-
 #include <gtest/gtest_prod.h>
+#include <map>
 #include <string>
 #include <vector>
 
+
+class FormattedLineInterface;
+class LineInfo;
 
 class Parser {
 public:

@@ -1,4 +1,6 @@
 #include "configuration.h"
+#include "formatted_line_interface.h"
+#include "line_info.h"
 #include "logger.h"
 #include "parser.h"
 
