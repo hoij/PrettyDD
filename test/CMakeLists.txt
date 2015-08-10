@@ -5,15 +5,14 @@ include_directories(SYSTEM ${GMOCK_DIR}/gtest/include
 include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/source")
 
 
-function(add_gmock_test target lib_to_test)
 # add_gmock_test(<target> <lib_to_test> <sources>...)
 #
 #  Adds a Google Mock based test executable, <target>, built from <lib_to_test>
 #  and <sources> and adds the test so that CTest will run it. Both the
 #  executable and the test will be named <target>.
-
+function(add_gmock_header_test target)
 	add_executable(${target} ${ARGN})
-	target_link_libraries(${target} gmock_main ${lib_to_test})
+	target_link_libraries(${target} gmock_main)
 
 	add_test(${target} ${target})
 
@@ -24,13 +23,30 @@ function(add_gmock_test target lib_to_test)
 			   COMMENT "Running ${target}" VERBATIM)
 endfunction()
 
-function(add_gmock_parser_test target lib_to_test helper_lib)
+# add_gmock_test(<target> <lib_to_test> <sources>...)
+#
+#  Adds a Google Mock based test executable, <target>, built from <lib>
+#  and <sources> and adds the test so that CTest will run it. Both the
+#  executable and the test will be named <target>.
+function(add_gmock_test target lib)
+	add_executable(${target} ${ARGN})
+	target_link_libraries(${target} gmock_main ${lib})
+
+	add_test(${target} ${target})
+
+	add_custom_command(TARGET ${target}
+			   POST_BUILD
+			   COMMAND ${target}
+			   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			   COMMENT "Running ${target}" VERBATIM)
+endfunction()
+
 # add_gmock_test(<target> <lib_to_test> <sources>...)
 #
 #  Adds a Google Mock based test executable, <target>, built from <lib_to_test>
 #  and <sources> and adds the test so that CTest will run it. Both the
 #  executable and the test will be named <target>.
-
+function(add_gmock_parser_test target lib_to_test helper_lib)
 	add_executable(${target} ${ARGN})
 	target_link_libraries(${target} gmock_main ${lib_to_test} ${helper_lib})
 
@@ -62,3 +78,5 @@ add_gmock_test(parser_renameSpecial_test parserlib parser_renameSpecial_test.cpp
 add_gmock_test(parser_chat_test parserlib parser_chat_test.cpp)
 
 add_gmock_test(formatted_line_test formatted_linelib formatted_line_test.cpp)
+#add_gmock_header_test(player_vector_test player_vector_test.cpp)
+add_gmock_test(player_vector_test loggerlib player_vector_test.cpp)
