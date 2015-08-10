@@ -3,23 +3,19 @@
 
 #include <string>
 
+
+class LineInfo;
+
 class BasePlayer {
 public:
-    BasePlayer() {}
-    BasePlayer(std::string name) {
-        this->name = name;
-    }
+    BasePlayer(std::string name) {this->name = name;}
     virtual ~BasePlayer() {}
-    std::string getName() const {
-        return name;
-    }
-    void setName(std::string name) {
-        this->name = name;
-    }
+    std::string getName() const {return name;}
+    void setName(std::string name) {this->name = name;}
+    virtual void add(LineInfo& lineInfo) = 0;
 
 private:
     std::string name;
-
 };
 
 

@@ -5,7 +5,6 @@
 #include "base_player.h"
 #include "damage.h"
 #include "heal.h"
-#include "line_info.h"
 #include "nano.h"
 
 #include <map>
@@ -13,20 +12,18 @@
 #include <vector>
 
 
+class LineInfo;
+
 class AffectedPlayer : public BasePlayer {
 public:
-	AffectedPlayer();
-	AffectedPlayer(std::string name, LineInfo& lineInfo);
-	~AffectedPlayer();
-	AffectedPlayer(const AffectedPlayer& p);
-	AffectedPlayer& operator=(const AffectedPlayer& p);
+	AffectedPlayer(std::string name);
 
     void add(LineInfo& lineInfo);
 
     Damage getTotalDamage() const;
     Damage getTotalDamage(bool nanobots) const;
-    Damage getTotalDamagePerDamageType(const std::string damageType);
-    Damage getTotalDamagePerDamageType(const std::string damageType, bool nanobots);
+    Damage getTotalDamagePerDamageType(const std::string damageType) const;
+    Damage getTotalDamagePerDamageType(const std::string damageType, bool nanobots) const;
 
     const Heal& getHeal() const;
     const Nano& getNano() const;

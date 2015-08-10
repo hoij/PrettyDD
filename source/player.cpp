@@ -1,34 +1,10 @@
-#include <algorithm>
+#include "line_info.h"
 #include "player.h"
 
+#include <algorithm>
 
-Player::Player() {
-}
 
-Player::Player(std::string name, LineInfo& lineInfo) : BasePlayer(name) {
-    add(lineInfo);
-}
-
-Player::~Player() {
-}
-
-Player::Player(const Player& p) : BasePlayer(p.getName()) {
-    nameOfLastNanoProgramCasted = p.nameOfLastNanoProgramCasted;
-    nanoPrograms = p.nanoPrograms;
-    affectedPlayers = p.affectedPlayers;
-    xp = p.xp;
-}
-
-Player& Player::operator=(const Player& p) {
-    if (this != &p) {
-        setName(p.getName());
-        nameOfLastNanoProgramCasted = p.nameOfLastNanoProgramCasted;
-        nanoPrograms = p.nanoPrograms;
-        affectedPlayers = p.affectedPlayers;
-        xp = p.xp;
-    }
-    return *this;
-}
+Player::Player(std::string name) : BasePlayer(name) {}
 
 void Player::add(LineInfo& lineInfo) {
     if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
@@ -67,13 +43,13 @@ void Player::addNanoProgram(std::string name, std::string subtype) {
     nanoPrograms.push_back(NanoProgram(name, subtype));
 }
 
-Damage Player::getTotalDamage() {
+Damage Player::getTotalDamage() const {
     return getTotalDamage(true) + getTotalDamage(false);
 }
 
-Damage Player::getTotalDamage(bool nanobots) {
+Damage Player::getTotalDamage(bool nanobots) const {
     Damage d;
-    for (AffectedPlayer& ap : affectedPlayers) {
+    for (const AffectedPlayer& ap : affectedPlayers) {
         if (ap.getName() != getName()) {
             d += ap.getTotalDamage(nanobots);
         }
@@ -88,7 +64,7 @@ Damage Player::getTotalDamagePerDamageType(const std::string damageType) {
 
 Damage Player::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) {
     Damage d;
-    for (AffectedPlayer& ap : affectedPlayers) {
+    for (const AffectedPlayer& ap : affectedPlayers) {
         d += ap.getTotalDamagePerDamageType(damageType, nanobots);
     }
     return d;
@@ -126,7 +102,7 @@ unsigned int Player::getLongestAffectedPlayerNameLength() const {
 
 Heal Player::getTotalHeals() {
     Heal h;
-    for (AffectedPlayer& ap : affectedPlayers) {
+    for (const AffectedPlayer& ap : affectedPlayers) {
         h += ap.getHeal();
     }
     return h;
@@ -142,7 +118,7 @@ const XP& Player::getXp() {
 
 Nano Player::getTotalNano() {
     Nano n;
-    for (AffectedPlayer& ap : affectedPlayers) {
+    for (const AffectedPlayer& ap : affectedPlayers) {
         n += ap.getNano();
     }
     return n;

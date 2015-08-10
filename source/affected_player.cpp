@@ -1,32 +1,9 @@
 #include "affected_player.h"
+#include "line_info.h"
 
 
-AffectedPlayer::AffectedPlayer() {
-}
+AffectedPlayer::AffectedPlayer(std::string name) : BasePlayer(name) {
 
-AffectedPlayer::AffectedPlayer(std::string name, LineInfo& lineInfo) : BasePlayer(name) {
-    add(lineInfo);
-}
-
-AffectedPlayer::~AffectedPlayer(){
-}
-
-AffectedPlayer::AffectedPlayer(const AffectedPlayer& p) : BasePlayer(p.getName()) {
-    regularDamage = p.regularDamage;
-    nanobotsDamage = p.nanobotsDamage;
-    heal = p.heal;
-    nano = p.nano;
-}
-
-AffectedPlayer& AffectedPlayer::operator=(const AffectedPlayer& p) {
-    if (this != &p) {
-        setName(p.getName());
-        nanobotsDamage = p.nanobotsDamage;
-        regularDamage = p.regularDamage;
-        heal = p.heal;
-        nano = p.nano;
-    }
-    return *this;
 }
 
 void AffectedPlayer::add(LineInfo& lineInfo) {
@@ -86,17 +63,31 @@ Damage AffectedPlayer::getTotalDamage(bool nanobots) const {
     return d;
 }
 
-Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType) {
+Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType) const {
     return getTotalDamagePerDamageType(damageType, true) +
            getTotalDamagePerDamageType(damageType, false);
 }
 
-Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) {
+Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) const {
     if (nanobots) {
-        return nanobotsDamage[damageType];
+        auto it = nanobotsDamage.find(damageType);
+        if (it != nanobotsDamage.end()) {
+            return it->second;
+        }
+        else {
+            Damage d;
+            return d;  // Empty Damage
+        }
     }
     else {
-        return regularDamage[damageType];
+        auto it = regularDamage.find(damageType);
+        if (it != regularDamage.end()) {
+            return it->second;
+        }
+        else {
+            Damage d;
+            return d;  // Empty Damage
+        }
     }
 }
 

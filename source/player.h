@@ -6,7 +6,6 @@
 #include "base_player.h"
 #include "damage.h"
 #include "heal.h"
-#include "line_info.h"
 #include "nano.h"
 #include "nano_program.h"
 #include "player_vector.h"
@@ -17,18 +16,17 @@
 #include <vector>
 
 
+class LineInfo;
+
 class Player : public BasePlayer {
 public:
-	Player();
-	Player(std::string name, LineInfo& lineInfo);
-	~Player();
-	Player(const Player& p);
-	Player& operator=(const Player& p);
+	Player(std::string name);
 
     void add(LineInfo& lineInfo);
 
-    Damage getTotalDamage();
-    Damage getTotalDamage(bool nanobots);
+    unsigned int getLongestAffectedPlayerNameLength() const;
+    Damage getTotalDamage() const;
+    Damage getTotalDamage(bool nanobots) const;
     Damage getTotalDamagePerDamageType(const std::string damageType);
     Damage getTotalDamagePerDamageType(const std::string damageType, bool nanobots);
     std::vector<std::pair<std::string, Damage>> getTotalDamagePerAffectedPlayer() const;
@@ -40,8 +38,6 @@ public:
 
     const XP& getXp();
     const std::vector<NanoProgram>& getNanoPrograms();
-
-    unsigned int getLongestAffectedPlayerNameLength() const;
 
     PlayerVector<AffectedPlayer>& getAffectedPlayers();
 
