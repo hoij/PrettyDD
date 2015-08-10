@@ -16,7 +16,7 @@ void writeDamageDealtOverview(PlayerVector<Player>& pv) {
     std::ofstream file("damage_dealt_overview");
     if (file.is_open()) {
         unsigned int longestNameLength = 0;
-        for (const Player& p : pv.getPlayers()) {
+        for (const Player& p : pv) {
             if (p.getName().length() > longestNameLength) {
                 longestNameLength = p.getName().length();
             }
@@ -25,8 +25,8 @@ void writeDamageDealtOverview(PlayerVector<Player>& pv) {
         file << std::left << std::setw(longestNameLength) <<
                 "Name" << Damage::writeHeadings << std::endl;
 
-        std::sort(pv.getPlayers().begin(), pv.getPlayers().end(), compareTotalReceivedFromPlayer);
-        for (Player& p : pv.getPlayers()) {
+        std::sort(pv.begin(), pv.end(), compareTotalReceivedFromPlayer);
+        for (const Player& p : pv) {
             file << std::left << std::setw(longestNameLength) << p.getName();
             p.getTotalDamage().writeDamageReceivedFromPlayer(file);
         }
@@ -45,8 +45,8 @@ void writeDamageReceivedOverview(PlayerVector<Player>& pv) {
         file << std::left << std::setw(longestNameLength) <<
                 "Name" << Damage::writeHeadings << std::endl;
 
-        std::sort(pv.getPlayers().begin(), pv.getPlayers().end(), compareTotalDealtToPlayer);
-        for (Player& p : pv.getPlayers()) {
+        std::sort(pv.begin(), pv.end(), compareTotalDealtToPlayer);
+        for (const Player& p : pv) {
             file << std::left << std::setw(longestNameLength) << p.getName();
             p.getTotalDamage().writeDamageDealtToPlayer(file);
         }
