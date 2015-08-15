@@ -12,23 +12,18 @@
 // Will probably have to switch spaces to tabs where possible to save bytes
 // as AO can only handle 1 kB scripts.
 
-void writeDamageDealtOverview(PlayerVector<Player>& pv) {
-    std::ofstream file("damage_dealt_overview");
+void writeDamageDealtOverviewUnsorted(PlayerVector<Player*>& pv) {
+    std::ofstream file("damage_dealt_overview_unsorted");
     if (file.is_open()) {
-        unsigned int longestNameLength = 0;
-        for (const Player& p : pv) {
-            if (p.getName().length() > longestNameLength) {
-                longestNameLength = p.getName().length();
-            }
-        }
+        int longestNameLength = pv.getLongestNameLength();
 
         file << std::left << std::setw(longestNameLength) <<
                 "Name" << Damage::writeHeadings << std::endl;
 
-        std::sort(pv.begin(), pv.end(), compareTotalReceivedFromPlayer);
-        for (const Player& p : pv) {
-            file << std::left << std::setw(longestNameLength) << p.getName();
-            p.getTotalDamage().writeDamageReceivedFromPlayer(file);
+        //std::sort(pv.begin(), pv.end(), compareTotalReceivedFromPlayer);
+        for (const Player* p : pv) {
+            file << std::left << std::setw(longestNameLength) << p->getName();
+            p->getTotalDamage().writeDamageReceivedFromPlayer(file);
         }
     }
     else {
@@ -36,7 +31,26 @@ void writeDamageDealtOverview(PlayerVector<Player>& pv) {
     }
 }
 
-void writeDamageReceivedOverview(PlayerVector<Player>& pv) {
+void writeDamageDealtOverview(PlayerVector<Player*>& pv) {
+    std::ofstream file("damage_dealt_overview");
+    if (file.is_open()) {
+        int longestNameLength = pv.getLongestNameLength();
+
+        file << std::left << std::setw(longestNameLength) <<
+                "Name" << Damage::writeHeadings << std::endl;
+
+        std::sort(pv.begin(), pv.end(), compareTotalReceivedFromPlayer);
+        for (const Player* p : pv) {
+            file << std::left << std::setw(longestNameLength) << p->getName();
+            p->getTotalDamage().writeDamageReceivedFromPlayer(file);
+        }
+    }
+    else {
+        // Write error
+    }
+}
+
+void writeDamageReceivedOverview(PlayerVector<Player*>& pv) {
     std::string fileName = "damage_received_overview";
     std::ofstream file(fileName);
     if (file.is_open()) {
@@ -46,9 +60,9 @@ void writeDamageReceivedOverview(PlayerVector<Player>& pv) {
                 "Name" << Damage::writeHeadings << std::endl;
 
         std::sort(pv.begin(), pv.end(), compareTotalDealtToPlayer);
-        for (const Player& p : pv) {
-            file << std::left << std::setw(longestNameLength) << p.getName();
-            p.getTotalDamage().writeDamageDealtToPlayer(file);
+        for (const Player* p : pv) {
+            file << std::left << std::setw(longestNameLength) << p->getName();
+            p->getTotalDamage().writeDamageDealtToPlayer(file);
         }
     }
     else {
@@ -56,14 +70,14 @@ void writeDamageReceivedOverview(PlayerVector<Player>& pv) {
     }
 }
 
-bool compareTotalReceivedFromPlayer(Player& p1, Player& p2) {
-    return p1.getTotalDamage().getTotalReceived() >
-           p2.getTotalDamage().getTotalReceived();
+bool compareTotalReceivedFromPlayer(const Player* p1, const Player* p2) {
+    return p1->getTotalDamage().getTotalReceived() >
+           p2->getTotalDamage().getTotalReceived();
 }
 
-bool compareTotalDealtToPlayer(Player& p1, Player& p2) {
-    return p1.getTotalDamage().getTotalDealt() >
-           p2.getTotalDamage().getTotalDealt();
+bool compareTotalDealtToPlayer(const Player* p1, const Player* p2) {
+    return p1->getTotalDamage().getTotalDealt() >
+           p2->getTotalDamage().getTotalDealt();
 }
 
 void writeDamageDealtPerOpponent(const Player* pp) {
@@ -75,7 +89,7 @@ void writeDamageDealtPerOpponent(const Player* pp) {
             file << std::left << std::setw(longestNameLength) <<
             "Name" << Damage::writeHeadings << std::endl;
 
-            for (auto& pair : pp->getTotalDamagePerAffectedPlayer()) {
+            for (auto& pair : pp->getTotalDamageForEachAffectedPlayer()) {
                 file << std::left << std::setw(longestNameLength) << pair.first;
                 pair.second.writeDamageReceivedFromPlayer(file);
             }

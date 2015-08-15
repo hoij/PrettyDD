@@ -1,18 +1,18 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <chrono>
-#include <ctime>
-#include <thread>
-#include <vector>
-#include "player.h"
-#include "player_vector.h"
+#include "configuration.h"
 #include "formatted_line.h"
 #include "logger.h"
 #include "parser.h"
-#include "configuration.h"
-
+#include "player.h"
+#include "player_vector.h"
 #include "write_stats_to_file.h"
+
+#include <chrono>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <vector>
 
 
 std::string currentTime() {
@@ -31,7 +31,7 @@ int main(void) {
         return 1;
     }
     Parser parser(config.getplayerRunningProgram());
-    PlayerVector<Player> pv;
+    PlayerVector<Player*> pv;
 
 	std::ifstream logstream("../../test/test_damage.txt");
 
@@ -64,7 +64,7 @@ int main(void) {
                         pv.addToPlayers(lineInfo);
                     }
                     else if (!lineInfo.command.empty()) {
-                        // write a new class/header for this that deals with input
+                        // TODO: write a new class/header for this that deals with input
                         if (lineInfo.command == "dd") {
                             writeDamageDealtOverview(pv);
                             writeDamageReceivedOverview(pv);

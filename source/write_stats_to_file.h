@@ -6,9 +6,9 @@
 #include "player_vector.h"
 #include "player.h"
 
-
-void writeDamageDealtOverview(PlayerVector<Player>& pv);
-void writeDamageReceivedOverview(PlayerVector<Player>& pv);
+void writeDamageDealtOverviewUnsorted(PlayerVector<Player*>& pv);
+void writeDamageDealtOverview(PlayerVector<Player*>& pv);
+void writeDamageReceivedOverview(PlayerVector<Player*>& pv);
 void writeDamageDealtPerOpponent(const Player* pp);
 void writeDamageDealtPerDamageType(Player&);
 void writeHealOverview();
@@ -18,8 +18,8 @@ void writeNanoProgramDetails();
 void writeNanoOverview();
 void writeNanoDetails();
 
-bool compareTotalReceivedFromPlayer(Player& p1, Player& p2);
-bool compareTotalDealtToPlayer(Player& p1, Player& p2);
+bool compareTotalReceivedFromPlayer(const Player* p1, const Player* p2);
+bool compareTotalDealtToPlayer(const Player* p1, const Player* p2);
 
 
 #endif  // WRITE_STATS_TO_FILE_H
