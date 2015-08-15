@@ -218,5 +218,4 @@ private:
 };
 
 
-
 #endif // DAMAGE_H
