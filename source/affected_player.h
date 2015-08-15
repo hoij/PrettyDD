@@ -25,6 +25,8 @@ public:
     Damage getTotalDamagePerDamageType(const std::string damageType) const;
     Damage getTotalDamagePerDamageType(const std::string damageType, bool nanobots) const;
 
+    const std::map<std::string, Damage>& getRegularDamage() const;
+    const std::map<std::string, Damage>& getNanobotsDamage() const;
     const Heal& getHeal() const;
     const Nano& getNano() const;
 

@@ -16,7 +16,6 @@ void AffectedPlayer::add(LineInfo& lineInfo) {
 }
 
 void AffectedPlayer::addDamage(LineInfo& li) {
-
     if (li.receiver_name != getName()) {
         if (li.nanobots) {
             nanobotsDamage[li.subtype].add(li, "dealer");
@@ -89,6 +88,14 @@ Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType,
             return d;  // Empty Damage
         }
     }
+}
+
+const std::map<std::string, Damage>& AffectedPlayer::getRegularDamage() const {
+    return regularDamage;
+}
+
+const std::map<std::string, Damage>& AffectedPlayer::getNanobotsDamage() const {
+    return nanobotsDamage;
 }
 
 const Heal& AffectedPlayer::getHeal() const {
