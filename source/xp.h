@@ -1,11 +1,11 @@
 #ifndef XP_H
 #define XP_H
 
+#include "line_info.h"
 
-#include <string>
 #include <limits>
 #include <map>
-#include "line_info.h"
+#include <string>
 
 
 class XP {
@@ -16,6 +16,10 @@ public:
         int max = -1;
         int min = std::numeric_limits<int>::max();
     };
+
+public:
+    std::map<std::string, info> gained;
+    std::map<std::string, info> lost;
 
     void add(LineInfo& li) {
         if (li.subtype == "gained") {
@@ -42,10 +46,6 @@ public:
             // TODO: Log error.
         }
     }
-
-private:
-    std::map<std::string, info> gained;
-    std::map<std::string, info> lost;
 };
 
 

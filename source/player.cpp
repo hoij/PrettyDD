@@ -2,24 +2,62 @@
 #include "player.h"
 
 #include <algorithm>
+#include <stdexcept>
+#include <utility>
 
 
-Player::Player(std::string name) : BasePlayer(name) {}
+Player::Player(std::string name) : BasePlayer(name) {
+    affectedPlayers = new AffectedPlayerVector();
+}
+
+Player::Player(std::string name, AffectedPlayerVector* pv) :
+    BasePlayer(name),
+    affectedPlayers(pv) {}
+
+Player::~Player() {
+    delete affectedPlayers;
+}
+
+Player::Player(const Player& other) : BasePlayer(other.getName()) {
+    affectedPlayers = new AffectedPlayerVector;
+    *affectedPlayers = *other.affectedPlayers;
+    nameOfLastNanoProgramCasted = other.nameOfLastNanoProgramCasted;
+	nanoPrograms = other.nanoPrograms;
+    xp = other.xp;
+}
+
+Player::Player(Player&& other) : Player(other.getName()) {
+    swap(*this, other);
+}
+
+Player& Player::operator=(Player rhs) {
+    swap(*this, rhs);
+    return *this;
+}
+
+void swap(Player& first, Player& second) {
+    std::swap(static_cast<BasePlayer&>(first), static_cast<BasePlayer&>(second));
+    std::swap(first.affectedPlayers, second.affectedPlayers);
+    std::swap(first.nameOfLastNanoProgramCasted, second.nameOfLastNanoProgramCasted);
+    std::swap(first.xp, second.xp);
+    std::swap(first.nanoPrograms, second.nanoPrograms);
+}
 
 void Player::add(LineInfo& lineInfo) {
     if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
-        affectedPlayers.addToPlayers(lineInfo);
+        affectedPlayers->addToPlayers(lineInfo);
     }
     else if (lineInfo.type == "nano cast") {
-    // Only add the nano when a message about the success/fail has arrived.
-    // Because in that case, the nano will not be mentioned by name.
         if (lineInfo.nanoProgramName != "") {
+            // When a nano program is casted there is no message about the
+            // success of the cast. That success info arrives in the next
+            // message. So in this case, the name is only saved.
             nameOfLastNanoProgramCasted = lineInfo.nanoProgramName;
         }
         else {
-            // If nano casted successfully/resisted/countered/aborted/fumble
-
-            // TODO: Must the last nano casted be a real nano or can it be just a name?
+            // If nano casted successfully/resisted/countered/aborted/fumble,
+            // the message won't contain a name. The previously saved name
+            // is added with the new subtype info (the success info).
             addNanoProgram(nameOfLastNanoProgramCasted, lineInfo.subtype);
         }
     }
@@ -34,10 +72,10 @@ void Player::addXp(LineInfo& lineInfo) {
 
 void Player::addNanoProgram(std::string name, std::string subtype) {
     // Adds a nano program if it hasn't already been added.
-    for (auto& npInVec : nanoPrograms) {
-        if (npInVec.getName() == name) {
-            npInVec.addAction(subtype);
-            return;
+    for (auto& nanoProgram : nanoPrograms) {
+        if (nanoProgram.getName() == name) {
+            nanoProgram.addAction(subtype);
+            break;
         }
     }
     nanoPrograms.push_back(NanoProgram(name, subtype));
@@ -48,40 +86,20 @@ Damage Player::getTotalDamage() const {
 }
 
 Damage Player::getTotalDamage(bool nanobots) const {
-    Damage d;
-    for (const AffectedPlayer& ap : affectedPlayers) {
-        if (ap.getName() != getName()) {
-            d += ap.getTotalDamage(nanobots);
-        }
-    }
-    return d;
+    return affectedPlayers->getTotalDamage(getName(), nanobots);
 }
 
-Damage Player::getTotalDamagePerDamageType(const std::string damageType) {
+Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
     return getTotalDamagePerDamageType(damageType, false) +
            getTotalDamagePerDamageType(damageType, true);
 }
 
-Damage Player::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) {
-    Damage d;
-    for (const AffectedPlayer& ap : affectedPlayers) {
-        d += ap.getTotalDamagePerDamageType(damageType, nanobots);
-    }
-    return d;
+Damage Player::getTotalDamagePerDamageType(std::string damageType, bool nanobots) const {
+    return affectedPlayers->getTotalDamagePerDamageType(getName(), damageType, nanobots);
 }
 
-std::vector<std::pair<std::string, Damage>> Player::getTotalDamagePerAffectedPlayer() const {
-    std::vector<std::pair<std::string, Damage>> totalDamagePerAffectedPlayer;
-    for (const AffectedPlayer& ap : affectedPlayers) {
-        if (ap.getName() != getName()) {
-            totalDamagePerAffectedPlayer.push_back(
-                std::make_pair(ap.getName(), ap.getTotalDamage()));
-            }
-    }
-    std::sort(totalDamagePerAffectedPlayer.begin(),
-              totalDamagePerAffectedPlayer.end(),
-              compareTotalReceivedFromPlayer);
-    return totalDamagePerAffectedPlayer;
+std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForEachAffectedPlayer() const {
+    return affectedPlayers->getTotalDamageForEachPlayer(getName());
 }
 
 bool Player::compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,
@@ -90,25 +108,31 @@ bool Player::compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,
            p2.second.getTotalDealt();
 }
 
-bool Player::compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
-                                       std::pair<std::string, Damage>& p2) {
-    return p1.second.getTotalReceived() >
-           p2.second.getTotalReceived();
+int Player::getLongestAffectedPlayerNameLength() const {
+    return affectedPlayers->getLongestNameLength();
 }
 
-unsigned int Player::getLongestAffectedPlayerNameLength() const {
-    return affectedPlayers.getLongestNameLength();
-}
-
-Heal Player::getTotalHeals() {
+Heal Player::getTotalHeals() const {
     Heal h;
-    for (const AffectedPlayer& ap : affectedPlayers) {
+    for (const AffectedPlayer& ap : *affectedPlayers) {
         h += ap.getHeal();
     }
     return h;
 }
 
-const std::vector<NanoProgram>& Player::getNanoPrograms() {
+const std::map<std::string, Damage>& Player::getNanobotsDamagePerAffectedPlayer(std::string name) const {
+    return affectedPlayers->getNanobotsDamagePerAffectedPlayer(name);
+}
+
+const std::map<std::string, Damage>& Player::getRegularDamagePerAffectedPlayer(std::string name) const {
+    return affectedPlayers->getRegularDamagePerAffectedPlayer(name);
+}
+
+std::vector<std::pair<std::string, Heal>> Player::getHealsForEachAffectedPlayer() const {
+    return affectedPlayers->getHealsForEachAffectedPlayer();
+}
+
+const std::vector<NanoProgram>& Player::getNanoPrograms() const {
     return nanoPrograms;
 }
 
@@ -116,14 +140,18 @@ const XP& Player::getXp() {
     return xp;
 }
 
-Nano Player::getTotalNano() {
+Nano Player::getTotalNano() const {
     Nano n;
-    for (const AffectedPlayer& ap : affectedPlayers) {
+    for (const AffectedPlayer& ap : *affectedPlayers) {
         n += ap.getNano();
     }
     return n;
 }
 
-PlayerVector<AffectedPlayer>& Player::getAffectedPlayers()  {
-    return affectedPlayers;
+std::vector<std::pair<std::string, Nano>> Player::getNanoForEachAffectedPlayer() const {
+    std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
+    for (const AffectedPlayer& ap : *affectedPlayers) {
+        nanoPerPlayer.push_back(std::make_pair(ap.getName(), ap.getNano()));
+    }
+    return nanoPerPlayer;
 }

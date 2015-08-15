@@ -12,7 +12,7 @@ public:
     virtual ~BasePlayer() {}
     std::string getName() const {return name;}
     void setName(std::string name) {this->name = name;}
-    virtual void add(LineInfo& lineInfo) = 0;
+    virtual void add(LineInfo& lineInfo) {(void)lineInfo;}
 
 private:
     std::string name;
