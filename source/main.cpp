@@ -33,7 +33,7 @@ int main(void) {
     Parser parser(config.getplayerRunningProgram());
     PlayerVector<Player*> pv;
 
-	std::ifstream logstream("../../test/test_damage.txt");
+	std::ifstream logstream("../../test/example_lines.txt");
 
 	if (logstream.is_open()) {
 		// Go to the end of the file
