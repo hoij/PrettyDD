@@ -2,60 +2,79 @@
 #define HEAL_H
 
 
-#include <string>
-#include <limits>
 #include "line_info.h"
+
+#include <limits>
+#include <string>
+
 
 class Heal {
 public:
     Heal& operator+=(const Heal& rhs) {
-        dealt += rhs.dealt;
-        received += rhs.received;
+        dealtOnPlayer += rhs.dealtOnPlayer;
+        receivedFromPlayer += rhs.receivedFromPlayer;
         return *this;
     }
 
     void add(LineInfo& li, std::string playerType) {
         if (playerType == "dealer") {
-            dealt.count++;
+            dealtOnPlayer.count++;
             // The dealer amount is always the potential heal
             // This will be either the total amount the dealer has given to
             // you or the total amount you have given to the receiver.
-            dealt.potential += li.amount;
+            // TODO: What? The above makes no sense.
+            dealtOnPlayer.potential += li.amount;
             // Check min/max
-            if (li.amount < dealt.potentialMin) {
-                dealt.potentialMin = li.amount;
+            if (li.amount < dealtOnPlayer.potentialMin) {
+                dealtOnPlayer.potentialMin = li.amount;
             }
-            if (li.amount > dealt.potentialMax) {
-                dealt.potentialMax = li.amount;
+            if (li.amount > dealtOnPlayer.potentialMax) {
+                dealtOnPlayer.potentialMax = li.amount;
             }
         }
         else if (playerType == "receiver") {
-            received.count++;
+            receivedFromPlayer.count++;
             if (li.subtype == "actual") {
                 // Only available for "You".
-                received.actual += li.amount;
+                receivedFromPlayer.actual += li.amount;
                 // Check min/max
-                if (li.amount < received.actualMin) {
-                    received.actualMin = li.amount;
+                if (li.amount < receivedFromPlayer.actualMin) {
+                    receivedFromPlayer.actualMin = li.amount;
                 }
-                if (li.amount > received.actualMax) {
-                    received.actualMax = li.amount;
+                if (li.amount > receivedFromPlayer.actualMax) {
+                    receivedFromPlayer.actualMax = li.amount;
                 }
             }
             else if (li.subtype == "potential") {
-                // This will be either the total amount you have received or
+                // This will be either the total amount you have receivedFromPlayer or
                 // the total amount you have given to the receiver.
-                received.potential += li.amount;
+                receivedFromPlayer.potential += li.amount;
                 // Check min/max
-                if (li.amount < received.potentialMin) {
-                    received.potentialMin = li.amount;
+                if (li.amount < receivedFromPlayer.potentialMin) {
+                    receivedFromPlayer.potentialMin = li.amount;
                 }
-                if (li.amount > dealt.potentialMax) {
-                    received.potentialMax = li.amount;
+                if (li.amount > dealtOnPlayer.potentialMax) {
+                    receivedFromPlayer.potentialMax = li.amount;
                 }
             }
         }
     }
+
+int getActualDealt() const {return dealtOnPlayer.actual;}
+int getPotentialDealt() const {return dealtOnPlayer.potential;}
+int getCountDealt() const {return dealtOnPlayer.count;}
+int getActualMaxDealt() const {return dealtOnPlayer.actualMax;}
+int getActualMinDealt() const {return dealtOnPlayer.actualMin;}
+int getPotentialMaxDealt() const {return dealtOnPlayer.potentialMax;}
+int getPotentialMinDealt() const {return dealtOnPlayer.potentialMin;}
+
+int getActualReceived() const {return receivedFromPlayer.actual;}
+int getPotentialReceived() const {return receivedFromPlayer.potential;}
+int getCountReceived() const {return receivedFromPlayer.count;}
+int getActualMaxReceived() const {return receivedFromPlayer.actualMax;}
+int getActualMinReceived() const {return receivedFromPlayer.actualMin;}
+int getPotentialMaxReceived() const {return receivedFromPlayer.potentialMax;}
+int getPotentialMinReceived() const {return receivedFromPlayer.potentialMin;}
 
 private:
     struct healInfo {
@@ -88,8 +107,8 @@ private:
         int potentialMax = -1;
     };
 
-    healInfo dealt;
-    healInfo received;
+    healInfo dealtOnPlayer;
+    healInfo receivedFromPlayer;
 };
 
 

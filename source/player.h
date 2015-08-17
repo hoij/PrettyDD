@@ -33,8 +33,8 @@ public:
 
     virtual Damage getTotalDamage() const;
     virtual Damage getTotalDamage(bool nanobots) const;
-    Damage getTotalDamagePerDamageType(std::string damageType) const;
-    Damage getTotalDamagePerDamageType(std::string damageType, bool nanobots) const;
+    virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
+    virtual Damage getTotalDamagePerDamageType(std::string damageType, bool nanobots) const;
     Heal getTotalHeals() const;
     Nano getTotalNano() const;
     std::vector<std::pair<std::string, Damage>> getTotalDamageForEachAffectedPlayer() const;

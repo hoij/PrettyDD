@@ -113,11 +113,7 @@ int Player::getLongestAffectedPlayerNameLength() const {
 }
 
 Heal Player::getTotalHeals() const {
-    Heal h;
-    for (const AffectedPlayer& ap : *affectedPlayers) {
-        h += ap.getHeal();
-    }
-    return h;
+    return affectedPlayers->getTotalHeals(getName());
 }
 
 const std::map<std::string, Damage>& Player::getNanobotsDamagePerAffectedPlayer(std::string name) const {

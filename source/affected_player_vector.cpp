@@ -8,32 +8,32 @@
 #include <utility>
 
 
-Damage AffectedPlayerVector::getTotalDamage(std::string name, bool nanobots) {
+Damage AffectedPlayerVector::getTotalDamage(std::string callersName, bool nanobots) {
     Damage d;
     for (const AffectedPlayer& ap : players) {
-        if (ap.getName() != name) {  // If not self
+        if (ap.getName() != callersName) {  // If not self
             d += ap.getTotalDamage(nanobots);
         }
     }
     return d;
 }
 
-Damage AffectedPlayerVector::getTotalDamagePerDamageType(std::string name, const std::string damageType, bool nanobots) {
+Damage AffectedPlayerVector::getTotalDamagePerDamageType(std::string callersName, const std::string damageType, bool nanobots) {
     Damage d;
     for (const AffectedPlayer& ap : players) {
-        if (ap.getName() != name) {  // If not self
+        if (ap.getName() != callersName) {  // If not self
             d += ap.getTotalDamagePerDamageType(damageType, nanobots);
         }
     }
     return d;
 }
 
-std::vector<std::pair<std::string, Damage>> AffectedPlayerVector::getTotalDamageForEachPlayer(std::string name) const {
+std::vector<std::pair<std::string, Damage>> AffectedPlayerVector::getTotalDamageForEachPlayer(std::string callersName) const {
     // Returns a sorted vector of pairs containing the players name and their
     // total damage (in the form of the Damage class).
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const AffectedPlayer& ap : players) {
-        if (ap.getName() != name) {  // If not self
+        if (ap.getName() != callersName) {  // If not self
             totalDamagePerPlayer.push_back(
                 std::make_pair(ap.getName(), ap.getTotalDamage()));
             }
@@ -72,10 +72,10 @@ const std::map<std::string, Damage>& AffectedPlayerVector::getRegularDamagePerAf
                                 "affected players list");
 }
 
-Heal AffectedPlayerVector::getTotalHeals(std::string name) {
+Heal AffectedPlayerVector::getTotalHeals(std::string callersName) {
     Heal h;
     for (const AffectedPlayer& ap : players) {
-        if (ap.getName() != name) {
+        if (ap.getName() != callersName) {
             h += ap.getHeal();
         }
     }

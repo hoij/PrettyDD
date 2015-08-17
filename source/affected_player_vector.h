@@ -22,15 +22,15 @@ public:
     virtual int getLongestNameLength() const;
     virtual const AffectedPlayer* getPlayer(std::string name);
 
-    virtual Damage getTotalDamage(std::string name, bool nanobots);
-    virtual Damage getTotalDamagePerDamageType(std::string name,
+    virtual Damage getTotalDamage(std::string callersName, bool nanobots);
+    virtual Damage getTotalDamagePerDamageType(std::string callersName,
                                                const std::string damageType,
                                                bool nanobots);
-    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer(std::string name) const;
+    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer(std::string callersName) const;
     const std::map<std::string, Damage>& getNanobotsDamagePerAffectedPlayer(std::string name) const;
     const std::map<std::string, Damage>& getRegularDamagePerAffectedPlayer(std::string name) const;
 
-    virtual Heal getTotalHeals(std::string name);
+    virtual Heal getTotalHeals(std::string callersName);
     std::vector<std::pair<std::string, Heal>> getHealsForEachAffectedPlayer() const;
 
     typedef typename std::vector<AffectedPlayer>::iterator AffectedPlayerVectorIterator;

@@ -4,7 +4,6 @@
 
 #include "logger.h"
 #include "player.h"
-//#include "player_vector_base.h"
 
 #include <iterator>
 #include <string>
@@ -15,20 +14,23 @@ class Damage;
 class Heal;
 class LineInfo;
 
-//TODO: Rewrite as template taking pointer to class
 template<class C>
 class PlayerVector {
 public:
+    PlayerVector() {}
     virtual ~PlayerVector();
+    PlayerVector(PlayerVector& pv) = delete;
+    PlayerVector& operator=(PlayerVector rhs) = delete;
+
     virtual void addToPlayers(LineInfo& lineInfo);
     virtual int getLongestNameLength() const;
     virtual const C getPlayer(std::string name);
 
     virtual Damage getTotalDamage(bool nanobots);
-    virtual Damage getTotalDamagePerDamageType(const std::string damageType,
+    virtual Damage getTotalDamagePerDamageType(std::string damageType,
                                                bool nanobots);
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer() const;
-    virtual Heal getTotalHeals();
+    virtual Heal getTotalHeals() const;
 
     typedef typename std::vector<C>::iterator PlayerVectorIterator;
     virtual PlayerVectorIterator begin() {return players.begin();}
@@ -62,7 +64,7 @@ Damage PlayerVector<C>::getTotalDamage(bool nanobots) {
 }
 
 template<class C>
-Damage PlayerVector<C>::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) {
+Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType, bool nanobots) {
     Damage d;
     for (const C p : players) {
         d += p->getTotalDamagePerDamageType(damageType, nanobots);
@@ -87,13 +89,13 @@ std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageForEa
 
 template<class C>
 bool PlayerVector<C>::compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
-                                                  std::pair<std::string, Damage>& p2) {
+                                                     std::pair<std::string, Damage>& p2) {
     return p1.second.getTotalReceived() >
            p2.second.getTotalReceived();
 }
 
 template<class C>
-Heal PlayerVector<C>::getTotalHeals() {
+Heal PlayerVector<C>::getTotalHeals() const {
     Heal h;
     for (const C p : players) {
         h += p->getTotalHeals();
