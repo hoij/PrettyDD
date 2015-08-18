@@ -1,13 +1,14 @@
+#include "affected_player.h"
+#include "affected_player_vector.h"
 #include "line_info.h"
 #include "player.h"
-#include "affected_player_vector.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <string>
 
 
-class MockPlayerVector : public AffectedPlayerVector {
+class MockPlayerVector : public AffectedPlayerVector<AffectedPlayer*> {
 public:
     MOCK_METHOD1(addToPlayers, void(LineInfo& li));
     MOCK_CONST_METHOD0(getLongestNameLength, int());

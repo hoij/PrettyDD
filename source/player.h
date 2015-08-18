@@ -1,14 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-
-#include "affected_player.h"
+#include "affected_player_vector.h"
 #include "base_player.h"
 #include "damage.h"
 #include "heal.h"
 #include "nano.h"
 #include "nano_program.h"
-#include "affected_player_vector.h"
 #include "xp.h"
 
 #include <map>
@@ -22,7 +20,7 @@ class LineInfo;
 class Player : public BasePlayer {
 public:
     Player(std::string name);
-    Player(std::string name, AffectedPlayerVector* pv);
+    Player(std::string name, AffectedPlayerVector<AffectedPlayer*>* pv);
     virtual ~Player();
     Player(const Player& other);
     Player(Player&& other);
@@ -57,7 +55,7 @@ private:
     Damage sumDamage(bool nanobots);
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
-    AffectedPlayerVector* affectedPlayers = nullptr;
+    AffectedPlayerVector<AffectedPlayer*>* affectedPlayers = nullptr;
     std::string nameOfLastNanoProgramCasted;
 	std::vector<NanoProgram> nanoPrograms;
     XP xp;

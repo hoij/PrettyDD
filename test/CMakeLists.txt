@@ -5,7 +5,7 @@ include_directories(SYSTEM ${GMOCK_DIR}/gtest/include
 include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/source")
 
 
-# add_gmock_test(<target> <lib_to_test> <sources>...)
+# add_gmock_header_test(<target> <lib_to_test> <sources>...)
 #
 #  Adds a Google Mock based test executable, <target>, built from <lib_to_test>
 #  and <sources> and adds the test so that CTest will run it. Both the
@@ -41,7 +41,7 @@ function(add_gmock_test target lib)
 			   COMMENT "Running ${target}" VERBATIM)
 endfunction()
 
-# add_gmock_test(<target> <lib_to_test> <sources>...)
+# add_gmock_test_2_libs(<target> <lib_to_test> <sources>...)
 #
 #  Adds a Google Mock based test executable, <target>, built from <lib_to_test>
 #  and <sources> and adds the test so that CTest will run it. Both the
@@ -78,5 +78,5 @@ add_gmock_test(parser_renameSpecial_test parserlib parser_renameSpecial_test.cpp
 add_gmock_test(parser_chat_test parserlib parser_chat_test.cpp)
 
 add_gmock_test(formatted_line_test formatted_linelib formatted_line_test.cpp)
-add_gmock_test_2_libs(player_vector_test playerlib loggerlib player_vector_test.cpp)
+add_gmock_test_2_libs(player_vector_test playerlib loggerlib player_vector_test.cpp ../source/player_vector.h)
 add_gmock_test(player_test playerlib player_test.cpp)

@@ -3,6 +3,7 @@ include_directories(SYSTEM ${GMOCK_DIR}/gtest/include
 
 # CMake cant make libraries out of headers only so they are added here
 add_executable(PrettyDD main.cpp
+        affected_player_vector.h
         base_player.h
 	player_vector.h
 	line_info.h
@@ -18,13 +19,11 @@ add_library(nano_programlib nano_program.cpp)
 add_library(affected_playerlib affected_player.cpp)
 add_library(loggerlib logger.cpp)
 add_library(playerlib player.cpp)
-target_link_libraries(playerlib nano_programlib affected_player_vectorlib loggerlib)
+target_link_libraries(playerlib affected_playerlib nano_programlib loggerlib)
 add_library(formatted_linelib formatted_line.cpp)
 target_link_libraries(formatted_linelib loggerlib)
 add_library(parserlib parser.cpp)
 target_link_libraries(parserlib loggerlib)
-add_library(affected_player_vectorlib affected_player_vector.cpp)
-target_link_libraries(affected_player_vectorlib affected_playerlib loggerlib)
 add_library(write_stats_to_filelib write_stats_to_file.cpp)
 add_library(configurationlib configuration.cpp)
 

@@ -1,3 +1,5 @@
+#include "affected_player.h"
+#include "affected_player_vector.h"
 #include "line_info.h"
 #include "player.h"
 
@@ -7,10 +9,10 @@
 
 
 Player::Player(std::string name) : BasePlayer(name) {
-    affectedPlayers = new AffectedPlayerVector();
+    affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
 }
 
-Player::Player(std::string name, AffectedPlayerVector* pv) :
+Player::Player(std::string name, AffectedPlayerVector<AffectedPlayer*>* pv) :
     BasePlayer(name),
     affectedPlayers(pv) {}
 
@@ -19,7 +21,7 @@ Player::~Player() {
 }
 
 Player::Player(const Player& other) : BasePlayer(other.getName()) {
-    affectedPlayers = new AffectedPlayerVector;
+    affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>;
     *affectedPlayers = *other.affectedPlayers;
     nameOfLastNanoProgramCasted = other.nameOfLastNanoProgramCasted;
 	nanoPrograms = other.nanoPrograms;
@@ -137,17 +139,13 @@ const XP& Player::getXp() {
 }
 
 Nano Player::getTotalNano() const {
-    Nano n;
-    for (const AffectedPlayer& ap : *affectedPlayers) {
-        n += ap.getNano();
-    }
-    return n;
+    return affectedPlayers->getTotalNano(getName());
 }
 
 std::vector<std::pair<std::string, Nano>> Player::getNanoForEachAffectedPlayer() const {
     std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
-    for (const AffectedPlayer& ap : *affectedPlayers) {
-        nanoPerPlayer.push_back(std::make_pair(ap.getName(), ap.getNano()));
+    for (const AffectedPlayer* ap : *affectedPlayers) {
+        nanoPerPlayer.push_back(std::make_pair(ap->getName(), ap->getNano()));
     }
     return nanoPerPlayer;
 }
