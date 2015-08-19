@@ -2,11 +2,12 @@
 #define DAMAGE_H
 
 
-#include <string>
+#include "line_info.h"
+
+#include <iomanip>
 #include <limits>
 #include <ostream>
-#include <iomanip>
-#include "line_info.h"
+#include <string>
 
 
 class Damage {

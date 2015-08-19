@@ -29,18 +29,19 @@ public:
     virtual int getLongestNameLength() const;
     virtual const C getPlayer(std::string name);
 
-    virtual Damage getTotalDamage(std::string callersName, bool nanobots);
-    virtual Damage getTotalDamagePerDamageType(std::string callersName,
+    virtual Damage getTotalDamage(std::string callerName, bool nanobots);
+    virtual Damage getTotalDamagePerDamageType(std::string callerName,
                                                const std::string damageType,
                                                bool nanobots);
-    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer(std::string callersName) const;
-    const std::map<std::string, Damage>& getNanobotsDamagePerAffectedPlayer(std::string name) const;
-    const std::map<std::string, Damage>& getRegularDamagePerAffectedPlayer(std::string name) const;
+    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer(std::string callerName) const;
+    virtual const std::map<std::string, Damage>& getNanobotsDamagePerAffectedPlayer(std::string name) const;
+    virtual const std::map<std::string, Damage>& getRegularDamagePerAffectedPlayer(std::string name) const;
 
-    virtual Heal getTotalHeals(std::string callersName);
+    virtual Heal getTotalHeals(std::string callerName);
     std::vector<std::pair<std::string, Heal>> getHealsForEachAffectedPlayer() const;
 
-    Nano getTotalNano(std::string callersName) const;
+    Nano getTotalNano(std::string callerName) const;
+    std::vector<std::pair<std::string, Nano>> getNanoForEachAffectedPlayer(std::string callerName) const;
 
     typedef typename std::vector<C>::iterator AffectedPlayerVectorIterator;
     virtual AffectedPlayerVectorIterator begin() {return players.begin();}
@@ -93,10 +94,10 @@ void swap(AffectedPlayerVector<T>& first, AffectedPlayerVector<T>& second) {
 }
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalDamage(std::string callersName, bool nanobots) {
+Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName, bool nanobots) {
     Damage d;
     for (const C ap : players) {
-        if (ap->getName() != callersName) {  // If not self
+        if (ap->getName() != callerName) {  // If not self
             d += ap->getTotalDamage(nanobots);
         }
     }
@@ -104,10 +105,10 @@ Damage AffectedPlayerVector<C>::getTotalDamage(std::string callersName, bool nan
 }
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callersName, const std::string damageType, bool nanobots) {
+Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerName, const std::string damageType, bool nanobots) {
     Damage d;
     for (const C ap : players) {
-        if (ap->getName() != callersName) {  // If not self
+        if (ap->getName() != callerName) {  // If not self
             d += ap->getTotalDamagePerDamageType(damageType, nanobots);
         }
     }
@@ -115,15 +116,15 @@ Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callersN
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForEachPlayer(std::string callersName) const {
+std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForEachPlayer(std::string callerName) const {
     // Returns a sorted vector of pairs containing the players name and their
     // total damage (in the form of the Damage class).
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C ap : players) {
-        if (ap->getName() != callersName) {  // If not self
+        if (ap->getName() != callerName) {  // If not self
             totalDamagePerPlayer.push_back(
                 std::make_pair(ap->getName(), ap->getTotalDamage()));
-            }
+        }
     }
     std::sort(totalDamagePerPlayer.begin(),
               totalDamagePerPlayer.end(),
@@ -133,7 +134,7 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDam
 
 template<class C>
 bool AffectedPlayerVector<C>::compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
-                                                          std::pair<std::string, Damage>& p2) {
+                                                             std::pair<std::string, Damage>& p2) {
     return p1.second.getTotalReceived() >
            p2.second.getTotalReceived();
 }
@@ -163,10 +164,10 @@ const std::map<std::string, Damage>& AffectedPlayerVector<C>::getRegularDamagePe
 }
 
 template<class C>
-Heal AffectedPlayerVector<C>::getTotalHeals(std::string callersName) {
+Heal AffectedPlayerVector<C>::getTotalHeals(std::string callerName) {
     Heal h;
     for (const C ap : players) {
-        if (ap->getName() != callersName) {
+        if (ap->getName() != callerName) {
             h += ap->getHeal();
         }
     }
@@ -184,14 +185,25 @@ std::vector<std::pair<std::string, Heal>> AffectedPlayerVector<C>::getHealsForEa
 }
 
 template<class C>
-Nano AffectedPlayerVector<C>::getTotalNano(std::string callersName) const {
+Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
     Nano n;
     for (const AffectedPlayer* ap : players) {
-        if (ap->getName() != callersName) {
+        if (ap->getName() != callerName) {
             n += ap->getNano();
         }
     }
     return n;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForEachAffectedPlayer(std::string callerName) const {
+    std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
+    for (const C ap : players) {
+        if (ap->getName() != callerName) {
+            nanoPerPlayer.push_back(std::make_pair(ap->getName(), ap->getNano()));
+        }
+    }
+    return nanoPerPlayer;
 }
 
 template<class C>

@@ -111,5 +111,9 @@ private:
     healInfo receivedFromPlayer;
 };
 
+inline Heal operator+(Heal lhs, const Heal& rhs) {
+    return lhs += rhs;
+}
+
 
 #endif  // HEAL_H

@@ -83,12 +83,16 @@ void Player::addNanoProgram(std::string name, std::string subtype) {
     nanoPrograms.push_back(NanoProgram(name, subtype));
 }
 
+Damage Player::getTotalDamage(bool nanobots) const {
+    return affectedPlayers->getTotalDamage(getName(), nanobots);
+}
+
 Damage Player::getTotalDamage() const {
     return getTotalDamage(true) + getTotalDamage(false);
 }
 
-Damage Player::getTotalDamage(bool nanobots) const {
-    return affectedPlayers->getTotalDamage(getName(), nanobots);
+Damage Player::getTotalDamagePerDamageType(std::string damageType, bool nanobots) const {
+    return affectedPlayers->getTotalDamagePerDamageType(getName(), damageType, nanobots);
 }
 
 Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
@@ -96,19 +100,15 @@ Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
            getTotalDamagePerDamageType(damageType, true);
 }
 
-Damage Player::getTotalDamagePerDamageType(std::string damageType, bool nanobots) const {
-    return affectedPlayers->getTotalDamagePerDamageType(getName(), damageType, nanobots);
-}
-
 std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForEachAffectedPlayer() const {
     return affectedPlayers->getTotalDamageForEachPlayer(getName());
 }
 
-bool Player::compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,
-                                       std::pair<std::string, Damage>& p2) {
-    return p1.second.getTotalDealt() >
-           p2.second.getTotalDealt();
-}
+//bool Player::compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,
+//                                       std::pair<std::string, Damage>& p2) {
+//    return p1.second.getTotalDealt() >
+//           p2.second.getTotalDealt();
+//}
 
 int Player::getLongestAffectedPlayerNameLength() const {
     return affectedPlayers->getLongestNameLength();
@@ -134,18 +134,14 @@ const std::vector<NanoProgram>& Player::getNanoPrograms() const {
     return nanoPrograms;
 }
 
+std::vector<std::pair<std::string, Nano>> Player::getNanoForEachAffectedPlayer() const {
+    return affectedPlayers->getNanoForEachAffectedPlayer(getName());
+}
+
 const XP& Player::getXp() {
     return xp;
 }
 
 Nano Player::getTotalNano() const {
     return affectedPlayers->getTotalNano(getName());
-}
-
-std::vector<std::pair<std::string, Nano>> Player::getNanoForEachAffectedPlayer() const {
-    std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
-    for (const AffectedPlayer* ap : *affectedPlayers) {
-        nanoPerPlayer.push_back(std::make_pair(ap->getName(), ap->getNano()));
-    }
-    return nanoPerPlayer;
 }
