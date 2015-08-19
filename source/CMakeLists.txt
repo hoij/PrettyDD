@@ -5,6 +5,7 @@ include_directories(SYSTEM ${GMOCK_DIR}/gtest/include
 add_executable(PrettyDD main.cpp
         affected_player_vector.h
         base_player.h
+	base_vector.h
 	player_vector.h
 	line_info.h
 	heal.h

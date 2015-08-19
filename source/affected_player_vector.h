@@ -3,6 +3,7 @@
 
 
 #include "affected_player.h"
+#include "base_vector.h"
 #include "damage.h"
 #include "heal.h"
 #include "line_info.h"
@@ -14,20 +15,13 @@
 #include <utility>
 #include <vector>
 
+
 template<class C>
-class AffectedPlayerVector {
+class AffectedPlayerVector : public BaseVector<C> {
 public:
     AffectedPlayerVector() {}
-    virtual ~AffectedPlayerVector();
-    AffectedPlayerVector(const AffectedPlayerVector<C>& ap);
-    AffectedPlayerVector(AffectedPlayerVector<C>&& other);
-    AffectedPlayerVector& operator=(AffectedPlayerVector<C> rhs);
-    template<class T>
-    friend void swap(AffectedPlayerVector<T>& first, AffectedPlayerVector<T>& second);
-
-    virtual void addToPlayers(LineInfo& lineInfo);
-    virtual int getLongestNameLength() const;
-    virtual const C getPlayer(std::string name);
+    virtual ~AffectedPlayerVector() {};
+    AffectedPlayerVector(const AffectedPlayerVector<C>& other) : BaseVector<C>(other) {}
 
     virtual Damage getTotalDamage(std::string callerName, bool nanobots);
     virtual Damage getTotalDamagePerDamageType(std::string callerName,
@@ -43,61 +37,21 @@ public:
     Nano getTotalNano(std::string callerName) const;
     std::vector<std::pair<std::string, Nano>> getNanoForEachAffectedPlayer(std::string callerName) const;
 
-    typedef typename std::vector<C>::iterator AffectedPlayerVectorIterator;
-    virtual AffectedPlayerVectorIterator begin() {return players.begin();}
-    virtual AffectedPlayerVectorIterator end() {return players.end();}
-    typedef typename std::vector<C>::const_iterator const_AffectedPlayerVectorIterator;
-    virtual const_AffectedPlayerVectorIterator begin() const {return players.begin();}
-    virtual const_AffectedPlayerVectorIterator end() const {return players.end();}
-
 private:
-    void createPlayer(std::string name, LineInfo& lineInfo);
-    static bool compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
-                                               std::pair<std::string, Damage>& p2);
-
-    std::vector<C> players;
+    static bool comparePotentialHeal(const std::pair<std::string, Heal>& p1,
+                                     const std::pair<std::string, Heal>& p2);
 };
 
 
-
-
-template<class C>
-AffectedPlayerVector<C>::~AffectedPlayerVector() {
-    for (C player : players) {
-        delete player;
-    }
-}
-
-template<class C>
-AffectedPlayerVector<C>::AffectedPlayerVector(const AffectedPlayerVector<C>& other) {
-    for (C player : other.players) {
-        typedef typename std::remove_pointer<C>::type CNoPointer;
-        C p = new CNoPointer(*player);
-        players.push_back(p);
-    }
-}
-
-template<class C>
-AffectedPlayerVector<C>::AffectedPlayerVector(AffectedPlayerVector<C>&& other) : AffectedPlayerVector<C>() {
-    swap(*this, other);
-}
-
-template<class C>
-AffectedPlayerVector<C>& AffectedPlayerVector<C>::operator=(AffectedPlayerVector<C> rhs) {
-    swap(*this, rhs);
-    return *this;
-}
-
-template<class T>
-void swap(AffectedPlayerVector<T>& first, AffectedPlayerVector<T>& second) {
-        std::swap(first.players, second.players);
-}
-
 template<class C>
 Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName, bool nanobots) {
+    /* The damage belonging to the caller should not be included in the sum
+    because it already exists in the other players damage stats. If it  is
+    added it will incorrectly increase the values. */
+
     Damage d;
-    for (const C ap : players) {
-        if (ap->getName() != callerName) {  // If not self
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
             d += ap->getTotalDamage(nanobots);
         }
     }
@@ -107,8 +61,8 @@ Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName, bool nano
 template<class C>
 Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerName, const std::string damageType, bool nanobots) {
     Damage d;
-    for (const C ap : players) {
-        if (ap->getName() != callerName) {  // If not self
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
             d += ap->getTotalDamagePerDamageType(damageType, nanobots);
         }
     }
@@ -120,28 +74,21 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDam
     // Returns a sorted vector of pairs containing the players name and their
     // total damage (in the form of the Damage class).
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
-    for (const C ap : players) {
-        if (ap->getName() != callerName) {  // If not self
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
             totalDamagePerPlayer.push_back(
                 std::make_pair(ap->getName(), ap->getTotalDamage()));
         }
     }
     std::sort(totalDamagePerPlayer.begin(),
               totalDamagePerPlayer.end(),
-              compareTotalReceivedFromPlayer);
+              this->compareTotalReceivedFromPlayer);
     return totalDamagePerPlayer;
 }
 
 template<class C>
-bool AffectedPlayerVector<C>::compareTotalReceivedFromPlayer(std::pair<std::string, Damage>& p1,
-                                                             std::pair<std::string, Damage>& p2) {
-    return p1.second.getTotalReceived() >
-           p2.second.getTotalReceived();
-}
-
-template<class C>
 const std::map<std::string, Damage>& AffectedPlayerVector<C>::getNanobotsDamagePerAffectedPlayer(std::string name) const {
-    for (const C ap : players) {
+    for (const C ap : this->players) {
         if (ap->getName() == name) {
             return ap->getNanobotsDamage();
         }
@@ -153,7 +100,7 @@ const std::map<std::string, Damage>& AffectedPlayerVector<C>::getNanobotsDamageP
 
 template<class C>
 const std::map<std::string, Damage>& AffectedPlayerVector<C>::getRegularDamagePerAffectedPlayer(std::string name) const {
-    for (const C ap : players) {
+    for (const C ap : this->players) {
         if (ap->getName() == name) {
             return ap->getRegularDamage();
         }
@@ -166,8 +113,8 @@ const std::map<std::string, Damage>& AffectedPlayerVector<C>::getRegularDamagePe
 template<class C>
 Heal AffectedPlayerVector<C>::getTotalHeals(std::string callerName) {
     Heal h;
-    for (const C ap : players) {
-        if (ap->getName() != callerName) {
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
             h += ap->getHeal();
         }
     }
@@ -178,17 +125,20 @@ template<class C>
 std::vector<std::pair<std::string, Heal>> AffectedPlayerVector<C>::getHealsForEachAffectedPlayer() const {
     // TODO: This will include the owning player as well. Do I want that?
     std::vector<std::pair<std::string, Heal>> healsPerPlayer;
-    for (const C ap : players) {
+    for (const C ap : this->players) {
         healsPerPlayer.push_back(std::make_pair(ap->getName(), ap->getHeal()));
     }
+    std::sort(healsPerPlayer.begin(),
+              healsPerPlayer.end(),
+              comparePotentialHeal);
     return healsPerPlayer;
 }
 
 template<class C>
 Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
     Nano n;
-    for (const AffectedPlayer* ap : players) {
-        if (ap->getName() != callerName) {
+    for (const AffectedPlayer* ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
             n += ap->getNano();
         }
     }
@@ -198,7 +148,7 @@ Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
 template<class C>
 std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForEachAffectedPlayer(std::string callerName) const {
     std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
-    for (const C ap : players) {
+    for (const C ap : this->players) {
         if (ap->getName() != callerName) {
             nanoPerPlayer.push_back(std::make_pair(ap->getName(), ap->getNano()));
         }
@@ -207,59 +157,10 @@ std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForEac
 }
 
 template<class C>
-void AffectedPlayerVector<C>::addToPlayers(LineInfo& lineInfo) {
-    // Adds the info found in a log line to dealer and receiver.
-    // If a player with the same name is not found, a new one is created.
-    bool dealerFound = false;
-    bool receiverFound = false;
-
-    for (AffectedPlayer* ap : players) {
-        if (ap->getName() == lineInfo.dealer_name) {
-            ap->add(lineInfo);
-            dealerFound = true;
-        }
-        else if (ap->getName() == lineInfo.receiver_name) {
-            ap->add(lineInfo);
-            receiverFound = true;
-        }
-    }
-    if(!dealerFound && lineInfo.dealer_name != "") {
-        createPlayer(lineInfo.dealer_name, lineInfo);
-    }
-    if(!receiverFound && lineInfo.receiver_name != "") {
-        createPlayer(lineInfo.receiver_name, lineInfo);
-    }
-}
-
-template<class C>
-void AffectedPlayerVector<C>::createPlayer(std::string name, LineInfo& lineInfo) {
-    // Get the type pointed to by C
-    typedef typename std::remove_pointer<C>::type CNoPointer;
-    C p = new CNoPointer(name);
-    p->add(lineInfo);
-    players.push_back(p);
-}
-
-template<class C>
-const C AffectedPlayerVector<C>::getPlayer(std::string name) {
-    for (const C ap : players) {
-        if (ap->getName() == name) {
-            return ap;
-        }
-    }
-    errorLog.write("Playerould not find a player with the name " + name);
-    return nullptr;
-}
-
-template<class C>
-int AffectedPlayerVector<C>::getLongestNameLength() const {
-    unsigned int longestNameLength = 0;
-    for (const C ap : players) {
-        if (ap->getName().length() > longestNameLength) {
-            longestNameLength = ap->getName().length();
-        }
-    }
-    return longestNameLength;
+bool AffectedPlayerVector<C>::comparePotentialHeal(const std::pair<std::string, Heal>& p1,
+                                                   const std::pair<std::string, Heal>& p2) {
+    return p1.second.getPotentialDealt() >
+           p2.second.getPotentialDealt();
 }
 
 

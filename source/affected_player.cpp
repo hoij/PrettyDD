@@ -106,7 +106,7 @@ const Nano& AffectedPlayer::getNano() const {
     return nano;
 }
 
-bool AffectedPlayer::compareTotalDealt(AffectedPlayer& ap1, AffectedPlayer& ap2) {
-    return ap1.getTotalDamage().getTotalDealt() >
-           ap2.getTotalDamage().getTotalDealt();
-}
+//bool AffectedPlayer::compareTotalDealt(AffectedPlayer& ap1, AffectedPlayer& ap2) {
+//    return ap1.getTotalDamage().getTotalDealt() >
+//           ap2.getTotalDamage().getTotalDealt();
+//}

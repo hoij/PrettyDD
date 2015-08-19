@@ -78,5 +78,9 @@ add_gmock_test(parser_renameSpecial_test parserlib parser_renameSpecial_test.cpp
 add_gmock_test(parser_chat_test parserlib parser_chat_test.cpp)
 
 add_gmock_test(formatted_line_test formatted_linelib formatted_line_test.cpp)
-add_gmock_test_2_libs(player_vector_test playerlib loggerlib player_vector_test.cpp ../source/player_vector.h)
 add_gmock_test(player_test playerlib player_test.cpp)
+add_gmock_test_2_libs(player_vector_test playerlib loggerlib player_vector_test.cpp ../source/player_vector.h)
+add_gmock_test_2_libs(affected_player_vector_test playerlib loggerlib
+                      affected_player_vector_test.cpp ../source/affected_player_vector.h)
+add_gmock_test(base_vector_test playerlib base_vector_test.cpp ../source/base_vector.h)
+

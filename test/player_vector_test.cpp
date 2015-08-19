@@ -9,17 +9,7 @@
 #include <string>
 
 
-/* Test Players */
-
-class StubPlayer : public Player {
-public:
-    StubPlayer(std::string name) : Player(name) {}
-    void add(LineInfo& li) {
-        (void)li;
-        callsToAdd++;
-    }
-    int callsToAdd = 0;
-};
+/* Test Player */
 
 class MockPlayer : public Player {
 public:
@@ -47,40 +37,13 @@ const MockPlayer* addPlayerToVector(std::string name,
     return p;
 }
 
-void addToPlayers(std::string dealer,
-                  std::string receiver,
-                  PlayerVector<StubPlayer*>* playerVector) {
+Damage createDamage(int amount, std::string playerType) {
     LineInfo li;
-    li.dealer_name = dealer;
-    li.receiver_name = receiver;
-    playerVector->addToPlayers(li);
-    // Verify that they get added to the vector
-    if (dealer != "") {
-        const StubPlayer* p = playerVector->getPlayer(dealer);
-        EXPECT_FALSE(p == nullptr);
-    }
-    if (receiver != "") {
-        const StubPlayer* p = playerVector->getPlayer(receiver);
-        EXPECT_FALSE(p == nullptr);
-    }
-}
-
-Damage createDamage(LineInfo li, std::string playerType) {
+    li.amount = amount;
     Damage d;
     d.add(li, playerType);
     return d;
 }
-
-class PlayerVectorStubPlayerTest : public ::testing::Test {
-protected:
-    virtual void SetUp() {
-        playerVector = new PlayerVector<StubPlayer*>;
-    }
-    virtual void TearDown() {
-        delete playerVector;
-    }
-    PlayerVector<StubPlayer*>* playerVector;
-};
 
 class PlayerVectorDamageTest : public ::testing::Test {
 /* NiceMock suppresses warnings about function calls not expected via an
@@ -113,151 +76,6 @@ protected:
 };
 
 /* Test cases */
-
-TEST_F(PlayerVectorStubPlayerTest, noDealerNorReceiver) {
-    /* Adds a line info object with no dealer and no receiver.
-    Verifies that the total nr of players is 0. */
-    addToPlayers("", "", playerVector);
-
-    int nrOfPlayers = 0;
-    for (const auto& player : *playerVector) {
-        (void)player;
-        nrOfPlayers++;
-    }
-    EXPECT_EQ(0, nrOfPlayers);
-}
-
-
-TEST_F(PlayerVectorStubPlayerTest, newDealerOnly) {
-    /* Adds a line info object with only the dealer name defined
-    Verifies that only the dealer is added. */
-    addToPlayers("Dealer", "", playerVector);
-
-    int nrOfPlayers = 0;
-    for (const auto& player : *playerVector) {
-        nrOfPlayers++;
-        EXPECT_EQ("Dealer", player->getName());
-    }
-    EXPECT_EQ(1, nrOfPlayers);
-}
-
-TEST_F(PlayerVectorStubPlayerTest, newReceiverOnly) {
-    /* Adds a line info object with only the receiver name defined
-    Verifies that only the receiver is added. */
-    addToPlayers("", "Receiver", playerVector);
-
-    int nrOfPlayers = 0;
-    for (const auto& player : *playerVector) {
-        nrOfPlayers++;
-        EXPECT_EQ("Receiver", player->getName());
-    }
-    EXPECT_EQ(1, nrOfPlayers);
-}
-
-TEST_F(PlayerVectorStubPlayerTest, newDealerAndReceiver) {
-    /*Adds a line info object with both dealer and receiver names defined.
-    Verifies that they are unique and that the total nr of players is 2. */
-    addToPlayers("Dealer", "Receiver", playerVector);
-
-    int nrOfPlayers = 0;
-    bool isDealerFound = false;
-    bool isReceiverFound = false;
-    for (const auto& player : *playerVector) {
-        nrOfPlayers++;
-        if (player->getName() == "Dealer" && !isDealerFound) {
-            isDealerFound = true;
-        }
-        else if (player->getName() == "Receiver" && !isReceiverFound) {
-            isReceiverFound = true;
-        }
-    }
-
-    EXPECT_EQ(2, nrOfPlayers);
-    EXPECT_TRUE(isDealerFound);
-    EXPECT_TRUE(isReceiverFound);
-}
-
-TEST_F(PlayerVectorStubPlayerTest, existingDealer) {
-    /*Adds an identical line info object, with dealer name defined, twice.
-    Verifies that the dealer info is added to the existing dealer.
-    Also verifies that the added players add method gets called twice. */
-    addToPlayers("Dealer", "", playerVector);
-    addToPlayers("Dealer", "", playerVector);
-
-    int nrOfPlayers = 0;
-    for (const auto& player : *playerVector) {
-        nrOfPlayers++;
-        EXPECT_EQ("Dealer", player->getName());
-        EXPECT_EQ(2, player->callsToAdd);
-    }
-    EXPECT_EQ(1, nrOfPlayers);
-}
-
-TEST_F(PlayerVectorStubPlayerTest, existingReceiver) {
-    /* Adds an identical line info object, with receiver name defined, twice.
-    Verifies that the receiver info is added to the existing receiver.
-    Also verifies that the added players add method gets called twice. */
-    addToPlayers("", "Receiver", playerVector);
-    addToPlayers("", "Receiver", playerVector);
-
-    int nrOfPlayers = 0;
-    for (const auto& player : *playerVector) {
-        nrOfPlayers++;
-        EXPECT_EQ("Receiver", player->getName());
-        EXPECT_EQ(2, player->callsToAdd);
-    }
-    EXPECT_EQ(1, nrOfPlayers);
-}
-
-TEST_F(PlayerVectorStubPlayerTest, existingDealerAndReceiver) {
-    /*
-    Adds an identical line info object, with receiver and dealer name
-    defined, twice.
-    Verifies that only one of each player is added.
-    */
-
-    addToPlayers("Dealer", "Receiver", playerVector);
-    addToPlayers("Dealer", "Receiver", playerVector);
-
-    int nrOfPlayers = 0;
-    bool isDealerFound = false;
-    bool isReceiverFound = false;
-    for (const auto& player : *playerVector) {
-        nrOfPlayers++;
-        if (player->getName() == "Dealer" && !isDealerFound) {
-            isDealerFound = true;
-        }
-        else if (player->getName() == "Receiver" && !isReceiverFound) {
-            isReceiverFound = true;
-        }
-    }
-    EXPECT_EQ(2, nrOfPlayers);
-    EXPECT_TRUE(isDealerFound);
-    EXPECT_TRUE(isReceiverFound);
-}
-
-TEST_F(PlayerVectorStubPlayerTest, getLongestNameLength) {
-    /* Adds eigth players and gets the longest name length. */
-    std::string theLongestName = "AReallyReallyLongName OfSomeone";
-    addToPlayers("Name", "Name2", playerVector);
-    addToPlayers("AName2", "AName", playerVector);
-    addToPlayers("A Really Long Name Of Someone", theLongestName, playerVector);
-    addToPlayers("ALongName", "AReallyReallyLongNameOfSomeone", playerVector);
-
-    EXPECT_EQ(theLongestName.length(), playerVector->getLongestNameLength());
-}
-
-TEST_F(PlayerVectorStubPlayerTest, getPlayer) {
-    /* Adds players and uses the getPlayer method to return them.
-    Verifies that they are correct by comparing their names. */
-    addToPlayers("Dealer", "Receiver", playerVector);
-    addToPlayers("Dealer2", "Receiver2", playerVector);
-
-    EXPECT_EQ("Dealer", playerVector->getPlayer("Dealer")->getName());
-    EXPECT_EQ("Dealer2", playerVector->getPlayer("Dealer2")->getName());
-    EXPECT_EQ("Receiver", playerVector->getPlayer("Receiver")->getName());
-    EXPECT_EQ("Receiver2", playerVector->getPlayer("Receiver2")->getName());
-}
 
 TEST_F(PlayerVectorDamageTest, getTotalDamage_regular) {
     /*
@@ -386,18 +204,10 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     const MockPlayer* p4 = addPlayerToVector("Receiver4", &playerVector);
 
     // Set up the return values.
-    LineInfo li1;
-    LineInfo li2;
-    LineInfo li3;
-    LineInfo li4;
-    li1.amount = 7000;
-    li2.amount = 0;
-    li3.amount = 5000000;
-    li4.amount = 15000;
-    Damage d1 = createDamage(li1, "receiver");
-    Damage d2 = createDamage(li2, "receiver");
-    Damage d3 = createDamage(li3, "receiver");
-    Damage d4 = createDamage(li4, "receiver");
+    Damage d1 = createDamage(7000, "receiver");
+    Damage d2 = createDamage(0, "receiver");
+    Damage d3 = createDamage(500000, "receiver");
+    Damage d4 = createDamage(1500, "receiver");
 
     EXPECT_CALL(*p1, getTotalDamage())
         .WillOnce(::testing::Return(d1));
@@ -411,8 +221,8 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     std::vector<std::pair<std::string, Damage>> result;
     result = playerVector.getTotalDamageForEachPlayer();
 
-    EXPECT_EQ(li3.amount, result[0].second.getTotalReceived());
-    EXPECT_EQ(li4.amount, result[1].second.getTotalReceived());
-    EXPECT_EQ(li1.amount, result[2].second.getTotalReceived());
-    EXPECT_EQ(li2.amount, result[3].second.getTotalReceived());
+    EXPECT_EQ(d3.getTotalReceived(), result[0].second.getTotalReceived());
+    EXPECT_EQ(d1.getTotalReceived(), result[1].second.getTotalReceived());
+    EXPECT_EQ(d4.getTotalReceived(), result[2].second.getTotalReceived());
+    EXPECT_EQ(d2.getTotalReceived(), result[3].second.getTotalReceived());
 }
