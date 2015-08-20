@@ -3,6 +3,7 @@
 
 
 #include <limits>
+#include <string>
 
 
 class Nano {
@@ -13,19 +14,38 @@ public:
         return *this;
     }
 
-    void add() {
-
+    void add(LineInfo& li, std::string playerType) {
+        if (playerType == "dealer") {
+            dealt.count++;
+            dealt.total += li.amount;
+            if (li.amount < dealt.min) {
+                dealt.min = li.amount;
+            }
+            if (li.amount > dealt.max) {
+                dealt.max = li.amount;
+            }
+        }
+        else if (playerType == "receiver") {
+            received.count++;
+            received.total += li.amount;
+            if (li.amount < received.min) {
+                received.min = li.amount;
+            }
+            if (li.amount > received.max) {
+                received.max = li.amount;
+            }
+        }
     }
 
-    int getTotalDealt() {return dealt.total;}
-    int getCountDealt() {return dealt.count;}
-    int getMaxDealt() {return dealt.max;}
-    int getMinDealt() {return dealt.min;}
+    int getTotalDealt() const {return dealt.total;}
+    int getCountDealt() const {return dealt.count;}
+    int getMaxDealt() const {return dealt.max;}
+    int getMinDealt() const {return dealt.min;}
 
-    int getTotalReceived() {return received.total;}
-    int getCountReceived() {return received.count;}
-    int getMaxReceived() {return received.max;}
-    int getMinReceived() {return received.min;}
+    int getTotalReceived() const {return received.total;}
+    int getCountReceived() const {return received.count;}
+    int getMaxReceived() const {return received.max;}
+    int getMinReceived() const {return received.min;}
 
 private:
     struct nanoInfo {
@@ -51,5 +71,8 @@ private:
     nanoInfo received;
 };
 
+inline Nano operator+(Nano lhs, const Nano& rhs) {
+    return lhs += rhs;
+}
 
 #endif  // NANO_H
