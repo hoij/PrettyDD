@@ -13,6 +13,9 @@ void AffectedPlayer::add(LineInfo& lineInfo) {
     else if (lineInfo.type == "heal") {
         addHeal(lineInfo);
     }
+//    else if (lineInfo.type == "nano") {
+//      addNano(lineInfo);
+//    }
 }
 
 void AffectedPlayer::addDamage(LineInfo& li) {

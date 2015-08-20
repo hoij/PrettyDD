@@ -80,7 +80,7 @@ protected:
 TEST_F(PlayerVectorDamageTest, getTotalDamage_regular) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Calls getTotalDamage(false) to retreive the regular damage.
     Verifies that each players getTotalDamage is in turn called and that
@@ -100,7 +100,7 @@ TEST_F(PlayerVectorDamageTest, getTotalDamage_nanobots) {
     // TODO: Keep two tests for regular/nanonbots or just have one?
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Calls getTotalDamage(true) to retreive the nanobot damage.
     Verifies that each players getTotalDamage is in turn called and that
@@ -119,7 +119,7 @@ TEST_F(PlayerVectorDamageTest, getTotalDamage_nanobots) {
 TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType_regular) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Calls getTotalDamagePerDamageType("poison", false) to retreive the regular
     damage.
@@ -140,7 +140,7 @@ TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType_regular) {
 TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType_nanobots) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Calls getTotalDamagePerDamageType("poison", false) to retreive the nanobot
     damage.
@@ -162,7 +162,7 @@ TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType_nanobots) {
 TEST_F(PlayerVectorDamageTest, getTotalHeals) {
     /*
     This test case depends on the implementation of Heal.
-    If it fails it's a good idea to make sure that Heals's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Calls getTotalHeals().
     Verifies that each players getTotalHeal is in turn called and that
@@ -225,4 +225,5 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     EXPECT_EQ(d1.getTotalReceived(), result[1].second.getTotalReceived());
     EXPECT_EQ(d4.getTotalReceived(), result[2].second.getTotalReceived());
     EXPECT_EQ(d2.getTotalReceived(), result[3].second.getTotalReceived());
+    EXPECT_EQ(4, result.size());
 }

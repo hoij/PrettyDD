@@ -1,8 +1,9 @@
-#include "heal.h"
-#include "damage.h"
-#include "line_info.h"
 #include "affected_player.h"
 #include "affected_player_vector.h"
+#include "damage.h"
+#include "heal.h"
+#include "line_info.h"
+#include "nano.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -22,8 +23,8 @@ public:
                                                            bool nanobots));
     MOCK_CONST_METHOD0(getRegularDamage, std::map<std::string, Damage>&(void));
     MOCK_CONST_METHOD0(getNanobotsDamage, std::map<std::string, Damage>&(void));
-    MOCK_CONST_METHOD0(getHeal, Heal(void));
-    MOCK_CONST_METHOD0(getNano, Heal(void));
+    MOCK_CONST_METHOD0(getHeal, Heal&(void));
+    MOCK_CONST_METHOD0(getNano, Nano&(void));
 };
 
 /* Helper functions */
@@ -53,6 +54,14 @@ Heal createHeal(int amount, std::string playerType) {
     Heal h;
     h.add(li, playerType);
     return h;
+}
+
+Nano createNano(int amount, std::string playerType) {
+    LineInfo li;
+    li.amount = amount;
+    Nano n;
+    n.add(li, playerType);
+    return n;
 }
 
 /* Test Fixture */
@@ -96,7 +105,7 @@ protected:
 TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage_regular) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Adds the a player with the same name as the caller to the vector.
     Calls getTotalDamage(false) to retreive the regular damage.
@@ -122,7 +131,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage_regular) {
 TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage_nanobots) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Adds the a player with the same name as the caller to the vector.
     Calls getTotalDamage(true) to retreive the nanobot damage.
@@ -148,7 +157,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage_nanobots) {
 TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType_regular) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Adds the a player with the same name as the caller to the vector and
     calls getTotalDamagePerDamageType to retreive the regular damage.
@@ -176,7 +185,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType_regular) {
 TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType_nanobots) {
     /*
     This test case depends on the implementation of Damage.
-    If it fails it's a good idea to make sure that Damage's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
     Adds the a player with the same name as the caller to the vector and
     calls getTotalDamagePerDamageType to retreive the nanobot damage.
@@ -202,28 +211,83 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType_nanobots) {
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getNanobotsDamagePerAffectedPlayer) {
+    /* Verifies that getNanobotsDamage is called on the the correct player */
 
+    std::map<std::string, Damage> expected;
+    expected["type"] = d2;
+
+    EXPECT_CALL(*p2, getNanobotsDamage())
+        .WillOnce(::testing::ReturnRef(expected));
+
+    std::map<std::string, Damage> result2 =
+        affectedPlayerVector->getNanobotsDamagePerAffectedPlayer("dealer2");
+
+    EXPECT_EQ(1, result2.count("type"));
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getRegularDamagePerAffectedPlayer) {
+    /* Verifies that getRegularDamage is called on the the correct player */
 
+    std::map<std::string, Damage> expected;
+    expected["type"] = d2;
+
+    EXPECT_CALL(*p2, getRegularDamage())
+        .WillOnce(::testing::ReturnRef(expected));
+
+    std::map<std::string, Damage> result2 =
+        affectedPlayerVector->getRegularDamagePerAffectedPlayer("dealer2");
+
+    EXPECT_EQ(1, result2.count("type"));
+}
+
+TEST_F(AffectedPlayerVectorDamageTest, getRegularDamagePerAffectedPlayer_notFound) {
+    /* Verifies that the correct exception is thrown when a player is not
+    found in the vector */
+
+    std::string name = "NotInTheVector";
+
+    EXPECT_THROW(affectedPlayerVector->getRegularDamagePerAffectedPlayer(name),
+                 std::invalid_argument);
+
+    try {
+        affectedPlayerVector->getRegularDamagePerAffectedPlayer(name);
+    }
+    catch(const std::invalid_argument& e) {
+        EXPECT_EQ(e.what(), "\"" + name + "\" was not found among the " +
+                            "affected players.");
+    }
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getTotalHeals) {
+    /* Verifies that getHeal is called for each player in the vector and
+    that the returned sum is correct. */
 
+    Heal h1 = createHeal(10, "dealer");
+    Heal h2 = createHeal(30, "dealer");
+    const MockAffectedPlayer* caller = addPlayerToVector("Caller",
+                                                         affectedPlayerVector);
+
+    EXPECT_CALL(*p1, getHeal())
+        .WillOnce(::testing::ReturnRef(h1));
+    EXPECT_CALL(*p2, getHeal())
+        .WillOnce(::testing::ReturnRef(h2));
+    EXPECT_CALL(*caller, getHeal())
+        .Times(0);
+
+    Heal totalHeal = affectedPlayerVector->getTotalHeals("Caller");
+
+    EXPECT_EQ((h1 + h2).getPotentialDealt(), totalHeal.getPotentialDealt());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getHealsForEachAffectedPlayer) {
     /*
     This test case depends on the implementation of Heal.
-    If it fails it's a good idea to make sure that Heals's tests can pass.
+    If it fails, make sure that Heals's tests can pass.
 
-    Calls getTotalHeals().
-    Verifies that each players getTotalHeal is in turn called and that
-    the summed heal is correct.
+    Calls getHealsForEachAffectedPlayer().
+    Verifies that each players getHeal is in turn called and that
+    the returned vector is sorted on potential heal dealt.
     */
-        // TODO: Fix the descriptions.
-
 
     // Add more players to the vector. "dealer1" and "dealer2" have already
     // been added in the SetUp();
@@ -236,13 +300,13 @@ TEST_F(AffectedPlayerVectorDamageTest, getHealsForEachAffectedPlayer) {
     Heal h4 = createHeal(3000, "dealer");
 
     EXPECT_CALL(*p1, getHeal())
-        .WillOnce(::testing::Return(h1));
+        .WillOnce(::testing::ReturnRef(h1));
     EXPECT_CALL(*p2, getHeal())
-        .WillOnce(::testing::Return(h2));
+        .WillOnce(::testing::ReturnRef(h2));
     EXPECT_CALL(*p3, getHeal())
-        .WillOnce(::testing::Return(h3));
+        .WillOnce(::testing::ReturnRef(h3));
     EXPECT_CALL(*p4, getHeal())
-        .WillOnce(::testing::Return(h4));
+        .WillOnce(::testing::ReturnRef(h4));
 
     std::vector<std::pair<std::string, Heal>> result =
         affectedPlayerVector->getHealsForEachAffectedPlayer();
@@ -251,14 +315,63 @@ TEST_F(AffectedPlayerVectorDamageTest, getHealsForEachAffectedPlayer) {
     EXPECT_EQ(h4.getPotentialDealt(), result[1].second.getPotentialDealt());
     EXPECT_EQ(h1.getPotentialDealt(), result[2].second.getPotentialDealt());
     EXPECT_EQ(h2.getPotentialDealt(), result[3].second.getPotentialDealt());
+    EXPECT_EQ(4, result.size());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getTotalNano) {
+    /* Verifies that getNano is called for each player in the vector and
+    that the returned sum is correct. */
 
+    Nano n1 = createNano(10, "dealer");
+    Nano n2 = createNano(30, "dealer");
+    const MockAffectedPlayer* caller = addPlayerToVector("Caller",
+                                                         affectedPlayerVector);
+
+    EXPECT_CALL(*p1, getNano())
+        .WillOnce(::testing::ReturnRef(n1));
+    EXPECT_CALL(*p2, getNano())
+        .WillOnce(::testing::ReturnRef(n2));
+    EXPECT_CALL(*caller, getNano())
+        .Times(0);
+
+    Nano totalNano = affectedPlayerVector->getTotalNano("Caller");
+
+    EXPECT_EQ((n1 + n2).getTotalDealt(), totalNano.getTotalDealt());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getNanoForEachAffectedPlayer) {
+    /* Verifies that the nanos are returned in a sorted list */
+    // Add more players to the vector. "dealer1" and "dealer2" have already
+    // been added in the SetUp();
+    const MockAffectedPlayer* p3 = addPlayerToVector("dealer3", affectedPlayerVector);
+    const MockAffectedPlayer* p4 = addPlayerToVector("dealer4", affectedPlayerVector);
 
+    Nano n1 = createNano(10, "dealer");
+    Nano n2 = createNano(0, "dealer");
+    Nano n3 = createNano(500000, "dealer");
+    Nano n4 = createNano(3000, "dealer");
+
+    EXPECT_CALL(*p1, getNano())
+        .WillOnce(::testing::ReturnRef(n1));
+    EXPECT_CALL(*p2, getNano())
+        .WillOnce(::testing::ReturnRef(n2));
+    EXPECT_CALL(*p3, getNano())
+        .WillOnce(::testing::ReturnRef(n3));
+    EXPECT_CALL(*p4, getNano())
+        .WillOnce(::testing::ReturnRef(n4));
+
+    std::vector<std::pair<std::string, Nano>> result =
+        affectedPlayerVector->getNanoForEachAffectedPlayer();
+
+    EXPECT_EQ(n3.getTotalDealt(), result[0].second.getTotalDealt());
+    EXPECT_EQ(n4.getTotalDealt(), result[1].second.getTotalDealt());
+    EXPECT_EQ(n1.getTotalDealt(), result[2].second.getTotalDealt());
+    EXPECT_EQ(n2.getTotalDealt(), result[3].second.getTotalDealt());
+    EXPECT_EQ(p3->getName(), result[0].first);
+    EXPECT_EQ(p4->getName(), result[1].first);
+    EXPECT_EQ(p1->getName(), result[2].first);
+    EXPECT_EQ(p2->getName(), result[3].first);
+    EXPECT_EQ(4, result.size());
 }
 
 TEST(AffectedPlayerVectorTest, getTotalDamageForEachPlayer) {
@@ -298,4 +411,5 @@ TEST(AffectedPlayerVectorTest, getTotalDamageForEachPlayer) {
     EXPECT_EQ(d1.getTotalReceived(), result[1].second.getTotalReceived());
     EXPECT_EQ(d4.getTotalReceived(), result[2].second.getTotalReceived());
     EXPECT_EQ(d2.getTotalReceived(), result[3].second.getTotalReceived());
+    EXPECT_EQ(4, result.size());
 }

@@ -35,9 +35,11 @@ public:
     std::vector<std::pair<std::string, Heal>> getHealsForEachAffectedPlayer() const;
 
     Nano getTotalNano(std::string callerName) const;
-    std::vector<std::pair<std::string, Nano>> getNanoForEachAffectedPlayer(std::string callerName) const;
+    std::vector<std::pair<std::string, Nano>> getNanoForEachAffectedPlayer() const;
 
 private:
+    static bool compareNanoDealt(const std::pair<std::string, Nano>& p1,
+                                     const std::pair<std::string, Nano>& p2);
     static bool comparePotentialHeal(const std::pair<std::string, Heal>& p1,
                                      const std::pair<std::string, Heal>& p2);
 };
@@ -94,8 +96,8 @@ const std::map<std::string, Damage>& AffectedPlayerVector<C>::getNanobotsDamageP
         }
     }
     // TODO: Catch and log this error somwhere.
-    throw std::invalid_argument("\"" + name + "\" was not found in the " +
-                                "affected players");
+    throw std::invalid_argument("\"" + name + "\" was not found among the " +
+                                "affected players.");
 }
 
 template<class C>
@@ -106,8 +108,8 @@ const std::map<std::string, Damage>& AffectedPlayerVector<C>::getRegularDamagePe
         }
     }
     // TODO: Catch and log this error somwhere.
-    throw std::invalid_argument("\"" + name + "\" was not found in the " +
-                                "affected players list");
+    throw std::invalid_argument("\"" + name + "\" was not found among the " +
+                                "affected players.");
 }
 
 template<class C>
@@ -137,7 +139,7 @@ std::vector<std::pair<std::string, Heal>> AffectedPlayerVector<C>::getHealsForEa
 template<class C>
 Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
     Nano n;
-    for (const AffectedPlayer* ap : this->players) {
+    for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
             n += ap->getNano();
         }
@@ -146,14 +148,21 @@ Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
 }
 
 template<class C>
-std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForEachAffectedPlayer(std::string callerName) const {
+std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForEachAffectedPlayer() const {
     std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
     for (const C ap : this->players) {
-        if (ap->getName() != callerName) {
             nanoPerPlayer.push_back(std::make_pair(ap->getName(), ap->getNano()));
-        }
     }
+    std::sort(nanoPerPlayer.begin(),
+              nanoPerPlayer.end(),
+              compareNanoDealt);
     return nanoPerPlayer;
+}
+template<class C>
+bool AffectedPlayerVector<C>::compareNanoDealt(const std::pair<std::string, Nano>& p1,
+                                               const std::pair<std::string, Nano>& p2) {
+    return p1.second.getTotalDealt() >
+           p2.second.getTotalDealt();
 }
 
 template<class C>

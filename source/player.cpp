@@ -135,7 +135,7 @@ const std::vector<NanoProgram>& Player::getNanoPrograms() const {
 }
 
 std::vector<std::pair<std::string, Nano>> Player::getNanoForEachAffectedPlayer() const {
-    return affectedPlayers->getNanoForEachAffectedPlayer(getName());
+    return affectedPlayers->getNanoForEachAffectedPlayer();
 }
 
 const XP& Player::getXp() {
