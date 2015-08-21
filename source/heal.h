@@ -35,7 +35,7 @@ public:
         else if (playerType == "receiver") {
             receivedFromPlayer.count++;
             if (li.subtype == "actual") {
-                // Only available for "You".
+                // Only ever called for AffectedPlayer "You".
                 receivedFromPlayer.actual += li.amount;
                 // Check min/max
                 if (li.amount < receivedFromPlayer.actualMin) {

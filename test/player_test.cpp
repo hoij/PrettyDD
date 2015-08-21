@@ -15,7 +15,6 @@ as they only return the result of the call. So I have not implemented them all.
 Maybe I'll do it later.
 */
 
-
 class MockAffectedPlayerVector : public AffectedPlayerVector<AffectedPlayer*> {
 public:
     MOCK_METHOD1(addToPlayers, void(LineInfo& li));
@@ -277,6 +276,3 @@ TEST_F(PlayerTest, getTotalHeals) {
 
     EXPECT_EQ(h.getPotentialDealt(), result.getPotentialDealt());
 }
-
-
-
