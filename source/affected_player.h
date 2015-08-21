@@ -34,11 +34,10 @@ public:
     const Heal& getHeal() const;
     const Nano& getNano() const;
 
-//    static bool compareTotalDealt(AffectedPlayer& ap1, AffectedPlayer& ap2);
-
 private:
     void addDamage(LineInfo& li);
     void addHeal(LineInfo& li);
+    void addNano(LineInfo& li);
 
     std::map<std::string, Damage> regularDamage;
     std::map<std::string, Damage> nanobotsDamage;
