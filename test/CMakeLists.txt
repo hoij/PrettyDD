@@ -83,4 +83,4 @@ add_gmock_test_2_libs(player_vector_test playerlib loggerlib player_vector_test.
 add_gmock_test_2_libs(affected_player_vector_test playerlib loggerlib
                       affected_player_vector_test.cpp ../source/affected_player_vector.h)
 add_gmock_test(base_vector_test playerlib base_vector_test.cpp ../source/base_vector.h)
-
+add_gmock_test(affected_player_test affected_playerlib affected_player_test.cpp)
