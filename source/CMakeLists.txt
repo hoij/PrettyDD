@@ -9,18 +9,19 @@ add_executable(PrettyDD main.cpp
 	player_vector.h
 	line_info.h
 	heal.h
-	damage.h
 	xp.h
 	nano.h
 	formatted_line_interface.h
 	)
 
 # These libraries are mainly made to make test case linking easier
+add_library(damagelib damage.cpp)
 add_library(nano_programlib nano_program.cpp)
-add_library(affected_playerlib affected_player.cpp)
 add_library(loggerlib logger.cpp)
+add_library(affected_playerlib affected_player.cpp)
+target_link_libraries(affected_playerlib damagelib)
 add_library(playerlib player.cpp)
-target_link_libraries(playerlib affected_playerlib nano_programlib loggerlib)
+target_link_libraries(playerlib affected_playerlib nano_programlib damagelib loggerlib)
 add_library(formatted_linelib formatted_line.cpp)
 target_link_libraries(formatted_linelib loggerlib)
 add_library(parserlib parser.cpp)
