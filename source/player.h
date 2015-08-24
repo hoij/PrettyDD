@@ -29,10 +29,12 @@ public:
 
     virtual void add(LineInfo& lineInfo);
 
-    virtual Damage getTotalDamage(bool nanobots) const;
     virtual Damage getTotalDamage() const;
-    virtual Damage getTotalDamagePerDamageType(std::string damageType, bool nanobots) const;
+    virtual Damage getTotalRegularDamage() const;
+    virtual Damage getTotalNanobotsDamage() const;
     virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
+    virtual Damage getTotalRegularDamagePerDamageType(std::string damageType) const;
+    virtual Damage getTotalNanobotsDamagePerDamageType(std::string damageType) const;
     std::vector<std::pair<std::string, Damage>> getTotalDamageForEachAffectedPlayer() const;
     const std::map<std::string, Damage>& getNanobotsDamagePerAffectedPlayer(std::string name) const;
     const std::map<std::string, Damage>& getRegularDamagePerAffectedPlayer(std::string name) const;

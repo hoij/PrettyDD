@@ -88,49 +88,49 @@ void AffectedPlayer::addNano(LineInfo& li) {
 }
 
 Damage AffectedPlayer::getTotalDamage() const {
-    return getTotalDamage(true) + getTotalDamage(false);
+    return getTotalRegularDamage() + getTotalNanobotsDamage();
 }
 
-Damage AffectedPlayer::getTotalDamage(bool nanobots) const {
+Damage AffectedPlayer::getTotalRegularDamage() const {
     Damage d;
-    if (nanobots)  {
-        for (const auto& type : nanobotsDamage) {
-            d += type.second;
-        }
+    for (const auto& type : regularDamage) {
+        d += type.second;
     }
-    else {
-        for (const auto& type : regularDamage) {
-            d += type.second;
-        }
+    return d;
+}
+
+Damage AffectedPlayer::getTotalNanobotsDamage() const {
+    Damage d;
+    for (const auto& type : nanobotsDamage) {
+        d += type.second;
     }
     return d;
 }
 
 Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType) const {
-    return getTotalDamagePerDamageType(damageType, true) +
-           getTotalDamagePerDamageType(damageType, false);
+    return getTotalRegularDamagePerDamageType(damageType) +
+           getTotalNanobotsDamagePerDamageType(damageType);
 }
 
-Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType, bool nanobots) const {
-    if (nanobots) {
-        auto it = nanobotsDamage.find(damageType);
-        if (it != nanobotsDamage.end()) {
-            return it->second;
-        }
-        else {
-            Damage d;
-            return d;  // Empty Damage
-        }
+Damage AffectedPlayer::getTotalRegularDamagePerDamageType(const std::string damageType) const {
+    auto it = regularDamage.find(damageType);
+    if (it != regularDamage.end()) {
+        return it->second;
     }
     else {
-        auto it = regularDamage.find(damageType);
-        if (it != regularDamage.end()) {
-            return it->second;
-        }
-        else {
-            Damage d;
-            return d;  // Empty Damage
-        }
+        Damage d;
+        return d;  // Empty Damage
+    }
+}
+
+Damage AffectedPlayer::getTotalNanobotsDamagePerDamageType(const std::string damageType) const {
+    auto it = nanobotsDamage.find(damageType);
+    if (it != nanobotsDamage.end()) {
+        return it->second;
+    }
+    else {
+        Damage d;
+        return d;  // Empty Damage
     }
 }
 

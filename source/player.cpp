@@ -83,21 +83,28 @@ void Player::addNanoProgram(std::string name, std::string subtype) {
     nanoPrograms.push_back(NanoProgram(name, subtype));
 }
 
-Damage Player::getTotalDamage(bool nanobots) const {
-    return affectedPlayers->getTotalDamage(getName(), nanobots);
-}
-
 Damage Player::getTotalDamage() const {
-    return getTotalDamage(true) + getTotalDamage(false);
+    return affectedPlayers->getTotalDamage(getName());
 }
 
-Damage Player::getTotalDamagePerDamageType(std::string damageType, bool nanobots) const {
-    return affectedPlayers->getTotalDamagePerDamageType(getName(), damageType, nanobots);
+Damage Player::getTotalRegularDamage() const {
+    return affectedPlayers->getTotalRegularDamage(getName());
+}
+
+Damage Player::getTotalNanobotsDamage() const {
+    return affectedPlayers->getTotalNanobotsDamage(getName());
 }
 
 Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
-    return getTotalDamagePerDamageType(damageType, false) +
-           getTotalDamagePerDamageType(damageType, true);
+    return affectedPlayers->getTotalDamagePerDamageType(getName(), damageType);
+}
+
+Damage Player::getTotalRegularDamagePerDamageType(std::string damageType) const {
+    return affectedPlayers->getTotalRegularDamagePerDamageType(getName(), damageType);
+}
+
+Damage Player::getTotalNanobotsDamagePerDamageType(std::string damageType) const {
+    return affectedPlayers->getTotalNanobotsDamagePerDamageType(getName(), damageType);
 }
 
 std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForEachAffectedPlayer() const {

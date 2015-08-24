@@ -25,9 +25,11 @@ public:
     void add(LineInfo& lineInfo);
 
     Damage getTotalDamage() const;
-    Damage getTotalDamage(bool nanobots) const;
+    Damage getTotalRegularDamage() const;
+    Damage getTotalNanobotsDamage() const;
     Damage getTotalDamagePerDamageType(const std::string damageType) const;
-    Damage getTotalDamagePerDamageType(const std::string damageType, bool nanobots) const;
+    Damage getTotalRegularDamagePerDamageType(const std::string damageType) const;
+    Damage getTotalNanobotsDamagePerDamageType(const std::string damageType) const;
 
     const std::map<std::string, Damage>& getRegularDamage() const;
     const std::map<std::string, Damage>& getNanobotsDamage() const;

@@ -8,6 +8,10 @@
 #include <gtest/gtest.h>
 #include <string>
 
+/* Many of these test cases rely on the implementation of Damage/Heal/Nano/XP.
+If a test case fails it might be a good idea to verify that the tests for
+these classes pass. */
+
 
 /* Test Player */
 
@@ -15,10 +19,15 @@ class MockPlayer : public Player {
 public:
     MockPlayer(std::string name) : Player(name) {}
     MOCK_METHOD1(add, void(LineInfo& li));
-    MOCK_CONST_METHOD1(getTotalDamage, Damage(bool nanobots));
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
-    MOCK_CONST_METHOD2(getTotalDamagePerDamageType,
-                       Damage(std::string damageType, bool nanobots));
+    MOCK_CONST_METHOD0(getTotalRegularDamage, Damage(void));
+    MOCK_CONST_METHOD0(getTotalNanobotsDamage, Damage(void));
+    MOCK_CONST_METHOD1(getTotalDamagePerDamageType,
+                       Damage(std::string damageType));
+    MOCK_CONST_METHOD1(getTotalRegularDamagePerDamageType,
+                       Damage(std::string damageType));
+    MOCK_CONST_METHOD1(getTotalNanobotsDamagePerDamageType,
+                       Damage(std::string damageType));
     MOCK_CONST_METHOD0(getTotalDamageForEachPlayer,
                        std::vector<std::pair<std::string, Damage>>(void));
     MOCK_CONST_METHOD0(getTotalHeals, Heal(void));
@@ -77,97 +86,104 @@ protected:
 
 /* Test cases */
 
-TEST_F(PlayerVectorDamageTest, getTotalDamage_regular) {
-    /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
+TEST_F(PlayerVectorDamageTest, getTotalDamage) {
+    /* Calls getTotalDamage().
+    Verifies that each players getTotalDamage is in turn called and
+    that the summed damage is correct. */
 
-    Calls getTotalDamage(false) to retreive the regular damage.
-    Verifies that each players getTotalDamage is in turn called and that
-    the summed damage is correct.
-    */
-
-    EXPECT_CALL(*p1, getTotalDamage(false))
+    EXPECT_CALL(*p1, getTotalDamage())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage(false))
+    EXPECT_CALL(*p2, getTotalDamage())
         .WillOnce(::testing::Return(d2));
 
-    Damage totalDamage = playerVector->getTotalDamage(false);
+    Damage totalDamage = playerVector->getTotalDamage();
+
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(PlayerVectorDamageTest, getTotalDamage_nanobots) {
-    // TODO: Keep two tests for regular/nanonbots or just have one?
-    /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
+TEST_F(PlayerVectorDamageTest, getTotalRegularDamage) {
+    /* Calls getTotalRegularDamage().
+    Verifies that each players getTotalRegularDamage is in turn called and
+    that the summed damage is correct. */
 
-    Calls getTotalDamage(true) to retreive the nanobot damage.
-    Verifies that each players getTotalDamage is in turn called and that
-    the summed damage is correct.
-    */
-
-    EXPECT_CALL(*p1, getTotalDamage(true))
+    EXPECT_CALL(*p1, getTotalRegularDamage())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage(true))
+    EXPECT_CALL(*p2, getTotalRegularDamage())
         .WillOnce(::testing::Return(d2));
 
-    Damage totalDamage = playerVector->getTotalDamage(true);
+    Damage totalDamage = playerVector->getTotalRegularDamage();
+
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType_regular) {
-    /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
+TEST_F(PlayerVectorDamageTest, getTotalNanobotsDamage) {
+    /* Calls getTotalNanobotsDamage().
+    Verifies that each players getTotalNanobotsDamage is in turn called and
+    that the summed damage is correct. */
 
-    Calls getTotalDamagePerDamageType("poison", false) to retreive the regular
-    damage.
+    EXPECT_CALL(*p1, getTotalNanobotsDamage())
+        .WillOnce(::testing::Return(d1));
+    EXPECT_CALL(*p2, getTotalNanobotsDamage())
+        .WillOnce(::testing::Return(d2));
+
+    Damage totalDamage = playerVector->getTotalNanobotsDamage();
+
+    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
+}
+
+TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType) {
+    /* Calls getTotalDamagePerDamageType("poison").
     Verifies that each players getTotalDamagePerDamageType is in turn
-    called and that the summed damage is correct.
-    */
+    called and that the summed damage is correct. */
 
     std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType, false))
+    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType, false))
+    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d2));
 
-    Damage totalDamage = playerVector->getTotalDamagePerDamageType(damageType, false);
+    Damage totalDamage = playerVector->getTotalDamagePerDamageType(damageType);
+
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType_nanobots) {
-    /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
-
-    Calls getTotalDamagePerDamageType("poison", false) to retreive the nanobot
-    damage.
-    Verifies that each players getTotalDamagePerDamageType is in turn
-    called and that the summed damage is correct.
-    */
+TEST_F(PlayerVectorDamageTest, getTotalRegularDamagePerDamageType) {
+    /* Calls getTotalRegularDamagePerDamageType("poison").
+    Verifies that each players getTotalRegularDamagePerDamageType is in turn
+    called and that the summed damage is correct. */
 
     std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType, true))
+    EXPECT_CALL(*p1, getTotalRegularDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType, true))
+    EXPECT_CALL(*p2, getTotalRegularDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d2));
 
-    Damage totalDamage = playerVector->getTotalDamagePerDamageType(damageType, true);
+    Damage totalDamage = playerVector->getTotalRegularDamagePerDamageType(damageType);
+
+    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
+}
+
+TEST_F(PlayerVectorDamageTest, getTotalNanobotsDamagePerDamageType) {
+    /* Calls getTotalNanobotsDamagePerDamageType("poison").
+    Verifies that each players getTotalNanobotsDamagePerDamageType is in turn
+    called and that the summed damage is correct. */
+
+    std::string damageType = "poison";
+    EXPECT_CALL(*p1, getTotalNanobotsDamagePerDamageType(damageType))
+        .WillOnce(::testing::Return(d1));
+    EXPECT_CALL(*p2, getTotalNanobotsDamagePerDamageType(damageType))
+        .WillOnce(::testing::Return(d2));
+
+    Damage totalDamage = playerVector->getTotalNanobotsDamagePerDamageType(
+                                           damageType);
 
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
 TEST_F(PlayerVectorDamageTest, getTotalHeals) {
-    /*
-    This test case depends on the implementation of Heal.
-    If it fails, make sure that Heals's tests can pass.
-
-    Calls getTotalHeals().
+    /* Calls getTotalHeals().
     Verifies that each players getTotalHeal is in turn called and that
-    the summed heal is correct.
-    */
+    the summed heal is correct. */
 
     LineInfo li1;
     LineInfo li2;

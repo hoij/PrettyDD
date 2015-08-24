@@ -9,6 +9,10 @@
 #include <gtest/gtest.h>
 #include <string>
 
+/* Many of these test cases rely on the implementation of Damage/Heal/Nano/XP.
+If a test case fails it might be a good idea to verify that the tests for
+these classes pass. */
+
 
 /* Test Player */
 
@@ -16,11 +20,12 @@ class MockAffectedPlayer : public AffectedPlayer {
 public:
     MockAffectedPlayer(std::string name) : AffectedPlayer(name) {}
     MOCK_METHOD1(add, void(LineInfo& li));
-    MOCK_CONST_METHOD1(getTotalDamage, Damage(bool nanobots));
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
-    MOCK_CONST_METHOD1(getTotalDamagePerDamageType, Damage(std::string damageType));
-    MOCK_CONST_METHOD2(getTotalDamagePerDamageType, Damage(const std::string damageType,
-                                                           bool nanobots));
+    MOCK_CONST_METHOD0(getTotalRegularDamage, Damage(void));
+    MOCK_CONST_METHOD0(getTotalNanobotsDamage, Damage(void));
+    MOCK_CONST_METHOD1(getTotalDamagePerDamageType, Damage(const std::string damageType));
+    MOCK_CONST_METHOD1(getTotalRegularDamagePerDamageType, Damage(const std::string damageType));
+    MOCK_CONST_METHOD1(getTotalNanobotsDamagePerDamageType, Damage(const std::string damageType));
     MOCK_CONST_METHOD0(getRegularDamage, std::map<std::string, Damage>&(void));
     MOCK_CONST_METHOD0(getNanobotsDamage, std::map<std::string, Damage>&(void));
     MOCK_CONST_METHOD0(getHeal, Heal&(void));
@@ -98,114 +103,151 @@ protected:
 
 /* Test cases */
 
-// TODO: Make sure to test adding a player with the callers name and making sure
-// that that player is not included in the result.
-// Do this for all tests.
-
-TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage_regular) {
+TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage) {
     /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
-
     Adds the a player with the same name as the caller to the vector.
-    Calls getTotalDamage(false) to retreive the regular damage.
-    Verifies that each players, except for the callers, getTotalDamage is in
-    turn called and that the summed damage is correct.
+    Calls getTotalDamage().
+    Verifies that each players, except for the callers, getTotalDamage
+    is in turn called and that the summed damage is correct.
     */
 
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
-    EXPECT_CALL(*p1, getTotalDamage(false))
+    EXPECT_CALL(*p1, getTotalDamage())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage(false))
+    EXPECT_CALL(*p2, getTotalDamage())
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getTotalDamage(true))
+    EXPECT_CALL(*caller, getTotalDamage())
         .Times(0);
 
-    Damage totalDamage = affectedPlayerVector->getTotalDamage("Caller", false);
+    Damage totalDamage = affectedPlayerVector->getTotalDamage("Caller");
 
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage_nanobots) {
+TEST_F(AffectedPlayerVectorDamageTest, getTotalRegularDamage) {
     /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
-
     Adds the a player with the same name as the caller to the vector.
-    Calls getTotalDamage(true) to retreive the nanobot damage.
-    Verifies that each players, except for the callers, getTotalDamage is in
-    turn called and that the summed damage is correct.
+    Calls getTotalRegularDamage().
+    Verifies that each players, except for the callers, getTotalRegularDamage
+    is in turn called and that the summed damage is correct.
     */
 
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
-    EXPECT_CALL(*p1, getTotalDamage(true))
+    EXPECT_CALL(*p1, getTotalRegularDamage())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage(true))
+    EXPECT_CALL(*p2, getTotalRegularDamage())
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getTotalDamage(true))
+    EXPECT_CALL(*caller, getTotalRegularDamage())
         .Times(0);
 
-    Damage totalDamage = affectedPlayerVector->getTotalDamage("Caller", true);
+    Damage totalDamage = affectedPlayerVector->getTotalRegularDamage("Caller");
 
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType_regular) {
+TEST_F(AffectedPlayerVectorDamageTest, getTotalNanobotsDamage) {
     /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
+    Adds the a player with the same name as the caller to the vector.
+    Calls getTotalNanonbotsDamage().
+    Verifies that each players, except for the callers, getTotalNanobotsDamage
+    is in turn called and that the summed damage is correct.
+    */
 
+    const MockAffectedPlayer* caller = addPlayerToVector("Caller",
+                                                         affectedPlayerVector);
+
+    EXPECT_CALL(*p1, getTotalNanobotsDamage())
+        .WillOnce(::testing::Return(d1));
+    EXPECT_CALL(*p2, getTotalNanobotsDamage())
+        .WillOnce(::testing::Return(d2));
+    EXPECT_CALL(*caller, getTotalNanobotsDamage())
+        .Times(0);
+
+    Damage totalDamage = affectedPlayerVector->getTotalNanobotsDamage("Caller");
+
+    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
+}
+
+TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType) {
+    /*
     Adds the a player with the same name as the caller to the vector and
-    calls getTotalDamagePerDamageType to retreive the regular damage.
+    calls getTotalRegularDamagePerDamageType().
     Verifies that each players, except for the callers,
-    getTotalDamagePerDamageType is called and that the summed damage is correct.
+    getTotalDamagePerDamageType is called and that the summed damage is
+    correct.
     */
 
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
     std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType, false))
+    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType, false))
+    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getTotalDamagePerDamageType(damageType, false))
+    EXPECT_CALL(*caller, getTotalDamagePerDamageType(damageType))
         .Times(0);
 
-    Damage totalDamage = affectedPlayerVector->getTotalDamagePerDamageType(
-                             "Caller", damageType, false);
+    Damage totalDamage =
+        affectedPlayerVector->getTotalDamagePerDamageType("Caller",
+                                                          damageType);
 
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType_nanobots) {
+TEST_F(AffectedPlayerVectorDamageTest, getTotalRegularDamagePerDamageType) {
     /*
-    This test case depends on the implementation of Damage.
-    If it fails, make sure that Heals's tests can pass.
-
     Adds the a player with the same name as the caller to the vector and
-    calls getTotalDamagePerDamageType to retreive the nanobot damage.
+    calls getTotalRegularDamagePerDamageType().
     Verifies that each players, except for the callers,
-    getTotalDamagePerDamageType is called and that the summed damage is correct.
+    getTotalRegularDamagePerDamageType is called and that the summed damage is
+    correct.
     */
 
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
     std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType, true))
+    EXPECT_CALL(*p1, getTotalRegularDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType, true))
+    EXPECT_CALL(*p2, getTotalRegularDamagePerDamageType(damageType))
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getTotalDamagePerDamageType(damageType, true))
+    EXPECT_CALL(*caller, getTotalRegularDamagePerDamageType(damageType))
+        .Times(0);
+
+    Damage totalDamage =
+        affectedPlayerVector->getTotalRegularDamagePerDamageType("Caller",
+                                                                 damageType);
+
+    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
+}
+
+TEST_F(AffectedPlayerVectorDamageTest, getTotalNanobotsDamagePerDamageType) {
+    /*
+    Adds the a player with the same name as the caller to the vector and
+    calls getTotalNanobotsDamagePerDamageType().
+    Verifies that each players, except for the callers,
+    getTotalNanobotsDamagePerDamageType is called and that the summed damage
+    is correct.
+    */
+
+    const MockAffectedPlayer* caller = addPlayerToVector("Caller",
+                                                         affectedPlayerVector);
+
+    std::string damageType = "poison";
+    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType))
+        .WillOnce(::testing::Return(d1));
+    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType))
+        .WillOnce(::testing::Return(d2));
+    EXPECT_CALL(*caller, getTotalDamagePerDamageType(damageType))
         .Times(0);
 
     Damage totalDamage = affectedPlayerVector->getTotalDamagePerDamageType(
-                             "Caller", damageType, true);
+                             "Caller", damageType);
 
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }

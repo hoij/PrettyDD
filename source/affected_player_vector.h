@@ -23,10 +23,15 @@ public:
     virtual ~AffectedPlayerVector() {};
     AffectedPlayerVector(const AffectedPlayerVector<C>& other) : BaseVector<C>(other) {}
 
-    virtual Damage getTotalDamage(std::string callerName, bool nanobots);
+    virtual Damage getTotalDamage(std::string callerName) const;
+    virtual Damage getTotalRegularDamage(std::string callerName) const;
+    virtual Damage getTotalNanobotsDamage(std::string callerName) const;
     virtual Damage getTotalDamagePerDamageType(std::string callerName,
-                                               const std::string damageType,
-                                               bool nanobots);
+                                               const std::string damageType) const;
+    virtual Damage getTotalRegularDamagePerDamageType(std::string callerName,
+                                                      const std::string damageType) const;
+    virtual Damage getTotalNanobotsDamagePerDamageType(std::string callerName,
+                                                       const std::string damageType) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer(std::string callerName) const;
     virtual const std::map<std::string, Damage>& getNanobotsDamagePerAffectedPlayer(std::string name) const;
     virtual const std::map<std::string, Damage>& getRegularDamagePerAffectedPlayer(std::string name) const;
@@ -46,7 +51,7 @@ private:
 
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName, bool nanobots) {
+Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName) const {
     /* The damage belonging to the caller should not be included in the sum
     because it already exists in the other players damage stats. If it  is
     added it will incorrectly increase the values. */
@@ -54,18 +59,73 @@ Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName, bool nano
     Damage d;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalDamage(nanobots);
+            d += ap->getTotalDamage();
         }
     }
     return d;
 }
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerName, const std::string damageType, bool nanobots) {
+Damage AffectedPlayerVector<C>::getTotalRegularDamage(std::string callerName) const {
+    /* The damage belonging to the caller should not be included in the sum
+    because it already exists in the other players damage stats. If it  is
+    added it will incorrectly increase the values. */
+
     Damage d;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalDamagePerDamageType(damageType, nanobots);
+            d += ap->getTotalRegularDamage();
+        }
+    }
+    return d;
+}
+
+template<class C>
+Damage AffectedPlayerVector<C>::getTotalNanobotsDamage(std::string callerName) const {
+    /* The damage belonging to the caller should not be included in the sum
+    because it already exists in the other players damage stats. If it  is
+    added it will incorrectly increase the values. */
+
+    Damage d;
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            d += ap->getTotalNanobotsDamage();
+        }
+    }
+    return d;
+}
+
+template<class C>
+Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerName,
+                                                            const std::string damageType) const {
+    Damage d;
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            d += ap->getTotalDamagePerDamageType(damageType);
+        }
+    }
+    return d;
+}
+
+template<class C>
+Damage AffectedPlayerVector<C>::getTotalRegularDamagePerDamageType(std::string callerName,
+                                                                   const std::string damageType) const {
+    Damage d;
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            d += ap->getTotalRegularDamagePerDamageType(damageType);
+        }
+    }
+    return d;
+}
+
+template<class C>
+Damage AffectedPlayerVector<C>::getTotalNanobotsDamagePerDamageType(std::string callerName,
+                                                                    const std::string damageType) const {
+    Damage d;
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            d += ap->getTotalNanobotsDamagePerDamageType(damageType);
         }
     }
     return d;

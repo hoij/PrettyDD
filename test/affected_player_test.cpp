@@ -183,7 +183,30 @@ TEST_F(AffectedPlayerTest, getTotalDamage) {
               affectedPlayer->getTotalDamage().getTotalDealt());
 }
 
-TEST_F(AffectedPlayerTest, getTotalDamage_nanobots) {
+TEST_F(AffectedPlayerTest, getTotalRegularDamage) {
+    /* Adds one nanobots damage and two regular damage lines.
+    Verifies that the summed regular damage is returned */
+    LineInfo li1;
+    li1.dealer_name = affectedPlayer->getName();
+    li1.type = "damage";
+    li1.subtype = "melee";
+
+    LineInfo li2 = li1;
+    LineInfo li3 = li1;
+    li1.amount = 100;
+    li2.amount = 300;
+    li3.amount = 900;
+    li1.nanobots = true;
+
+    affectedPlayer->add(li1);
+    affectedPlayer->add(li2);
+    affectedPlayer->add(li3);
+
+    EXPECT_EQ(li2.amount + li3.amount,
+              affectedPlayer->getTotalRegularDamage().getTotalDealt());
+}
+
+TEST_F(AffectedPlayerTest, getTotalNanobotsDamage) {
     /* Adds one regular damage and two nanobots damage lines.
     Verifies that the summed nanobots damage is returned */
     LineInfo li1;
@@ -204,30 +227,7 @@ TEST_F(AffectedPlayerTest, getTotalDamage_nanobots) {
     affectedPlayer->add(li3);
 
     EXPECT_EQ(li2.amount + li3.amount,
-              affectedPlayer->getTotalDamage(true).getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, getTotalDamage_regular) {
-    /* Adds one nanobots damage and two regular damage lines.
-    Verifies that the summed regular damage is returned */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-    li1.subtype = "melee";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li1.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-    affectedPlayer->add(li3);
-
-    EXPECT_EQ(li2.amount + li3.amount,
-              affectedPlayer->getTotalDamage(false).getTotalDealt());
+              affectedPlayer->getTotalNanobotsDamage().getTotalDealt());
 }
 
 TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType) {
@@ -256,7 +256,40 @@ TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType) {
                   getTotalDealt());
 }
 
-TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_nanobots) {
+TEST_F(AffectedPlayerTest, getTotalRegularDamagePerDamageType) {
+    /* Adds four damage lines and calls getTotalDamagePerDamageType(false).
+    Verifies that the the regular damage is returned for the specified
+    damageType */
+    LineInfo li1;
+    li1.dealer_name = affectedPlayer->getName();
+    li1.type = "damage";
+
+    LineInfo li2 = li1;
+    LineInfo li3 = li1;
+    LineInfo li4 = li1;
+
+    li1.subtype = "melee";
+    li2.subtype = "melee";
+    li3.subtype = "melee";
+    li4.subtype = "projectile";
+    li1.amount = 100;
+    li2.amount = 300;
+    li3.amount = 900;
+    li4.amount = 10000;
+    li3.nanobots = true;
+
+    affectedPlayer->add(li1);
+    affectedPlayer->add(li2);
+    affectedPlayer->add(li3);
+    affectedPlayer->add(li4);
+
+    Damage result = affectedPlayer->getTotalRegularDamagePerDamageType(
+                                        "melee");
+
+    EXPECT_EQ(li1.amount + li2.amount, result.getTotalDealt());
+}
+
+TEST_F(AffectedPlayerTest, getTotalNanobotsDamagePerDamageType) {
     /* Adds four damage lines and calls getTotalDamagePerDamageType(true).
     Verifies that the the nanobots damage is returned for the specified
     damageType */
@@ -286,44 +319,10 @@ TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_nanobots) {
     affectedPlayer->add(li3);
     affectedPlayer->add(li4);
 
-    Damage result = affectedPlayer->getTotalDamagePerDamageType("melee",
-                                                                true);
+    Damage result = affectedPlayer->getTotalNanobotsDamagePerDamageType(
+                                        "melee");
 
     EXPECT_EQ(li1.amount + li2.amount, result.getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_regular) {
-    /* Adds four damage lines and calls getTotalDamagePerDamageType(false).
-    Verifies that the the regular damage is returned for the specified
-    damageType */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    LineInfo li4 = li1;
-
-    li1.subtype = "melee";
-    li2.subtype = "melee";
-    li3.subtype = "melee";
-    li4.subtype = "projectile";
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li4.amount = 10000;
-    li3.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-    affectedPlayer->add(li3);
-    affectedPlayer->add(li4);
-
-    Damage result = affectedPlayer->getTotalDamagePerDamageType("melee",
-                                                                false);
-
-    EXPECT_EQ(li1.amount + li2.amount, result.getTotalDealt());
-
 }
 
 TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_nonexistent) {
@@ -348,11 +347,9 @@ TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_nonexistent) {
     affectedPlayer->add(li2);
 
     Damage result1 = affectedPlayer->getTotalDamagePerDamageType(
-                         "nonexistingType",
-                         true);
+                         "nonexistingType");
     Damage result2 = affectedPlayer->getTotalDamagePerDamageType(
-                         "nonexistingType",
-                         false);
+                         "nonexistingType");
 
     EXPECT_EQ(0, result1.getTotalDealt());
     EXPECT_EQ(0, result2.getTotalDealt());

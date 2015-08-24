@@ -23,27 +23,66 @@ public:
     virtual ~PlayerVector() {};
     PlayerVector(const PlayerVector<C>& other) : BaseVector<C>(other) {}
 
-    virtual Damage getTotalDamage(bool nanobots);
-    virtual Damage getTotalDamagePerDamageType(std::string damageType,
-                                               bool nanobots);
+    virtual Damage getTotalDamage() const;
+    virtual Damage getTotalRegularDamage() const;
+    virtual Damage getTotalNanobotsDamage() const;
+    virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
+    virtual Damage getTotalRegularDamagePerDamageType(std::string damageType) const;
+    virtual Damage getTotalNanobotsDamagePerDamageType(std::string damageType) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer() const;
     virtual Heal getTotalHeals() const;
 };
 
 template<class C>
-Damage PlayerVector<C>::getTotalDamage(bool nanobots) {
+Damage PlayerVector<C>::getTotalDamage() const {
     Damage d;
     for (const C p : this->players) {
-        d += p->getTotalDamage(nanobots);
+        d += p->getTotalDamage();
     }
     return d;
 }
 
 template<class C>
-Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType, bool nanobots) {
+Damage PlayerVector<C>::getTotalRegularDamage() const {
     Damage d;
     for (const C p : this->players) {
-        d += p->getTotalDamagePerDamageType(damageType, nanobots);
+        d += p->getTotalRegularDamage();
+    }
+    return d;
+}
+
+template<class C>
+Damage PlayerVector<C>::getTotalNanobotsDamage() const {
+    Damage d;
+    for (const C p : this->players) {
+        d += p->getTotalNanobotsDamage();
+    }
+    return d;
+}
+
+template<class C>
+Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType) const {
+    Damage d;
+    for (const C p : this->players) {
+        d += p->getTotalDamagePerDamageType(damageType);
+    }
+    return d;
+}
+
+template<class C>
+Damage PlayerVector<C>::getTotalRegularDamagePerDamageType(std::string damageType) const {
+    Damage d;
+    for (const C p : this->players) {
+        d += p->getTotalRegularDamagePerDamageType(damageType);
+    }
+    return d;
+}
+
+template<class C>
+Damage PlayerVector<C>::getTotalNanobotsDamagePerDamageType(std::string damageType) const {
+    Damage d;
+    for (const C p : this->players) {
+        d += p->getTotalNanobotsDamagePerDamageType(damageType);
     }
     return d;
 }
