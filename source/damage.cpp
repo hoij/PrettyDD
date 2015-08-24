@@ -17,69 +17,41 @@ Damage operator+(Damage lhs, const Damage& rhs) {
     return lhs += rhs;
 }
 
-void Damage::add(LineInfo& li, std::string playerType) {
-    if (playerType == "dealer") {
-        addDamageDealtOnPlayer(li);
-    }
-    else if (playerType == "receiver") {
-        addDamageReceivedFromPlayer(li);
-    }
-}
-
 void Damage::addDamageDealtOnPlayer(LineInfo& li) {
-    dealtOnPlayer.total += li.amount;
-    dealtOnPlayer.count++;
-    if (!li.crit) {
-        if (li.amount > dealtOnPlayer.regularMax) {
-            dealtOnPlayer.regularMax = li.amount;
-        }
-        if (li.amount < dealtOnPlayer.regularMin) {
-            dealtOnPlayer.regularMin = li.amount;
-        }
-        if (li.deflect) {
-            dealtOnPlayer.deflects++;
-        }
-        if (li.miss) {
-            dealtOnPlayer.misses++;
-        }
-    }
-    else {
-        dealtOnPlayer.critCount++;
-        dealtOnPlayer.critTotal += li.amount;
-        if (li.amount > dealtOnPlayer.critMax) {
-            dealtOnPlayer.critMax = li.amount;
-        }
-        if (li.amount < dealtOnPlayer.critMin) {
-            dealtOnPlayer.critMin = li.amount;
-        }
-    }
+    addDamage(li, dealtOnPlayer);
 }
 
 void Damage::addDamageReceivedFromPlayer(LineInfo& li) {
-    receivedFromPlayer.total += li.amount;
-    receivedFromPlayer.count++;
-    if (!li.crit) {
-        if (li.amount > receivedFromPlayer.regularMax) {
-            receivedFromPlayer.regularMax = li.amount;
+    addDamage(li, receivedFromPlayer);
+}
+
+void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
+    di.total += li.amount;
+    di.count++;
+    if (li.crit) {
+        di.critCount++;
+        di.critTotal += li.amount;
+        if (li.amount > di.critMax) {
+            di.critMax = li.amount;
         }
-        if (li.amount < receivedFromPlayer.regularMin) {
-            receivedFromPlayer.regularMin = li.amount;
-        }
-        if (li.deflect) {
-            receivedFromPlayer.deflects++;
-        }
-        if (li.miss) {
-            receivedFromPlayer.misses++;
+        if (li.amount < di.critMin) {
+            di.critMin = li.amount;
         }
     }
     else {
-        receivedFromPlayer.critCount++;
-        receivedFromPlayer.critTotal += li.amount;
-        if (li.amount > receivedFromPlayer.critMax) {
-            receivedFromPlayer.critMax = li.amount;
+        if (li.deflect) {
+            di.deflects++;
+            return;
         }
-        if (li.amount < receivedFromPlayer.critMin) {
-            receivedFromPlayer.critMin = li.amount;
+        if (li.miss) {
+            di.misses++;
+            return;
+        }
+        if (li.amount > di.regularMax) {
+            di.regularMax = li.amount;
+        }
+        if (li.amount < di.regularMin) {
+            di.regularMin = li.amount;
         }
     }
 }
@@ -140,7 +112,7 @@ std::ostream& Damage::writeHeadings(std::ostream& os) {
     return os;
 }
 
-Damage::damageInfo& Damage::damageInfo::operator+=(const damageInfo& rhs) {
+Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     total += rhs.total;
     count += rhs.count;
     if (rhs.regularMax > regularMax) {

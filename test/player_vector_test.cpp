@@ -46,11 +46,19 @@ const MockPlayer* addPlayerToVector(std::string name,
     return p;
 }
 
-Damage createDamage(int amount, std::string playerType) {
+Damage createDealerDamage(int amount) {
     LineInfo li;
     li.amount = amount;
     Damage d;
-    d.add(li, playerType);
+    d.addDamageDealtOnPlayer(li);
+    return d;
+}
+
+Damage createReceiverDamage(int amount) {
+    LineInfo li;
+    li.amount = amount;
+    Damage d;
+    d.addDamageReceivedFromPlayer(li);
     return d;
 }
 
@@ -62,12 +70,8 @@ protected:
         playerVector = new PlayerVector<::testing::NiceMock<MockPlayer>*>;
 
         // Set up the return values.
-        LineInfo li1;
-        LineInfo li2;
-        li1.amount = 10;
-        li2.amount = 30;
-        d1.add(li1, "dealer");
-        d2.add(li2, "dealer");
+        d1 = createDealerDamage(10);
+        d1 = createDealerDamage(30);
 
         // Add players to the vector.
         p1 = addPlayerToVector("dealer1", playerVector);
@@ -220,10 +224,11 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     const MockPlayer* p4 = addPlayerToVector("Receiver4", &playerVector);
 
     // Set up the return values.
-    Damage d1 = createDamage(7000, "receiver");
-    Damage d2 = createDamage(0, "receiver");
-    Damage d3 = createDamage(500000, "receiver");
-    Damage d4 = createDamage(1500, "receiver");
+
+    Damage d1 = createReceiverDamage(7000);
+    Damage d2 = createReceiverDamage(0);
+    Damage d3 = createReceiverDamage(500000);
+    Damage d4 = createReceiverDamage(1500);
 
     EXPECT_CALL(*p1, getTotalDamage())
         .WillOnce(::testing::Return(d1));

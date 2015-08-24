@@ -21,18 +21,18 @@ void AffectedPlayer::add(LineInfo& lineInfo) {
 void AffectedPlayer::addDamage(LineInfo& li) {
     if (li.dealer_name == getName()) {
         if (li.nanobots) {
-            nanobotsDamage[li.subtype].add(li, "dealer");
+            nanobotsDamage[li.subtype].addDamageDealtOnPlayer(li);
         }
         else {
-            regularDamage[li.subtype].add(li, "dealer");
+            regularDamage[li.subtype].addDamageDealtOnPlayer(li);
         }
     }
     else if (li.receiver_name == getName()) {
         if (li.nanobots) {
-            nanobotsDamage[li.subtype].add(li, "receiver");
+            nanobotsDamage[li.subtype].addDamageReceivedFromPlayer(li);
         }
         else {
-            regularDamage[li.subtype].add(li, "receiver");
+            regularDamage[li.subtype].addDamageReceivedFromPlayer(li);
         }
     }
     else {

@@ -9,14 +9,35 @@
 class LineInfo;
 
 class Damage {
+private:
+	struct DamageInfo {
+        DamageInfo& operator+=(const DamageInfo& rhs);
+
+        int total = 0;
+        int count = 0;
+        int regularMax = -1;
+        int regularMin = std::numeric_limits<int>::max();
+        int critTotal = 0;
+		int critCount = 0;
+		int critMax = -1;
+		int critMin = std::numeric_limits<int>::max();
+        int deflects = 0;
+        int misses = 0;
+    };
+
+    DamageInfo dealtOnPlayer;
+    DamageInfo receivedFromPlayer;
+
+    void addDamage(LineInfo& li, DamageInfo& di);
+
 public:
     Damage& operator+=(const Damage& rhs);
     friend Damage operator+(Damage lhs, const Damage& rhs);
 
-    void add(LineInfo& li, std::string playerType);
     void addDamageDealtOnPlayer(LineInfo& li);
     void addDamageReceivedFromPlayer(LineInfo& li);
 
+    // TODO: Move these to separate class?
     std::ostream& writeDamageDealtToPlayer(std::ostream& os);
     std::ostream& writeDamageReceivedFromPlayer(std::ostream& os);
     static std::ostream& writeHeadings(std::ostream& os);
@@ -42,27 +63,6 @@ public:
     int getCritMinReceived() const {return receivedFromPlayer.critMin;}
     int getDeflectsReceived() const {return receivedFromPlayer.deflects;}
     int getMissesReceived() const {return receivedFromPlayer.misses;}
-
-private:
-	struct damageInfo {
-        damageInfo& operator+=(const damageInfo& rhs);
-
-        int total = 0;
-        int count = 0;
-        int regularMax = -1;
-        int regularMin = std::numeric_limits<int>::max();
-        int critTotal = 0;
-		int critCount = 0;
-		int critMax = -1;
-		int critMin = std::numeric_limits<int>::max();
-        int deflects = 0;
-        int misses = 0;
-        // Not used at the moment:
-        int meanTime = 0;
-    };
-
-    damageInfo dealtOnPlayer;
-    damageInfo receivedFromPlayer;
 };
 
 

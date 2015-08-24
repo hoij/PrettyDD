@@ -61,8 +61,8 @@ protected:
         LineInfo li2;
         li1.amount = 10;
         li2.amount = 30;
-        d1.add(li1, "dealer");
-        d2.add(li2, "dealer");
+        d1.addDamageDealtOnPlayer(li1);
+        d2.addDamageDealtOnPlayer(li2);
     }
     virtual void TearDown() {
         delete player;
