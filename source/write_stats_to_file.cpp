@@ -15,7 +15,7 @@
 void writeDamageDealtOverviewUnsorted(PlayerVector<Player*>& pv) {
     std::ofstream file("damage_dealt_overview_unsorted");
     if (file.is_open()) {
-        int longestNameLength = pv.getLongestNameLength();
+        size_t longestNameLength = pv.getLongestNameLength();
 
         file << std::left << std::setw(longestNameLength) <<
                 "Name" << Damage::writeHeadings << std::endl;
@@ -34,7 +34,7 @@ void writeDamageDealtOverviewUnsorted(PlayerVector<Player*>& pv) {
 void writeDamageDealtOverview(PlayerVector<Player*>& pv) {
     std::ofstream file("damage_dealt_overview");
     if (file.is_open()) {
-        int longestNameLength = pv.getLongestNameLength();
+        size_t longestNameLength = pv.getLongestNameLength();
 
         file << std::left << std::setw(longestNameLength) <<
                 "Name" << Damage::writeHeadings << std::endl;
@@ -54,7 +54,7 @@ void writeDamageReceivedOverview(PlayerVector<Player*>& pv) {
     std::string fileName = "damage_received_overview";
     std::ofstream file(fileName);
     if (file.is_open()) {
-        int longestNameLength = pv.getLongestNameLength();
+        size_t longestNameLength = pv.getLongestNameLength();
 
         file << std::left << std::setw(longestNameLength) <<
                 "Name" << Damage::writeHeadings << std::endl;
@@ -85,7 +85,7 @@ void writeDamageDealtPerOpponent(const Player* pp) {
         std::string fileName = "damage_dealt_per_opponent_for_" + pp->getName();
         std::ofstream file(fileName);
         if (file.is_open()) {
-            unsigned int longestNameLength = pp->getLongestAffectedPlayerNameLength();
+            size_t longestNameLength = pp->getLongestAffectedPlayerNameLength();
             file << std::left << std::setw(longestNameLength) <<
             "Name" << Damage::writeHeadings << std::endl;
 

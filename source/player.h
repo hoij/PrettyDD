@@ -50,7 +50,7 @@ public:
     const std::vector<NanoProgram>& getNanoPrograms() const;
     const XP& getXp();
 
-    int getLongestAffectedPlayerNameLength() const;
+    size_t getLongestAffectedPlayerNameLength() const;
 
 private:
 //    static bool compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,

@@ -117,7 +117,7 @@ std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForEachAffecte
 //           p2.second.getTotalDealt();
 //}
 
-int Player::getLongestAffectedPlayerNameLength() const {
+size_t Player::getLongestAffectedPlayerNameLength() const {
     return affectedPlayers->getLongestNameLength();
 }
 

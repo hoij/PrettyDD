@@ -14,6 +14,8 @@
 #include <thread>
 #include <vector>
 
+#pragma warning(disable : 4996)  // Disable ctime unsafe warning
+
 
 std::string currentTime() {
     std::chrono::time_point<std::chrono::system_clock> time_p = std::chrono::system_clock::now();

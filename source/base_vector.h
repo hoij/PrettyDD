@@ -26,7 +26,7 @@ public:
     friend void swap(BaseVector<T>& first, BaseVector<T>& second);
 
     virtual void addToPlayers(LineInfo& lineInfo);
-    virtual int getLongestNameLength() const;
+    virtual size_t getLongestNameLength() const;
     virtual const C getPlayer(std::string name);
 
     typedef typename std::vector<C>::iterator PlayerVectorIterator;
@@ -122,8 +122,8 @@ const C BaseVector<C>::getPlayer(std::string name) {
 }
 
 template<class C>
-int BaseVector<C>::getLongestNameLength() const {
-    unsigned int longestNameLength = 0;
+size_t BaseVector<C>::getLongestNameLength() const {
+    size_t longestNameLength = 0;
     for (const C player : players) {
         if (player->getName().length() > longestNameLength) {
             longestNameLength = player->getName().length();

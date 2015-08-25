@@ -1,10 +1,11 @@
 #ifndef BASE_PLAYER_H
 #define BASE_PLAYER_H
 
+
+#include "line_info.h"
+
 #include <string>
 
-
-class LineInfo;
 
 class BasePlayer {
 public:
