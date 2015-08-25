@@ -14,7 +14,7 @@ class MockAffectedPlayerVector : public AffectedPlayerVector<AffectedPlayer*> {
 public:
     MOCK_METHOD1(addToPlayers, void(LineInfo& li));
 
-    MOCK_CONST_METHOD0(getLongestNameLength, int());
+    MOCK_CONST_METHOD0(getLongestNameLength, size_t());
 
     MOCK_CONST_METHOD1(getTotalDamage, Damage(std::string callerName));
     MOCK_CONST_METHOD1(getTotalRegularDamage, Damage(std::string callerName));

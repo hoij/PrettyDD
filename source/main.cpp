@@ -14,7 +14,9 @@
 #include <thread>
 #include <vector>
 
+#ifdef WIN32
 #pragma warning(disable : 4996)  // Disable ctime unsafe warning
+#endif
 
 
 std::string currentTime() {
