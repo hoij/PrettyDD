@@ -17,7 +17,7 @@
 class LineInfo;
 
 
-class Player : public PlayerInterface {
+class Player : public virtual PlayerInterface {
 public:
     Player(std::string name);
     Player(std::string name, AffectedPlayerVector<AffectedPlayer*>* pv);

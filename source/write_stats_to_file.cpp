@@ -1,12 +1,15 @@
 #include "write_stats_to_file.h"
 
-#include <fstream>
-#include <vector>
-#include <iomanip>
-#include <algorithm>
 #include "affected_player.h"
 #include "damage.h"
 #include "logger.h"
+#include "player.h"
+
+#include <algorithm>
+#include <fstream>
+#include <iomanip>
+#include <vector>
+
 
 
 // Will probably have to switch spaces to tabs where possible to save bytes
@@ -96,7 +99,6 @@ void writeDamageDealtPerOpponent(const Player* pp) {
         }
     }
 }
-
 
 //void writeDamageDetailsPerDamageType(PlayerVector& pv, std::string& playerName) {
 //

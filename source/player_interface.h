@@ -10,6 +10,7 @@
 class Damage;
 class Heal;
 class Nano;
+class NanoProgram;
 class LineInfo;
 class XP;
 

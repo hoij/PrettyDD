@@ -2,6 +2,7 @@
 #include "damage.h"
 #include "line_info.h"
 #include "player.h"
+#include "player_interface.h"
 #include "player_vector.h"
 
 #include <gmock/gmock.h>
@@ -15,19 +16,22 @@ these classes pass. */
 
 /* Test Player */
 
-class MockPlayer : public Player {
+class MockPlayer : public virtual PlayerInterface, public Player {
 public:
     MockPlayer(std::string name) : Player(name) {}
     MOCK_METHOD1(add, void(LineInfo& li));
+
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
     MOCK_CONST_METHOD0(getTotalRegularDamage, Damage(void));
     MOCK_CONST_METHOD0(getTotalNanobotsDamage, Damage(void));
+
     MOCK_CONST_METHOD1(getTotalDamagePerDamageType,
                        Damage(std::string damageType));
     MOCK_CONST_METHOD1(getTotalRegularDamagePerDamageType,
                        Damage(std::string damageType));
     MOCK_CONST_METHOD1(getTotalNanobotsDamagePerDamageType,
                        Damage(std::string damageType));
+
     MOCK_CONST_METHOD0(getTotalDamageForEachPlayer,
                        std::vector<std::pair<std::string, Damage>>(void));
     MOCK_CONST_METHOD0(getTotalHeals, Heal(void));

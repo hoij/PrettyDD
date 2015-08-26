@@ -2,7 +2,7 @@
 #include "formatted_line.h"
 #include "logger.h"
 #include "parser.h"
-#include "player.h"
+#include "player_interface.h"
 #include "player_vector.h"
 #include "write_stats_to_file.h"
 

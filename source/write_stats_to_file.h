@@ -2,9 +2,12 @@
 #define WRITE_STATS_TO_FILE_H
 
 
-#include <string>
 #include "player_vector.h"
-#include "player.h"
+
+#include <string>
+
+
+class Player;
 
 void writeDamageDealtOverviewUnsorted(PlayerVector<Player*>& pv);
 void writeDamageDealtOverview(PlayerVector<Player*>& pv);
