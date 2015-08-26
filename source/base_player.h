@@ -2,8 +2,6 @@
 #define BASE_PLAYER_H
 
 
-#include "line_info.h"
-
 #include <string>
 
 
@@ -13,7 +11,6 @@ public:
     virtual ~BasePlayer() {}
     std::string getName() const {return name;}
     void setName(std::string name) {this->name = name;}
-    virtual void add(LineInfo& lineInfo) {(void)lineInfo;}
 
 private:
     std::string name;

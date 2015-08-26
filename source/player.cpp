@@ -107,8 +107,8 @@ Damage Player::getTotalNanobotsDamagePerDamageType(std::string damageType) const
     return affectedPlayers->getTotalNanobotsDamagePerDamageType(getName(), damageType);
 }
 
-std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForEachAffectedPlayer() const {
-    return affectedPlayers->getTotalDamageForEachPlayer(getName());
+std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForAllAffectedPlayers() const {
+    return affectedPlayers->getTotalDamageForAllAffectedPlayers(getName());
 }
 
 //bool Player::compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,
@@ -125,24 +125,32 @@ Heal Player::getTotalHeals() const {
     return affectedPlayers->getTotalHeals(getName());
 }
 
-const std::map<std::string, Damage>& Player::getNanobotsDamagePerAffectedPlayer(std::string name) const {
-    return affectedPlayers->getNanobotsDamagePerAffectedPlayer(name);
+const std::map<std::string, Damage>& Player::getNanobotsDamageFromAffectedPlayer(std::string name) const {
+    return affectedPlayers->getNanobotsDamageFromAffectedPlayer(name);
 }
 
-const std::map<std::string, Damage>& Player::getRegularDamagePerAffectedPlayer(std::string name) const {
-    return affectedPlayers->getRegularDamagePerAffectedPlayer(name);
+const std::map<std::string, Damage>& Player::getRegularDamageFromAffectedPlayer(std::string name) const {
+    return affectedPlayers->getRegularDamageFromAffectedPlayer(name);
 }
 
-std::vector<std::pair<std::string, Heal>> Player::getHealsForEachAffectedPlayer() const {
-    return affectedPlayers->getHealsForEachAffectedPlayer();
+std::vector<std::pair<std::string, Heal>> Player::getHealsForAllAffectedPlayers() const {
+    return affectedPlayers->getHealsForAllAffectedPlayers();
+}
+
+const Heal& Player::getHealFromAffectedPlayer(std::string name) const {
+    return affectedPlayers->getHealFromAffectedPlayer(name);
 }
 
 const std::vector<NanoProgram>& Player::getNanoPrograms() const {
     return nanoPrograms;
 }
 
-std::vector<std::pair<std::string, Nano>> Player::getNanoForEachAffectedPlayer() const {
-    return affectedPlayers->getNanoForEachAffectedPlayer();
+std::vector<std::pair<std::string, Nano>> Player::getNanoForAllAffectedPlayers() const {
+    return affectedPlayers->getNanoForAllAffectedPlayers();
+}
+
+const Nano& Player::getNanoFromAffectedPlayer(std::string name) const {
+    return affectedPlayers->getNanoFromAffectedPlayer(name);
 }
 
 const XP& Player::getXp() {

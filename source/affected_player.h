@@ -2,6 +2,7 @@
 #define AFFECTED_PLAYER_H
 
 
+#include "affected_player_interface.h"
 #include "base_player.h"
 #include "damage.h"
 #include "heal.h"
@@ -18,7 +19,7 @@ class Nano;
 
 class LineInfo;
 
-class AffectedPlayer : public BasePlayer {
+class AffectedPlayer : public AffectedPlayerInterface, public BasePlayer {
 public:
 	AffectedPlayer(std::string name);
 

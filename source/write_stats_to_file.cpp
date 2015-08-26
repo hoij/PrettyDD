@@ -89,7 +89,7 @@ void writeDamageDealtPerOpponent(const Player* pp) {
             file << std::left << std::setw(longestNameLength) <<
             "Name" << Damage::writeHeadings << std::endl;
 
-            for (auto& pair : pp->getTotalDamageForEachAffectedPlayer()) {
+            for (auto& pair : pp->getTotalDamageForAllAffectedPlayers()) {
                 file << std::left << std::setw(longestNameLength) << pair.first;
                 pair.second.writeDamageReceivedFromPlayer(file);
             }

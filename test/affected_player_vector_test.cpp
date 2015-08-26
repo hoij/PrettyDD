@@ -16,9 +16,9 @@ these classes pass. */
 
 /* Test Player */
 
-class MockAffectedPlayer : public AffectedPlayer {
+class MockAffectedPlayer : public AffectedPlayerInterface, public BasePlayer {
 public:
-    MockAffectedPlayer(std::string name) : AffectedPlayer(name) {}
+    MockAffectedPlayer(std::string name) : BasePlayer(name) {}
     MOCK_METHOD1(add, void(LineInfo& li));
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
     MOCK_CONST_METHOD0(getTotalRegularDamage, Damage(void));
@@ -256,7 +256,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalNanobotsDamagePerDamageType) {
     EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getNanobotsDamagePerAffectedPlayer) {
+TEST_F(AffectedPlayerVectorDamageTest, getNanobotsDamageFromAffectedPlayer) {
     /* Verifies that getNanobotsDamage is called on the the correct player */
 
     std::map<std::string, Damage> expected;
@@ -266,12 +266,12 @@ TEST_F(AffectedPlayerVectorDamageTest, getNanobotsDamagePerAffectedPlayer) {
         .WillOnce(::testing::ReturnRef(expected));
 
     std::map<std::string, Damage> result2 =
-        affectedPlayerVector->getNanobotsDamagePerAffectedPlayer("dealer2");
+        affectedPlayerVector->getNanobotsDamageFromAffectedPlayer("dealer2");
 
     EXPECT_EQ(1, result2.count("type"));
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getRegularDamagePerAffectedPlayer) {
+TEST_F(AffectedPlayerVectorDamageTest, getRegularDamageFromAffectedPlayer) {
     /* Verifies that getRegularDamage is called on the the correct player */
 
     std::map<std::string, Damage> expected;
@@ -281,22 +281,22 @@ TEST_F(AffectedPlayerVectorDamageTest, getRegularDamagePerAffectedPlayer) {
         .WillOnce(::testing::ReturnRef(expected));
 
     std::map<std::string, Damage> result2 =
-        affectedPlayerVector->getRegularDamagePerAffectedPlayer("dealer2");
+        affectedPlayerVector->getRegularDamageFromAffectedPlayer("dealer2");
 
     EXPECT_EQ(1, result2.count("type"));
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getRegularDamagePerAffectedPlayer_notFound) {
+TEST_F(AffectedPlayerVectorDamageTest, getRegularDamageFromAffectedPlayer_notFound) {
     /* Verifies that the correct exception is thrown when a player is not
     found in the vector */
 
     std::string name = "NotInTheVector";
 
-    EXPECT_THROW(affectedPlayerVector->getRegularDamagePerAffectedPlayer(name),
+    EXPECT_THROW(affectedPlayerVector->getRegularDamageFromAffectedPlayer(name),
                  std::invalid_argument);
 
     try {
-        affectedPlayerVector->getRegularDamagePerAffectedPlayer(name);
+        affectedPlayerVector->getRegularDamageFromAffectedPlayer(name);
     }
     catch(const std::invalid_argument& e) {
         EXPECT_EQ(e.what(), "\"" + name + "\" was not found among the " +
@@ -325,12 +325,12 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalHeals) {
     EXPECT_EQ((h1 + h2).getPotentialDealt(), totalHeal.getPotentialDealt());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getHealsForEachAffectedPlayer) {
+TEST_F(AffectedPlayerVectorDamageTest, getHealsForAllAffectedPlayers) {
     /*
     This test case depends on the implementation of Heal.
     If it fails, make sure that Heals's tests can pass.
 
-    Calls getHealsForEachAffectedPlayer().
+    Calls getHealsForAllAffectedPlayers().
     Verifies that each players getHeal is in turn called and that
     the returned vector is sorted on potential heal dealt.
     */
@@ -355,7 +355,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getHealsForEachAffectedPlayer) {
         .WillOnce(::testing::ReturnRef(h4));
 
     std::vector<std::pair<std::string, Heal>> result =
-        affectedPlayerVector->getHealsForEachAffectedPlayer();
+        affectedPlayerVector->getHealsForAllAffectedPlayers();
 
     EXPECT_EQ(h3.getPotentialDealt(), result[0].second.getPotentialDealt());
     EXPECT_EQ(h4.getPotentialDealt(), result[1].second.getPotentialDealt());
@@ -385,7 +385,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalNano) {
     EXPECT_EQ((n1 + n2).getTotalDealt(), totalNano.getTotalDealt());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getNanoForEachAffectedPlayer) {
+TEST_F(AffectedPlayerVectorDamageTest, getNanoForAllAffectedPlayers) {
     /* Verifies that the nanos are returned in a sorted list */
     // Add more players to the vector. "dealer1" and "dealer2" have already
     // been added in the SetUp();
@@ -407,7 +407,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getNanoForEachAffectedPlayer) {
         .WillOnce(::testing::ReturnRef(n4));
 
     std::vector<std::pair<std::string, Nano>> result =
-        affectedPlayerVector->getNanoForEachAffectedPlayer();
+        affectedPlayerVector->getNanoForAllAffectedPlayers();
 
     EXPECT_EQ(n3.getTotalDealt(), result[0].second.getTotalDealt());
     EXPECT_EQ(n4.getTotalDealt(), result[1].second.getTotalDealt());
@@ -420,10 +420,10 @@ TEST_F(AffectedPlayerVectorDamageTest, getNanoForEachAffectedPlayer) {
     EXPECT_EQ(4, result.size());
 }
 
-TEST(AffectedPlayerVectorTest, getTotalDamageForEachPlayer) {
+TEST(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     /*
     Adds several players with different damage.
-    Calls getTotalDamageForEachPlayer().
+    Calls getTotalDamageForAllAffectedPlayers().
     Verifies that each players getTotalDamage() is called and that the
     returned vector is sorted on total received damage.
     */
@@ -451,7 +451,7 @@ TEST(AffectedPlayerVectorTest, getTotalDamageForEachPlayer) {
         .WillOnce(::testing::Return(d4));
 
     std::vector<std::pair<std::string, Damage>> result;
-    result = affectedPlayerVector.getTotalDamageForEachPlayer("Caller");
+    result = affectedPlayerVector.getTotalDamageForAllAffectedPlayers("Caller");
 
     EXPECT_EQ(d3.getTotalReceived(), result[0].second.getTotalReceived());
     EXPECT_EQ(d1.getTotalReceived(), result[1].second.getTotalReceived());
