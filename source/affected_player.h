@@ -3,7 +3,6 @@
 
 
 #include "affected_player_interface.h"
-#include "base_player.h"
 #include "damage.h"
 #include "heal.h"
 #include "nano.h"
@@ -19,11 +18,13 @@ class Nano;
 
 class LineInfo;
 
-class AffectedPlayer : public AffectedPlayerInterface, public BasePlayer {
+class AffectedPlayer : public virtual AffectedPlayerInterface {
 public:
 	AffectedPlayer(std::string name);
 
     void add(LineInfo& lineInfo);
+
+    std::string getName() const {return name;}
 
     Damage getTotalDamage() const;
     Damage getTotalRegularDamage() const;
@@ -38,6 +39,8 @@ public:
     const Nano& getNano() const;
 
 private:
+    std::string name;
+
     void addDamage(LineInfo& li);
     void addHeal(LineInfo& li);
     void addNano(LineInfo& li);

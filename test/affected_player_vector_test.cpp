@@ -16,10 +16,9 @@ these classes pass. */
 
 /* Test Player */
 
-class MockAffectedPlayer : public AffectedPlayerInterface, public BasePlayer {
+class MockAffectedPlayer : public virtual AffectedPlayerInterface, public AffectedPlayer {
 public:
-    MockAffectedPlayer(std::string name) : BasePlayer(name) {}
-    MOCK_METHOD1(add, void(LineInfo& li));
+    MockAffectedPlayer(std::string name) : AffectedPlayer(name) {}
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
     MOCK_CONST_METHOD0(getTotalRegularDamage, Damage(void));
     MOCK_CONST_METHOD0(getTotalNanobotsDamage, Damage(void));

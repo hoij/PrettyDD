@@ -29,6 +29,8 @@ public:
     virtual const std::map<std::string, Damage>& getNanobotsDamage() const = 0;
     virtual const Heal& getHeal() const = 0;
     virtual const Nano& getNano() const = 0;
+
+    virtual std::string getName() const = 0;
 };
 
 

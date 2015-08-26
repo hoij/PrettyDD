@@ -46,7 +46,7 @@ public:
 
 private:
     static bool compareNanoDealt(const std::pair<std::string, Nano>& p1,
-                                     const std::pair<std::string, Nano>& p2);
+                                 const std::pair<std::string, Nano>& p2);
     static bool comparePotentialHeal(const std::pair<std::string, Heal>& p1,
                                      const std::pair<std::string, Heal>& p2);
 };

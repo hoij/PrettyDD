@@ -75,7 +75,6 @@ void swap(BaseVector<T>& first, BaseVector<T>& second) {
         std::swap(first.players, second.players);
 }
 
-
 template<class C>
 void BaseVector<C>::addToPlayers(LineInfo& lineInfo) {
     // Adds the info found in a log line to dealer and receiver.

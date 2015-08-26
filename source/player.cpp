@@ -8,19 +8,20 @@
 #include <utility>
 
 
-Player::Player(std::string name) : BasePlayer(name) {
+Player::Player(std::string name) : name(name) {
     affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
 }
 
 Player::Player(std::string name, AffectedPlayerVector<AffectedPlayer*>* pv) :
-    BasePlayer(name),
+    name(name),
     affectedPlayers(pv) {}
 
 Player::~Player() {
     delete affectedPlayers;
 }
 
-Player::Player(const Player& other) : BasePlayer(other.getName()) {
+Player::Player(const Player& other) {
+    name = other.name;
     affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>;
     *affectedPlayers = *other.affectedPlayers;
     nameOfLastNanoProgramCasted = other.nameOfLastNanoProgramCasted;
@@ -38,7 +39,7 @@ Player& Player::operator=(Player rhs) {
 }
 
 void swap(Player& first, Player& second) {
-    std::swap(static_cast<BasePlayer&>(first), static_cast<BasePlayer&>(second));
+    std::swap(first.name, second.name);
     std::swap(first.affectedPlayers, second.affectedPlayers);
     std::swap(first.nameOfLastNanoProgramCasted, second.nameOfLastNanoProgramCasted);
     std::swap(first.xp, second.xp);

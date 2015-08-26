@@ -2,9 +2,7 @@
 #include "line_info.h"
 
 
-AffectedPlayer::AffectedPlayer(std::string name) : BasePlayer(name) {
-
-}
+AffectedPlayer::AffectedPlayer(std::string name) : name(name) {}
 
 void AffectedPlayer::add(LineInfo& lineInfo) {
     if (lineInfo.type == "damage") {
