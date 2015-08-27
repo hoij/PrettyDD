@@ -1,6 +1,7 @@
 #ifndef NANO_H
 #define NANO_H
 
+#include "line_info.h"
 
 #include <limits>
 #include <string>

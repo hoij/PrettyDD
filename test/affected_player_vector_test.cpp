@@ -60,11 +60,11 @@ Damage createReceiverDamage(int amount) {
     return d;
 }
 
-Heal createHeal(int amount, std::string playerType) {
+Heal createHeal(int amount) {
     LineInfo li;
     li.amount = amount;
     Heal h;
-    h.add(li, playerType);
+    h.addHealDealtOnPlayer(li);
     return h;
 }
 
@@ -307,8 +307,8 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalHeals) {
     /* Verifies that getHeal is called for each player in the vector and
     that the returned sum is correct. */
 
-    Heal h1 = createHeal(10, "dealer");
-    Heal h2 = createHeal(30, "dealer");
+    Heal h1 = createHeal(10);
+    Heal h2 = createHeal(30);
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
@@ -339,10 +339,10 @@ TEST_F(AffectedPlayerVectorDamageTest, getHealsForAllAffectedPlayers) {
     const MockAffectedPlayer* p3 = addPlayerToVector("dealer3", affectedPlayerVector);
     const MockAffectedPlayer* p4 = addPlayerToVector("dealer4", affectedPlayerVector);
 
-    Heal h1 = createHeal(10, "dealer");
-    Heal h2 = createHeal(0, "dealer");
-    Heal h3 = createHeal(500000, "dealer");
-    Heal h4 = createHeal(3000, "dealer");
+    Heal h1 = createHeal(10);
+    Heal h2 = createHeal(0);
+    Heal h3 = createHeal(500000);
+    Heal h4 = createHeal(3000);
 
     EXPECT_CALL(*p1, getHeal())
         .WillOnce(::testing::ReturnRef(h1));

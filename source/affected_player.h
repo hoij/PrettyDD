@@ -11,10 +11,6 @@
 #include <string>
 #include <vector>
 
-class Damage;
-class Heal;
-class Nano;
-
 
 class LineInfo;
 

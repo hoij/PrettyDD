@@ -58,14 +58,14 @@ void AffectedPlayer::addHeal(LineInfo& li) {
     */
 
     if (li.subtype == "actual") {
-        heal.add(li, "receiver");
+        heal.addHealReceivedFromPlayer(li);
     }
     else if (li.subtype == "potential") {
         if (li.dealer_name == getName()) {
-            heal.add(li, "dealer");
+            heal.addHealDealtOnPlayer(li);
         }
         else if (li.receiver_name == getName()) {
-            heal.add(li, "receiver");
+            heal.addHealReceivedFromPlayer(li);
         }
         else {
             // TODO: Throw exception?

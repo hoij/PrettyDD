@@ -85,3 +85,4 @@ add_gmock_test_2_libs(affected_player_vector_test playerlib loggerlib
 add_gmock_test(base_vector_test playerlib base_vector_test.cpp ../source/base_vector.h)
 add_gmock_test(affected_player_test affected_playerlib affected_player_test.cpp)
 add_gmock_test(damage_test damagelib damage_test.cpp)
+add_gmock_test(heal_test heallib heal_test.cpp)

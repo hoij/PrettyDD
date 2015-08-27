@@ -281,7 +281,7 @@ TEST_F(PlayerTest, getTotalHeals) {
     LineInfo li;
     li.amount = 10;
     Heal h;
-    h.add(li, "dealer");
+    h.addHealDealtOnPlayer(li);
 
     EXPECT_CALL(*mockAffectedPlayerVector,
         getTotalHeals(player->getName()))

@@ -199,8 +199,8 @@ TEST_F(PlayerVectorDamageTest, getTotalHeals) {
     li2.amount = 30;
     Heal h1;
     Heal h2;
-    h1.add(li1, "dealer");
-    h2.add(li2, "dealer");
+    h1.addHealDealtOnPlayer(li1);
+    h2.addHealDealtOnPlayer(li2);
 
     EXPECT_CALL(*p1, getTotalHeals())
         .WillOnce(::testing::Return(h1));
