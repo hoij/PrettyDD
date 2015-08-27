@@ -48,43 +48,24 @@ TEST_F(HealTest, addHealDealtOnPlayer) {
     LineInfo li1;
     li1.subtype = "potential";
     li1.amount = 3000;
-
     h->addHealDealtOnPlayer(li1);
-
-    EXPECT_EQ(li1.amount, h->getPotentialDealt());
-    EXPECT_EQ(1, h->getCountDealt());
-    EXPECT_EQ(li1.amount, h->getPotentialMaxDealt());
-    EXPECT_EQ(li1.amount, h->getPotentialMinDealt());
 
     /* Add a second larger heal */
     LineInfo li2;
     li2.subtype = "potential";
     li2.amount = 3001;
-
     h->addHealDealtOnPlayer(li2);
-
-    EXPECT_EQ(li1.amount + li2.amount, h->getPotentialDealt());
-    EXPECT_EQ(2, h->getCountDealt());
-    EXPECT_EQ(li2.amount, h->getPotentialMaxDealt());
-    EXPECT_EQ(li1.amount, h->getPotentialMinDealt());
 
     /* Add a third smallest heal */
     LineInfo li3;
     li3.subtype = "potential";
     li3.amount = 2999;
-
     h->addHealDealtOnPlayer(li3);
-
-    EXPECT_EQ(li1.amount + li2.amount + li3.amount, h->getPotentialDealt());
-    EXPECT_EQ(3, h->getCountDealt());
-    EXPECT_EQ(li2.amount, h->getPotentialMaxDealt());
-    EXPECT_EQ(li3.amount, h->getPotentialMinDealt());
 
     /* Add a fourth heal of the same size*/
     LineInfo li4;
     li4.subtype = "potential";
     li4.amount = 2999;
-
     h->addHealDealtOnPlayer(li4);
 
     EXPECT_EQ(li1.amount + li2.amount + li3.amount + li4.amount,
@@ -97,7 +78,6 @@ TEST_F(HealTest, addHealDealtOnPlayer) {
     EXPECT_EQ(0, h->getActualDealt());
     EXPECT_EQ(-1, h->getActualMaxDealt());
     EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinDealt());
-
     verifyReceivedFromPlayerIsZero();
 }
 
@@ -106,28 +86,23 @@ TEST_F(HealTest, addHealReceivedFromPlayer_actual) {
     LineInfo li1;
     li1.subtype = "actual";
     li1.amount = 99;
-
     h->addHealReceivedFromPlayer(li1);
 
     /* Add a second larger heal */
     LineInfo li2;
     li2.subtype = "actual";
     li2.amount = 100;
-
     h->addHealReceivedFromPlayer(li2);
 
     /* Add a third smallest heal */
     LineInfo li3;
     li3.subtype = "actual";
     li3.amount = 98;
-
     h->addHealReceivedFromPlayer(li3);
-
     /* Add a fourth heal of the same size */
     LineInfo li4;
     li4.subtype = "actual";
     li4.amount = 98;
-
     h->addHealReceivedFromPlayer(li4);
 
     /* Verify */
@@ -175,10 +150,10 @@ TEST(HealOperatorPlusTest, addToEmptyHeal) {
     EXPECT_EQ(li3.amount, h3.getPotentialMinReceived());
 
     EXPECT_EQ(0, h3.getActualDealt());
-    EXPECT_EQ(50000, h3.getPotentialDealt());
+    EXPECT_EQ(li2.amount, h3.getPotentialDealt());
     EXPECT_EQ(1, h3.getCountDealt());
     EXPECT_EQ(-1, h3.getActualMaxDealt());
     EXPECT_EQ(std::numeric_limits<int>::max(), h3.getActualMinDealt());
-    EXPECT_EQ(50000, h3.getPotentialMaxDealt());
-    EXPECT_EQ(50000, h3.getPotentialMinDealt());
+    EXPECT_EQ(li2.amount, h3.getPotentialMaxDealt());
+    EXPECT_EQ(li2.amount, h3.getPotentialMinDealt());
 }
