@@ -86,3 +86,4 @@ add_gmock_test(base_vector_test playerlib base_vector_test.cpp ../source/base_ve
 add_gmock_test(affected_player_test affected_playerlib affected_player_test.cpp)
 add_gmock_test(damage_test damagelib damage_test.cpp)
 add_gmock_test(heal_test heallib heal_test.cpp)
+add_gmock_test(nano_test nanolib nano_test.cpp)

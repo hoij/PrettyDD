@@ -78,10 +78,10 @@ void AffectedPlayer::addHeal(LineInfo& li) {
 
 void AffectedPlayer::addNano(LineInfo& li) {
     if (li.receiver_name == getName()) {
-        nano.add(li, "receiver");
+        nano.addNanoReceivedFromPlayer(li);
     }
     else if (li.dealer_name == getName()) {
-        nano.add(li, "dealer");
+        nano.addNanoDealtOnPlayer(li);
     }
 }
 

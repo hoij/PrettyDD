@@ -68,11 +68,11 @@ Heal createHeal(int amount) {
     return h;
 }
 
-Nano createNano(int amount, std::string playerType) {
+Nano createNano(int amount) {
     LineInfo li;
     li.amount = amount;
     Nano n;
-    n.add(li, playerType);
+    n.addNanoDealtOnPlayer(li);
     return n;
 }
 
@@ -367,8 +367,8 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalNano) {
     /* Verifies that getNano is called for each player in the vector and
     that the returned sum is correct. */
 
-    Nano n1 = createNano(10, "dealer");
-    Nano n2 = createNano(30, "dealer");
+    Nano n1 = createNano(10);
+    Nano n2 = createNano(30);
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
@@ -391,10 +391,10 @@ TEST_F(AffectedPlayerVectorDamageTest, getNanoForAllAffectedPlayers) {
     const MockAffectedPlayer* p3 = addPlayerToVector("dealer3", affectedPlayerVector);
     const MockAffectedPlayer* p4 = addPlayerToVector("dealer4", affectedPlayerVector);
 
-    Nano n1 = createNano(10, "dealer");
-    Nano n2 = createNano(0, "dealer");
-    Nano n3 = createNano(500000, "dealer");
-    Nano n4 = createNano(3000, "dealer");
+    Nano n1 = createNano(10);
+    Nano n2 = createNano(0);
+    Nano n3 = createNano(500000);
+    Nano n4 = createNano(3000);
 
     EXPECT_CALL(*p1, getNano())
         .WillOnce(::testing::ReturnRef(n1));
