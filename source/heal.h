@@ -32,8 +32,8 @@ public:
     int getPotentialMaxReceived() const {return receivedFromPlayer.potentialMax;}
 
 private:
-    struct healInfo {
-        healInfo& operator+=(const healInfo& rhs);
+    struct HealInfo {
+        HealInfo& operator+=(const HealInfo& rhs);
 
         int actual = 0;
         int potential = 0;
@@ -44,8 +44,8 @@ private:
         int potentialMax = -1;
     };
 
-    healInfo dealtOnPlayer;
-    healInfo receivedFromPlayer;
+    HealInfo dealtOnPlayer;
+    HealInfo receivedFromPlayer;
 };
 
 
