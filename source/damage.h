@@ -32,7 +32,6 @@ private:
 
 public:
     Damage& operator+=(const Damage& rhs);
-    friend Damage operator+(Damage lhs, const Damage& rhs);
 
     void addDamageDealtOnPlayer(LineInfo& li);
     void addDamageReceivedFromPlayer(LineInfo& li);
@@ -65,5 +64,9 @@ public:
     int getMissesReceived() const {return receivedFromPlayer.misses;}
 };
 
+
+inline Damage operator+(Damage lhs, const Damage& rhs) {
+    return lhs += rhs;
+}
 
 #endif // DAMAGE_H

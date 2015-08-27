@@ -11,7 +11,6 @@ class LineInfo;
 class Heal {
 public:
     Heal& operator+=(const Heal& rhs);
-    friend Heal operator+(Heal lhs, const Heal& rhs);
 
     void addHealDealtOnPlayer(LineInfo& li);
     void addHealReceivedFromPlayer(LineInfo& li);
@@ -48,6 +47,11 @@ private:
     healInfo dealtOnPlayer;
     healInfo receivedFromPlayer;
 };
+
+
+inline Heal operator+(Heal lhs, const Heal& rhs) {
+    return lhs += rhs;
+}
 
 
 #endif  // HEAL_H

@@ -9,10 +9,6 @@ Heal& Heal::operator+=(const Heal& rhs) {
     return *this;
 }
 
-Heal operator+(Heal lhs, const Heal& rhs) {
-    return lhs += rhs;
-}
-
 void Heal::addHealDealtOnPlayer(LineInfo& li) {
     // The dealt amount is always a potential heal
     // but it will be verified here just to make sure.

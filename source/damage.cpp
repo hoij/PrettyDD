@@ -13,10 +13,6 @@ Damage& Damage::operator+=(const Damage& rhs) {
     return *this;
 }
 
-Damage operator+(Damage lhs, const Damage& rhs) {
-    return lhs += rhs;
-}
-
 void Damage::addDamageDealtOnPlayer(LineInfo& li) {
     addDamage(li, dealtOnPlayer);
 }
