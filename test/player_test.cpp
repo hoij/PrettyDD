@@ -136,7 +136,7 @@ TEST_F(PlayerTest, add_xp) {
     li.subtype = "gained";
     li.amount = 123456;
     player->add(li);
-    EXPECT_EQ(li.amount, player->getXp().gained.at("xp").total);
+    EXPECT_EQ(li.amount, player->getXp().getTotalGained("xp"));
 }
 
 TEST_F(PlayerTest, getTotalNanobotsDamage) {
