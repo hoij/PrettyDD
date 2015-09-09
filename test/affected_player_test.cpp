@@ -24,7 +24,7 @@ protected:
     AffectedPlayer* affectedPlayer;
 };
 
-TEST_F(AffectedPlayerTest, addDamage_dealerNanobots) {
+TEST_F(AffectedPlayerTest, addDamage_dealer) {
     /* Verifies that the correct branch in the addDamage method is selected */
     LineInfo li;
     li.dealer_name = affectedPlayer->getName();
@@ -35,25 +35,11 @@ TEST_F(AffectedPlayerTest, addDamage_dealerNanobots) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(li.amount, affectedPlayer->getNanobotsDamage().
-                             at(li.subtype).getTotalDealt());
+    EXPECT_EQ(li.amount, affectedPlayer->getDamagePerDamageType("projectile").
+                                             getTotalDealtOnPlayer());
 }
 
-TEST_F(AffectedPlayerTest, addDamage_dealerRegular) {
-    /* Verifies that the correct branch in the addDamage method is selected */
-    LineInfo li;
-    li.dealer_name = affectedPlayer->getName();
-    li.amount = 100;
-    li.type = "damage";
-    li.subtype = "projectile";
-
-    affectedPlayer->add(li);
-
-    EXPECT_EQ(li.amount, affectedPlayer->getRegularDamage().
-                             at(li.subtype).getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, addDamage_receiverNanobots) {
+TEST_F(AffectedPlayerTest, addDamage_receiver) {
     /* Verifies that the correct branch in the addDamage method is selected */
     LineInfo li;
     li.receiver_name = affectedPlayer->getName();
@@ -64,22 +50,8 @@ TEST_F(AffectedPlayerTest, addDamage_receiverNanobots) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(li.amount, affectedPlayer->getNanobotsDamage().
-                             at(li.subtype).getTotalReceived());
-}
-
-TEST_F(AffectedPlayerTest, addDamage_receiverRegular) {
-    /* Verifies that the correct branch in the addDamage method is selected */
-    LineInfo li;
-    li.receiver_name = affectedPlayer->getName();
-    li.amount = 100;
-    li.type = "damage";
-    li.subtype = "projectile";
-
-    affectedPlayer->add(li);
-
-    EXPECT_EQ(li.amount, affectedPlayer->getRegularDamage().
-                             at(li.subtype).getTotalReceived());
+    EXPECT_EQ(li.amount, affectedPlayer->getDamagePerDamageType("projectile").
+                                             getTotalReceivedFromPlayer());
 }
 
 TEST_F(AffectedPlayerTest, addHeal_actual) {
@@ -93,10 +65,10 @@ TEST_F(AffectedPlayerTest, addHeal_actual) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialReceived());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getActualDealt());
-    EXPECT_EQ(li.amount, affectedPlayer->getHeal().getActualReceived());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialDealt());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialReceivedFromPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getActualDealtOnPlayer());
+    EXPECT_EQ(li.amount, affectedPlayer->getHeal().getActualReceivedFromPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerTest, addHeal_potentialReceived) {
@@ -110,10 +82,10 @@ TEST_F(AffectedPlayerTest, addHeal_potentialReceived) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(li.amount, affectedPlayer->getHeal().getPotentialReceived());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialDealt());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getActualReceived());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getActualDealt());
+    EXPECT_EQ(li.amount, affectedPlayer->getHeal().getPotentialReceivedFromPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialDealtOnPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getActualReceivedFromPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getActualDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerTest, addHeal_potentialDealt) {
@@ -127,10 +99,10 @@ TEST_F(AffectedPlayerTest, addHeal_potentialDealt) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialReceived());
-    EXPECT_EQ(li.amount, affectedPlayer->getHeal().getPotentialDealt());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getActualReceived());
-    EXPECT_EQ(0, affectedPlayer->getHeal().getActualDealt());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getPotentialReceivedFromPlayer());
+    EXPECT_EQ(li.amount, affectedPlayer->getHeal().getPotentialDealtOnPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getActualReceivedFromPlayer());
+    EXPECT_EQ(0, affectedPlayer->getHeal().getActualDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerTest, addNano_receiver) {
@@ -143,8 +115,8 @@ TEST_F(AffectedPlayerTest, addNano_receiver) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(li.amount, affectedPlayer->getNano().getTotalReceived());
-    EXPECT_EQ(0, affectedPlayer->getNano().getTotalDealt());
+    EXPECT_EQ(li.amount, affectedPlayer->getNano().getTotalReceivedFromPlayer());
+    EXPECT_EQ(0, affectedPlayer->getNano().getTotalDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerTest, addNano_dealer) {
@@ -157,8 +129,8 @@ TEST_F(AffectedPlayerTest, addNano_dealer) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(0, affectedPlayer->getNano().getTotalReceived());
-    EXPECT_EQ(li.amount, affectedPlayer->getNano().getTotalDealt());
+    EXPECT_EQ(0, affectedPlayer->getNano().getTotalReceivedFromPlayer());
+    EXPECT_EQ(li.amount, affectedPlayer->getNano().getTotalDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerTest, getTotalDamage) {
@@ -180,57 +152,10 @@ TEST_F(AffectedPlayerTest, getTotalDamage) {
     affectedPlayer->add(li2);
 
     EXPECT_EQ(li1.amount + li2.amount,
-              affectedPlayer->getTotalDamage().getTotalDealt());
+              affectedPlayer->getTotalDamage().getTotalDealtOnPlayer());
 }
 
-TEST_F(AffectedPlayerTest, getTotalRegularDamage) {
-    /* Adds one nanobots damage and two regular damage lines.
-    Verifies that the summed regular damage is returned */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-    li1.subtype = "melee";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li1.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-    affectedPlayer->add(li3);
-
-    EXPECT_EQ(li2.amount + li3.amount,
-              affectedPlayer->getTotalRegularDamage().getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, getTotalNanobotsDamage) {
-    /* Adds one regular damage and two nanobots damage lines.
-    Verifies that the summed nanobots damage is returned */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-    li1.subtype = "melee";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li2.nanobots = true;
-    li3.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-    affectedPlayer->add(li3);
-
-    EXPECT_EQ(li2.amount + li3.amount,
-              affectedPlayer->getTotalNanobotsDamage().getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType) {
+TEST_F(AffectedPlayerTest, getDamagePerDamageType) {
     /* Adds two damages with the same subtype and one with a different.
     Verifies that the sum of the nanobots and regular damage with the same
     subtype is returned for the specified damageType */
@@ -252,80 +177,11 @@ TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType) {
     affectedPlayer->add(li2);
 
     EXPECT_EQ(li1.amount + li2.amount,
-              affectedPlayer->getTotalDamagePerDamageType("melee").
-                  getTotalDealt());
+              affectedPlayer->getDamagePerDamageType("melee").
+                  getTotalDealtOnPlayer());
 }
 
-TEST_F(AffectedPlayerTest, getTotalRegularDamagePerDamageType) {
-    /* Adds four damage lines and calls getTotalDamagePerDamageType(false).
-    Verifies that the the regular damage is returned for the specified
-    damageType */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    LineInfo li4 = li1;
-
-    li1.subtype = "melee";
-    li2.subtype = "melee";
-    li3.subtype = "melee";
-    li4.subtype = "projectile";
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li4.amount = 10000;
-    li3.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-    affectedPlayer->add(li3);
-    affectedPlayer->add(li4);
-
-    Damage result = affectedPlayer->getTotalRegularDamagePerDamageType(
-                                        "melee");
-
-    EXPECT_EQ(li1.amount + li2.amount, result.getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, getTotalNanobotsDamagePerDamageType) {
-    /* Adds four damage lines and calls getTotalDamagePerDamageType(true).
-    Verifies that the the nanobots damage is returned for the specified
-    damageType */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    LineInfo li4 = li1;
-
-    li1.subtype = "melee";
-    li2.subtype = "melee";
-    li3.subtype = "melee";
-    li4.subtype = "projectile";
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li3.amount = 10000;
-    li1.nanobots = true;
-    li2.nanobots = true;
-    li3.nanobots = false;
-    li4.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-    affectedPlayer->add(li3);
-    affectedPlayer->add(li4);
-
-    Damage result = affectedPlayer->getTotalNanobotsDamagePerDamageType(
-                                        "melee");
-
-    EXPECT_EQ(li1.amount + li2.amount, result.getTotalDealt());
-}
-
-TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_nonexistent) {
+TEST_F(AffectedPlayerTest, getDamagePerDamageType_nonexistent) {
     /* Adds two damages of the same subtype. One with nanobots and the other
     without. Then calls getTotalDamagePerDamageType with a non-existing type.
     Verifies that an empty instance of Damage is returned when the
@@ -346,13 +202,13 @@ TEST_F(AffectedPlayerTest, getTotalDamagePerDamageType_nonexistent) {
     affectedPlayer->add(li1);
     affectedPlayer->add(li2);
 
-    Damage result1 = affectedPlayer->getTotalDamagePerDamageType(
+    Damage result1 = affectedPlayer->getDamagePerDamageType(
                          "nonexistingType");
-    Damage result2 = affectedPlayer->getTotalDamagePerDamageType(
+    Damage result2 = affectedPlayer->getDamagePerDamageType(
                          "nonexistingType");
 
-    EXPECT_EQ(0, result1.getTotalDealt());
-    EXPECT_EQ(0, result2.getTotalDealt());
-    EXPECT_EQ(0, result1.getTotalReceived());
-    EXPECT_EQ(0, result2.getTotalReceived());
+    EXPECT_EQ(0, result1.getTotalDealtOnPlayer());
+    EXPECT_EQ(0, result2.getTotalDealtOnPlayer());
+    EXPECT_EQ(0, result1.getTotalReceivedFromPlayer());
+    EXPECT_EQ(0, result2.getTotalReceivedFromPlayer());
 }

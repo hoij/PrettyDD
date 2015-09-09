@@ -88,24 +88,12 @@ Damage Player::getTotalDamage() const {
     return affectedPlayers->getTotalDamage(getName());
 }
 
-Damage Player::getTotalRegularDamage() const {
-    return affectedPlayers->getTotalRegularDamage(getName());
-}
-
-Damage Player::getTotalNanobotsDamage() const {
-    return affectedPlayers->getTotalNanobotsDamage(getName());
-}
-
 Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
     return affectedPlayers->getTotalDamagePerDamageType(getName(), damageType);
 }
 
-Damage Player::getTotalRegularDamagePerDamageType(std::string damageType) const {
-    return affectedPlayers->getTotalRegularDamagePerDamageType(getName(), damageType);
-}
-
-Damage Player::getTotalNanobotsDamagePerDamageType(std::string damageType) const {
-    return affectedPlayers->getTotalNanobotsDamagePerDamageType(getName(), damageType);
+std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForEveryDamageType() const {
+    return affectedPlayers->getTotalDamageForEveryDamageType(getName());
 }
 
 std::vector<std::pair<std::string, Damage>> Player::getTotalDamageForAllAffectedPlayers() const {
@@ -126,12 +114,8 @@ Heal Player::getTotalHeals() const {
     return affectedPlayers->getTotalHeals(getName());
 }
 
-const std::map<std::string, Damage>& Player::getNanobotsDamageFromAffectedPlayer(std::string name) const {
-    return affectedPlayers->getNanobotsDamageFromAffectedPlayer(name);
-}
-
-const std::map<std::string, Damage>& Player::getRegularDamageFromAffectedPlayer(std::string name) const {
-    return affectedPlayers->getRegularDamageFromAffectedPlayer(name);
+std::vector<std::pair<std::string, Damage>> Player::getAllDamageFromAffectedPlayer(std::string name) const {
+    return affectedPlayers->getAllDamageFromAffectedPlayer(name);
 }
 
 std::vector<std::pair<std::string, Heal>> Player::getHealsForAllAffectedPlayers() const {

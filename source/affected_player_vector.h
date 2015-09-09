@@ -24,17 +24,11 @@ public:
     AffectedPlayerVector(const AffectedPlayerVector<C>& other) : BaseVector<C>(other) {}
 
     virtual Damage getTotalDamage(std::string callerName) const;
-    virtual Damage getTotalRegularDamage(std::string callerName) const;
-    virtual Damage getTotalNanobotsDamage(std::string callerName) const;
     virtual Damage getTotalDamagePerDamageType(std::string callerName,
                                                std::string damageType) const;
-    virtual Damage getTotalRegularDamagePerDamageType(std::string callerName,
-                                                      std::string damageType) const;
-    virtual Damage getTotalNanobotsDamagePerDamageType(std::string callerName,
-                                                       std::string damageType) const;
+    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageType(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers(std::string callerName) const;
-    virtual const std::map<std::string, Damage>& getNanobotsDamageFromAffectedPlayer(std::string name) const;
-    virtual const std::map<std::string, Damage>& getRegularDamageFromAffectedPlayer(std::string name) const;
+    virtual std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
 
     virtual Heal getTotalHeals(std::string callerName);
     virtual std::vector<std::pair<std::string, Heal>> getHealsForAllAffectedPlayers() const;
@@ -68,66 +62,12 @@ Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName) const {
 }
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalRegularDamage(std::string callerName) const {
-    /* The damage belonging to the caller should not be included in the sum
-    because it already exists in the other players damage stats. If it  is
-    added it will incorrectly increase the values. */
-
-    Damage d;
-    for (const C ap : this->players) {
-        if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalRegularDamage();
-        }
-    }
-    return d;
-}
-
-template<class C>
-Damage AffectedPlayerVector<C>::getTotalNanobotsDamage(std::string callerName) const {
-    /* The damage belonging to the caller should not be included in the sum
-    because it already exists in the other players damage stats. If it  is
-    added it will incorrectly increase the values. */
-
-    Damage d;
-    for (const C ap : this->players) {
-        if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalNanobotsDamage();
-        }
-    }
-    return d;
-}
-
-template<class C>
 Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerName,
                                                             std::string damageType) const {
     Damage d;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalDamagePerDamageType(damageType);
-        }
-    }
-    return d;
-}
-
-template<class C>
-Damage AffectedPlayerVector<C>::getTotalRegularDamagePerDamageType(std::string callerName,
-                                                                   std::string damageType) const {
-    Damage d;
-    for (const C ap : this->players) {
-        if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalRegularDamagePerDamageType(damageType);
-        }
-    }
-    return d;
-}
-
-template<class C>
-Damage AffectedPlayerVector<C>::getTotalNanobotsDamagePerDamageType(std::string callerName,
-                                                                    std::string damageType) const {
-    Damage d;
-    for (const C ap : this->players) {
-        if (ap->getName() != callerName) {  // If not owner of the vector
-            d += ap->getTotalNanobotsDamagePerDamageType(damageType);
+            d += ap->getDamagePerDamageType(damageType);
         }
     }
     return d;
@@ -151,27 +91,55 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDam
 }
 
 template<class C>
-const std::map<std::string, Damage>& AffectedPlayerVector<C>::getNanobotsDamageFromAffectedPlayer(std::string name) const {
+std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForEveryDamageType(std::string callerName) const {
+    // Returns a sorted vector of pairs containing the damage type name
+    // and it's summed damage. The vector is sorted by total damage
+    // received from player. It includes all damage types for both
+    // dealt and received damage.
+    // TODO: Write a test
+
+    std::vector<std::pair<std::string, Damage>> damageTypes;
     for (const C ap : this->players) {
-        if (ap->getName() == name) {
-            return ap->getNanobotsDamage();
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            std::vector<std::pair<std::string, Damage>> apsDamageTypes =
+                ap->getAllDamage();
+            for (const auto& damagePair : apsDamageTypes) {
+                // Check if the damage type already exists in the vector
+                auto it = std::find_if(
+                    damageTypes.begin(),
+                    damageTypes.end(),
+                    [&damagePair](const std::pair<std::string, Damage> p) {
+                        return damagePair.first == p.first;});
+
+                if (it != damageTypes.end() ) {
+                    // If it exists, add it to the existing one
+                    it->second += damagePair.second;
+                }
+                else {
+                    // Otherwise create a new one.
+                    damageTypes.push_back(damagePair);
+                }
+            }
         }
     }
-    // TODO: Catch and log this error somwhere.
-    throw std::invalid_argument("\"" + name + "\" was not found among the " +
-                                "affected players.");
+    return damageTypes;
 }
 
 template<class C>
-const std::map<std::string, Damage>& AffectedPlayerVector<C>::getRegularDamageFromAffectedPlayer(std::string name) const {
+std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getAllDamageFromAffectedPlayer(std::string name) const {
     for (const C ap : this->players) {
         if (ap->getName() == name) {
-            return ap->getRegularDamage();
+            return ap->getAllDamage();
         }
     }
-    // TODO: Catch and log this error somwhere.
-    throw std::invalid_argument("\"" + name + "\" was not found among the " +
-                                "affected players.");
+
+    // An affected player may return an empty vector if no damage has
+    // been done to it. So to differentiate from that case and
+    // a non-existing player a pair with the key "empty" is returned.
+    Damage d;
+    std::vector<std::pair<std::string, Damage>> emptyVector;
+    emptyVector.push_back(std::make_pair("empty", d));
+    return emptyVector;
 }
 
 template<class C>
@@ -248,15 +216,15 @@ const Nano& AffectedPlayerVector<C>::getNanoFromAffectedPlayer(std::string name)
 template<class C>
 bool AffectedPlayerVector<C>::compareNanoDealt(const std::pair<std::string, Nano>& p1,
                                                const std::pair<std::string, Nano>& p2) {
-    return p1.second.getTotalDealt() >
-           p2.second.getTotalDealt();
+    return p1.second.getTotalDealtOnPlayer() >
+           p2.second.getTotalDealtOnPlayer();
 }
 
 template<class C>
 bool AffectedPlayerVector<C>::comparePotentialHeal(const std::pair<std::string, Heal>& p1,
                                                    const std::pair<std::string, Heal>& p2) {
-    return p1.second.getPotentialDealt() >
-           p2.second.getPotentialDealt();
+    return p1.second.getPotentialDealtOnPlayer() >
+           p2.second.getPotentialDealtOnPlayer();
 }
 
 

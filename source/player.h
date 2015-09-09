@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+
 #include "affected_player_vector.h"
 #include "damage.h"
 #include "heal.h"
@@ -32,15 +33,11 @@ public:
     void add(LineInfo& lineInfo);
 
     Damage getTotalDamage() const;
-    Damage getTotalRegularDamage() const;
-    Damage getTotalNanobotsDamage() const;
     Damage getTotalDamagePerDamageType(std::string damageType) const;
-    Damage getTotalRegularDamagePerDamageType(std::string damageType) const;
-    Damage getTotalNanobotsDamagePerDamageType(std::string damageType) const;
 
+    std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageType() const;
     std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers() const;
-    const std::map<std::string, Damage>& getNanobotsDamageFromAffectedPlayer(std::string name) const;
-    const std::map<std::string, Damage>& getRegularDamageFromAffectedPlayer(std::string name) const;
+    std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
 
     Heal getTotalHeals() const;
     std::vector<std::pair<std::string, Heal>> getHealsForAllAffectedPlayers() const;
@@ -54,6 +51,9 @@ public:
     const XP& getXp();
 
     size_t getLongestAffectedPlayerNameLength() const;
+    typename std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers() {
+        return affectedPlayers->size();
+    }
 
 private:
 //    static bool compareTotalDealtToPlayer(std::pair<std::string, Damage>& p1,

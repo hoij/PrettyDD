@@ -24,11 +24,7 @@ public:
     PlayerVector(const PlayerVector<C>& other) : BaseVector<C>(other) {}
 
     virtual Damage getTotalDamage() const;
-    virtual Damage getTotalRegularDamage() const;
-    virtual Damage getTotalNanobotsDamage() const;
     virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
-    virtual Damage getTotalRegularDamagePerDamageType(std::string damageType) const;
-    virtual Damage getTotalNanobotsDamagePerDamageType(std::string damageType) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer() const;
     virtual Heal getTotalHeals() const;
 };
@@ -43,24 +39,6 @@ Damage PlayerVector<C>::getTotalDamage() const {
 }
 
 template<class C>
-Damage PlayerVector<C>::getTotalRegularDamage() const {
-    Damage d;
-    for (const C p : this->players) {
-        d += p->getTotalRegularDamage();
-    }
-    return d;
-}
-
-template<class C>
-Damage PlayerVector<C>::getTotalNanobotsDamage() const {
-    Damage d;
-    for (const C p : this->players) {
-        d += p->getTotalNanobotsDamage();
-    }
-    return d;
-}
-
-template<class C>
 Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType) const {
     Damage d;
     for (const C p : this->players) {
@@ -70,27 +48,9 @@ Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType) cons
 }
 
 template<class C>
-Damage PlayerVector<C>::getTotalRegularDamagePerDamageType(std::string damageType) const {
-    Damage d;
-    for (const C p : this->players) {
-        d += p->getTotalRegularDamagePerDamageType(damageType);
-    }
-    return d;
-}
-
-template<class C>
-Damage PlayerVector<C>::getTotalNanobotsDamagePerDamageType(std::string damageType) const {
-    Damage d;
-    for (const C p : this->players) {
-        d += p->getTotalNanobotsDamagePerDamageType(damageType);
-    }
-    return d;
-}
-
-template<class C>
 std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageForEachPlayer() const {
-    // Returns a sorted vector of pairs containing the players name and their
-    // total damage (in the form of the Damage class).
+    /* Returns a sorted vector of pairs containing the players name and their
+    total damage (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
         totalDamagePerPlayer.push_back(

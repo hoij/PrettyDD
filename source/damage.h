@@ -4,19 +4,66 @@
 
 #include <limits>
 #include <ostream>
-#include <string>
+
 
 class LineInfo;
 
 class Damage {
+public:
+    Damage& operator+=(const Damage& rhs);
+
+    void addDamageDealtOnPlayer(LineInfo& li);
+    void addDamageReceivedFromPlayer(LineInfo& li);
+
+    // TODO: Just make the data public?
+    int getTotalDealtOnPlayer() const {return dealtOnPlayer.total;}
+    int getCountDealtOnPlayer() const {return dealtOnPlayer.count;}
+    int getRegularTotalDealtOnPlayer() const {return dealtOnPlayer.regularTotal;}
+    int getRegularCountDealtOnPlayer() const {return dealtOnPlayer.regularCount;}
+    int getRegularMaxDealtOnPlayer() const {return dealtOnPlayer.regularMax;}
+    int getRegularMinDealtOnPlayer() const {return dealtOnPlayer.regularMin;}
+    int getNanobotTotalDealtOnPlayer() const {return dealtOnPlayer.nanobotTotal;}
+    int getNanobotCountDealtOnPlayer() const {return dealtOnPlayer.nanobotCount;}
+    int getNanobotMaxDealtOnPlayer() const {return dealtOnPlayer.nanobotMax;}
+    int getNanobotMinDealtOnPlayer() const {return dealtOnPlayer.nanobotMin;}
+    int getCritTotalDealtOnPlayer() const {return dealtOnPlayer.critTotal;}
+    int getCritCountDealtOnPlayer() const {return dealtOnPlayer.critCount;}
+    int getCritMaxDealtOnPlayer() const {return dealtOnPlayer.critMax;}
+    int getCritMinDealtOnPlayer() const {return dealtOnPlayer.critMin;}
+    int getDeflectsDealtOnPlayer() const {return dealtOnPlayer.deflects;}
+    int getMissesDealtOnPlayer() const {return dealtOnPlayer.misses;}
+
+    int getTotalReceivedFromPlayer() const {return receivedFromPlayer.total;}
+    int getCountReceivedFromPlayer() const {return receivedFromPlayer.count;}
+    int getRegularTotalReceivedFromPlayer() const {return receivedFromPlayer.regularTotal;}
+    int getRegularCountReceivedFromPlayer() const {return receivedFromPlayer.regularCount;}
+    int getRegularMaxReceivedFromPlayer() const {return receivedFromPlayer.regularMax;}
+    int getRegularMinReceivedFromPlayer() const {return receivedFromPlayer.regularMin;}
+    int getNanobotTotalReceivedFromPlayer() const {return receivedFromPlayer.nanobotTotal;}
+    int getNanobotCountReceivedFromPlayer() const {return receivedFromPlayer.nanobotCount;}
+    int getNanobotMaxReceivedFromPlayer() const {return receivedFromPlayer.nanobotMax;}
+    int getNanobotMinReceivedFromPlayer() const {return receivedFromPlayer.nanobotMin;}
+    int getCritTotalReceivedFromPlayer() const {return receivedFromPlayer.critTotal;}
+    int getCritCountReceivedFromPlayer() const {return receivedFromPlayer.critCount;}
+    int getCritMaxReceivedFromPlayer() const {return receivedFromPlayer.critMax;}
+    int getCritMinReceivedFromPlayer() const {return receivedFromPlayer.critMin;}
+    int getDeflectsReceivedFromPlayer() const {return receivedFromPlayer.deflects;}
+    int getMissesReceivedFromPlayer() const {return receivedFromPlayer.misses;}
+
 private:
 	struct DamageInfo {
         DamageInfo& operator+=(const DamageInfo& rhs);
 
         int total = 0;
         int count = 0;
+        int regularTotal = 0;
+        int regularCount = 0;
         int regularMax = -1;
         int regularMin = std::numeric_limits<int>::max();
+        int nanobotTotal = 0;
+        int nanobotCount = 0;
+        int nanobotMax = -1;
+        int nanobotMin = std::numeric_limits<int>::max();
         int critTotal = 0;
 		int critCount = 0;
 		int critMax = -1;
@@ -29,44 +76,12 @@ private:
     DamageInfo receivedFromPlayer;
 
     void addDamage(LineInfo& li, DamageInfo& di);
-
-public:
-    Damage& operator+=(const Damage& rhs);
-
-    void addDamageDealtOnPlayer(LineInfo& li);
-    void addDamageReceivedFromPlayer(LineInfo& li);
-
-    // TODO: Move these to separate class?
-    std::ostream& writeDamageDealtToPlayer(std::ostream& os);
-    std::ostream& writeDamageReceivedFromPlayer(std::ostream& os);
-    static std::ostream& writeHeadings(std::ostream& os);
-
-    int getTotalDealt() const {return dealtOnPlayer.total;}
-    int getCountDealt() const {return dealtOnPlayer.count;}
-    int getRegularMaxDealt() const {return dealtOnPlayer.regularMax;}
-    int getRegularMinDealt() const {return dealtOnPlayer.regularMin;}
-    int getCritTotalDealt() const {return dealtOnPlayer.critTotal;}
-    int getCritCountDealt() const {return dealtOnPlayer.critCount;}
-    int getCritMaxDealt() const {return dealtOnPlayer.critMax;}
-    int getCritMinDealt() const {return dealtOnPlayer.critMin;}
-    int getDeflectsDealt() const {return dealtOnPlayer.deflects;}
-    int getMissesDealt() const {return dealtOnPlayer.misses;}
-
-    int getTotalReceived() const {return receivedFromPlayer.total;}
-    int getCountReceived() const {return receivedFromPlayer.count;}
-    int getRegularMaxReceived() const {return receivedFromPlayer.regularMax;}
-    int getRegularMinReceived() const {return receivedFromPlayer.regularMin;}
-    int getCritTotalReceived() const {return receivedFromPlayer.critTotal;}
-    int getCritCountReceived() const {return receivedFromPlayer.critCount;}
-    int getCritMaxReceived() const {return receivedFromPlayer.critMax;}
-    int getCritMinReceived() const {return receivedFromPlayer.critMin;}
-    int getDeflectsReceived() const {return receivedFromPlayer.deflects;}
-    int getMissesReceived() const {return receivedFromPlayer.misses;}
 };
 
 
 inline Damage operator+(Damage lhs, const Damage& rhs) {
     return lhs += rhs;
 }
+
 
 #endif // DAMAGE_H

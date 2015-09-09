@@ -18,23 +18,13 @@ void AffectedPlayer::add(LineInfo& lineInfo) {
 
 void AffectedPlayer::addDamage(LineInfo& li) {
     if (li.dealer_name == getName()) {
-        if (li.nanobots) {
-            nanobotsDamage[li.subtype].addDamageDealtOnPlayer(li);
-        }
-        else {
-            regularDamage[li.subtype].addDamageDealtOnPlayer(li);
-        }
+        damage[li.subtype].addDamageDealtOnPlayer(li);
     }
     else if (li.receiver_name == getName()) {
-        if (li.nanobots) {
-            nanobotsDamage[li.subtype].addDamageReceivedFromPlayer(li);
-        }
-        else {
-            regularDamage[li.subtype].addDamageReceivedFromPlayer(li);
-        }
+        damage[li.subtype].addDamageReceivedFromPlayer(li);
     }
     else {
-        // Exception?
+        // TODO: Exception?
     }
 }
 
@@ -86,33 +76,16 @@ void AffectedPlayer::addNano(LineInfo& li) {
 }
 
 Damage AffectedPlayer::getTotalDamage() const {
-    return getTotalRegularDamage() + getTotalNanobotsDamage();
-}
-
-Damage AffectedPlayer::getTotalRegularDamage() const {
     Damage d;
-    for (const auto& type : regularDamage) {
+    for (const auto& type : damage) {
         d += type.second;
     }
     return d;
 }
 
-Damage AffectedPlayer::getTotalNanobotsDamage() const {
-    Damage d;
-    for (const auto& type : nanobotsDamage) {
-        d += type.second;
-    }
-    return d;
-}
-
-Damage AffectedPlayer::getTotalDamagePerDamageType(const std::string damageType) const {
-    return getTotalRegularDamagePerDamageType(damageType) +
-           getTotalNanobotsDamagePerDamageType(damageType);
-}
-
-Damage AffectedPlayer::getTotalRegularDamagePerDamageType(const std::string damageType) const {
-    auto it = regularDamage.find(damageType);
-    if (it != regularDamage.end()) {
+Damage AffectedPlayer::getDamagePerDamageType(const std::string damageType) const {
+    auto it = damage.find(damageType);
+    if (it != damage.end()) {
         return it->second;
     }
     else {
@@ -121,23 +94,13 @@ Damage AffectedPlayer::getTotalRegularDamagePerDamageType(const std::string dama
     }
 }
 
-Damage AffectedPlayer::getTotalNanobotsDamagePerDamageType(const std::string damageType) const {
-    auto it = nanobotsDamage.find(damageType);
-    if (it != nanobotsDamage.end()) {
-        return it->second;
+std::vector<std::pair<std::string, Damage>> AffectedPlayer::getAllDamage() const {
+    // Copy the data to a sortable container
+    std::vector<std::pair<std::string, Damage>> sortableDamage;
+    for (const auto& damagePair : damage) {
+        sortableDamage.push_back(damagePair);
     }
-    else {
-        Damage d;
-        return d;  // Empty Damage
-    }
-}
-
-const std::map<std::string, Damage>& AffectedPlayer::getRegularDamage() const {
-    return regularDamage;
-}
-
-const std::map<std::string, Damage>& AffectedPlayer::getNanobotsDamage() const {
-    return nanobotsDamage;
+    return sortableDamage;
 }
 
 const Heal& AffectedPlayer::getHeal() const {

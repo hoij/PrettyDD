@@ -14,15 +14,15 @@ public:
     void addNanoDealtOnPlayer(LineInfo& li);
     void addNanoReceivedFromPlayer(LineInfo& li);
 
-    int getTotalDealt() const {return dealtOnPlayer.total;}
-    int getCountDealt() const {return dealtOnPlayer.count;}
-    int getMaxDealt() const {return dealtOnPlayer.max;}
-    int getMinDealt() const {return dealtOnPlayer.min;}
+    int getTotalDealtOnPlayer() const {return dealtOnPlayer.total;}
+    int getCountDealtOnPlayer() const {return dealtOnPlayer.count;}
+    int getMaxDealtOnPlayer() const {return dealtOnPlayer.max;}
+    int getMinDealtOnPlayer() const {return dealtOnPlayer.min;}
 
-    int getTotalReceived() const {return receivedFromPlayer.total;}
-    int getCountReceived() const {return receivedFromPlayer.count;}
-    int getMaxReceived() const {return receivedFromPlayer.max;}
-    int getMinReceived() const {return receivedFromPlayer.min;}
+    int getTotalReceivedFromPlayer() const {return receivedFromPlayer.total;}
+    int getCountReceivedFromPlayer() const {return receivedFromPlayer.count;}
+    int getMaxReceivedFromPlayer() const {return receivedFromPlayer.max;}
+    int getMinReceivedFromPlayer() const {return receivedFromPlayer.min;}
 
 private:
     struct NanoInfo {

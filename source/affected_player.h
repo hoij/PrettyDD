@@ -23,14 +23,9 @@ public:
     std::string getName() const {return name;}
 
     Damage getTotalDamage() const;
-    Damage getTotalRegularDamage() const;
-    Damage getTotalNanobotsDamage() const;
-    Damage getTotalDamagePerDamageType(const std::string damageType) const;
-    Damage getTotalRegularDamagePerDamageType(const std::string damageType) const;
-    Damage getTotalNanobotsDamagePerDamageType(const std::string damageType) const;
+    Damage getDamagePerDamageType(const std::string damageType) const;
+    std::vector<std::pair<std::string, Damage>> getAllDamage() const;
 
-    const std::map<std::string, Damage>& getRegularDamage() const;
-    const std::map<std::string, Damage>& getNanobotsDamage() const;
     const Heal& getHeal() const;
     const Nano& getNano() const;
 
@@ -41,8 +36,7 @@ private:
     void addHeal(LineInfo& li);
     void addNano(LineInfo& li);
 
-    std::map<std::string, Damage> regularDamage;
-    std::map<std::string, Damage> nanobotsDamage;
+    std::map<std::string, Damage> damage;
     Heal heal;
     Nano nano;
 };

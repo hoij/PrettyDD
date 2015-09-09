@@ -23,24 +23,24 @@ protected:
 
 void HealTest::verifyReceivedFromPlayerIsZero() {
     // Used to verify that the LineInfo is not added to the received Heal.
-    EXPECT_EQ(0, h->getActualReceived());
-    EXPECT_EQ(0, h->getPotentialReceived());
-    EXPECT_EQ(0, h->getCountReceived());
-    EXPECT_EQ(-1, h->getActualMaxReceived());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinReceived());
-    EXPECT_EQ(-1, h->getPotentialMaxReceived());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h->getPotentialMinReceived());
+    EXPECT_EQ(0, h->getActualReceivedFromPlayer());
+    EXPECT_EQ(0, h->getPotentialReceivedFromPlayer());
+    EXPECT_EQ(0, h->getCountReceivedFromPlayer());
+    EXPECT_EQ(-1, h->getActualMaxReceivedFromPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinReceivedFromPlayer());
+    EXPECT_EQ(-1, h->getPotentialMaxReceivedFromPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h->getPotentialMinReceivedFromPlayer());
 }
 
 void HealTest::verifyDealtOnPlayerIsZero() {
     // Used to verify that the LineInfo is not added to the dealt Heal.
-    EXPECT_EQ(0, h->getActualDealt());
-    EXPECT_EQ(0, h->getPotentialDealt());
-    EXPECT_EQ(0, h->getCountDealt());
-    EXPECT_EQ(-1, h->getActualMaxDealt());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinDealt());
-    EXPECT_EQ(-1, h->getPotentialMaxDealt());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h->getPotentialMinDealt());
+    EXPECT_EQ(0, h->getActualDealtOnPlayer());
+    EXPECT_EQ(0, h->getPotentialDealtOnPlayer());
+    EXPECT_EQ(0, h->getCountDealtOnPlayer());
+    EXPECT_EQ(-1, h->getActualMaxDealtOnPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinDealtOnPlayer());
+    EXPECT_EQ(-1, h->getPotentialMaxDealtOnPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h->getPotentialMinDealtOnPlayer());
 }
 
 TEST_F(HealTest, addHealDealtOnPlayer) {
@@ -69,15 +69,15 @@ TEST_F(HealTest, addHealDealtOnPlayer) {
     h->addHealDealtOnPlayer(li4);
 
     EXPECT_EQ(li1.amount + li2.amount + li3.amount + li4.amount,
-              h->getPotentialDealt());
-    EXPECT_EQ(4, h->getCountDealt());
-    EXPECT_EQ(li2.amount, h->getPotentialMaxDealt());
-    EXPECT_EQ(li3.amount, h->getPotentialMinDealt());
+              h->getPotentialDealtOnPlayer());
+    EXPECT_EQ(4, h->getCountDealtOnPlayer());
+    EXPECT_EQ(li2.amount, h->getPotentialMaxDealtOnPlayer());
+    EXPECT_EQ(li3.amount, h->getPotentialMinDealtOnPlayer());
 
     /* Verify values that should not have changed */
-    EXPECT_EQ(0, h->getActualDealt());
-    EXPECT_EQ(-1, h->getActualMaxDealt());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinDealt());
+    EXPECT_EQ(0, h->getActualDealtOnPlayer());
+    EXPECT_EQ(-1, h->getActualMaxDealtOnPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h->getActualMinDealtOnPlayer());
     verifyReceivedFromPlayerIsZero();
 }
 
@@ -107,15 +107,15 @@ TEST_F(HealTest, addHealReceivedFromPlayer_actual) {
 
     /* Verify */
     EXPECT_EQ(li1.amount + li2.amount + li3.amount + li4.amount,
-              h->getActualReceived());
-    EXPECT_EQ(4, h->getCountReceived());
-    EXPECT_EQ(li2.amount, h->getActualMaxReceived());
-    EXPECT_EQ(li3.amount, h->getActualMinReceived());
+              h->getActualReceivedFromPlayer());
+    EXPECT_EQ(4, h->getCountReceivedFromPlayer());
+    EXPECT_EQ(li2.amount, h->getActualMaxReceivedFromPlayer());
+    EXPECT_EQ(li3.amount, h->getActualMinReceivedFromPlayer());
 
     /* Verify values that should not have changed */
-    EXPECT_EQ(0, h->getPotentialReceived());
-    EXPECT_EQ(-1, h->getPotentialMaxReceived());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h->getPotentialMinReceived());
+    EXPECT_EQ(0, h->getPotentialReceivedFromPlayer());
+    EXPECT_EQ(-1, h->getPotentialMaxReceivedFromPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h->getPotentialMinReceivedFromPlayer());
 
     verifyDealtOnPlayerIsZero();
 }
@@ -141,19 +141,19 @@ TEST(HealOperatorPlusTest, addToEmptyHeal) {
     Heal h3;
     h3 = h1 + h2;
 
-    EXPECT_EQ(li1.amount, h3.getActualReceived());
-    EXPECT_EQ(li3.amount, h3.getPotentialReceived());
-    EXPECT_EQ(2, h3.getCountReceived());
-    EXPECT_EQ(li1.amount, h3.getActualMaxReceived());
-    EXPECT_EQ(li1.amount, h3.getActualMinReceived());
-    EXPECT_EQ(li3.amount, h3.getPotentialMaxReceived());
-    EXPECT_EQ(li3.amount, h3.getPotentialMinReceived());
+    EXPECT_EQ(li1.amount, h3.getActualReceivedFromPlayer());
+    EXPECT_EQ(li3.amount, h3.getPotentialReceivedFromPlayer());
+    EXPECT_EQ(2, h3.getCountReceivedFromPlayer());
+    EXPECT_EQ(li1.amount, h3.getActualMaxReceivedFromPlayer());
+    EXPECT_EQ(li1.amount, h3.getActualMinReceivedFromPlayer());
+    EXPECT_EQ(li3.amount, h3.getPotentialMaxReceivedFromPlayer());
+    EXPECT_EQ(li3.amount, h3.getPotentialMinReceivedFromPlayer());
 
-    EXPECT_EQ(0, h3.getActualDealt());
-    EXPECT_EQ(li2.amount, h3.getPotentialDealt());
-    EXPECT_EQ(1, h3.getCountDealt());
-    EXPECT_EQ(-1, h3.getActualMaxDealt());
-    EXPECT_EQ(std::numeric_limits<int>::max(), h3.getActualMinDealt());
-    EXPECT_EQ(li2.amount, h3.getPotentialMaxDealt());
-    EXPECT_EQ(li2.amount, h3.getPotentialMinDealt());
+    EXPECT_EQ(0, h3.getActualDealtOnPlayer());
+    EXPECT_EQ(li2.amount, h3.getPotentialDealtOnPlayer());
+    EXPECT_EQ(1, h3.getCountDealtOnPlayer());
+    EXPECT_EQ(-1, h3.getActualMaxDealtOnPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), h3.getActualMinDealtOnPlayer());
+    EXPECT_EQ(li2.amount, h3.getPotentialMaxDealtOnPlayer());
+    EXPECT_EQ(li2.amount, h3.getPotentialMinDealtOnPlayer());
 }

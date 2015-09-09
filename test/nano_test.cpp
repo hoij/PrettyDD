@@ -23,18 +23,18 @@ protected:
 
 void NanoTest::verifyReceivedFromPlayerIsZero() {
     // Used to verify that the LineInfo is not added to the received Nano.
-    EXPECT_EQ(0, n->getTotalReceived());
-    EXPECT_EQ(0, n->getCountReceived());
-    EXPECT_EQ(-1, n->getMaxReceived());
-    EXPECT_EQ(std::numeric_limits<int>::max(), n->getMinReceived());
+    EXPECT_EQ(0, n->getTotalReceivedFromPlayer());
+    EXPECT_EQ(0, n->getCountReceivedFromPlayer());
+    EXPECT_EQ(-1, n->getMaxReceivedFromPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), n->getMinReceivedFromPlayer());
 }
 
 void NanoTest::verifyDealtOnPlayerIsZero() {
     // Used to verify that the LineInfo is not added to the dealt Nano.
-    EXPECT_EQ(0, n->getTotalDealt());
-    EXPECT_EQ(0, n->getCountDealt());
-    EXPECT_EQ(-1, n->getMaxDealt());
-    EXPECT_EQ(std::numeric_limits<int>::max(), n->getMinDealt());
+    EXPECT_EQ(0, n->getTotalDealtOnPlayer());
+    EXPECT_EQ(0, n->getCountDealtOnPlayer());
+    EXPECT_EQ(-1, n->getMaxDealtOnPlayer());
+    EXPECT_EQ(std::numeric_limits<int>::max(), n->getMinDealtOnPlayer());
 }
 
 TEST_F(NanoTest, addNanoDealtOnPlayer) {
@@ -59,10 +59,10 @@ TEST_F(NanoTest, addNanoDealtOnPlayer) {
     n->addNanoDealtOnPlayer(li4);
 
     EXPECT_EQ(li1.amount + li2.amount + li3.amount + li4.amount,
-              n->getTotalDealt());
-    EXPECT_EQ(4, n->getCountDealt());
-    EXPECT_EQ(li2.amount, n->getMaxDealt());
-    EXPECT_EQ(li3.amount, n->getMinDealt());
+              n->getTotalDealtOnPlayer());
+    EXPECT_EQ(4, n->getCountDealtOnPlayer());
+    EXPECT_EQ(li2.amount, n->getMaxDealtOnPlayer());
+    EXPECT_EQ(li3.amount, n->getMinDealtOnPlayer());
 
     /* Verify values that should not have changed */
     verifyReceivedFromPlayerIsZero();
@@ -91,10 +91,10 @@ TEST_F(NanoTest, addNanoReceivedFromPlayer_actual) {
 
     /* Verify */
     EXPECT_EQ(li1.amount + li2.amount + li3.amount + li4.amount,
-              n->getTotalReceived());
-    EXPECT_EQ(4, n->getCountReceived());
-    EXPECT_EQ(li2.amount, n->getMaxReceived());
-    EXPECT_EQ(li3.amount, n->getMinReceived());
+              n->getTotalReceivedFromPlayer());
+    EXPECT_EQ(4, n->getCountReceivedFromPlayer());
+    EXPECT_EQ(li2.amount, n->getMaxReceivedFromPlayer());
+    EXPECT_EQ(li3.amount, n->getMinReceivedFromPlayer());
 
     /* Verify values that should not have changed */
     verifyDealtOnPlayerIsZero();
@@ -115,13 +115,13 @@ TEST(NanoOperatorPlusTest, addToEmptyNano) {
     Nano n3;
     n3 = n1 + n2;
 
-    EXPECT_EQ(li1.amount, n3.getTotalReceived());
-    EXPECT_EQ(1, n3.getCountReceived());
-    EXPECT_EQ(li1.amount, n3.getMaxReceived());
-    EXPECT_EQ(li1.amount, n3.getMinReceived());
+    EXPECT_EQ(li1.amount, n3.getTotalReceivedFromPlayer());
+    EXPECT_EQ(1, n3.getCountReceivedFromPlayer());
+    EXPECT_EQ(li1.amount, n3.getMaxReceivedFromPlayer());
+    EXPECT_EQ(li1.amount, n3.getMinReceivedFromPlayer());
 
-    EXPECT_EQ(li2.amount, n3.getTotalDealt());
-    EXPECT_EQ(1, n3.getCountDealt());
-    EXPECT_EQ(li2.amount, n3.getMaxDealt());
-    EXPECT_EQ(li2.amount, n3.getMinDealt());
+    EXPECT_EQ(li2.amount, n3.getTotalDealtOnPlayer());
+    EXPECT_EQ(1, n3.getCountDealtOnPlayer());
+    EXPECT_EQ(li2.amount, n3.getMaxDealtOnPlayer());
+    EXPECT_EQ(li2.amount, n3.getMinDealtOnPlayer());
 }

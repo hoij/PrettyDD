@@ -796,7 +796,8 @@ LineInfo Parser::chat(const std::string& message, const std::string& sender) {
     li.hasStats = false;
     std::smatch m;
     if (sender == playerRunningProgram &&
-        message == "dd") {
+           (message.compare(0, 3, "dd ") == 0 ||  // first chars == "dd "
+            message == "dd")) {
         li.command = message;
     }
     return li;

@@ -29,8 +29,9 @@ add_library(formatted_linelib formatted_line.cpp)
 target_link_libraries(formatted_linelib loggerlib)
 add_library(parserlib parser.cpp)
 target_link_libraries(parserlib loggerlib)
-add_library(write_stats_to_filelib write_stats_to_file.cpp)
+add_library(stat_writerlib stat_writer.cpp)
 add_library(configurationlib configuration.cpp)
+add_library(command_handlerlib command_handler.cpp)
 
 target_link_libraries(PrettyDD
   damagelib
@@ -43,6 +44,7 @@ target_link_libraries(PrettyDD
   nano_programlib
   loggerlib
   formatted_linelib
-  write_stats_to_filelib
+  stat_writerlib
   configurationlib
+  command_handlerlib
   )

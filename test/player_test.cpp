@@ -17,25 +17,15 @@ public:
     MOCK_CONST_METHOD0(getLongestNameLength, size_t());
 
     MOCK_CONST_METHOD1(getTotalDamage, Damage(std::string callerName));
-    MOCK_CONST_METHOD1(getTotalRegularDamage, Damage(std::string callerName));
-    MOCK_CONST_METHOD1(getTotalNanobotsDamage, Damage(std::string callerName));
 
     MOCK_CONST_METHOD2(getTotalDamagePerDamageType, Damage(std::string callerName,
-                                                     const std::string damageType));
-    MOCK_CONST_METHOD2(getTotalRegularDamagePerDamageType, Damage(std::string callerName,
-                                                     const std::string damageType));
-    MOCK_CONST_METHOD2(getTotalNanobotsDamagePerDamageType, Damage(std::string callerName,
                                                      const std::string damageType));
 
     MOCK_CONST_METHOD1(getTotalDamageForAllAffectedPlayers,
                        std::vector<std::pair<std::string, Damage>>(
                        std::string callerName));
 
-
-    MOCK_CONST_METHOD1(getNanobotsDamageFromAffectedPlayer,
-                       std::map<std::string, Damage>&(std::string name));
-
-    MOCK_CONST_METHOD1(getRegularDamageFromAffectedPlayer,
+    MOCK_CONST_METHOD1(getAllDamageFromAffectedPlayer,
                        std::map<std::string, Damage>&(std::string name));
 
     MOCK_METHOD1(getTotalHeals, Heal(std::string callerName));
@@ -139,30 +129,6 @@ TEST_F(PlayerTest, add_xp) {
     EXPECT_EQ(li.amount, player->getXp().getTotalGained("xp"));
 }
 
-TEST_F(PlayerTest, getTotalNanobotsDamage) {
-    /* Verifies that getTotalNanobotsDamage() calls AffectedPlayerVectors
-    getTotalNanobotsDamage() method.  */
-
-    EXPECT_CALL(*mockAffectedPlayerVector, getTotalNanobotsDamage(player->getName()))
-        .WillOnce(::testing::Return(d1));
-
-    Damage result = player->getTotalNanobotsDamage();
-
-    EXPECT_EQ(d1.getTotalDealt(), result.getTotalDealt());
-}
-
-TEST_F(PlayerTest, getTotalRegularDamage) {
-    /* Verifies that getTotalRegularDamage() calls AffectedPlayerVectors
-    getTotalRegularDamage() method.  */
-
-    EXPECT_CALL(*mockAffectedPlayerVector, getTotalRegularDamage(player->getName()))
-        .WillOnce(::testing::Return(d1));
-
-    Damage result = player->getTotalRegularDamage();
-
-    EXPECT_EQ(d1.getTotalDealt(), result.getTotalDealt());
-}
-
 TEST_F(PlayerTest, getTotalDamage) {
     /* Verifies that getTotalDamage() calls AffectedPlayerVectors
     getTotalDamage() */
@@ -172,35 +138,7 @@ TEST_F(PlayerTest, getTotalDamage) {
 
     Damage result = player->getTotalDamage();
 
-    EXPECT_EQ(d1.getTotalDealt(), result.getTotalDealt());
-}
-
-TEST_F(PlayerTest, getTotalNanobotsDamagePerDamageType) {
-    /* Verifies that getTotalNanobotsDamagePerDamageType() calls
-    AffectedPlayerVectors getTotalNanobotsDamagePerDamageType() method. */
-
-    std::string damageType = "chemical";
-    EXPECT_CALL(*mockAffectedPlayerVector,
-                getTotalNanobotsDamagePerDamageType(player->getName(), damageType))
-        .WillOnce(::testing::Return(d1));
-
-    Damage result = player->getTotalNanobotsDamagePerDamageType(damageType);
-
-    EXPECT_EQ(d1.getTotalDealt(), result.getTotalDealt());
-}
-
-TEST_F(PlayerTest, getTotalRegularDamagePerDamageType) {
-    /* Verifies that getTotalRegularDamagePerDamageType() calls
-    AffectedPlayerVectors getTotalRegularDamagePerDamageType() method. */
-
-    std::string damageType = "chemical";
-    EXPECT_CALL(*mockAffectedPlayerVector,
-                getTotalRegularDamagePerDamageType(player->getName(), damageType))
-        .WillOnce(::testing::Return(d1));
-
-    Damage result = player->getTotalRegularDamagePerDamageType(damageType);
-
-    EXPECT_EQ(d1.getTotalDealt(), result.getTotalDealt());
+    EXPECT_EQ(d1.getTotalDealtOnPlayer(), result.getTotalDealtOnPlayer());
 }
 
 TEST_F(PlayerTest, getTotalDamagePerDamageType) {
@@ -214,7 +152,7 @@ TEST_F(PlayerTest, getTotalDamagePerDamageType) {
 
     Damage result = player->getTotalDamagePerDamageType(damageType);
 
-    EXPECT_EQ(d1.getTotalDealt(), result.getTotalDealt());
+    EXPECT_EQ(d1.getTotalDealtOnPlayer(), result.getTotalDealtOnPlayer());
 }
 
 TEST_F(PlayerTest, getTotalDamageForAllAffectedPlayers) {
@@ -234,44 +172,24 @@ TEST_F(PlayerTest, getTotalDamageForAllAffectedPlayers) {
         player->getTotalDamageForAllAffectedPlayers();
 }
 
-TEST_F(PlayerTest, getNanobotsDamageFromAffectedPlayer) {
-    /* Verifies that getNanobotsDamageFromAffectedPlayer() calls
-    PlayerVectors getNanobotsDamageFromAffectedPlayer(std::string callerName).
+TEST_F(PlayerTest, getAllDamageFromAffectedPlayer) {
+    /* Verifies that getAllDamageFromAffectedPlayer() calls
+    PlayerVectors getAllDamageFromAffectedPlayer(std::string callerName).
     */
 
     std::string name = "AffectedPlayer1";
-    std::map<std::string, Damage> nanobotsDamageFromAffectedPlayer;
-    nanobotsDamageFromAffectedPlayer[name] = d1;
+    std::map<std::string, Damage> damageFromAffectedPlayer;
+    damageFromAffectedPlayer[name] = d1;
 
     EXPECT_CALL(*mockAffectedPlayerVector,
-        getNanobotsDamageFromAffectedPlayer(name))
-        .WillOnce(::testing::ReturnRef(nanobotsDamageFromAffectedPlayer));
+        getAllDamageFromAffectedPlayer(name))
+        .WillOnce(::testing::ReturnRef(damageFromAffectedPlayer));
 
     std::map<std::string, Damage> result =
-        player->getNanobotsDamageFromAffectedPlayer(name);
+        player->getAllDamageFromAffectedPlayer(name);
 
-    EXPECT_EQ(nanobotsDamageFromAffectedPlayer.at(name).getTotalDealt(),
-              result.at(name).getTotalDealt());
-}
-
-TEST_F(PlayerTest, getRegularDamageFromAffectedPlayer) {
-    /* Verifies that getRegularDamageFromAffectedPlayer() calls
-    PlayerVectors getRegularDamageFromAffectedPlayer(std::string callerName).
-    */
-
-    std::string name = "AffectedPlayer1";
-    std::map<std::string, Damage> regularDamageFromAffectedPlayer;
-    regularDamageFromAffectedPlayer[name] = d1;
-
-    EXPECT_CALL(*mockAffectedPlayerVector,
-        getRegularDamageFromAffectedPlayer(name))
-        .WillOnce(::testing::ReturnRef(regularDamageFromAffectedPlayer));
-
-    std::map<std::string, Damage> result =
-        player->getRegularDamageFromAffectedPlayer(name);
-
-    EXPECT_EQ(regularDamageFromAffectedPlayer.at(name).getTotalDealt(),
-              result.at(name).getTotalDealt());
+    EXPECT_EQ(damageFromAffectedPlayer.at(name).getTotalDealtOnPlayer(),
+              result.at(name).getTotalDealtOnPlayer());
 }
 
 TEST_F(PlayerTest, getTotalHeals) {
@@ -289,5 +207,5 @@ TEST_F(PlayerTest, getTotalHeals) {
 
     Heal result = player->getTotalHeals();
 
-    EXPECT_EQ(h.getPotentialDealt(), result.getPotentialDealt());
+    EXPECT_EQ(h.getPotentialDealtOnPlayer(), result.getPotentialDealtOnPlayer());
 }

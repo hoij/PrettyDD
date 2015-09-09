@@ -22,14 +22,8 @@ public:
     MOCK_METHOD1(add, void(LineInfo& li));
 
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
-    MOCK_CONST_METHOD0(getTotalRegularDamage, Damage(void));
-    MOCK_CONST_METHOD0(getTotalNanobotsDamage, Damage(void));
 
     MOCK_CONST_METHOD1(getTotalDamagePerDamageType,
-                       Damage(std::string damageType));
-    MOCK_CONST_METHOD1(getTotalRegularDamagePerDamageType,
-                       Damage(std::string damageType));
-    MOCK_CONST_METHOD1(getTotalNanobotsDamagePerDamageType,
                        Damage(std::string damageType));
 
     MOCK_CONST_METHOD0(getTotalDamageForEachPlayer,
@@ -106,37 +100,7 @@ TEST_F(PlayerVectorDamageTest, getTotalDamage) {
 
     Damage totalDamage = playerVector->getTotalDamage();
 
-    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
-}
-
-TEST_F(PlayerVectorDamageTest, getTotalRegularDamage) {
-    /* Calls getTotalRegularDamage().
-    Verifies that each players getTotalRegularDamage is in turn called and
-    that the summed damage is correct. */
-
-    EXPECT_CALL(*p1, getTotalRegularDamage())
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalRegularDamage())
-        .WillOnce(::testing::Return(d2));
-
-    Damage totalDamage = playerVector->getTotalRegularDamage();
-
-    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
-}
-
-TEST_F(PlayerVectorDamageTest, getTotalNanobotsDamage) {
-    /* Calls getTotalNanobotsDamage().
-    Verifies that each players getTotalNanobotsDamage is in turn called and
-    that the summed damage is correct. */
-
-    EXPECT_CALL(*p1, getTotalNanobotsDamage())
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalNanobotsDamage())
-        .WillOnce(::testing::Return(d2));
-
-    Damage totalDamage = playerVector->getTotalNanobotsDamage();
-
-    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
+    EXPECT_EQ((d1 + d2).getTotalDealtOnPlayer(), totalDamage.getTotalDealtOnPlayer());
 }
 
 TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType) {
@@ -152,40 +116,7 @@ TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType) {
 
     Damage totalDamage = playerVector->getTotalDamagePerDamageType(damageType);
 
-    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
-}
-
-TEST_F(PlayerVectorDamageTest, getTotalRegularDamagePerDamageType) {
-    /* Calls getTotalRegularDamagePerDamageType("poison").
-    Verifies that each players getTotalRegularDamagePerDamageType is in turn
-    called and that the summed damage is correct. */
-
-    std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalRegularDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalRegularDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d2));
-
-    Damage totalDamage = playerVector->getTotalRegularDamagePerDamageType(damageType);
-
-    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
-}
-
-TEST_F(PlayerVectorDamageTest, getTotalNanobotsDamagePerDamageType) {
-    /* Calls getTotalNanobotsDamagePerDamageType("poison").
-    Verifies that each players getTotalNanobotsDamagePerDamageType is in turn
-    called and that the summed damage is correct. */
-
-    std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalNanobotsDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalNanobotsDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d2));
-
-    Damage totalDamage = playerVector->getTotalNanobotsDamagePerDamageType(
-                                           damageType);
-
-    EXPECT_EQ((d1 + d2).getTotalDealt(), totalDamage.getTotalDealt());
+    EXPECT_EQ((d1 + d2).getTotalDealtOnPlayer(), totalDamage.getTotalDealtOnPlayer());
 }
 
 TEST_F(PlayerVectorDamageTest, getTotalHeals) {
@@ -209,7 +140,7 @@ TEST_F(PlayerVectorDamageTest, getTotalHeals) {
 
     Heal resultHeal = playerVector->getTotalHeals();
 
-    EXPECT_EQ((h1 + h2).getPotentialDealt(), resultHeal.getPotentialDealt());
+    EXPECT_EQ((h1 + h2).getPotentialDealtOnPlayer(), resultHeal.getPotentialDealtOnPlayer());
 }
 
 TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
@@ -246,9 +177,9 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     std::vector<std::pair<std::string, Damage>> result;
     result = playerVector.getTotalDamageForEachPlayer();
 
-    EXPECT_EQ(d3.getTotalReceived(), result[0].second.getTotalReceived());
-    EXPECT_EQ(d1.getTotalReceived(), result[1].second.getTotalReceived());
-    EXPECT_EQ(d4.getTotalReceived(), result[2].second.getTotalReceived());
-    EXPECT_EQ(d2.getTotalReceived(), result[3].second.getTotalReceived());
+    EXPECT_EQ(d3.getTotalReceivedFromPlayer(), result[0].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d1.getTotalReceivedFromPlayer(), result[1].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d4.getTotalReceivedFromPlayer(), result[2].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d2.getTotalReceivedFromPlayer(), result[3].second.getTotalReceivedFromPlayer());
     EXPECT_EQ(4, result.size());
 }

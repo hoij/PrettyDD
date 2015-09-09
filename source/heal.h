@@ -15,21 +15,21 @@ public:
     void addHealDealtOnPlayer(LineInfo& li);
     void addHealReceivedFromPlayer(LineInfo& li);
 
-    int getActualDealt() const {return dealtOnPlayer.actual;}
-    int getPotentialDealt() const {return dealtOnPlayer.potential;}
-    int getCountDealt() const {return dealtOnPlayer.count;}
-    int getActualMinDealt() const {return dealtOnPlayer.actualMin;}
-    int getActualMaxDealt() const {return dealtOnPlayer.actualMax;}
-    int getPotentialMinDealt() const {return dealtOnPlayer.potentialMin;}
-    int getPotentialMaxDealt() const {return dealtOnPlayer.potentialMax;}
+    int getActualDealtOnPlayer() const {return dealtOnPlayer.actual;}
+    int getPotentialDealtOnPlayer() const {return dealtOnPlayer.potential;}
+    int getCountDealtOnPlayer() const {return dealtOnPlayer.count;}
+    int getActualMinDealtOnPlayer() const {return dealtOnPlayer.actualMin;}
+    int getActualMaxDealtOnPlayer() const {return dealtOnPlayer.actualMax;}
+    int getPotentialMinDealtOnPlayer() const {return dealtOnPlayer.potentialMin;}
+    int getPotentialMaxDealtOnPlayer() const {return dealtOnPlayer.potentialMax;}
 
-    int getActualReceived() const {return receivedFromPlayer.actual;}
-    int getPotentialReceived() const {return receivedFromPlayer.potential;}
-    int getCountReceived() const {return receivedFromPlayer.count;}
-    int getActualMinReceived() const {return receivedFromPlayer.actualMin;}
-    int getActualMaxReceived() const {return receivedFromPlayer.actualMax;}
-    int getPotentialMinReceived() const {return receivedFromPlayer.potentialMin;}
-    int getPotentialMaxReceived() const {return receivedFromPlayer.potentialMax;}
+    int getActualReceivedFromPlayer() const {return receivedFromPlayer.actual;}
+    int getPotentialReceivedFromPlayer() const {return receivedFromPlayer.potential;}
+    int getCountReceivedFromPlayer() const {return receivedFromPlayer.count;}
+    int getActualMinReceivedFromPlayer() const {return receivedFromPlayer.actualMin;}
+    int getActualMaxReceivedFromPlayer() const {return receivedFromPlayer.actualMax;}
+    int getPotentialMinReceivedFromPlayer() const {return receivedFromPlayer.potentialMin;}
+    int getPotentialMaxReceivedFromPlayer() const {return receivedFromPlayer.potentialMax;}
 
 private:
     struct HealInfo {

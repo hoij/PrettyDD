@@ -19,14 +19,9 @@ public:
     virtual void add(LineInfo& lineInfo) = 0;
 
     virtual Damage getTotalDamage() const = 0;
-    virtual Damage getTotalRegularDamage() const = 0;
-    virtual Damage getTotalNanobotsDamage() const = 0;
-    virtual Damage getTotalDamagePerDamageType(const std::string damageType) const = 0;
-    virtual Damage getTotalRegularDamagePerDamageType(const std::string damageType) const = 0;
-    virtual Damage getTotalNanobotsDamagePerDamageType(const std::string damageType) const = 0;
+    virtual Damage getDamagePerDamageType(const std::string damageType) const = 0;
+    virtual std::vector<std::pair<std::string, Damage>> getAllDamage() const = 0;
 
-    virtual const std::map<std::string, Damage>& getRegularDamage() const = 0;
-    virtual const std::map<std::string, Damage>& getNanobotsDamage() const = 0;
     virtual const Heal& getHeal() const = 0;
     virtual const Nano& getNano() const = 0;
 

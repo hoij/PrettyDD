@@ -1,10 +1,11 @@
+#include "command_handler.h"
 #include "configuration.h"
 #include "formatted_line.h"
 #include "logger.h"
 #include "parser.h"
 #include "player_interface.h"
 #include "player_vector.h"
-#include "write_stats_to_file.h"
+#include "stat_writer.h"
 
 #include <chrono>
 #include <ctime>
@@ -35,7 +36,9 @@ int main(void) {
         return 1;
     }
     Parser parser(config.getplayerRunningProgram());
-    PlayerVector<Player*> pv;
+    PlayerVector<Player*> playerVector;
+    StatWriter statWriter(playerVector);
+    CommandHandler commandHandler(statWriter);
 
     std::ifstream logstream("../../test/example_lines.txt");
 
@@ -65,15 +68,10 @@ int main(void) {
                 if (formattedLine.isFormatted()) {
                     LineInfo lineInfo = parser.parse(formattedLine);
                     if(lineInfo.hasStats) {
-                        pv.addToPlayers(lineInfo);
+                        playerVector.addToPlayers(lineInfo);
                     }
                     else if (!lineInfo.command.empty()) {
-                        // TODO: write a new class/header for this that deals with input
-                        if (lineInfo.command == "dd") {
-                            writeDamageDealtOverview(pv);
-                            writeDamageReceivedOverview(pv);
-                            writeDamageDealtPerOpponent(pv.getPlayer("You"));
-                        }
+                        commandHandler.execute(lineInfo.command);
                     }
                 }
             }

@@ -2,6 +2,7 @@
 #include "logger.h"
 #include "xp.h"
 
+
 void XP::add(LineInfo& li) {
     if (li.subtype == "gained") {
         XP::XpInfo incomming;

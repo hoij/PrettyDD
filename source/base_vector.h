@@ -1,6 +1,7 @@
 #ifndef PLAYER_VECTOR_BASE_H
 #define PLAYER_VECTOR_BASE_H
 
+
 #include "damage.h"
 #include "line_info.h"
 #include "logger.h"
@@ -24,6 +25,8 @@ public:
     BaseVector& operator=(BaseVector<C> rhs);
     template<class T>
     friend void swap(BaseVector<T>& first, BaseVector<T>& second);
+
+    typename std::vector<C>::size_type size() {return this->players.size();}
 
     virtual void addToPlayers(LineInfo& lineInfo);
     virtual size_t getLongestNameLength() const;
@@ -134,8 +137,8 @@ size_t BaseVector<C>::getLongestNameLength() const {
 template<class C>
 bool BaseVector<C>::compareTotalReceivedFromPlayer(const std::pair<std::string, Damage>& p1,
                                                    const std::pair<std::string, Damage>& p2) {
-    return p1.second.getTotalReceived() >
-           p2.second.getTotalReceived();
+    return p1.second.getTotalReceivedFromPlayer() >
+           p2.second.getTotalReceivedFromPlayer();
 }
 
 
