@@ -84,6 +84,9 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDam
                 std::make_pair(ap->getName(), ap->getTotalDamage()));
         }
     }
+
+    // TODO: Remove this sorting and update the tests. Reason:
+    // Sometimes it's needed to sort by damage received and not dealt.
     std::sort(totalDamagePerPlayer.begin(),
               totalDamagePerPlayer.end(),
               this->compareTotalReceivedFromPlayer);

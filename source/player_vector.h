@@ -49,16 +49,16 @@ Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType) cons
 
 template<class C>
 std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageForEachPlayer() const {
-    /* Returns a sorted vector of pairs containing the players name and their
+    /* Returns a vector of pairs containing the players name and their
     total damage (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
         totalDamagePerPlayer.push_back(
             std::make_pair(p->getName(), p->getTotalDamage()));
     }
-    std::sort(totalDamagePerPlayer.begin(),
-              totalDamagePerPlayer.end(),
-              this->compareTotalReceivedFromPlayer);
+//    std::sort(totalDamagePerPlayer.begin(),
+//              totalDamagePerPlayer.end(),
+//              this->compareTotalReceivedFromPlayer);
     return totalDamagePerPlayer;
 }
 

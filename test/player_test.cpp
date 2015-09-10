@@ -26,7 +26,7 @@ public:
                        std::string callerName));
 
     MOCK_CONST_METHOD1(getAllDamageFromAffectedPlayer,
-                       std::map<std::string, Damage>&(std::string name));
+                       std::vector<std::pair<std::string, Damage>>(std::string name));
 
     MOCK_METHOD1(getTotalHeals, Heal(std::string callerName));
 
@@ -178,18 +178,18 @@ TEST_F(PlayerTest, getAllDamageFromAffectedPlayer) {
     */
 
     std::string name = "AffectedPlayer1";
-    std::map<std::string, Damage> damageFromAffectedPlayer;
-    damageFromAffectedPlayer[name] = d1;
+    std::vector<std::pair<std::string, Damage>> damageFromAffectedPlayer;
+    damageFromAffectedPlayer.push_back(std::make_pair(name, d1));
 
     EXPECT_CALL(*mockAffectedPlayerVector,
         getAllDamageFromAffectedPlayer(name))
-        .WillOnce(::testing::ReturnRef(damageFromAffectedPlayer));
+        .WillOnce(::testing::Return(damageFromAffectedPlayer));
 
-    std::map<std::string, Damage> result =
+    std::vector<std::pair<std::string, Damage>> result =
         player->getAllDamageFromAffectedPlayer(name);
 
-    EXPECT_EQ(damageFromAffectedPlayer.at(name).getTotalDealtOnPlayer(),
-              result.at(name).getTotalDealtOnPlayer());
+    EXPECT_EQ(damageFromAffectedPlayer[0].second.getTotalDealtOnPlayer(),
+              result[0].second.getTotalDealtOnPlayer());
 }
 
 TEST_F(PlayerTest, getTotalHeals) {

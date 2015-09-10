@@ -21,7 +21,7 @@ public:
     MockAffectedPlayer(std::string name) : AffectedPlayer(name) {}
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
     MOCK_CONST_METHOD1(getDamagePerDamageType, Damage(const std::string damageType));
-    MOCK_CONST_METHOD0(getAllDamage, std::map<std::string, Damage>&(void));
+    MOCK_CONST_METHOD0(getAllDamage, std::vector<std::pair<std::string, Damage>>(void));
     MOCK_CONST_METHOD0(getHeal, Heal&(void));
     MOCK_CONST_METHOD0(getNano, Nano&(void));
 };
@@ -154,34 +154,31 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType) {
 TEST_F(AffectedPlayerVectorDamageTest, getAllDamageFromAffectedPlayer) {
     /* Verifies that getAllDamage is called on the the correct player */
 
-    std::map<std::string, Damage> expected;
-    expected["type"] = d2;
+    std::vector<std::pair<std::string, Damage>> expected;
+    expected.push_back(std::make_pair("type", d2));
 
     EXPECT_CALL(*p2, getAllDamage())
-        .WillOnce(::testing::ReturnRef(expected));
+        .WillOnce(::testing::Return(expected));
 
-    std::map<std::string, Damage> result2 =
+    std::vector<std::pair<std::string, Damage>> result2 =
         affectedPlayerVector->getAllDamageFromAffectedPlayer("dealer2");
 
-    EXPECT_EQ(1, result2.count("type"));
+    EXPECT_EQ(expected[0].first, result2[0].first);
+    EXPECT_EQ(expected[0].second.getTotalDealtOnPlayer(),
+              result2[0].second.getTotalDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getAllDamageFromAffectedPlayer_notFound) {
-    /* Verifies that the correct exception is thrown when a player is not
-    found in the vector */
+    /* Verifies that a vector with the pair "empty" and an empty Damage
+    is returned when the player is not found in the vector. */
 
     std::string name = "NotInTheVector";
 
-    EXPECT_THROW(affectedPlayerVector->getAllDamageFromAffectedPlayer(name),
-                 std::invalid_argument);
+    auto result = affectedPlayerVector->getAllDamageFromAffectedPlayer(name);
 
-    try {
-        affectedPlayerVector->getAllDamageFromAffectedPlayer(name);
-    }
-    catch(const std::invalid_argument& e) {
-        EXPECT_EQ(e.what(), "\"" + name + "\" was not found among the " +
-                            "affected players.");
-    }
+    EXPECT_EQ(1, result.size());
+    EXPECT_EQ("empty", result[0].first);
+    EXPECT_EQ(0, result[0].second.getTotalDealtOnPlayer());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getTotalHeals) {

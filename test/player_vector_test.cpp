@@ -177,9 +177,14 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     std::vector<std::pair<std::string, Damage>> result;
     result = playerVector.getTotalDamageForEachPlayer();
 
-    EXPECT_EQ(d3.getTotalReceivedFromPlayer(), result[0].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d1.getTotalReceivedFromPlayer(), result[1].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d4.getTotalReceivedFromPlayer(), result[2].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d2.getTotalReceivedFromPlayer(), result[3].second.getTotalReceivedFromPlayer());
+    // Assuming the order is the same as when added which could be untrue.
+    EXPECT_EQ(d1.getTotalReceivedFromPlayer(),
+              result[0].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d2.getTotalReceivedFromPlayer(),
+              result[1].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d3.getTotalReceivedFromPlayer(),
+              result[2].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d4.getTotalReceivedFromPlayer(),
+              result[3].second.getTotalReceivedFromPlayer());
     EXPECT_EQ(4, result.size());
 }

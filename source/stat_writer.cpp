@@ -17,8 +17,12 @@ StatWriter::StatWriter(PlayerVector<Player*>& playerVector) :
 
 void StatWriter::createDDTopList() {
 
+    std::string fileNameBase = "dd top list";
+
     std::vector<std::pair<std::string, Damage>> totalDamageForEachPlayer =
         playerVector.getTotalDamageForEachPlayer();
+    sortByDealt(totalDamageForEachPlayer);
+
     size_t maxNameLength = playerVector.getLongestNameLength();
 
     // Calculate the number of files needed to write all players
@@ -27,45 +31,24 @@ void StatWriter::createDDTopList() {
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
-    int place = 1;
-    for (int i = 0; i != nrOfFiles; i++) {
-        std::string fileNr = std::to_string(i+1);
-        std::string fileName;
-        if (nrOfFiles == 1) {
-            fileName = "dd top list";
-        }
-        else {
-            fileName = ("dd top list " + fileNr);
-        }
-        std::ofstream file(fileName);
-        if (file.is_open()) {
-            file << "<a href=\"text://Top Damage:<br>" << std::endl;
-
-            writeDDTopListHeadings(maxNameLength, file);
-
-            auto start = totalDamageForEachPlayer.begin() +
-                         i * playersPerFile;
-            auto stop1 = totalDamageForEachPlayer.begin() +
-                         (i + 1) * playersPerFile;
-            auto stop2 = totalDamageForEachPlayer.end();
-            for (auto it = start; it != stop1 && it != stop2; it++) {
-                writePlace(place++, file);
-                writeName(it->first, maxNameLength, file);
-                writeDDTopList(it->second, file);
-            }
-
-            file << "\">Top " << i * playersPerFile + bool(!i) <<
-                    " - " << (i + 1) * playersPerFile << "</a>" << std::endl;
-        }
-        else {
-            // Write a function to write error common to all write functions.
-        }
-    }
+    writeContentsToFile(fileNameBase,
+                        totalDamageForEachPlayer,
+                        nrOfFiles,
+                        playersPerFile,
+                        maxNameLength,
+                        &StatWriter::writeDDTopListHeadings,
+                        &StatWriter::writeDDTopList);
 }
 
 void StatWriter::createDDDetailedOverview() {
 
     std::string fileNameBase = "dd overview";
+
+    std::vector<std::pair<std::string, Damage>> totalDamageForEachPlayer =
+        playerVector.getTotalDamageForEachPlayer();
+    sortByDealt(totalDamageForEachPlayer);
+
+    size_t maxNameLength = playerVector.getLongestNameLength();
 
     // Calculate the number of files needed to write all players
     const int playersPerFile = 12;
@@ -73,16 +56,13 @@ void StatWriter::createDDDetailedOverview() {
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
-    std::vector<std::pair<std::string, Damage>> totalDamageForEachPlayer =
-        playerVector.getTotalDamageForEachPlayer();
-    size_t maxNameLength = playerVector.getLongestNameLength();
-
     writeContentsToFile(fileNameBase,
                         totalDamageForEachPlayer,
                         nrOfFiles,
                         playersPerFile,
                         maxNameLength,
-                        &StatWriter::writeDDDetailedOverviewHeadings);
+                        &StatWriter::writeDDDetailedOverviewHeadings,
+                        &StatWriter::writeDDDetailedOverview);
 }
 
 void StatWriter::createDDPerOpponent(std::string playerName) {
@@ -102,9 +82,12 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
+    // TODO: Remove sorting from getTotalDamageForAllAffectedPlayers
+    // and do the sorting here instead.
     std::vector<std::pair<std::string, Damage>>
         totalDamageForEachAffectedPlayer =
             pp->getTotalDamageForAllAffectedPlayers();
+
     size_t maxNameLength = pp->getLongestAffectedPlayerNameLength();
 
     writeContentsToFile(fileNameBase,
@@ -112,7 +95,8 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
                         nrOfFiles,
                         playersPerFile,
                         maxNameLength,
-                        &StatWriter::writeDDDetailedOverviewHeadings);
+                        &StatWriter::writeDDDetailedOverviewHeadings,
+                        &StatWriter::writeDDDetailedOverview);
 }
 
 void StatWriter::createDDOnSpecificOpponent(
@@ -146,7 +130,7 @@ void StatWriter::createDDOnSpecificOpponent(
     }
 
     // Calculate the number of files needed to write all players
-    const int typesPerFile = 2;
+    const int typesPerFile = 12;
     int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
     int nrOfFiles = nrOfTypes / typesPerFile +
                    (nrOfTypes % typesPerFile != 0);
@@ -158,157 +142,44 @@ void StatWriter::createDDOnSpecificOpponent(
                         nrOfFiles,
                         typesPerFile,
                         maxNameLength,
-                        &StatWriter::writeDDOnSpecificOpponentHeadings);
-}
-
-void StatWriter::createNotFoundMessage(std::string fileName,
-                                       std::string message) {
-    std::ofstream file(fileName);
-    if (file.is_open()) {
-        file << "<a href=\"text://" + message + "<br>" << std::endl;
-        file << "\">" + fileName + "</a>" << std::endl;
-    }
-    else {
-        // Write error.
-    }
-}
-
-void StatWriter::writeContentsToFile(
-    std::string fileNameBase,
-    std::vector<std::pair<std::string, Damage>>& v,
-    int nrOfFiles,
-    int typesPerFile,
-    size_t maxNameLength,
-    std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os)) {
-
-    int place = 1;
-    for (int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
-        // Append the file nr to the file name
-        std::string fileName = fileNameBase + " " + std::to_string(fileNr);
-
-        // Do the actual writing:
-        auto start = v.begin() +
-                     (fileNr - 1) * typesPerFile;
-        auto stop1 = v.begin() +
-                    fileNr * typesPerFile;
-        auto stop2 = v.end();
-        writeContents(start,
-                      stop1,
-                      stop2,
-                      fileName,
-                      maxNameLength,
-                      place,
-                      writeHeadings);
-    }
-}
-
-void StatWriter::writeContents(
-    std::vector<std::pair<std::string, Damage>>::iterator start,
-    std::vector<std::pair<std::string, Damage>>::iterator stop1,
-    std::vector<std::pair<std::string, Damage>>::iterator stop2,
-    std::string fileName,
-    size_t maxNameLength,
-    int& place,
-    std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os)) {
-
-    std::ofstream file(fileName);
-    if (file.is_open()) {
-
-        file << "<a href=\"text://" + fileName + ":<br>" << std::endl;
-
-        (this->*writeHeadings)(maxNameLength, file);
-
-        for (auto it = start; it != stop1 && it != stop2; it++) {
-            writePlace(place++, file);
-            writeName(it->first, maxNameLength, file);
-            writeDDDetailedOverview(it->second, file);
-        }
-
-        file << "\">" + fileName + "</a>" << std::endl;
-    }
-    else {
-        // Write a function to write error common to all write functions.
-    }
-
+                        &StatWriter::writeDDOnSpecificOpponentHeadings,
+                        &StatWriter::writeDDDetailedOverview);
 }
 
 void StatWriter::createDDPerDamageType(std::string playerName) {
 
+    std::string fileNameBase = "dd per damage type by " + playerName;
+
     Player* pp = playerVector.getPlayer(playerName);
-    if (pp != nullptr) {
-        // Calculate the number of files needed to write all players
-        const int typesPerFile = 12;
-
-        // Get the data and sort it:
-        std::vector<std::pair<std::string, Damage>>
-            allDamageTypesFromAffectedPlayer =
-                pp->getTotalDamageForEveryDamageType();
-        sortByDealt(allDamageTypesFromAffectedPlayer);
-
-        int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
-        int nrOfFiles = nrOfTypes / typesPerFile +
-                       (nrOfTypes % typesPerFile != 0);
-
-        // TODO: This should be the length of the longest damage type
-        size_t longestTypeNameLength = 20;
-
-        int place = 1;
-        auto start = allDamageTypesFromAffectedPlayer.begin();
-        for (int i = 0; i != nrOfFiles; i++) {
-            std::string fileNr = std::to_string(i+1);
-            std::string fileName;
-            if (nrOfFiles == 1) {
-                fileName = "dd per damage type by " + pp->getName();
-            }
-            else {
-                fileName = "dd per damage type by " + pp->getName() +
-                           " " + fileNr;
-            }
-            std::ofstream file(fileName);
-            if (file.is_open()) {
-                file << "<a href=\"text://" + fileName + ":<br>" << std::endl;
-
-                writeDDPerDamageTypeHeadings(longestTypeNameLength, file);
-
-                auto stop1 = (i + 1) * typesPerFile;
-                auto stop2 = allDamageTypesFromAffectedPlayer.end();
-                int row = 0;
-
-                for (auto it = start; row != stop1 && it != stop2; it++, row++) {
-                    writePlace(place++, file);
-                    writeName(it->first, longestTypeNameLength, file);
-                    writeDDDetailedOverview(it->second, file);
-                    std::advance(start, 1);
-                }
-
-                file << "\">" + fileName + "</a>" << std::endl;
-            }
-            else {
-                // Write a function to write error common to all write functions.
-            }
-        }
+    if (pp == nullptr) {
+        createNotFoundMessage(fileNameBase + " 1",
+                              playerName + " not found.");
+        return;
     }
-}
 
-void StatWriter::createOldDDOverview() {
-    std::ofstream file("old_damage_dealt_overview");
-    if (file.is_open()) {
-        size_t maxNameLength = playerVector.getLongestNameLength();
+    // Calculate the number of files needed to write all players
+    const int typesPerFile = 12;
 
-        file << std::left << std::setw(maxNameLength) << "Name";
-        writeDDHeadings(file);
+    // Get the data and sort it:
+    std::vector<std::pair<std::string, Damage>>
+        allDamageTypesFromAffectedPlayer =
+            pp->getTotalDamageForEveryDamageType();
+    sortByDealt(allDamageTypesFromAffectedPlayer);
 
-        std::sort(playerVector.begin(), playerVector.end(), compareTotalDealtOld);
-        for (const Player* p : playerVector) {
-            file << std::left << std::setw(maxNameLength) << p->getName();
-            writeDDOld(p->getTotalDamage(), file);
-        }
-    }
-    else {
-        // Write error
-    }
+    int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
+    int nrOfFiles = nrOfTypes / typesPerFile +
+                   (nrOfTypes % typesPerFile != 0);
+
+    // TODO: This should be the length of the longest damage type
+    size_t longestTypeNameLength = 20;
+
+    writeContentsToFile(fileNameBase,
+                        allDamageTypesFromAffectedPlayer,
+                        nrOfFiles,
+                        typesPerFile,
+                        longestTypeNameLength,
+                        &StatWriter::writeDDPerDamageTypeHeadings,
+                        &StatWriter::writeDDDetailedOverview);
 }
 
 void StatWriter::createDRDetailedOverview() {
@@ -329,72 +200,6 @@ void StatWriter::createDRDetailedOverview() {
     else {
         errorLog.write("Could not open" + fileName);
     }
-}
-
-/******************/
-/* General prints */
-/******************/
-
-std::ostream& StatWriter::writeNameHeading(std::string category,
-                                           size_t maxNameLength,
-                                           std::ostream& os) {
-    /* Writes "Name" in the heading. */
-    writeName("     " + category, maxNameLength, os);
-    return os;
-}
-
-std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
-    os << place << ". ";
-
-    int placeNumbers = 1;
-    while (place /= 10) {
-        placeNumbers++;
-    }
-
-    switch(placeNumbers) {
-        case 1 :
-            os << "  ";
-            break;
-        case 2 :
-            os << " ";
-            break;
-    }
-    return os;
-}
-
-std::ostream& StatWriter::writeName(std::string name,
-                                    size_t maxNameLength,
-                                    std::ostream& os) {
-    /* Writes the name and replaces as many trailing whitespaces
-    as possible for tabs. */
-        const int tabSize = 8;
-        const int placeSize = 5;
-
-        int charDiff = maxNameLength - name.size();
-        int sizeOfFirstTab = tabSize - (name.size() + placeSize) % tabSize;
-
-        int nrOfTabs = charDiff / tabSize; //+ (charDiff % tabSize != 0);
-        if (sizeOfFirstTab < (charDiff - nrOfTabs * tabSize)) {
-            nrOfTabs++;
-        }
-        //int sizeOfFirstTab = tabSize - name.size() % tabSize;
-
-        if (nrOfTabs != 0) {
-            os << name;
-            for (int i = nrOfTabs; i != 0; i--) {
-                os << '\t';
-            }
-            int remainingSpaces = charDiff -
-                                  sizeOfFirstTab -
-                                  (nrOfTabs - 1) * tabSize;
-            for (int i = remainingSpaces; i != 0; i--) {
-                os << ' ';
-            }
-        }
-        else {
-            os << std::left << std::setw(maxNameLength) << name << std::right;
-        }
-        return os;
 }
 
 /*******************/
@@ -475,9 +280,21 @@ std::ostream& StatWriter::writeDDHeadings(std::ostream& os) {
     return os;
 }
 
-/****************/
-/* Damage stats */
-/****************/
+/*******************/
+/* Common headings */
+/*******************/
+
+std::ostream& StatWriter::writeNameHeading(std::string category,
+                                           size_t maxNameLength,
+                                           std::ostream& os) {
+    /* Writes "Name" in the heading. */
+    writeName("     " + category, maxNameLength, os);
+    return os;
+}
+
+/*****************/
+/* Damage writes */
+/*****************/
 
 std::ostream& StatWriter::writeDDTopList(
     const Damage& d,
@@ -553,6 +370,146 @@ std::ostream& StatWriter::writeDDOld(const Damage& d, std::ostream& os) {
     return os;
 }
 
+/*****************/
+/* Common writes */
+/*****************/
+
+void StatWriter::createNotFoundMessage(std::string fileName,
+                                       std::string message) {
+    std::ofstream file(fileName);
+    if (file.is_open()) {
+        file << "<a href=\"text://" + message + "<br>" << std::endl;
+        file << "\">" + fileName + "</a>" << std::endl;
+    }
+    else {
+        // Write error.
+    }
+}
+
+void StatWriter::writeContentsToFile(
+    std::string fileNameBase,
+    std::vector<std::pair<std::string, Damage>>& v,
+    int nrOfFiles,
+    int typesPerFile,
+    size_t maxNameLength,
+    std::ostream& (StatWriter::*writeHeadings)
+        (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeDD)
+        (const Damage& d, std::ostream& os)) {
+
+    /* Sets the file name number and calls the write function for
+    each file needed. */
+
+    int place = 1;
+    for (int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
+        // Append the file nr to the file name
+        std::string fileName = fileNameBase + " " + std::to_string(fileNr);
+
+        // Do the actual writing:
+        auto start = v.begin() +
+                     (fileNr - 1) * typesPerFile;
+        auto stop1 = v.begin() +
+                     fileNr * typesPerFile;
+        auto stop2 = v.end();
+        writeContents(start,
+                      stop1,
+                      stop2,
+                      fileName,
+                      maxNameLength,
+                      place,
+                      writeHeadings,
+                      writeDD);
+    }
+}
+
+void StatWriter::writeContents(
+    std::vector<std::pair<std::string, Damage>>::iterator start,
+    std::vector<std::pair<std::string, Damage>>::iterator stop1,
+    std::vector<std::pair<std::string, Damage>>::iterator stop2,
+    std::string fileName,
+    size_t maxNameLength,
+    int& place,
+    std::ostream& (StatWriter::*writeHeadings)
+        (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeDD)
+        (const Damage& d, std::ostream& os)) {
+
+    /* Writes headings and then the name and DD for each Damage
+    in the vector. */
+
+    std::ofstream file(fileName);
+    if (file.is_open()) {
+
+        file << "<a href=\"text://" + fileName + ":<br>" << std::endl;
+
+        (this->*writeHeadings)(maxNameLength, file);
+
+        for (auto it = start; it != stop1 && it != stop2; it++) {
+            writePlace(place++, file);
+            writeName(it->first, maxNameLength, file);
+            (this->*writeDD)(it->second, file);
+        }
+
+        file << "\">" + fileName + "</a>" << std::endl;
+    }
+    else {
+        // Write a function to write error common to all write functions.
+    }
+}
+
+std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
+    os << place << ". ";
+
+    int placeNumbers = 1;
+    while (place /= 10) {
+        placeNumbers++;
+    }
+
+    switch(placeNumbers) {
+        case 1 :
+            os << "  ";
+            break;
+        case 2 :
+            os << " ";
+            break;
+    }
+    return os;
+}
+
+std::ostream& StatWriter::writeName(std::string name,
+                                    size_t maxNameLength,
+                                    std::ostream& os) {
+    /* Writes the name and replaces as many trailing whitespaces
+    as possible for tabs. */
+        const int tabSize = 8;
+        const int placeSize = 5;
+
+        int charDiff = maxNameLength - name.size();
+        int sizeOfFirstTab = tabSize - (name.size() + placeSize) % tabSize;
+
+        int nrOfTabs = charDiff / tabSize; //+ (charDiff % tabSize != 0);
+        if (sizeOfFirstTab < (charDiff - nrOfTabs * tabSize)) {
+            nrOfTabs++;
+        }
+        //int sizeOfFirstTab = tabSize - name.size() % tabSize;
+
+        if (nrOfTabs != 0) {
+            os << name;
+            for (int i = nrOfTabs; i != 0; i--) {
+                os << '\t';
+            }
+            int remainingSpaces = charDiff -
+                                  sizeOfFirstTab -
+                                  (nrOfTabs - 1) * tabSize;
+            for (int i = remainingSpaces; i != 0; i--) {
+                os << ' ';
+            }
+        }
+        else {
+            os << std::left << std::setw(maxNameLength) << name << std::right;
+        }
+        return os;
+}
 
 /********************/
 /* Helper functions */
@@ -599,13 +556,6 @@ void StatWriter::sortByReceived(std::vector<std::pair<std::string, Damage>>& v) 
 /* Comparators */
 /***************/
 
-bool StatWriter::compareTotalDealt(
-    const std::pair<std::string, Damage>& p1,
-    const std::pair<std::string, Damage>& p2) {
-    return p1.second.getTotalReceivedFromPlayer() >
-           p2.second.getTotalReceivedFromPlayer();
-}
-
 bool StatWriter::compareTotalDealtOld(const Player* p1, const Player* p2) {
     return p1->getTotalDamage().getTotalReceivedFromPlayer() >
            p2->getTotalDamage().getTotalReceivedFromPlayer();
@@ -619,9 +569,7 @@ bool StatWriter::compareTotalReceived(const Player* p1, const Player* p2) {
 
 
 
-
-
-
+// Remove when done:
 void StatWriter::createDDOverviewUnsorted() {
     std::ofstream file("damage_dealt_overview_unsorted");
     if (file.is_open()) {
@@ -634,6 +582,25 @@ void StatWriter::createDDOverviewUnsorted() {
         for (const Player* p : playerVector) {
             file << std::left << std::setw(maxNameLength) << p->getName();
                     writeDDOld(p->getTotalDamage(), file);
+        }
+    }
+    else {
+        // Write error
+    }
+}
+
+void StatWriter::createOldDDOverview() {
+    std::ofstream file("old_damage_dealt_overview");
+    if (file.is_open()) {
+        size_t maxNameLength = playerVector.getLongestNameLength();
+
+        file << std::left << std::setw(maxNameLength) << "Name";
+        writeDDHeadings(file);
+
+        std::sort(playerVector.begin(), playerVector.end(), compareTotalDealtOld);
+        for (const Player* p : playerVector) {
+            file << std::left << std::setw(maxNameLength) << p->getName();
+            writeDDOld(p->getTotalDamage(), file);
         }
     }
     else {
