@@ -161,8 +161,7 @@ TEST_F(PlayerTest, getTotalDamageForAllAffectedPlayers) {
     */
 
     std::vector<std::pair<std::string, Damage>> totalDamageForAllAffectedPlayers;
-    totalDamageForAllAffectedPlayers.push_back(
-        std::make_pair("AffectedPlayer1", d1));
+    totalDamageForAllAffectedPlayers.emplace_back("AffectedPlayer1", d1);
 
     EXPECT_CALL(*mockAffectedPlayerVector,
         getTotalDamageForAllAffectedPlayers(player->getName()))
@@ -179,7 +178,7 @@ TEST_F(PlayerTest, getAllDamageFromAffectedPlayer) {
 
     std::string name = "AffectedPlayer1";
     std::vector<std::pair<std::string, Damage>> damageFromAffectedPlayer;
-    damageFromAffectedPlayer.push_back(std::make_pair(name, d1));
+    damageFromAffectedPlayer.emplace_back(name, d1);
 
     EXPECT_CALL(*mockAffectedPlayerVector,
         getAllDamageFromAffectedPlayer(name))

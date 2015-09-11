@@ -29,7 +29,7 @@ Player::Player(const Player& other) {
     xp = other.xp;
 }
 
-Player::Player(Player&& other) : Player(other.getName()) {
+Player::Player(Player&& other) noexcept : Player(other.getName()) {
     swap(*this, other);
 }
 
@@ -81,7 +81,7 @@ void Player::addNanoProgram(std::string name, std::string subtype) {
             break;
         }
     }
-    nanoPrograms.push_back(NanoProgram(name, subtype));
+    nanoPrograms.emplace_back(name, subtype);
 }
 
 Damage Player::getTotalDamage() const {

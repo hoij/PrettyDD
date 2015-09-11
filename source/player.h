@@ -24,7 +24,7 @@ public:
     Player(std::string name, AffectedPlayerVector<AffectedPlayer*>* pv);
     ~Player();
     Player(const Player& other);
-    Player(Player&& other);
+    Player(Player&& other) noexcept;
     Player& operator=(Player rhs);
     friend void swap(Player& first, Player& second);
 

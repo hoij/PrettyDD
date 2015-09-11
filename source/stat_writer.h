@@ -11,6 +11,7 @@
 class Player;
 
 class StatWriter {
+// TODO: Split into smaller classes
 public:
     StatWriter(PlayerVector<Player*>& playerVector);
 

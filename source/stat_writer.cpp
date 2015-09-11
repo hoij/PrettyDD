@@ -15,6 +15,10 @@
 StatWriter::StatWriter(PlayerVector<Player*>& playerVector) :
     playerVector(playerVector) {}
 
+/*******************/
+/* Create DD files */
+/*******************/
+
 void StatWriter::createDDTopList() {
 
     std::string fileNameBase = "dd top list";
@@ -82,11 +86,10 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
-    // TODO: Remove sorting from getTotalDamageForAllAffectedPlayers
-    // and do the sorting here instead.
     std::vector<std::pair<std::string, Damage>>
         totalDamageForEachAffectedPlayer =
             pp->getTotalDamageForAllAffectedPlayers();
+    sortByDealt(totalDamageForEachAffectedPlayer);
 
     size_t maxNameLength = pp->getLongestAffectedPlayerNameLength();
 
@@ -182,6 +185,10 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
                         &StatWriter::writeDDDetailedOverview);
 }
 
+/*******************/
+/* Create DR files */
+/*******************/
+
 void StatWriter::createDRDetailedOverview() {
     std::string fileName = "damage_received_overview";
     std::ofstream file(fileName);
@@ -202,6 +209,26 @@ void StatWriter::createDRDetailedOverview() {
     }
 }
 
+/*********************/
+/* Create heal files */
+/*********************/
+
+
+/*********************/
+/* Create nano files */
+/*********************/
+
+
+/*******************/
+/* Create XP files */
+/*******************/
+
+
+/*****************************/
+/* Create nano program files */
+/*****************************/
+
+
 /*******************/
 /* Damage headings */
 /*******************/
@@ -211,7 +238,7 @@ std::ostream& StatWriter::writeDDTopListHeadings(size_t maxNameLength,
     int width = 8;
     writeNameHeading("Name", maxNameLength, os);
     os << std::setw(width) << "Total" <<
-          std::setw(width) << "DPM" << std::endl;
+          std::setw(width) << "DPM" << "<br>" << std::endl;
     return os;
 }
 
@@ -227,7 +254,7 @@ std::ostream& StatWriter::writeDDDetailedOverviewHeadings(
           std::setw(width) << "Crit%" <<
           std::setw(width) << "Nanobot%" <<
           std::setw(width) << "Miss%" <<
-          std::setw(width) << "Deflect%" << std::endl;
+          std::setw(width) << "Deflect%" << "<br>" << std::endl;
 
     return os;
 }
@@ -244,7 +271,7 @@ std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
           std::setw(width) << "Crit%" <<
           std::setw(width) << "Nanobot%" <<
           std::setw(width) << "Miss%" <<
-          std::setw(width) << "Deflect%" << std::endl;
+          std::setw(width) << "Deflect%" << "<br>" << std::endl;
     return os;
 }
 
@@ -260,7 +287,7 @@ std::ostream& StatWriter::writeDDPerDamageTypeHeadings (
           std::setw(width) << "Crit%" <<
           std::setw(width) << "Nanobot%" <<
           std::setw(width) << "Miss%" <<
-          std::setw(width) << "Deflect%" << std::endl;
+          std::setw(width) << "Deflect%" << "<br>" << std::endl;
     return os;
 }
 
@@ -276,7 +303,7 @@ std::ostream& StatWriter::writeDDHeadings(std::ostream& os) {
           std::setw(width) << "CritMax" <<
           std::setw(width) << "CritMin" <<
           std::setw(width) << "Deflects" <<
-          std::setw(width) << "Misses" << std::endl;
+          std::setw(width) << "Misses" << "<br>" << std::endl;
     return os;
 }
 
@@ -302,7 +329,7 @@ std::ostream& StatWriter::writeDDTopList(
 
     int width = 8;
     os << std::setw(width) << d.getTotalReceivedFromPlayer() <<
-          std::setw(width) << damagePerMinute(0, 0) << std::endl;
+          std::setw(width) << damagePerMinute(0, 0) << "<br>" << std::endl;
     return os;
 }
 
@@ -326,7 +353,7 @@ std::ostream& StatWriter::writeDDDetailedOverview(
           std::setw(width) << critPercentage <<
           std::setw(width) << nanobotDamagePercentage <<
           std::setw(width) << missPercentage <<
-          std::setw(width) << deflectPercentage << std::endl;
+          std::setw(width) << deflectPercentage << "<br>" << std::endl;
     return os;
 }
 
@@ -346,7 +373,7 @@ std::ostream& StatWriter::writeDR(const Damage& d, std::ostream& os) {
           std::setw(width) << ((d.getCritMinDealtOnPlayer() == std::numeric_limits<int>::max()) ?
                             0 : d.getCritMinDealtOnPlayer()) <<
           std::setw(width) << d.getDeflectsDealtOnPlayer() <<
-          std::setw(width) << d.getMissesDealtOnPlayer() << std::endl;
+          std::setw(width) << d.getMissesDealtOnPlayer() << "<br>" << std::endl;
     return os;
 }
 
@@ -366,7 +393,7 @@ std::ostream& StatWriter::writeDDOld(const Damage& d, std::ostream& os) {
           std::setw(width) << ((d.getCritMinReceivedFromPlayer() == std::numeric_limits<int>::max()) ?
                             0 : d.getCritMinReceivedFromPlayer()) <<
           std::setw(width) << d.getDeflectsReceivedFromPlayer() <<
-          std::setw(width) << d.getMissesReceivedFromPlayer() << std::endl;
+          std::setw(width) << d.getMissesReceivedFromPlayer() << "<br>" << std::endl;
     return os;
 }
 
@@ -491,7 +518,6 @@ std::ostream& StatWriter::writeName(std::string name,
         if (sizeOfFirstTab < (charDiff - nrOfTabs * tabSize)) {
             nrOfTabs++;
         }
-        //int sizeOfFirstTab = tabSize - name.size() % tabSize;
 
         if (nrOfTabs != 0) {
             os << name;

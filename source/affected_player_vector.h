@@ -75,30 +75,23 @@ Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerNa
 
 template<class C>
 std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForAllAffectedPlayers(std::string callerName) const {
-    // Returns a sorted vector of pairs containing the players name and their
-    // total damage (in the form of the Damage class).
+    /* Returns a vector of pairs containing the players name and their
+    total damage (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
-            totalDamagePerPlayer.push_back(
-                std::make_pair(ap->getName(), ap->getTotalDamage()));
+            totalDamagePerPlayer.emplace_back(ap->getName(),
+                                              ap->getTotalDamage());
         }
     }
-
-    // TODO: Remove this sorting and update the tests. Reason:
-    // Sometimes it's needed to sort by damage received and not dealt.
-    std::sort(totalDamagePerPlayer.begin(),
-              totalDamagePerPlayer.end(),
-              this->compareTotalReceivedFromPlayer);
     return totalDamagePerPlayer;
 }
 
 template<class C>
 std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForEveryDamageType(std::string callerName) const {
-    // Returns a sorted vector of pairs containing the damage type name
-    // and it's summed damage. The vector is sorted by total damage
-    // received from player. It includes all damage types for both
-    // dealt and received damage.
+    /* Returns a vector of pairs containing the damage type name
+    and it's summed damage. The Damage includes all damage types for both
+    dealt and received damage. */
     // TODO: Write a test
 
     std::vector<std::pair<std::string, Damage>> damageTypes;
@@ -141,7 +134,7 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getAllDamag
     // a non-existing player a pair with the key "empty" is returned.
     Damage d;
     std::vector<std::pair<std::string, Damage>> emptyVector;
-    emptyVector.push_back(std::make_pair("empty", d));
+    emptyVector.emplace_back("empty", d);
     return emptyVector;
 }
 
@@ -161,7 +154,7 @@ std::vector<std::pair<std::string, Heal>> AffectedPlayerVector<C>::getHealsForAl
     // TODO: This will include the owning player as well. Do I want that?
     std::vector<std::pair<std::string, Heal>> healsPerPlayer;
     for (const C ap : this->players) {
-        healsPerPlayer.push_back(std::make_pair(ap->getName(), ap->getHeal()));
+        healsPerPlayer.emplace_back(ap->getName(), ap->getHeal());
     }
     std::sort(healsPerPlayer.begin(),
               healsPerPlayer.end(),
@@ -196,7 +189,7 @@ template<class C>
 std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForAllAffectedPlayers() const {
     std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
     for (const C ap : this->players) {
-            nanoPerPlayer.push_back(std::make_pair(ap->getName(), ap->getNano()));
+            nanoPerPlayer.emplace_back(ap->getName(), ap->getNano());
     }
     std::sort(nanoPerPlayer.begin(),
               nanoPerPlayer.end(),
@@ -211,7 +204,8 @@ const Nano& AffectedPlayerVector<C>::getNanoFromAffectedPlayer(std::string name)
             return ap->getNano();
         }
     }
-    // TODO: Catch and log this error somwhere.
+    // TODO: Change this to returning an empty instance of Nano instead?
+    // If not, remember to catch the exception.
     throw std::invalid_argument("\"" + name + "\" was not found among the " +
                                 "affected players.");
 }

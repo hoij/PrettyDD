@@ -53,12 +53,8 @@ std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageForEa
     total damage (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
-        totalDamagePerPlayer.push_back(
-            std::make_pair(p->getName(), p->getTotalDamage()));
+        totalDamagePerPlayer.emplace_back(p->getName(), p->getTotalDamage());
     }
-//    std::sort(totalDamagePerPlayer.begin(),
-//              totalDamagePerPlayer.end(),
-//              this->compareTotalReceivedFromPlayer);
     return totalDamagePerPlayer;
 }
 
