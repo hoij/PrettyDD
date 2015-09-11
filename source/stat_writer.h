@@ -8,6 +8,7 @@
 #include <string>
 
 
+class Damage;
 class Player;
 
 class StatWriter {
@@ -16,28 +17,40 @@ public:
     StatWriter(PlayerVector<Player*>& playerVector);
 
     void createDDTopList();
-    void createDDDetailedOverview();
-    void createDDPerOpponent(std::string playerName);
-    void createDDOnSpecificOpponent(std::string PlayerName,
-                                    std::string opponentName);
+    void createDDDetailedTopList();
     void createDDPerDamageType(std::string playerName);
+    void createDDPerOpponent(std::string playerName);  // Lists all opponents for playerName
+    void createDDOnSpecificOpponent(std::string playerName,
+                                    std::string opponentName);
 
     void createDRTopList();
-    void createDRDetailedOverview();
-    void createDRPerOpponent(std::string playerName);
-    void createDRFromSpecificOpponent(std::string PlayerName,
-                                      std::string opponentName);
+    void createDRDetailedTopList();
     void createDRPerDamageType(std::string playerName);
+    void createDRPerOpponent(std::string playerName);  // Lists all opponents for playerName
+    // This is probably covered by using
+    // createDDOnSpecificOpponent(playerName, opponentName)
+    // in reversed order?:
+    void createDRFromSpecificOpponent(std::string playerName,
+                                      std::string opponentName);
 
-    void createHealReceivedOverview();
+    void createHealReceivedTopList();
+    void createHealReceivedDetailedTopList();
     void createHealDealtPerReceiver();  // Can only be done for "You".
 
-    void createNanoReceivedOverview();
+    void createNanoReceivedTopList();
+    void createNanoReceivedDetailedTopList();
     void createNanoDealtPerReceiver();  // Can only be done for "You".
 
     void createNanoProgramsCasted();  // Can only be done for "You".
+    void createNanoProgramsCastedPerTarget();  // Can only be done for "You".
+    void createNanoProgramsCastedOnTarget(std::string targetName);  // Can only be done for "You".
     void createNanoProgramsReceived();  // Can only be done for "You".
-    void createNanoProgramsReceivedPerOpponent();  // Can only be done for "You".
+    void createNanoProgramsReceivedPerTarget();  // Can only be done for "You".
+    void createNanoProgramsReceivedFromTarget(std::string targetName);  // Can only be done for "You".
+
+    void createXPInfo();
+
+    void createHelp();
 
     // Remove when done:
     void createDDOverviewUnsorted();

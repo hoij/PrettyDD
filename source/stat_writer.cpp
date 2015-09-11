@@ -44,9 +44,9 @@ void StatWriter::createDDTopList() {
                         &StatWriter::writeDDTopList);
 }
 
-void StatWriter::createDDDetailedOverview() {
+void StatWriter::createDDDetailedTopList() {
 
-    std::string fileNameBase = "dd overview";
+    std::string fileNameBase = "dd detailed top list";
 
     std::vector<std::pair<std::string, Damage>> totalDamageForEachPlayer =
         playerVector.getTotalDamageForEachPlayer();
@@ -66,6 +66,42 @@ void StatWriter::createDDDetailedOverview() {
                         playersPerFile,
                         maxNameLength,
                         &StatWriter::writeDDDetailedOverviewHeadings,
+                        &StatWriter::writeDDDetailedOverview);
+}
+
+void StatWriter::createDDPerDamageType(std::string playerName) {
+
+    std::string fileNameBase = "dd per damage type by " + playerName;
+
+    Player* pp = playerVector.getPlayer(playerName);
+    if (pp == nullptr) {
+        createNotFoundMessage(fileNameBase + " 1",
+                              playerName + " not found.");
+        return;
+    }
+
+    // Calculate the number of files needed to write all players
+    const int typesPerFile = 12;
+
+    // Get the data and sort it:
+    std::vector<std::pair<std::string, Damage>>
+        allDamageTypesFromAffectedPlayer =
+            pp->getTotalDamageForEveryDamageType();
+    sortByDealt(allDamageTypesFromAffectedPlayer);
+
+    int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
+    int nrOfFiles = nrOfTypes / typesPerFile +
+                   (nrOfTypes % typesPerFile != 0);
+
+    // TODO: This should be the length of the longest damage type
+    size_t longestTypeNameLength = 20;
+
+    writeContentsToFile(fileNameBase,
+                        allDamageTypesFromAffectedPlayer,
+                        nrOfFiles,
+                        typesPerFile,
+                        longestTypeNameLength,
+                        &StatWriter::writeDDPerDamageTypeHeadings,
                         &StatWriter::writeDDDetailedOverview);
 }
 
@@ -149,47 +185,11 @@ void StatWriter::createDDOnSpecificOpponent(
                         &StatWriter::writeDDDetailedOverview);
 }
 
-void StatWriter::createDDPerDamageType(std::string playerName) {
-
-    std::string fileNameBase = "dd per damage type by " + playerName;
-
-    Player* pp = playerVector.getPlayer(playerName);
-    if (pp == nullptr) {
-        createNotFoundMessage(fileNameBase + " 1",
-                              playerName + " not found.");
-        return;
-    }
-
-    // Calculate the number of files needed to write all players
-    const int typesPerFile = 12;
-
-    // Get the data and sort it:
-    std::vector<std::pair<std::string, Damage>>
-        allDamageTypesFromAffectedPlayer =
-            pp->getTotalDamageForEveryDamageType();
-    sortByDealt(allDamageTypesFromAffectedPlayer);
-
-    int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
-    int nrOfFiles = nrOfTypes / typesPerFile +
-                   (nrOfTypes % typesPerFile != 0);
-
-    // TODO: This should be the length of the longest damage type
-    size_t longestTypeNameLength = 20;
-
-    writeContentsToFile(fileNameBase,
-                        allDamageTypesFromAffectedPlayer,
-                        nrOfFiles,
-                        typesPerFile,
-                        longestTypeNameLength,
-                        &StatWriter::writeDDPerDamageTypeHeadings,
-                        &StatWriter::writeDDDetailedOverview);
-}
-
 /*******************/
 /* Create DR files */
 /*******************/
 
-void StatWriter::createDRDetailedOverview() {
+void StatWriter::createDRDetailedTopList() {
     std::string fileName = "damage_received_overview";
     std::ofstream file(fileName);
     if (file.is_open()) {
