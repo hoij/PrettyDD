@@ -79,6 +79,18 @@ void CommandHandler::execute(std::string command) {
         else if (commandParts[1] == "help") {
             // statWriter.createHelp();
         }
+        else if (commandParts[1] == "start") {
+            // TODO:
+            // startLogging();
+        }
+        else if (commandParts[1] == "stop") {
+            // TODO:
+            // stopLogging();
+        }
+        else if (commandParts[1] == "reset") {
+            // TODO:
+            // reset();  // Removes all players from playerVector.
+        }
         else {
             // Assume the string is the name of a player/monster in AO
             statWriter.createDDPerOpponent(commandParts[1]);
@@ -150,11 +162,7 @@ void CommandHandler::execute(std::string command) {
             }
             else if (commandParts[2] == "received" &&
                      commandParts[3] == "t") {
-                //statWriter.createNanoProgramsCastedPerTarget();
-            }
-            else if (commandParts[2] == "received" &&
-                     commandParts[3] == "t") {
-                //statWriter.createNanoProgramsCastedPerTarget();
+                //statWriter.createNanoProgramsReceivedPerTarget();
             }
             else if (commandParts[2] == "casted") {
                 //statWriter.createNanoProgramsCastedOnTarget(commandParts[3]);
