@@ -35,13 +35,16 @@ void StatWriter::createDDTopList() {
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
-    writeContentsToFile(fileNameBase,
-                        totalDamageForEachPlayer,
-                        nrOfFiles,
-                        playersPerFile,
-                        maxNameLength,
-                        &StatWriter::writeDDTopListHeadings,
-                        &StatWriter::writeDDTopList);
+    std::vector<std::string> fileNames = writeContentsToFile(
+        fileNameBase,
+        totalDamageForEachPlayer,
+        nrOfFiles,
+        playersPerFile,
+        maxNameLength,
+        &StatWriter::writeDDTopListHeadings,
+        &StatWriter::writeDDTopList);
+
+    createMainScriptFile(fileNames);
 }
 
 void StatWriter::createDDDetailedTopList() {
@@ -60,13 +63,16 @@ void StatWriter::createDDDetailedTopList() {
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
-    writeContentsToFile(fileNameBase,
-                        totalDamageForEachPlayer,
-                        nrOfFiles,
-                        playersPerFile,
-                        maxNameLength,
-                        &StatWriter::writeDDDetailedOverviewHeadings,
-                        &StatWriter::writeDDDetailedOverview);
+    std::vector<std::string> fileNames = writeContentsToFile(
+        fileNameBase,
+        totalDamageForEachPlayer,
+        nrOfFiles,
+        playersPerFile,
+        maxNameLength,
+        &StatWriter::writeDDDetailedOverviewHeadings,
+        &StatWriter::writeDDDetailedOverview);
+
+    createMainScriptFile(fileNames);
 }
 
 void StatWriter::createDDPerDamageType(std::string playerName) {
@@ -75,13 +81,12 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(fileNameBase + " 1",
+        std::vector<std::string> fileNames = {fileNameBase};
+        createNotFoundMessage(fileNameBase,
                               playerName + " not found.");
+        createMainScriptFile(fileNames);
         return;
     }
-
-    // Calculate the number of files needed to write all players
-    const int typesPerFile = 12;
 
     // Get the data and sort it:
     std::vector<std::pair<std::string, Damage>>
@@ -89,6 +94,8 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
             pp->getTotalDamageForEveryDamageType();
     sortByDealt(allDamageTypesFromAffectedPlayer);
 
+    // Calculate the number of files needed to write all players
+    const int typesPerFile = 12;
     int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
     int nrOfFiles = nrOfTypes / typesPerFile +
                    (nrOfTypes % typesPerFile != 0);
@@ -96,13 +103,16 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
     // TODO: This should be the length of the longest damage type
     size_t longestTypeNameLength = 20;
 
-    writeContentsToFile(fileNameBase,
-                        allDamageTypesFromAffectedPlayer,
-                        nrOfFiles,
-                        typesPerFile,
-                        longestTypeNameLength,
-                        &StatWriter::writeDDPerDamageTypeHeadings,
-                        &StatWriter::writeDDDetailedOverview);
+    std::vector<std::string> fileNames = writeContentsToFile(
+        fileNameBase,
+        allDamageTypesFromAffectedPlayer,
+        nrOfFiles,
+        typesPerFile,
+        longestTypeNameLength,
+        &StatWriter::writeDDPerDamageTypeHeadings,
+        &StatWriter::writeDDDetailedOverview);
+
+    createMainScriptFile(fileNames);
 }
 
 void StatWriter::createDDPerOpponent(std::string playerName) {
@@ -111,8 +121,10 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(fileNameBase + " 1",
+        std::vector<std::string> fileNames = {fileNameBase};
+        createNotFoundMessage(fileNameBase,
                               playerName + " not found.");
+        createMainScriptFile(fileNames);
         return;
     }
 
@@ -129,13 +141,16 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
 
     size_t maxNameLength = pp->getLongestAffectedPlayerNameLength();
 
-    writeContentsToFile(fileNameBase,
-                        totalDamageForEachAffectedPlayer,
-                        nrOfFiles,
-                        playersPerFile,
-                        maxNameLength,
-                        &StatWriter::writeDDDetailedOverviewHeadings,
-                        &StatWriter::writeDDDetailedOverview);
+    std::vector<std::string> fileNames = writeContentsToFile(
+        fileNameBase,
+        totalDamageForEachAffectedPlayer,
+        nrOfFiles,
+        playersPerFile,
+        maxNameLength,
+        &StatWriter::writeDDDetailedOverviewHeadings,
+        &StatWriter::writeDDDetailedOverview);
+
+    createMainScriptFile(fileNames);
 }
 
 void StatWriter::createDDOnSpecificOpponent(
@@ -176,13 +191,16 @@ void StatWriter::createDDOnSpecificOpponent(
 
     size_t maxNameLength = 20;
 
-    writeContentsToFile(fileNameBase,
-                        allDamageTypesFromAffectedPlayer,
-                        nrOfFiles,
-                        typesPerFile,
-                        maxNameLength,
-                        &StatWriter::writeDDOnSpecificOpponentHeadings,
-                        &StatWriter::writeDDDetailedOverview);
+    std::vector<std::string> fileNames = writeContentsToFile(
+        fileNameBase,
+        allDamageTypesFromAffectedPlayer,
+        nrOfFiles,
+        typesPerFile,
+        maxNameLength,
+        &StatWriter::writeDDOnSpecificOpponentHeadings,
+        &StatWriter::writeDDDetailedOverview);
+
+    createMainScriptFile(fileNames);
 }
 
 /*******************/
@@ -413,7 +431,7 @@ void StatWriter::createNotFoundMessage(std::string fileName,
     }
 }
 
-void StatWriter::writeContentsToFile(
+std::vector<std::string> StatWriter::writeContentsToFile(
     std::string fileNameBase,
     std::vector<std::pair<std::string, Damage>>& v,
     int nrOfFiles,
@@ -425,18 +443,23 @@ void StatWriter::writeContentsToFile(
         (const Damage& d, std::ostream& os)) {
 
     /* Sets the file name number and calls the write function for
-    each file needed. */
+    each file needed. Returns the file names. */
+
+    std::vector<std::string> fileNames;
 
     int place = 1;
-    for (int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
+    for (int fileNr = 0; fileNr != nrOfFiles; fileNr++) {
         // Append the file nr to the file name
-        std::string fileName = fileNameBase + " " + std::to_string(fileNr);
+        std::string interval = std::to_string(fileNr * typesPerFile + 1) + "-" +
+                               std::to_string((fileNr + 1) * typesPerFile);
+        std::string fileName = fileNameBase + " " + interval;
+        fileNames.push_back(fileName);
 
         // Do the actual writing:
         auto start = v.begin() +
-                     (fileNr - 1) * typesPerFile;
-        auto stop1 = v.begin() +
                      fileNr * typesPerFile;
+        auto stop1 = v.begin() +
+                     (fileNr + 1) * typesPerFile;
         auto stop2 = v.end();
         writeContents(start,
                       stop1,
@@ -447,6 +470,7 @@ void StatWriter::writeContentsToFile(
                       writeHeadings,
                       writeDD);
     }
+    return fileNames;
 }
 
 void StatWriter::writeContents(
@@ -535,6 +559,19 @@ std::ostream& StatWriter::writeName(std::string name,
             os << std::left << std::setw(maxNameLength) << name << std::right;
         }
         return os;
+}
+
+void StatWriter::createMainScriptFile(std::vector<std::string> fileNames) {
+
+    std::ofstream file("pdd");
+    if (file.is_open()) {
+        for (const auto& fileName : fileNames) {
+            file << "/delay 250 /\"" << fileName << '"' << std::endl;
+        }
+    }
+    else {
+        // TODO: Write error.
+    }
 }
 
 /********************/

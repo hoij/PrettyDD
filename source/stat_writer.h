@@ -81,15 +81,17 @@ private:
     std::ostream& writeDDOld(const Damage& d, std::ostream& os);
 
     // Common writes
-    void writeContentsToFile(std::string fileNameBase,
-                             std::vector<std::pair<std::string, Damage>>& v,
-                             int nrOfFiles,
-                             int typesPerFile,
-                             size_t maxNameLength,
-                             std::ostream& (StatWriter::*writeHeadings)
-                                (size_t maxNameLength, std::ostream& os),
-                             std::ostream& (StatWriter::*writeDD)
-                                (const Damage& d, std::ostream& os));
+    std::vector<std::string> writeContentsToFile(
+        std::string fileNameBase,
+        std::vector<std::pair<std::string, Damage>>& v,
+        int nrOfFiles,
+        int typesPerFile,
+        size_t maxNameLength,
+        std::ostream& (StatWriter::*writeHeadings)
+        (size_t maxNameLength, std::ostream& os),
+        std::ostream& (StatWriter::*writeDD)
+            (const Damage& d, std::ostream& os));
+
     void writeContents(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop1,
@@ -106,6 +108,9 @@ private:
     std::ostream& writeName(std::string name,
                             size_t maxNameLength,
                             std::ostream& os);
+
+    void createMainScriptFile(std::vector<std::string> fileNames);
+
 
     // Helper functions
     double percentage(int total, int part);
