@@ -347,7 +347,8 @@ std::ostream& StatWriter::writeDDTopList(
 
     int width = 8;
     os << std::setw(width) << d.getTotalReceivedFromPlayer() <<
-          std::setw(width) << damagePerMinute(0, 0) << "<br>" << std::endl;
+          std::setw(width) << d.getDPMReceivedFromPlayer() <<
+          "<br>" << std::endl;
     return os;
 }
 
@@ -367,7 +368,8 @@ std::ostream& StatWriter::writeDDDetailedOverview(
                                           d.getDeflectsReceivedFromPlayer());
 
     os << std::setw(width) << d.getTotalReceivedFromPlayer() <<
-          std::setw(width) << damagePerMinute(0, 0) << std::fixed << std::setprecision(1) <<
+          std::setw(width) << d.getDPMReceivedFromPlayer() <<
+          std::fixed << std::setprecision(1) <<
           std::setw(width) << critPercentage <<
           std::setw(width) << nanobotDamagePercentage <<
           std::setw(width) << missPercentage <<
@@ -585,16 +587,6 @@ double StatWriter::percentage(int total, int part) {
     else {
         return (float)part * 100 / total;
     }
-}
-
-int StatWriter::damagePerMinute(int totalDamage, int startTime) {
-    // get time now
-    // diffTimeInMinutes = timeNow - startTime  // Convert to minutes
-    // return totalDamage / diffTimeInMinutes
-
-    (void)totalDamage;
-    (void)startTime;
-    return 0;
 }
 
 void StatWriter::sortByDealt(std::vector<std::pair<std::string, Damage>>& v) {

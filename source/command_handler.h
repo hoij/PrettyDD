@@ -2,6 +2,7 @@
 #define COMMAND_HANDLER_H
 
 
+#include "player_vector.h"
 #include "stat_writer.h"
 
 #include <string>
@@ -9,7 +10,9 @@
 
 class CommandHandler {
 public:
-    CommandHandler(StatWriter& statWriter) : statWriter(statWriter) {}
+    CommandHandler(StatWriter& statWriter,
+                   PlayerVector<Player*>& playerVector) :
+        statWriter(statWriter), playerVector(playerVector) {}
     void execute(std::string command);
 
 private:
@@ -20,6 +23,7 @@ private:
     //void testMerge();
 
     StatWriter& statWriter;
+    PlayerVector<Player*> playerVector;
 };
 
 

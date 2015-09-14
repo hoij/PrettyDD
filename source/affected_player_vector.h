@@ -8,6 +8,7 @@
 #include "heal.h"
 #include "line_info.h"
 #include "logger.h"
+#include "my_time.h"
 
 #include <algorithm>
 #include <iterator>
@@ -37,6 +38,8 @@ public:
     virtual Nano getTotalNano(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Nano>> getNanoForAllAffectedPlayers() const;
     virtual const Nano& getNanoFromAffectedPlayer(std::string name) const;
+
+    void incrementPauseDuration(const std::time_t& duration);
 
 private:
     static bool compareNanoDealt(const std::pair<std::string, Nano>& p1,
@@ -88,7 +91,9 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDam
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForEveryDamageType(std::string callerName) const {
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getTotalDamageForEveryDamageType(
+    std::string callerName) const {
     /* Returns a vector of pairs containing the damage type name
     and it's summed damage. The Damage includes all damage types for both
     dealt and received damage. */
@@ -222,6 +227,13 @@ bool AffectedPlayerVector<C>::comparePotentialHeal(const std::pair<std::string, 
                                                    const std::pair<std::string, Heal>& p2) {
     return p1.second.getPotentialDealtOnPlayer() >
            p2.second.getPotentialDealtOnPlayer();
+}
+
+template<class C>
+void AffectedPlayerVector<C>::incrementPauseDuration(const std::time_t& duration) {
+    for (C& ap : this->players) {
+        ap->incrementPauseDuration(duration);
+    }
 }
 
 

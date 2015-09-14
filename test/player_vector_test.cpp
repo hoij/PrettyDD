@@ -18,7 +18,7 @@ these classes pass. */
 
 class MockPlayer : public virtual PlayerInterface, public Player {
 public:
-    MockPlayer(std::string name) : Player(name) {}
+    MockPlayer(std::string name, MyTime* myTime) : Player(name, myTime) {}
     MOCK_METHOD1(add, void(LineInfo& li));
 
     MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
@@ -66,7 +66,7 @@ EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
         playerVector = new PlayerVector<::testing::NiceMock<MockPlayer>*>;
-
+        playerVector->startLogging();
         // Set up the return values.
         d1 = createDealerDamage(10);
         d1 = createDealerDamage(30);
@@ -87,6 +87,25 @@ protected:
 };
 
 /* Test cases */
+
+TEST_F(PlayerVectorDamageTest, reset) {
+    // Reset to remove the two players added in the SetUp.
+    playerVector->reset();
+    EXPECT_EQ(0, playerVector->size());
+
+    // Reset an empty vector:
+    playerVector->reset();
+    EXPECT_EQ(0, playerVector->size());
+
+    // Add two players
+    std::string p1Name = "dealerAfterReset1";
+    std::string p2Name = "dealerAfterReset2";
+    p1 = addPlayerToVector(p1Name, playerVector);
+    p2 = addPlayerToVector(p2Name, playerVector);
+    EXPECT_EQ(2, playerVector->size());
+    EXPECT_EQ(p1Name, p1->getName());
+    EXPECT_EQ(p2Name, p2->getName());
+}
 
 TEST_F(PlayerVectorDamageTest, getTotalDamage) {
     /* Calls getTotalDamage().
@@ -152,6 +171,7 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
     */
 
     PlayerVector<::testing::NiceMock<MockPlayer>*> playerVector;
+    playerVector.startLogging();
     // Add players to the vector.
     const MockPlayer* p1 = addPlayerToVector("Receiver1", &playerVector);
     const MockPlayer* p2 = addPlayerToVector("Receiver2", &playerVector);

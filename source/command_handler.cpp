@@ -80,16 +80,13 @@ void CommandHandler::execute(std::string command) {
             // statWriter.createHelp();
         }
         else if (commandParts[1] == "start") {
-            // TODO:
-            // startLogging();
+            playerVector.startLogging();
         }
         else if (commandParts[1] == "stop") {
-            // TODO:
-            // stopLogging();
+            playerVector.stopLogging();
         }
         else if (commandParts[1] == "reset") {
-            // TODO:
-            // reset();  // Removes all players from playerVector.
+             playerVector.reset();  // Removes all players from playerVector.
         }
         else {
             // Assume the string is the name of a player/monster in AO

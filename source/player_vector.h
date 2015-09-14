@@ -4,6 +4,7 @@
 
 #include "base_vector.h"
 #include "logger.h"
+#include "my_time.h"
 #include "player.h"
 
 #include <algorithm>
@@ -23,11 +24,50 @@ public:
     virtual ~PlayerVector() {};
     PlayerVector(const PlayerVector<C>& other) : BaseVector<C>(other) {}
 
+    virtual void addToPlayers(LineInfo& lineInfo);
+
     virtual Damage getTotalDamage() const;
     virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEachPlayer() const;
     virtual Heal getTotalHeals() const;
+    virtual void startLogging();
+    virtual void stopLogging();
+    virtual void reset();
+
+private:
+    bool log = false;
 };
+
+
+template<class C>
+void PlayerVector<C>::addToPlayers(LineInfo& lineInfo) {
+    // Adds the info found in a log line to dealer and receiver.
+    // If a player with the same name is not found, a new one is created.
+    bool dealerFound = false;
+    bool receiverFound = false;
+
+    if (!log) {
+        // Don't log when stopped.
+        return;
+    }
+
+    for (C player : this->players) {
+        if (player->getName() == lineInfo.dealer_name) {
+            player->add(lineInfo);
+            dealerFound = true;
+        }
+        else if (player->getName() == lineInfo.receiver_name) {
+            player->add(lineInfo);
+            receiverFound = true;
+        }
+    }
+    if(!dealerFound && lineInfo.dealer_name != "") {
+        this->createPlayer(lineInfo.dealer_name, lineInfo);
+    }
+    if(!receiverFound && lineInfo.receiver_name != "") {
+        this->createPlayer(lineInfo.receiver_name, lineInfo);
+    }
+}
 
 template<class C>
 Damage PlayerVector<C>::getTotalDamage() const {
@@ -65,6 +105,32 @@ Heal PlayerVector<C>::getTotalHeals() const {
         h += p->getTotalHeals();
     }
     return h;
+}
+
+template<class C>
+void PlayerVector<C>::stopLogging() {
+    log = false;
+    for (const auto& player : this->players) {
+        player->stopTimer();
+    }
+}
+
+template<class C>
+void PlayerVector<C>::startLogging() {
+    log = true;
+    for (const auto& player : this->players) {
+        if (player->getStartTime() != 0) {
+            player->resumeTimer();
+        }
+    }
+}
+
+template<class C>
+void PlayerVector<C>::reset() {
+    for (C player : this->players) {
+        delete player;
+    }
+    this->players.clear();
 }
 
 

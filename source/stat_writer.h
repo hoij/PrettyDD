@@ -114,7 +114,6 @@ private:
 
     // Helper functions
     double percentage(int total, int part);
-    int damagePerMinute(int totalDamage, int startTime);
     void createNotFoundMessage(std::string fileName,
                                std::string message);
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);

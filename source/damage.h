@@ -15,8 +15,12 @@ public:
     void addDamageDealtOnPlayer(LineInfo& li);
     void addDamageReceivedFromPlayer(LineInfo& li);
 
+    void setDealtOnPlayerDPM(int damagePerMinute);
+    void setReceivedFromPlayerDPM(int damagePerMinute);
+
     // TODO: Just make the data public?
     int getTotalDealtOnPlayer() const {return dealtOnPlayer.total;}
+    int getDPMDealtOnPlayer() const {return dealtOnPlayer.dpm;}
     int getCountDealtOnPlayer() const {return dealtOnPlayer.count;}
     int getRegularTotalDealtOnPlayer() const {return dealtOnPlayer.regularTotal;}
     int getRegularCountDealtOnPlayer() const {return dealtOnPlayer.regularCount;}
@@ -34,6 +38,7 @@ public:
     int getMissesDealtOnPlayer() const {return dealtOnPlayer.misses;}
 
     int getTotalReceivedFromPlayer() const {return receivedFromPlayer.total;}
+    int getDPMReceivedFromPlayer() const {return receivedFromPlayer.dpm;}
     int getCountReceivedFromPlayer() const {return receivedFromPlayer.count;}
     int getRegularTotalReceivedFromPlayer() const {return receivedFromPlayer.regularTotal;}
     int getRegularCountReceivedFromPlayer() const {return receivedFromPlayer.regularCount;}
@@ -55,6 +60,7 @@ private:
         DamageInfo& operator+=(const DamageInfo& rhs);
 
         int total = 0;
+        int dpm = 0;
         int count = 0;
         int regularTotal = 0;
         int regularCount = 0;

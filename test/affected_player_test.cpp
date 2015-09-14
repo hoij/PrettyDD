@@ -16,7 +16,8 @@ Issue arises it might be a good idea to check that their tests pass.
 class AffectedPlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        affectedPlayer = new AffectedPlayer("Player1");
+        MyTime* myTime = new MyTime();
+        affectedPlayer = new AffectedPlayer("Player1", myTime);
     }
     virtual void TearDown() {
         delete affectedPlayer;

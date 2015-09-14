@@ -21,6 +21,14 @@ void Damage::addDamageReceivedFromPlayer(LineInfo& li) {
     addDamage(li, receivedFromPlayer);
 }
 
+void Damage::setDealtOnPlayerDPM(int damagePerMinute) {
+    dealtOnPlayer.dpm = damagePerMinute;
+}
+
+void Damage::setReceivedFromPlayerDPM(int damagePerMinute) {
+    receivedFromPlayer.dpm = damagePerMinute;
+}
+
 void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     di.total += li.amount;
     di.count++;

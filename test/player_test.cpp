@@ -44,7 +44,8 @@ protected:
     virtual void SetUp() {
         // mockAffectedPlayerVector will be deleted in Player
         mockAffectedPlayerVector = new MockAffectedPlayerVector();
-        player = new Player("You", mockAffectedPlayerVector);
+        MyTime* myTime = new MyTime();
+        player = new Player("You", mockAffectedPlayerVector, myTime);
 
         // Set up the return values.
         LineInfo li1;
@@ -71,12 +72,38 @@ bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
     lhs.nanoProgramName == rhs.nanoProgramName;
 }
 
+TEST_F(PlayerTest, timerTest) {
+    // TODO: Fix this test.
+    // TODO: Mock the time functions.
+    LineInfo li;
+    li.type = "damage";
+    EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
+        .Times(1);
+    EXPECT_EQ(0, player->getStartTime());
+    player->add(li);
+
+    // Expect a start time to have been set
+    std::time_t startTime = player->getStartTime();
+    // TODO: Expect the exact time when my_time has been mocked.
+    EXPECT_NE(0, startTime);
+
+    player->stopTimer();
+    // Stop time for some duration
+    player->resumeTimer();
+
+    // Verify that the duration is as expected.
+    //EXPECT_EQ(10, player->getPauseDuration());
+}
+
 TEST_F(PlayerTest, add_damage) {
     LineInfo li;
     li.type = "damage";
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
+
+    // Expect a start time to have been set
+    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_heal) {
@@ -85,6 +112,9 @@ TEST_F(PlayerTest, add_heal) {
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
+
+    // Expect a start time to have been set
+    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_nano) {
@@ -93,6 +123,9 @@ TEST_F(PlayerTest, add_nano) {
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
+
+    // Expect a start time to have been set
+    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_nanoCast) {
@@ -116,10 +149,13 @@ TEST_F(PlayerTest, add_nanoCast) {
     EXPECT_EQ(1, player->getNanoPrograms().size());
     std::string storedNanoName = player->getNanoPrograms()[0].getName();
     EXPECT_EQ(li1.nanoProgramName, storedNanoName);
+
+    // Expect a start time to have been set
+    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_xp) {
-    /*This test uses the real class XP.
+    /* This test uses the real class XP.
     Test that a LineInfo object of type xp can be added successfully. */
     LineInfo li;
     li.type = "xp";
@@ -127,6 +163,9 @@ TEST_F(PlayerTest, add_xp) {
     li.amount = 123456;
     player->add(li);
     EXPECT_EQ(li.amount, player->getXp().getTotalGained("xp"));
+
+    // Expect a start time to have been set
+    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, getTotalDamage) {

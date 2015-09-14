@@ -5,6 +5,7 @@
 #include "damage.h"
 #include "line_info.h"
 #include "logger.h"
+#include "my_time.h"
 
 #include <algorithm>
 #include <iterator>
@@ -41,8 +42,7 @@ public:
 
 protected:
     void createPlayer(std::string name, LineInfo& lineInfo);
-    static bool compareTotalReceivedFromPlayer(const std::pair<std::string, Damage>& p1,
-                                               const std::pair<std::string, Damage>& p2);
+
     std::vector<C> players;
 };
 
@@ -107,7 +107,8 @@ template<class C>
 void BaseVector<C>::createPlayer(std::string name, LineInfo& lineInfo) {
     // Get the type pointed to by C
     typedef typename std::remove_pointer<C>::type CNoPointer;
-    C player = new CNoPointer(name);
+    MyTime* pTime = new MyTime();
+    C player = new CNoPointer(name, pTime);
     player->add(lineInfo);
     players.push_back(player);
 }
@@ -132,13 +133,6 @@ size_t BaseVector<C>::getLongestNameLength() const {
         }
     }
     return longestNameLength;
-}
-
-template<class C>
-bool BaseVector<C>::compareTotalReceivedFromPlayer(const std::pair<std::string, Damage>& p1,
-                                                   const std::pair<std::string, Damage>& p2) {
-    return p1.second.getTotalReceivedFromPlayer() >
-           p2.second.getTotalReceivedFromPlayer();
 }
 
 

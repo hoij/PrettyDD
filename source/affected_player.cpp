@@ -1,10 +1,15 @@
 #include "affected_player.h"
 #include "line_info.h"
+#include "my_time.h"
 
 
-AffectedPlayer::AffectedPlayer(std::string name) : name(name) {}
+AffectedPlayer::AffectedPlayer(std::string name, MyTime* myTime) :
+    name(name), myTime(myTime) {}
 
 void AffectedPlayer::add(LineInfo& lineInfo) {
+    if (startTime == 0) {
+        startTime = myTime->currentTime();
+    }
     if (lineInfo.type == "damage") {
         addDamage(lineInfo);
     }
@@ -109,4 +114,10 @@ const Heal& AffectedPlayer::getHeal() const {
 
 const Nano& AffectedPlayer::getNano() const {
     return nano;
+}
+
+void AffectedPlayer::incrementPauseDuration(
+    const std::time_t& duration) {
+
+    pauseDuration += duration;
 }

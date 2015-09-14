@@ -2,12 +2,12 @@
 #include "configuration.h"
 #include "formatted_line.h"
 #include "logger.h"
+#include "my_time.h"
 #include "parser.h"
 #include "player_interface.h"
 #include "player_vector.h"
 #include "stat_writer.h"
 
-#include <chrono>
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -15,21 +15,12 @@
 #include <thread>
 #include <vector>
 
-#ifdef WIN32
-#pragma warning(disable : 4996)  // Disable ctime unsafe warning
-#endif
-
-
-std::string currentTime() {
-    std::chrono::time_point<std::chrono::system_clock> time_p = std::chrono::system_clock::now();
-    std::time_t time = std::chrono::system_clock::to_time_t(time_p);  // Time since 1970
-    return std::ctime(&time);  // ctime converts to readable string
-}
 
 int main(void) {
+    MyTime myTime;
     errorLog.write("");
     errorLog.write("Program started at: ", false);
-    errorLog.write(currentTime());
+    errorLog.write(myTime.currentTimeString());
 
     Configuration config;
     if(!config.read()) {
@@ -38,9 +29,12 @@ int main(void) {
     Parser parser(config.getplayerRunningProgram());
     PlayerVector<Player*> playerVector;
     StatWriter statWriter(playerVector);
-    CommandHandler commandHandler(statWriter);
+    CommandHandler commandHandler(statWriter, playerVector);
 
     std::ifstream logstream("../../test/example_lines.txt");
+
+    // TODO: Remove when done:
+    playerVector.startLogging();
 
     if (logstream.is_open()) {
         // Go to the end of the file
@@ -89,7 +83,7 @@ int main(void) {
 
     errorLog.write("");
     errorLog.write("Program ended at: ", false);
-    errorLog.write(currentTime());
+    errorLog.write(myTime.currentTimeString());
 
     std::getchar();
     return 0;
