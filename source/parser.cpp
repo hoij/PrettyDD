@@ -99,8 +99,8 @@ int Parser::findAmount(const std::string& message) {
         return std::stoi(d[0]);
     }
     else {
-        errorLog.write("Amount not found in the following line: ");
-        errorLog.write(message);
+        errorLog.write("Error: Amount not found in the following line: ");
+        errorLog.write("Error: " + message);
         return 0;
     }
 }
@@ -134,7 +134,8 @@ std::string Parser::findDamageSubtype(const std::string& message) {
         return m[1];
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find a damage subtype in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }
@@ -148,7 +149,8 @@ std::string Parser::findHealSubtype(const std::string& message) {
         return "actual";
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find a heal subtype in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }
@@ -174,7 +176,8 @@ std::string Parser::findNanoCastSubtype(const std::string& message) {
         return "fumble";
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find a nano cast subtype in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }
@@ -188,7 +191,8 @@ std::string Parser::findSKSubtype(const std::string& message) {
         return "lost";
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find a SK subtype in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }
@@ -199,11 +203,12 @@ std::string Parser::findXPSubtype(const std::string& message) {
         return "gained";
     }
     else if (regex_search(message, m, regex("lost"))) {
-        // Find out what an aixp loss looks like
+        // TODO: Find out what an aixp loss looks like
         return "lost";
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find an XP subtype in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }
@@ -217,7 +222,8 @@ std::string Parser::findAIXPSubtype(const std::string& message) {
         return "lost";
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find an AIXP subtype in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }
@@ -251,7 +257,8 @@ std::string Parser::findSubtype(const std::string& message, const std::string ty
         return ""; // No subtype for nano.
     }
     else {
-        // TODO: Log error.
+        errorLog.write("Error: Could not find a type in:");
+        errorLog.write("Error: " + message);
         return "";
     }
 }

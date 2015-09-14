@@ -223,7 +223,8 @@ void StatWriter::createDRDetailedTopList() {
         }
     }
     else {
-        errorLog.write("Could not open" + fileName);
+        errorLog.write("Error: Could not open/create \"" + filename +
+                        "\" for writing.");
     }
 }
 
@@ -506,7 +507,8 @@ void StatWriter::writeContents(
         file << "\">" + fileName + "</a>" << std::endl;
     }
     else {
-        // Write a function to write error common to all write functions.
+        errorLog.write("Error: Could not open/create \"" + filename +
+                        "\" for writing.");
     }
 }
 
@@ -572,7 +574,8 @@ void StatWriter::createMainScriptFile(std::vector<std::string> fileNames) {
         }
     }
     else {
-        // TODO: Write error.
+        errorLog.write("Error: Could not open/create the main script file " +
+                       "\"pdd\" for writing.");
     }
 }
 
@@ -625,6 +628,7 @@ bool StatWriter::compareTotalReceived(const Player* p1, const Player* p2) {
 
 
 // Remove when done:
+
 void StatWriter::createDDOverviewUnsorted() {
     std::ofstream file("damage_dealt_overview_unsorted");
     if (file.is_open()) {
