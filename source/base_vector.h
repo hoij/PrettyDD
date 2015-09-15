@@ -105,6 +105,8 @@ void BaseVector<C>::addToPlayers(LineInfo& lineInfo) {
 
 template<class C>
 void BaseVector<C>::createPlayer(std::string name, LineInfo& lineInfo) {
+    // TODO: Move this out into a factory.
+
     // Get the type pointed to by C
     typedef typename std::remove_pointer<C>::type CNoPointer;
     MyTime* pTime = new MyTime();

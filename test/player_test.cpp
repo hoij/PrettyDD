@@ -3,6 +3,7 @@
 #include "damage.h"
 #include "heal.h"
 #include "line_info.h"
+#include "my_time_interface.h"
 #include "player.h"
 
 #include <gmock/gmock.h>
@@ -18,15 +19,17 @@ public:
 
     MOCK_CONST_METHOD1(getTotalDamage, Damage(std::string callerName));
 
-    MOCK_CONST_METHOD2(getTotalDamagePerDamageType, Damage(std::string callerName,
-                                                     const std::string damageType));
+    MOCK_CONST_METHOD2(getTotalDamagePerDamageType,
+                       Damage(std::string callerName,
+                              const std::string damageType));
 
     MOCK_CONST_METHOD1(getTotalDamageForAllAffectedPlayers,
                        std::vector<std::pair<std::string, Damage>>(
-                       std::string callerName));
+                           std::string callerName));
 
     MOCK_CONST_METHOD1(getAllDamageFromAffectedPlayer,
-                       std::vector<std::pair<std::string, Damage>>(std::string name));
+                       std::vector<std::pair<std::string, Damage>>(
+                           std::string name));
 
     MOCK_METHOD1(getTotalHeals, Heal(std::string callerName));
 
@@ -36,22 +39,29 @@ public:
     MOCK_CONST_METHOD1(getTotalNano, Nano(std::string callerName));
 
     MOCK_CONST_METHOD1(getNanoForAllAffectedPlayers,
-                       std::vector<std::pair<std::string, Nano>>(std::string callerName));
+                       std::vector<std::pair<std::string, Nano>>(
+                           std::string callerName));
+};
+
+class MockMyTime : public MyTimeInterface {
+public:
+    MOCK_METHOD0(currentTime, std::time_t(void));
+    MOCK_METHOD0(currentTimeString, std::string(void));
 };
 
 class PlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        // mockAffectedPlayerVector will be deleted in Player
+        // mockAffectedPlayerVector and mockMyTime will be deleted in Player
         mockAffectedPlayerVector = new MockAffectedPlayerVector();
-        MyTime* myTime = new MyTime();
-        player = new Player("You", mockAffectedPlayerVector, myTime);
+        mockMyTime = new ::testing::NiceMock<MockMyTime>;
+        player = new Player("You", mockAffectedPlayerVector, mockMyTime);
 
         // Set up the return values.
         LineInfo li1;
         LineInfo li2;
-        li1.amount = 10;
-        li2.amount = 30;
+        li1.amount = 1000;
+        li2.amount = 3000;
         d1.addDamageDealtOnPlayer(li1);
         d2.addDamageDealtOnPlayer(li2);
     }
@@ -60,8 +70,16 @@ protected:
     }
     Player* player;
     MockAffectedPlayerVector* mockAffectedPlayerVector;
+    ::testing::NiceMock<MockMyTime>* mockMyTime;
+
     Damage d1;
     Damage d2;
+
+    std::time_t startTime = 1442318667;
+    std::time_t stopTime = startTime + 180;
+    std::time_t resumeTime = startTime + 780;
+    std::time_t pauseDuration = resumeTime - stopTime; // 600
+    std::time_t DPMTime = startTime + 800;
 };
 
 bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
@@ -73,26 +91,70 @@ bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
 }
 
 TEST_F(PlayerTest, timerTest) {
-    // TODO: Fix this test.
-    // TODO: Mock the time functions.
+    /* Add player to set a start time.
+    "Stop" time.
+    Resume time.
+    Verify that the duration during which the time was stopped is correct. */
     LineInfo li;
     li.type = "damage";
+
+    // The start time should be zero when no stats have been added
+    // to the player.
+    EXPECT_EQ(0, player->getStartTime());
+
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
-    EXPECT_EQ(0, player->getStartTime());
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(startTime));
+
     player->add(li);
-
     // Expect a start time to have been set
-    std::time_t startTime = player->getStartTime();
-    // TODO: Expect the exact time when my_time has been mocked.
-    EXPECT_NE(0, startTime);
+    EXPECT_EQ(startTime, player->getStartTime());
 
-    player->stopTimer();
+
     // Stop time for some duration
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(stopTime));
+    player->stopTimer();
+
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(resumeTime));
     player->resumeTimer();
 
+
     // Verify that the duration is as expected.
-    //EXPECT_EQ(10, player->getPauseDuration());
+    EXPECT_EQ(pauseDuration, player->getPauseDuration());
+}
+
+TEST_F(PlayerTest, amountPerMinute) {
+    /* Test when the time is not stopped */
+    player->startTime = startTime;
+    player->pauseDuration = pauseDuration;
+
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(DPMTime));
+
+    // The active time is 200 s.
+    int expected1 = 300001/((float)200/60);
+    EXPECT_EQ(expected1, player->amountPerMinute(300001));
+
+
+    /* Test when time is stopped */
+    // Set a stopTime. The active time is still 200 s.
+    player->stopTime = DPMTime;
+    // Now stopTime should be used instead of currentTime().
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .Times(0);
+    EXPECT_EQ(expected1, player->amountPerMinute(300001));
+
+    /* Test 0 */
+    EXPECT_EQ(0, player->amountPerMinute(0));
+
+
+    /* Start and stop time are the same => an active time of 0. */
+    player->stopTime = startTime;
+    player->pauseDuration = 0;
+    EXPECT_EQ(0, player->amountPerMinute(2000));
 }
 
 TEST_F(PlayerTest, add_damage) {
@@ -101,9 +163,6 @@ TEST_F(PlayerTest, add_damage) {
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
-
-    // Expect a start time to have been set
-    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_heal) {
@@ -112,9 +171,6 @@ TEST_F(PlayerTest, add_heal) {
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
-
-    // Expect a start time to have been set
-    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_nano) {
@@ -123,9 +179,6 @@ TEST_F(PlayerTest, add_nano) {
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
-
-    // Expect a start time to have been set
-    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_nanoCast) {
@@ -149,9 +202,6 @@ TEST_F(PlayerTest, add_nanoCast) {
     EXPECT_EQ(1, player->getNanoPrograms().size());
     std::string storedNanoName = player->getNanoPrograms()[0].getName();
     EXPECT_EQ(li1.nanoProgramName, storedNanoName);
-
-    // Expect a start time to have been set
-    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_xp) {
@@ -163,9 +213,6 @@ TEST_F(PlayerTest, add_xp) {
     li.amount = 123456;
     player->add(li);
     EXPECT_EQ(li.amount, player->getXp().getTotalGained("xp"));
-
-    // Expect a start time to have been set
-    EXPECT_NE(0, player->getStartTime());
 }
 
 TEST_F(PlayerTest, getTotalDamage) {

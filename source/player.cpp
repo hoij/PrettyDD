@@ -10,22 +10,23 @@
 
 Player::Player(std::string name) : name(name) {
     affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
+    myTime = new MyTime();
 }
 
-Player::Player(std::string name, MyTime* myTime) : name(name), myTime(myTime) {
+Player::Player(std::string name, MyTimeInterface* myTime) : name(name), myTime(myTime) {
     affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
-    myTime = new MyTime;
 }
 
 Player::Player(std::string name,
                AffectedPlayerVector<AffectedPlayer*>* pv,
-               MyTime* myTime) :
+               MyTimeInterface* myTime) :
     name(name),
     affectedPlayers(pv),
     myTime(myTime) {}
 
 Player::~Player() {
     delete affectedPlayers;
+    delete myTime;
 }
 
 Player::Player(const Player& other) {
@@ -174,9 +175,8 @@ Nano Player::getTotalNano() const {
 }
 
 std::time_t Player::getTimeActive() const {
-    // Need to check that there is a start time?
-    // I don't think so because a start time should be set as soon
-    // as add is called which it always is for a new player.
+    // Start time is set the first time a player is added to the vector
+    // and it's add() method is called.
     std::time_t timeActive;
     if (stopTime == 0) {
         timeActive = myTime->currentTime() - startTime - pauseDuration;

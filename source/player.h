@@ -11,6 +11,7 @@
 #include "my_time.h"
 #include "xp.h"
 
+#include <gtest/gtest_prod.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -20,12 +21,13 @@ class LineInfo;
 
 
 class Player : public virtual PlayerInterface {
+// TODO: Se if Player can be split into smaller classes.
 public:
     Player(std::string name);
-    Player(std::string name, MyTime* myTime);
+    Player(std::string name, MyTimeInterface* myTime);
     Player(std::string name,
            AffectedPlayerVector<AffectedPlayer*>* pv,
-           MyTime* myTime);
+           MyTimeInterface* myTime);
     ~Player();
     Player(const Player& other);
     Player(Player&& other) noexcept;
@@ -66,6 +68,8 @@ public:
     }
 
 private:
+    FRIEND_TEST(PlayerTest, amountPerMinute);
+
     std::string name;
     std::time_t startTime = 0;
     std::time_t stopTime = 0;
@@ -74,14 +78,13 @@ private:
     int amountPerMinute(int amount) const;
     void addDPM(std::vector<std::pair<std::string, Damage>>& v) const;
 
-
     void addNanoProgram(std::string name, std::string subtype);
     void addXp(LineInfo& li);
     Damage sumDamage(bool nanobots);
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
     AffectedPlayerVector<AffectedPlayer*>* affectedPlayers = nullptr;
-    MyTime* myTime = nullptr;
+    MyTimeInterface* myTime = nullptr;
     std::string nameOfLastNanoProgramCasted;
 	std::vector<NanoProgram> nanoPrograms;
     XP xp;

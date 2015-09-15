@@ -223,7 +223,7 @@ void StatWriter::createDRDetailedTopList() {
         }
     }
     else {
-        errorLog.write("Error: Could not open/create \"" + filename +
+        errorLog.write("Error: Could not open/create \"" + fileName +
                         "\" for writing.");
     }
 }
@@ -507,7 +507,7 @@ void StatWriter::writeContents(
         file << "\">" + fileName + "</a>" << std::endl;
     }
     else {
-        errorLog.write("Error: Could not open/create \"" + filename +
+        errorLog.write("Error: Could not open/create \"" + fileName +
                         "\" for writing.");
     }
 }
@@ -574,7 +574,7 @@ void StatWriter::createMainScriptFile(std::vector<std::string> fileNames) {
         }
     }
     else {
-        errorLog.write("Error: Could not open/create the main script file " +
+        errorLog.write("Error: Could not open/create the main script file "
                        "\"pdd\" for writing.");
     }
 }
