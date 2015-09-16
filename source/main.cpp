@@ -26,12 +26,13 @@ int main(void) {
     if(!config.read()) {
         return 1;
     }
+
     Parser parser(config.getplayerRunningProgram());
     PlayerVector<Player*> playerVector;
     StatWriter statWriter(playerVector);
     CommandHandler commandHandler(statWriter, playerVector);
 
-    std::ifstream logstream("../../test/example_lines.txt");
+    std::ifstream logstream(config.getLogFilePath());
 
     // TODO: Remove when done:
     playerVector.startLogging();
@@ -78,7 +79,7 @@ int main(void) {
         }
     }
     else {
-        std::cerr << "Could not open the log file." << std::endl;
+        errorLog.write("Error: Could not open the log file.");
     }
 
     errorLog.write("");

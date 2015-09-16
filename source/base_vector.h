@@ -122,7 +122,6 @@ const C BaseVector<C>::getPlayer(std::string name) {
             return player;
         }
     }
-    errorLog.write("Could not find a player with the name " + name);
     return nullptr;
 }
 

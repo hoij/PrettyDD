@@ -99,8 +99,8 @@ int Parser::findAmount(const std::string& message) {
         return std::stoi(d[0]);
     }
     else {
-        errorLog.write("Error: Amount not found in the following line: ");
-        errorLog.write("Error: " + message);
+        errorLog.write("Error: Amount not found in: ");
+        errorLog.write("Error: Message: " + message);
         return 0;
     }
 }
@@ -135,7 +135,7 @@ std::string Parser::findDamageSubtype(const std::string& message) {
     }
     else {
         errorLog.write("Error: Could not find a damage subtype in:");
-        errorLog.write("Error: " + message);
+        errorLog.write("Error: Message: " + message);
         return "";
     }
 }
@@ -150,7 +150,7 @@ std::string Parser::findHealSubtype(const std::string& message) {
     }
     else {
         errorLog.write("Error: Could not find a heal subtype in:");
-        errorLog.write("Error: " + message);
+        errorLog.write("Error: Message: " + message);
         return "";
     }
 }
@@ -192,7 +192,7 @@ std::string Parser::findSKSubtype(const std::string& message) {
     }
     else {
         errorLog.write("Error: Could not find a SK subtype in:");
-        errorLog.write("Error: " + message);
+        errorLog.write("Error: Message: " + message);
         return "";
     }
 }
@@ -223,7 +223,7 @@ std::string Parser::findAIXPSubtype(const std::string& message) {
     }
     else {
         errorLog.write("Error: Could not find an AIXP subtype in:");
-        errorLog.write("Error: " + message);
+        errorLog.write("Error: Message: " + message);
         return "";
     }
 }
@@ -258,7 +258,7 @@ std::string Parser::findSubtype(const std::string& message, const std::string ty
     }
     else {
         errorLog.write("Error: Could not find a type in:");
-        errorLog.write("Error: " + message);
+        errorLog.write("Error: Message: " + message);
         return "";
     }
 }
@@ -312,15 +312,15 @@ void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterfa
     // Just to capture anything I might have missed.
     if (lineInfo.dealer_name == "" && lineInfo.receiver_name == "") {
         errorLog.write("Warning: Could not find dealer and receiver name in the following line (Note: This may be normal): ");
-        errorLog.write("Warning: " + formattedLine.getOriginalLine());
+        errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
     }
     else if (lineInfo.dealer_name == "") {
         errorLog.write("Warning: Could not find dealer name in the following line (Note: This may be normal): ");
-        errorLog.write("Warning: " + formattedLine.getOriginalLine());
+        errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
     }
     else if (lineInfo.receiver_name == "") {
         errorLog.write("Warning: Could not find receiver name in the following line (Note: This may be normal): ");
-        errorLog.write("Warning: " + formattedLine.getOriginalLine());
+        errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
     }
 }
 
