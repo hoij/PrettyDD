@@ -180,7 +180,7 @@ TEST_F(PlayerTest, amountPerMinute) {
         .WillOnce(::testing::Return(DPMTime));
 
     // The active time is 200 s.
-    int expected1 = 300001/((float)200/60);
+    int expected1 = (int)(300001/((float)200/60));
     EXPECT_EQ(expected1, player->amountPerMinute(300001));
 
 

@@ -15,6 +15,7 @@ class StatWriter {
 // TODO: Split into smaller classes
 public:
     StatWriter(PlayerVector<Player*>& playerVector);
+    StatWriter& operator=(StatWriter rhs) = delete;
 
     void createDDTopList();
     void createDDDetailedTopList();
@@ -94,8 +95,7 @@ private:
 
     void writeContents(
         std::vector<std::pair<std::string, Damage>>::iterator start,
-        std::vector<std::pair<std::string, Damage>>::iterator stop1,
-        std::vector<std::pair<std::string, Damage>>::iterator stop2,
+        std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::string fileName,
         size_t maxNameLength,
         int& place,

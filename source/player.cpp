@@ -38,7 +38,7 @@ Player::Player(const Player& other) {
     xp = other.xp;
 }
 
-Player::Player(Player&& other) noexcept : Player(other.getName()) {
+Player::Player(Player&& other) NOEXCEPT : Player(other.getName()) {
     swap(*this, other);
 }
 
@@ -203,7 +203,7 @@ int Player::amountPerMinute(int amount) const {
         return 0;
     }
     else {
-        return amount / ((double)t / 60);
+        return int(amount / ((double)t / 60));
     }
 }
 

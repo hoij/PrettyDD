@@ -31,7 +31,7 @@ void StatWriter::createDDTopList() {
 
     // Calculate the number of files needed to write all players
     const int playersPerFile = 20;
-    int nrOfPlayers = playerVector.size();
+    int nrOfPlayers = (int)playerVector.size();
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
@@ -59,7 +59,7 @@ void StatWriter::createDDDetailedTopList() {
 
     // Calculate the number of files needed to write all players
     const int playersPerFile = 12;
-    int nrOfPlayers = playerVector.size();
+    int nrOfPlayers = (int)playerVector.size();
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
@@ -96,7 +96,7 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
 
     // Calculate the number of files needed to write all players
     const int typesPerFile = 12;
-    int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
+    int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
     int nrOfFiles = nrOfTypes / typesPerFile +
                    (nrOfTypes % typesPerFile != 0);
 
@@ -130,7 +130,7 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
 
     // Calculate the number of files needed to write all players
     const int playersPerFile = 12;
-    int nrOfPlayers = pp->nrOfAffectedPlayers();
+    int nrOfPlayers = (int)pp->nrOfAffectedPlayers();
     int nrOfFiles = nrOfPlayers / playersPerFile +
                    (nrOfPlayers % playersPerFile != 0);
 
@@ -185,7 +185,7 @@ void StatWriter::createDDOnSpecificOpponent(
 
     // Calculate the number of files needed to write all players
     const int typesPerFile = 12;
-    int nrOfTypes = allDamageTypesFromAffectedPlayer.size();
+    int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
     int nrOfFiles = nrOfTypes / typesPerFile +
                    (nrOfTypes % typesPerFile != 0);
 
@@ -459,14 +459,16 @@ std::vector<std::string> StatWriter::writeContentsToFile(
         fileNames.push_back(fileName);
 
         // Do the actual writing:
-        auto start = v.begin() +
-                     fileNr * typesPerFile;
-        auto stop1 = v.begin() +
-                     (fileNr + 1) * typesPerFile;
-        auto stop2 = v.end();
+        auto start = v.begin() + fileNr * typesPerFile;
+        auto stop = v.begin();
+        if (v.size() < (fileNr + 1) * typesPerFile) {
+            stop = v.end();
+        }
+        else {
+            stop = v.begin() + (fileNr + 1) * typesPerFile;
+        }
         writeContents(start,
-                      stop1,
-                      stop2,
+                      stop,
                       fileName,
                       maxNameLength,
                       place,
@@ -478,8 +480,7 @@ std::vector<std::string> StatWriter::writeContentsToFile(
 
 void StatWriter::writeContents(
     std::vector<std::pair<std::string, Damage>>::iterator start,
-    std::vector<std::pair<std::string, Damage>>::iterator stop1,
-    std::vector<std::pair<std::string, Damage>>::iterator stop2,
+    std::vector<std::pair<std::string, Damage>>::iterator stop,
     std::string fileName,
     size_t maxNameLength,
     int& place,
@@ -498,7 +499,7 @@ void StatWriter::writeContents(
 
         (this->*writeHeadings)(maxNameLength, file);
 
-        for (auto it = start; it != stop1 && it != stop2; it++) {
+        for (auto it = start; it != stop; it++) {
             writePlace(place++, file);
             writeName(it->first, maxNameLength, file);
             (this->*writeDD)(it->second, file);
@@ -539,7 +540,7 @@ std::ostream& StatWriter::writeName(std::string name,
         const int tabSize = 8;
         const int placeSize = 5;
 
-        int charDiff = maxNameLength - name.size();
+        int charDiff = (int)maxNameLength - (int)name.size();
         int sizeOfFirstTab = tabSize - (name.size() + placeSize) % tabSize;
 
         int nrOfTabs = charDiff / tabSize; //+ (charDiff % tabSize != 0);

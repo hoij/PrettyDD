@@ -13,6 +13,7 @@ public:
     CommandHandler(StatWriter& statWriter,
                    PlayerVector<Player*>& playerVector) :
         statWriter(statWriter), playerVector(playerVector) {}
+    CommandHandler& operator=(CommandHandler rhs) = delete;
     void execute(std::string command);
 
 private:

@@ -17,8 +17,15 @@
 #include <vector>
 
 
-class LineInfo;
+#ifdef WIN32
+#pragma warning(disable : 4100)
+#define NOEXCEPT
+#else
+#define NOEXCEPT noexcept
+#endif
 
+
+class LineInfo;
 
 class Player : public virtual PlayerInterface {
 // TODO: Se if Player can be split into smaller classes.
@@ -30,7 +37,7 @@ public:
            MyTimeInterface* myTime);
     ~Player();
     Player(const Player& other);
-    Player(Player&& other) noexcept;
+    Player(Player&& other) NOEXCEPT;
     Player& operator=(Player rhs);
     friend void swap(Player& first, Player& second);
 
@@ -63,7 +70,7 @@ public:
     std::time_t getPauseDuration() {return pauseDuration;}
 
     size_t getLongestAffectedPlayerNameLength() const;
-    typename std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers() {
+    std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers() {
         return affectedPlayers->size();
     }
 

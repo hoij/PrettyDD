@@ -42,7 +42,7 @@ void CommandHandler::execute(std::string command) {
     std::vector<std::string> commandParts = mergeQuotedText(
                                                 splitCommand(command));
 
-    int nrOfOptions = commandParts.size() - 1;
+    int nrOfOptions = (int)commandParts.size() - 1;
 
     if (nrOfOptions == 0) {
         // Write the detailed top list by defualt:

@@ -1,3 +1,8 @@
+#ifdef WIN32
+#pragma warning(disable : 4250)
+#pragma warning(disable : 4373)
+#endif
+
 #include "affected_player.h"
 #include "affected_player_vector.h"
 #include "damage.h"
@@ -8,6 +13,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <string>
+
 
 /* Many of these test cases rely on the implementation of Damage/Heal/Nano/XP.
 If a test case fails it might be a good idea to verify that the tests for
