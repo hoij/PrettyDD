@@ -80,6 +80,12 @@ protected:
     std::time_t resumeTime = startTime + 780;
     std::time_t pauseDuration = resumeTime - stopTime; // 600
     std::time_t DPMTime = startTime + 800;
+    std::time_t stopTime2 = startTime + 820;
+    std::time_t resumeTime2 = startTime + 886;
+    std::time_t pauseDuration2 = pauseDuration +
+                                 resumeTime2 -
+                                 stopTime2; // 666
+    //std::time_t DPMTime = startTime + 800;
 };
 
 bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
@@ -94,7 +100,11 @@ TEST_F(PlayerTest, timerTest) {
     /* Add player to set a start time.
     "Stop" time.
     Resume time.
-    Verify that the duration during which the time was stopped is correct. */
+    Verify the pause duration.
+    Stop time a second time.
+    Resume time a second time.
+    Verify the pause duration.
+    */
     LineInfo li;
     li.type = "damage";
 
@@ -111,19 +121,54 @@ TEST_F(PlayerTest, timerTest) {
     // Expect a start time to have been set
     EXPECT_EQ(startTime, player->getStartTime());
 
-
     // Stop time for some duration
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(stopTime));
+    player->stopTimer();
+    // Resume time
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(resumeTime));
+    player->resumeTimer();
+
+    // Verify that the duration is as expected.
+    EXPECT_EQ(pauseDuration, player->getPauseDuration());
+
+    // Stop time a second time
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(stopTime2));
+    player->stopTimer();
+
+    // Resume time
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(resumeTime2));
+    player->resumeTimer();
+
+    // Verify that the duration is as expected.
+    EXPECT_EQ(pauseDuration2, player->getPauseDuration());
+}
+
+TEST_F(PlayerTest, instantStopResume) {
+    /* Stop and resume time on the same second */
+    LineInfo li;
+    li.type = "damage";
+
+    EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
+        .Times(1);
+    EXPECT_CALL(*mockMyTime, currentTime())
+        .WillOnce(::testing::Return(startTime));
+
+    player->add(li);
+
     EXPECT_CALL(*mockMyTime, currentTime())
         .WillOnce(::testing::Return(stopTime));
     player->stopTimer();
 
     EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(resumeTime));
+        .WillOnce(::testing::Return(stopTime));
     player->resumeTimer();
 
-
     // Verify that the duration is as expected.
-    EXPECT_EQ(pauseDuration, player->getPauseDuration());
+    EXPECT_EQ(0, player->getPauseDuration());
 }
 
 TEST_F(PlayerTest, amountPerMinute) {
