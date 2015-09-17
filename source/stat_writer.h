@@ -85,7 +85,7 @@ private:
     std::vector<std::string> writeContentsToFile(
         std::string fileNameBase,
         std::vector<std::pair<std::string, Damage>>& v,
-        int nrOfFiles,
+        unsigned int nrOfFiles,
         int typesPerFile,
         size_t maxNameLength,
         std::ostream& (StatWriter::*writeHeadings)

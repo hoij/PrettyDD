@@ -437,7 +437,7 @@ void StatWriter::createNotFoundMessage(std::string fileName,
 std::vector<std::string> StatWriter::writeContentsToFile(
     std::string fileNameBase,
     std::vector<std::pair<std::string, Damage>>& v,
-    int nrOfFiles,
+    unsigned int nrOfFiles,
     int typesPerFile,
     size_t maxNameLength,
     std::ostream& (StatWriter::*writeHeadings)
@@ -451,7 +451,7 @@ std::vector<std::string> StatWriter::writeContentsToFile(
     std::vector<std::string> fileNames;
 
     int place = 1;
-    for (int fileNr = 0; fileNr != nrOfFiles; fileNr++) {
+    for (unsigned int fileNr = 0; fileNr != nrOfFiles; fileNr++) {
         // Append the file nr to the file name
         std::string interval = std::to_string(fileNr * typesPerFile + 1) + "-" +
                                std::to_string((fileNr + 1) * typesPerFile);

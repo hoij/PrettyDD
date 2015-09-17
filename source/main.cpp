@@ -19,7 +19,7 @@
 int main(void) {
     MyTime myTime;
     errorLog.write("");
-    errorLog.write("Program started at: ", false);
+    errorLog.write("Info: Program started at: ", false);
     errorLog.write(myTime.currentTimeString());
 
     Configuration config;
@@ -32,58 +32,53 @@ int main(void) {
     StatWriter statWriter(playerVector);
     CommandHandler commandHandler(statWriter, playerVector);
 
-    std::ifstream logstream(config.getLogFilePath());
-
     // TODO: Remove when done:
     playerVector.startLogging();
 
-    if (logstream.is_open()) {
-        // Go to the end of the file
-        //logstream.seekg(0, logstream.end);
-        //logstream.close();
-
-        // Copying a log file with all examples for testing purposes
-        //ifstream inlogstream("test_damage.txt");
-        //ofstream outlogstream("log.txt");
-        //while (getline(inlogstream, line)) {
-        //	outlogstream << line << endl;
-        //}
-        //outlogstream.close();
-        //inlogstream.close();
-
-        //ifstream logstream("log.txt");
-
-        std::string logLine;
-        bool is_running = true;
-        while (is_running) {
-            while (getline(logstream, logLine)) {
-                std::cout << logLine << std::endl;
-                FormattedLine formattedLine(logLine);
-                // TODO: Figure out some way to handling this check nicer.
-                if (formattedLine.isFormatted()) {
-                    LineInfo lineInfo = parser.parse(formattedLine);
-                    if(lineInfo.hasStats) {
-                        playerVector.addToPlayers(lineInfo);
-                    }
-                    else if (!lineInfo.command.empty()) {
-                        commandHandler.execute(lineInfo.command);
-                    }
-                }
-            }
-            if (!logstream.eof()) {  // Why did I check for this?
-                std::cout << "Error: Not EOF!" << std::endl;
-                is_running = false;
-            }
-            logstream.clear();
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        }
+    std::ifstream logstream(config.getLogFilePath());
+    if (!logstream.is_open()) {
+        errorLog.write("Error: Could not open the log file:");
+        errorLog.write("Error: " + config.getLogFilePath());
     }
-    else {
-        errorLog.write("Error: Could not open the log file.");
+    logstream.clear();
+    logstream.seekg(0, logstream.end);
+    std::ios::streampos lastpos = logstream.tellg();
+    std::ios::streampos endpos = logstream.tellg();
+
+    std::string line;
+    bool is_running = true;
+    while (is_running) {
+        if(!std::getline(logstream, line) || logstream.eof()) {
+            // Check the end to see if the file has shrunk.
+            // If it has, then move back to the new end.
+            logstream.clear();
+            logstream.seekg(0, logstream.end);
+            endpos = logstream.tellg();
+            logstream.clear();
+            logstream.seekg((endpos < lastpos) ? endpos : lastpos);
+            //sleep to get less CPU intensive
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            continue;
+        }
+
+        FormattedLine formattedLine(line);
+        // TODO: Figure out some way to handling this check nicer.
+        if (formattedLine.isFormatted()) {
+            LineInfo lineInfo = parser.parse(formattedLine);
+            if(lineInfo.hasStats) {
+                playerVector.addToPlayers(lineInfo);
+            }
+            else if (!lineInfo.command.empty()) {
+                commandHandler.execute(lineInfo.command);
+            }
+        }
+
+        lastpos = logstream.tellg();
+        std::cout << "The log line: " << line << std::endl;
     }
 
     errorLog.write("");
-    errorLog.write("Program ended at: ", false);
+    errorLog.write("Info: Program ended at: ", false);
     errorLog.write(myTime.currentTimeString());
 
     std::getchar();
