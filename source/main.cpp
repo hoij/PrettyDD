@@ -29,7 +29,7 @@ int main(void) {
 
     Parser parser(config.getplayerRunningProgram());
     PlayerVector<Player*> playerVector;
-    StatWriter statWriter(playerVector);
+    StatWriter statWriter(playerVector, config);
     CommandHandler commandHandler(statWriter, playerVector);
 
     // TODO: Remove when done:
@@ -74,7 +74,7 @@ int main(void) {
         }
 
         lastpos = logstream.tellg();
-        std::cout << "The log line: " << line << std::endl;
+        //std::cout << "The log line: " << line << std::endl;
     }
 
     errorLog.write("");

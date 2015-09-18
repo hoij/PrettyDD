@@ -53,8 +53,8 @@ void CommandHandler::execute(std::string command) {
         statWriter.createDDTopList();
         statWriter.createDDDetailedTopList();
         statWriter.createDDPerOpponent("You");
-        statWriter.createDDPerOpponent("Nonexisting");
-        statWriter.createDDOnSpecificOpponent("You", "asshole");
+        //statWriter.createDDPerOpponent("Nonexisting");
+        //statWriter.createDDOnSpecificOpponent("You", "asshole");
         statWriter.createDDOnSpecificOpponent("You", "Predator Rogue");
         statWriter.createDDPerDamageType("You");
         //statWriter.createDDPerOpponentDetailed("Predator Rogue", "You");
@@ -193,12 +193,10 @@ std::vector<std::string> CommandHandler::mergeQuotedText(std::vector<std::string
     std::string quotedString;
     bool insideQuote = false;
 
-    std::vector<std::string> text5 = {"hello", "\"this", "is", "some", "quotedtext",
-                                      "\"", "and", "this", "is", "not"};
-
     for (auto& part : commandParts) {
         if (part.front() == '"' && part.back() != '"') {
             insideQuote = !insideQuote;
+            part.erase(0, 1);
             quotedString += part + " ";
         }
         else if (part.front() == '"' &&
@@ -217,6 +215,7 @@ std::vector<std::string> CommandHandler::mergeQuotedText(std::vector<std::string
             insideQuote = !insideQuote;
         }
         else if (part.back() == '"') {
+            part.erase(part.size() - 1);
             quotedString += part;
             result.push_back(quotedString);
             quotedString = "";

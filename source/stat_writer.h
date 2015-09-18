@@ -3,6 +3,7 @@
 
 
 #include "player_vector.h"
+#include "configuration.h"
 
 #include <ostream>
 #include <string>
@@ -14,7 +15,7 @@ class Player;
 class StatWriter {
 // TODO: Split into smaller classes
 public:
-    StatWriter(PlayerVector<Player*>& playerVector);
+    StatWriter(PlayerVector<Player*>& playerVector, Configuration& config);
     StatWriter& operator=(StatWriter rhs) = delete;
 
     void createDDTopList();
@@ -83,6 +84,7 @@ private:
 
     // Common writes
     std::vector<std::string> writeContentsToFile(
+        std::string titleBase,
         std::string fileNameBase,
         std::vector<std::pair<std::string, Damage>>& v,
         unsigned int nrOfFiles,
@@ -97,12 +99,25 @@ private:
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::string fileName,
+        std::string title,
         size_t maxNameLength,
         int& place,
         std::ostream& (StatWriter::*writeHeadings)
             (size_t maxNameLength, std::ostream& os),
         std::ostream& (StatWriter::*writeDD)
             (const Damage& d, std::ostream& os));
+
+    void StatWriter::writeContentsReadable(
+        std::vector<std::pair<std::string, Damage>>::iterator start,
+        std::vector<std::pair<std::string, Damage>>::iterator stop,
+        std::string fileName,
+        std::string title,
+        size_t maxNameLength,
+        int& place,
+        std::ostream& (StatWriter::*writeHeadings)
+        (size_t maxNameLength, std::ostream& os),
+        std::ostream& (StatWriter::*writeDD)
+        (const Damage& d, std::ostream& os));
 
     std::ostream& writePlace(int place, std::ostream& os);
     std::ostream& writeName(std::string name,
@@ -115,6 +130,7 @@ private:
     // Helper functions
     double percentage(int total, int part);
     void createNotFoundMessage(std::string fileName,
+                               std::string title,
                                std::string message);
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
@@ -126,6 +142,7 @@ private:
 
 
     PlayerVector<Player*>& playerVector;
+    Configuration& config;
 };
 
 

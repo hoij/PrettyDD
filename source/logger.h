@@ -11,7 +11,7 @@ class Logger {
 public:
     template<typename T>
     void write(const T& message, bool newline = true) {
-        std::ofstream logfile("errors.txt", std::ios::app);
+        std::ofstream logfile("pddlog.txt", std::ios::app);
         if (logfile.is_open()) {
             logfile << message;
             if (newline) {
@@ -19,7 +19,7 @@ public:
             }
         }
         else {
-            std::cerr << "Could not open the errors log for writing." <<
+            std::cerr << "Could not open pddlog.txt for writing." <<
             std::endl;
         }
     }

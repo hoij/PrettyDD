@@ -15,6 +15,7 @@ public:
         if (settings.is_open()) {
             getline(settings, playerRunningProgram);
             getline(settings, logFilePath);
+            getline(settings, scriptsPath);
             return verifyParameters();
         }
         else {
@@ -25,6 +26,7 @@ public:
 
     std::string& getplayerRunningProgram() {return playerRunningProgram;}
     std::string& getLogFilePath() {return logFilePath;}
+    std::string& getScriptsPath() {return scriptsPath;}
 
 private:
     bool verifyParameters() {
@@ -34,11 +36,15 @@ private:
             errorLog.write("Error: " + playerRunningProgram);
             return false;
         }
+        if (scriptsPath.back() != '\\') {
+            scriptsPath += '\\';
+        }
         return true;
     }
 
     std::string playerRunningProgram;
     std::string logFilePath;
+    std::string scriptsPath;
 };
 
 

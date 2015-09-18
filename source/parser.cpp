@@ -60,6 +60,11 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             // Vicinity, team or org chat messages
             lineInfo = chat(formattedLine.getMessage(), formattedLine.getSender());
         }
+    // TODO: Fix this case with system. It's both in the func map
+    // and also here as an else if.
+    else if (formattedLine.getDescription() == "System") {
+        lineInfo = system(formattedLine.getMessage());
+    }
     else {
         // Call a matching function from the map of parsing functions.
         auto funcMapIterator = funcMap.find(formattedLine.getDescription());
@@ -265,7 +270,7 @@ std::string Parser::findSubtype(const std::string& message, const std::string ty
 
 bool Parser::isCrit(const std::string& message) {
     std::smatch m;
-    if (regex_search(message, m, regex("damage.Critical hit!")))
+    if (regex_search(message, m, regex("damage. Critical hit!|damage.Critical hit!")))
         return true;
     else
         return false;
@@ -310,6 +315,12 @@ void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterfa
     // TODO: Remove at some point.
     // For development purposes only.
     // Just to capture anything I might have missed.
+    if (formattedLine.getDescription() == "System" ||
+        formattedLine.getDescription() == "Vicinity" ||
+        formattedLine.getDescription() == "Me got health" ||
+        formattedLine.getDescriptionCode() == "00000003000011fc") {
+        return;
+    }
     if (lineInfo.dealer_name == "" && lineInfo.receiver_name == "") {
         errorLog.write("Warning: Could not find dealer and receiver name in the following line (Note: This may be normal): ");
         errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
@@ -643,7 +654,7 @@ LineInfo Parser::meCastNano(const std::string& message) {
     ["#0000000042000018#","Me Cast Nano","",1434561648]Executing Nano Program: Uncontrollable Body Tremors.
     ["#0000000042000018#","Me Cast Nano","",1434561650]Your target countered the nano program.
 
-    Fix:
+    TODO:
     This nano will execute twice. It will cast the HP buff, then heal.
     When the last nano has received a status (land/resist etc.) I could clear the pointer.
     If then another status message arrives, I can ignore it.
@@ -651,6 +662,10 @@ LineInfo Parser::meCastNano(const std::string& message) {
     ["#0000000042000018#","Me Cast Nano","",1434562393]Nano program executed successfully.
     ["#0000000042000015#","Me got health","",1434562393]You were healed for 3025 points.
     ["#0000000042000018#","Me Cast Nano","",1434562393]Nano program executed successfully.
+
+    TODO:
+    Randomly this message can appear. Possibly when a proc fires. Need to handle it.
+    ["#0000000042000018#","Me Cast Nano","",1442506417]Nano program executed successfully.
     */
     LineInfo li;
     li.type = "nano cast";
@@ -785,8 +800,29 @@ LineInfo Parser::victoryPoints(const std::string& message) {
 }
 
 LineInfo Parser::system(const std::string& message) {
+    /*
+    ["#0000000040000001#", "System", "", 1442506644]Muwe executes Bodily Invigoration within your NCU...
+
+    ["#0000000040000001#","System","",1442506292]You hit with 29 bullets...
+    Followed by:
+    ["#0000000042000008#","You hit other","",1442506292]You hit Corrupted Xan-Kuir for 15000 points of Full Auto damage.
+
+    Note space before .
+    ["#0000000040000001#","System","",1442506297]You successfully perform Supressive Horde .
+    ["#0000000040000001#","System","",1442506339]You successfully perform Reinforce Slugs.
+    ["#0000000040000001#","System","",1442506369]You successfully perform a Jarring Burst attack.
+    */
     (void)message;
     LineInfo li;
+    std::smatch m;
+    if (regex_search(message, m, regex("You hit |You Successfully "))) {
+        li.dealer_name = "You";
+    }
+    else if (regex_search(message, m, regex("(.*?)(?: executes )(.*?)(?= within)"))) {
+        li.receiver_name = "You";
+        li.dealer_name = m[1];
+        li.nanoProgramName = m[2];
+    }
     li.hasStats = false;
     return li;
 }
@@ -803,8 +839,8 @@ LineInfo Parser::chat(const std::string& message, const std::string& sender) {
     li.hasStats = false;
     std::smatch m;
     if (sender == playerRunningProgram &&
-           (message.compare(0, 3, "dd ") == 0 ||  // first chars == "dd "
-            message == "dd")) {
+           (message.compare(0, 4, "pdd ") == 0 ||  // first chars == "pdd "
+            message == "pdd")) {
         li.command = message;
     }
     return li;
