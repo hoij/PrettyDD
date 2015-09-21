@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iomanip>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <utility>
 
@@ -239,18 +240,170 @@ void StatWriter::createDRDetailedTopList() {
 /*****************************/
 
 
+/*****************/
+/* Common writes */
+/*****************/
+
+void StatWriter::createNotFoundMessage(std::string title,
+    std::string message) {
+    std::ofstream file(config.getScriptsPath() + "pdd");
+    if (!file.is_open()) {
+        errorLog.write("Error: Could not open/create \"pdd"
+            "\" for writing. Tried writing it to:");
+        errorLog.write("Error: " + config.getScriptsPath());
+    }
+    file << "<a href=\"text://" + message + "<br>" <<
+        "\">" + title + "</a>";
+}
+
+void StatWriter::writeContentsToFile(
+    std::string titleBase,
+    std::vector<std::pair<std::string, Damage>>& v,
+    unsigned int nrOfWindows,
+    int typesPerWindow,
+    size_t maxNameLength,
+    std::ostream& (StatWriter::*writeHeadings)
+    (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeDD)
+    (const Damage& d, std::ostream& os)) {
+
+    // Open the script file pdd here
+    std::ofstream file(config.getScriptsPath() + "pdd");
+    if (!file.is_open()) {
+        errorLog.write("Error: Could not open/create \"pdd"
+            "\" for writing. Tried writing it to:");
+        errorLog.write("Error: " + config.getScriptsPath());
+    }
+
+    /* Sets the link name number and calls the write function for
+    each link needed. */
+    int place = 1;
+    for (unsigned int windowNr = 0; windowNr != nrOfWindows; windowNr++) {
+        // Append the interval to the title
+        std::string interval = std::to_string(windowNr * typesPerWindow + 1) +
+            "-" + std::to_string((windowNr + 1) *
+            typesPerWindow);
+        std::string title = titleBase + " " + interval;
+
+        auto start = v.begin() + windowNr * typesPerWindow;
+        auto stop = v.begin();
+        // Stop at either the end or the nr of types per file.
+        if (v.size() < (windowNr + 1) * typesPerWindow) {
+            stop = v.end();
+        }
+        else {
+            stop = v.begin() + (windowNr + 1) * typesPerWindow;
+        }
+
+        // Do the actual writing:
+        writeContents(start,
+            stop,
+            file,
+            title,
+            maxNameLength,
+            place,
+            writeHeadings,
+            writeDD);
+        //writeContentsReadable(start,
+        //                      stop,
+        //                      file,
+        //                      title,
+        //                      maxNameLength,
+        //                      place,
+        //                      writeHeadings,
+        //                      writeDD);
+    }
+}
+
+void StatWriter::writeContents(
+    std::vector<std::pair<std::string, Damage>>::iterator start,
+    std::vector<std::pair<std::string, Damage>>::iterator stop,
+    std::ostream& file,
+    std::string title,
+    size_t maxNameLength,
+    int& place,
+    std::ostream& (StatWriter::*writeHeadings)
+    (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeDD)
+    (const Damage& d, std::ostream& os)) {
+
+    /* Writes headings and then the DD, place and name for each Damage
+    in the vector.  */
+
+    file << "<a href=\"text://<font color = #FFFF00>" <<
+        title << "</font><br>" <<
+        "<font color = " + yellow + ">";
+
+    (this->*writeHeadings)(maxNameLength, file);
+
+    for (auto it = start; it != stop; it++) {
+        (this->*writeDD)(it->second, file);
+        writePlace(place++, file);
+        writeName(it->first, maxNameLength, file);
+        file << "<br>";
+    }
+    file << "</font>\">" + title + "</a>" << std::endl;
+}
+
+void StatWriter::writeContentsReadable(
+    std::vector<std::pair<std::string, Damage>>::iterator start,
+    std::vector<std::pair<std::string, Damage>>::iterator stop,
+    std::ostream& file,
+    std::string title,
+    size_t maxNameLength,
+    int& place,
+    std::ostream& (StatWriter::*writeHeadings)
+    (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeDD)
+    (const Damage& d, std::ostream& os)) {
+
+    /* Writes headings and then the DD, place and name for each Damage
+    in the vector. This method places endl's at the end to make
+    it human readable. */
+
+    file << "<a href=\"text://<font color = #FFFF00>" + title <<
+        "</font><br>" << std::endl <<
+        "<font color = " + yellow + ">" << std::endl;
+
+    (this->*writeHeadings)(maxNameLength, file);
+    file << std::endl;
+
+    for (auto it = start; it != stop; it++) {
+        (this->*writeDD)(it->second, file);
+        writePlace(place++, file);
+        writeName(it->first, maxNameLength, file);
+        file << "<br>";
+        file << std::endl;
+    }
+    file << "</font>\">" + title + "</a>" << std::endl;
+}
+
+std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
+    os << std::right << std::setw(3) << std::setfill(fillChar) <<
+        " " + std::to_string(place) <<
+        std::setfill(' ');
+    return os;
+}
+
+std::ostream& StatWriter::writeName(std::string name,
+    size_t maxNameLength,
+    std::ostream& os) {
+    os << " " << name;
+    return os;
+}
+
 /*******************/
 /* Damage headings */
 /*******************/
 
 std::ostream& StatWriter::writeDDTopListHeadings(size_t maxNameLength,
                                                  std::ostream& os) {
-    int width = 8;
-    writeNameHeading("Name", maxNameLength, os);
-    os << std::setfill(fillChar) <<
-          std::setw(width) << "Total" <<
-          std::setw(width) << "DPM" << "<br>" <<
-          std::setfill(' ');
+    int width = 9;
+    os << std::setfill(fillChar) << std::right <<
+          "<font color = " + lightBlue + ">" <<
+          std::setw(width + 2) << " Total " <<
+          std::setw(width) << " DPM " << 
+          "</font><br>" << std::setfill(' ');
     return os;
 }
 
@@ -258,16 +411,16 @@ std::ostream& StatWriter::writeDDDetailedOverviewHeadings(
     size_t maxNameLength,
     std::ostream& os) {
 
-    int width = 8;
-    writeNameHeading("Name", maxNameLength, os);
+    int width = 9;
     os << std::setfill(fillChar) << std::right <<
-          std::setw(width) << "Total" <<
-          std::setw(width) << "DPM" <<
-          std::setw(width) << "Crit" <<
-          std::setw(width) << "Nanobot" <<
-          std::setw(width) << "Miss" <<
-          std::setw(width) << "Deflect" << "<br>" <<
-          std::setfill(' ');
+        "<font color = " + lightBlue + ">" <<
+        std::setw(width+1) << " Total " <<
+        std::setw(width-1) << " DPM " <<
+        std::setw(width+1) << " Crit " <<
+        std::setw(width+1) << " Nanobot " <<
+        std::setw(width) << " Miss " <<
+        std::setw(width+2) << " Deflect " <<
+        "</font><br>" << std::setfill(' ');
 
     return os;
 }
@@ -276,37 +429,37 @@ std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
     size_t maxNameLength,
     std::ostream& os) {
 
-    writeNameHeading("Name", maxNameLength, os);
-    int width = 8;
-    os << std::right << std::setfill(fillChar) <<
-          std::setw(width) << "Total" <<
-          std::setw(width) << "DPM" <<
-          std::setw(width) << "Crit" <<
-          std::setw(width) << "Nanobot" <<
-          std::setw(width) << "Miss" <<
-          std::setw(width) << "Deflect" << "<br>" <<
-          std::setfill(' ');
+    int width = 9;
+    os << std::setfill(fillChar) << std::right <<
+        "<font color = " + lightBlue + ">" <<
+        std::setw(width + 1) << " Total " <<
+        std::setw(width - 1) << " DPM " <<
+        std::setw(width + 1) << " Crit " <<
+        std::setw(width + 1) << " Nanobot " <<
+        std::setw(width) << " Miss " <<
+        std::setw(width + 2) << " Deflect " <<
+        "</font><br>" << std::setfill(' ');
     return os;
 }
 
 std::ostream& StatWriter::writeDDPerDamageTypeHeadings (size_t maxNameLength,
                                                         std::ostream& os) {
 
-    writeNameHeading("Type", maxNameLength, os);
-    int width = 8;
-    os << std::right << std::setfill(fillChar) <<
-          std::setw(width) << "Total" <<
-          std::setw(width) << "DPM" <<
-          std::setw(width) << "Crit" <<
-          std::setw(width) << "Nanobot" <<
-          std::setw(width) << "Miss" <<
-          std::setw(width) << "Deflect" << "<br>" <<
-          std::setfill(' ');
+    int width = 9;
+    os << std::setfill(fillChar) << std::right <<
+        "<font color = " + lightBlue + ">" <<
+        std::setw(width + 1) << " Total " <<
+        std::setw(width - 1) << " DPM " <<
+        std::setw(width + 1) << " Crit " <<
+        std::setw(width + 1) << " Nanobot " <<
+        std::setw(width) << " Miss " <<
+        std::setw(width + 2) << " Deflect " <<
+        "</font><br>" << std::setfill(' ');
     return os;
 }
 
 std::ostream& StatWriter::writeDDHeadings(std::ostream& os) {
-    int width = 8;
+    int width = 9;
     os << std::right << std::setfill(fillChar) <<
           std::setw(width) << "Total" <<
           std::setw(width) << "Count" <<
@@ -340,10 +493,10 @@ std::ostream& StatWriter::writeNameHeading(std::string category,
 
 std::ostream& StatWriter::writeDDTopList(const Damage& d, std::ostream& os) {
 
-    const int width = 8;
+    const int width = 9;
     os << std::setfill(fillChar) <<
-          std::setw(width) << d.getTotalReceivedFromPlayer() <<
-          std::setw(width) << d.getDPMReceivedFromPlayer() << "<br>" <<
+          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer()) << " " <<
+          std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
           std::setfill(' ');
     return os;
 }
@@ -360,16 +513,21 @@ std::ostream& StatWriter::writeDDDetailedOverview(const Damage& d,
                                        d.getMissesReceivedFromPlayer());
     double deflectPercentage = percentage(d.getCountReceivedFromPlayer(),
                                           d.getDeflectsReceivedFromPlayer());
+    std::string crit = dblToString(critPercentage);
+    std::string nanobot = dblToString(nanobotDamagePercentage);
+    std::string misses = dblToString(missPercentage);
+    std::string deflect = dblToString(deflectPercentage);
+
     const int width = 8;
     const int critOffset = 1;
     os << std::setfill(fillChar) <<
-          std::setw(width) << d.getTotalReceivedFromPlayer() <<
-          std::setw(width) << d.getDPMReceivedFromPlayer() <<
+          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer()) << " " <<
+          std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
           std::fixed << std::setprecision(1) <<
-          std::setw(width-critOffset) << critPercentage << '%' <<
-          std::setw(width-critOffset) << nanobotDamagePercentage << '%' <<
-          std::setw(width-critOffset) << missPercentage << '%' <<
-          std::setw(width-critOffset) << deflectPercentage << '%' << "<br>" <<
+          std::setw(width - critOffset) << " " + crit << '%' << " " <<
+          std::setw(width - critOffset) << " " + nanobot << '%' << " " <<
+          std::setw(width - critOffset) << " " + misses << '%' << " " <<
+          std::setw(width - critOffset) << " " + deflect << '%' << "  " <<
           std::setfill(' ');
     return os;
 }
@@ -420,170 +578,6 @@ std::ostream& StatWriter::writeDDOld(const Damage& d, std::ostream& os) {
     return os;
 }
 
-/*****************/
-/* Common writes */
-/*****************/
-
-void StatWriter::createNotFoundMessage(std::string title,
-                                       std::string message) {
-    std::ofstream file("pdd");
-    if (!file.is_open()) {
-        errorLog.write("Error: Could not open/create \"pdd"
-                       "\" for writing. Tried writing it to:");
-        errorLog.write("Error: " + config.getScriptsPath());
-    }
-    file << "<a href=\"text://" + message + "<br>" <<
-            "\">" + title + "</a>";
-}
-
-void StatWriter::writeContentsToFile(
-    std::string titleBase,
-    std::vector<std::pair<std::string, Damage>>& v,
-    unsigned int nrOfWindows,
-    int typesPerWindow,
-    size_t maxNameLength,
-    std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os),
-    std::ostream& (StatWriter::*writeDD)
-        (const Damage& d, std::ostream& os)) {
-
-    // Open the script file pdd here
-    std::ofstream file("pdd");
-    if (!file.is_open()) {
-        errorLog.write("Error: Could not open/create \"pdd"
-                       "\" for writing. Tried writing it to:");
-        errorLog.write("Error: " + config.getScriptsPath());
-    }
-
-    /* Sets the link name number and calls the write function for
-    each link needed. */
-    int place = 1;
-    for (unsigned int windowNr = 0; windowNr != nrOfWindows; windowNr++) {
-        // Append the interval to the title
-        std::string interval = std::to_string(windowNr * typesPerWindow + 1) +
-                               "-" + std::to_string((windowNr + 1) *
-                                                    typesPerWindow);
-        std::string title = titleBase + " " + interval;
-
-        auto start = v.begin() + windowNr * typesPerWindow;
-        auto stop = v.begin();
-        // Stop at either the end or the nr of types per file.
-        if (v.size() < (windowNr + 1) * typesPerWindow) {
-            stop = v.end();
-        }
-        else {
-            stop = v.begin() + (windowNr + 1) * typesPerWindow;
-        }
-
-        // Do the actual writing:
-//        writeContents(start,
-//                      stop,
-//                      file,
-//                      title,
-//                      maxNameLength,
-//                      place,
-//                      writeHeadings,
-//                      writeDD);
-        writeContentsReadable(start,
-                              stop,
-                              file,
-                              title,
-                              maxNameLength,
-                              place,
-                              writeHeadings,
-                              writeDD);
-    }
-}
-
-void StatWriter::writeContents(
-    std::vector<std::pair<std::string, Damage>>::iterator start,
-    std::vector<std::pair<std::string, Damage>>::iterator stop,
-    std::ostream& file,
-    std::string title,
-    size_t maxNameLength,
-    int& place,
-    std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os),
-    std::ostream& (StatWriter::*writeDD)
-        (const Damage& d, std::ostream& os)) {
-
-    /* Writes headings and then the name and DD for each Damage
-    in the vector. */
-
-    file << "<a href=\"text://<font color = #FFFF00>" <<
-            title << "</font>:<br>" <<
-            "<font color = #00FF00>";
-
-    (this->*writeHeadings)(maxNameLength, file);
-
-    for (auto it = start; it != stop; it++) {
-        writePlace(place++, file);
-        writeName(it->first, maxNameLength, file);
-        (this->*writeDD)(it->second, file);
-    }
-    file << "</font>\">" + title + "</a>";
-}
-
-void StatWriter::writeContentsReadable(
-    std::vector<std::pair<std::string, Damage>>::iterator start,
-    std::vector<std::pair<std::string, Damage>>::iterator stop,
-    std::ostream& file,
-    std::string title,
-    size_t maxNameLength,
-    int& place,
-    std::ostream& (StatWriter::*writeHeadings)
-    (size_t maxNameLength, std::ostream& os),
-    std::ostream& (StatWriter::*writeDD)
-    (const Damage& d, std::ostream& os)) {
-
-    /* Writes headings and then the name and DD for each Damage
-    in the vector. This method places endl's at the end to make
-    it human readable. */
-
-    file << "<a href=\"text://<font color = #FFFF00>" + title <<
-            "</font>:<br>" << std::endl <<
-            "<font color = #00FF00>" << std::endl;
-
-    (this->*writeHeadings)(maxNameLength, file);
-    file << std::endl;
-
-    for (auto it = start; it != stop; it++) {
-        writePlace(place++, file);
-        writeName(it->first, maxNameLength, file);
-        (this->*writeDD)(it->second, file);
-        file << std::endl;
-    }
-    file << "</font>\">" + title + "</a>" << std::endl;
-}
-
-std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
-    os << place << ". ";
-
-    int placeNumbers = 1;
-    while (place /= 10) {
-        placeNumbers++;
-    }
-
-    switch(placeNumbers) {
-        case 1 :
-            os << "  ";
-            break;
-        case 2 :
-            os << " ";
-            break;
-    }
-    return os;
-}
-
-std::ostream& StatWriter::writeName(std::string name,
-                                    size_t maxNameLength,
-                                    std::ostream& os) {
-
-            os << std::left << std::setfill(fillChar) <<
-                  std::setw(maxNameLength) << name << std::right;
-        return os;
-}
-
 /********************/
 /* Helper functions */
 /********************/
@@ -615,6 +609,12 @@ void StatWriter::sortByReceived(
                      return damagePair1.second.getTotalDealtOnPlayer() >
                             damagePair2.second.getTotalDealtOnPlayer();
                  });
+}
+
+std::string StatWriter::dblToString(const double d) {
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(1) << d;
+    return out.str();
 }
 
 /***************/

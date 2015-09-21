@@ -52,6 +52,7 @@ void CommandHandler::execute(std::string command) {
         // For testing purposes:
 //        statWriter.createDDTopList();
         statWriter.createDDDetailedTopList();
+//        statWriter.createDDPerDamageType("You");
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
 //        statWriter.createDDPerOpponent("Nonexisting");

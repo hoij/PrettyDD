@@ -69,21 +69,8 @@ private:
     std::ostream& writeDDPerDamageTypeHeadings(size_t maxNameLength,
                                                     std::ostream& os);
     std::ostream& writeDDHeadings(std::ostream& os);
-
-    // Common headings
-    std::ostream& writeNameHeading(std::string category,
-                                   size_t maxNameLength,
-                                   std::ostream& os);
-
-    // Damage writes
-    std::ostream& writeDDTopList(const Damage& d, std::ostream& os);
-    std::ostream& writeDDDetailedOverview(const Damage& d, std::ostream& os);
-    std::ostream& writeDR(const Damage& d, std::ostream& os);
-    // Remove when done:
-    std::ostream& writeDDOld(const Damage& d, std::ostream& os);
-
+    
     // Common writes
-
     void writeContentsToFile(
         std::string titleBase,
         std::vector<std::pair<std::string, Damage>>& v,
@@ -93,7 +80,7 @@ private:
         std::ostream& (StatWriter::*writeHeadings)
         (size_t maxNameLength, std::ostream& os),
         std::ostream& (StatWriter::*writeDD)
-            (const Damage& d, std::ostream& os));
+        (const Damage& d, std::ostream& os));
 
     void writeContents(
         std::vector<std::pair<std::string, Damage>>::iterator start,
@@ -103,9 +90,9 @@ private:
         size_t maxNameLength,
         int& place,
         std::ostream& (StatWriter::*writeHeadings)
-            (size_t maxNameLength, std::ostream& os),
+        (size_t maxNameLength, std::ostream& os),
         std::ostream& (StatWriter::*writeDD)
-            (const Damage& d, std::ostream& os));
+        (const Damage& d, std::ostream& os));
 
     void writeContentsReadable(
         std::vector<std::pair<std::string, Damage>>::iterator start,
@@ -121,8 +108,20 @@ private:
 
     std::ostream& writePlace(int place, std::ostream& os);
     std::ostream& writeName(std::string name,
-                            size_t maxNameLength,
-                            std::ostream& os);
+        size_t maxNameLength,
+        std::ostream& os);
+
+    // Common headings
+    std::ostream& writeNameHeading(std::string category,
+                                   size_t maxNameLength,
+                                   std::ostream& os);
+
+    // Damage writes
+    std::ostream& writeDDTopList(const Damage& d, std::ostream& os);
+    std::ostream& writeDDDetailedOverview(const Damage& d, std::ostream& os);
+    std::ostream& writeDR(const Damage& d, std::ostream& os);
+    // Remove when done:
+    std::ostream& writeDDOld(const Damage& d, std::ostream& os);
 
     // Helper functions
     double percentage(int total, int part);
@@ -130,6 +129,7 @@ private:
                                std::string message);
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
+    std::string dblToString(const double d);
 
     // Comparators
     // Remove when done:
@@ -137,7 +137,11 @@ private:
     static bool compareTotalReceived(const Player* p1, const Player* p2);
 
 
-    const char fillChar = '.';
+    // Colors
+    const std::string lightBlue = "#3399FF";
+    const std::string yellow = "#00FF00";
+
+    const char fillChar = '_';
     PlayerVector<Player*>& playerVector;
     Configuration& config;
 };

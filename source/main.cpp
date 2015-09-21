@@ -41,7 +41,8 @@ int main(void) {
         errorLog.write("Error: " + config.getLogFilePath());
     }
     logstream.clear();
-    //logstream.seekg(0, logstream.end);
+    // Read from the end of the file
+    logstream.seekg(0, logstream.end);
     std::ios::streampos lastpos = logstream.tellg();
     std::ios::streampos endpos = logstream.tellg();
 
