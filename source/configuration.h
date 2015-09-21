@@ -36,7 +36,7 @@ private:
             errorLog.write("Error: " + playerRunningProgram);
             return false;
         }
-        if (scriptsPath.back() != '\\') {
+        if (scriptsPath.size() != 0 && scriptsPath.back() != '\\') {
             scriptsPath += '\\';
         }
         return true;

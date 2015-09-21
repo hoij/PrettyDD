@@ -83,12 +83,12 @@ private:
     std::ostream& writeDDOld(const Damage& d, std::ostream& os);
 
     // Common writes
-    std::vector<std::string> writeContentsToFile(
+
+    void writeContentsToFile(
         std::string titleBase,
-        std::string fileNameBase,
         std::vector<std::pair<std::string, Damage>>& v,
-        unsigned int nrOfFiles,
-        int typesPerFile,
+        unsigned int nrOfWindows,
+        int typesPerWindow,
         size_t maxNameLength,
         std::ostream& (StatWriter::*writeHeadings)
         (size_t maxNameLength, std::ostream& os),
@@ -98,7 +98,7 @@ private:
     void writeContents(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
-        std::string fileName,
+        std::ostream& file,
         std::string title,
         size_t maxNameLength,
         int& place,
@@ -107,10 +107,10 @@ private:
         std::ostream& (StatWriter::*writeDD)
             (const Damage& d, std::ostream& os));
 
-    void StatWriter::writeContentsReadable(
+    void writeContentsReadable(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
-        std::string fileName,
+        std::ostream& file,
         std::string title,
         size_t maxNameLength,
         int& place,
@@ -124,13 +124,9 @@ private:
                             size_t maxNameLength,
                             std::ostream& os);
 
-    void createMainScriptFile(std::vector<std::string> fileNames);
-
-
     // Helper functions
     double percentage(int total, int part);
-    void createNotFoundMessage(std::string fileName,
-                               std::string title,
+    void createNotFoundMessage(std::string title,
                                std::string message);
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
@@ -141,6 +137,7 @@ private:
     static bool compareTotalReceived(const Player* p1, const Player* p2);
 
 
+    const char fillChar = '.';
     PlayerVector<Player*>& playerVector;
     Configuration& config;
 };

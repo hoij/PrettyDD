@@ -33,7 +33,9 @@ TEST_P(ParseChatTest, parseChat) {
 
 // TODO: This will need a different ExtendedLineInfo because it uses commands.
 INSTANTIATE_TEST_CASE_P(parseChat, ParseChatTest,
-    testing::Values(std::make_tuple("dd", "Sgtcuddle", "dd"),
+    testing::Values(std::make_tuple("pdd", "Sgtcuddle", "pdd"),
+                    std::make_tuple("pdd ", "Sgtcuddle", "pdd "),
+                    std::make_tuple("pdd dtop", "Sgtcuddle", "pdd dtop"),
                     std::make_tuple("ddd", "Sgtcuddle", ""),
                     std::make_tuple(" dd", "Sgtcuddle", ""),
                     std::make_tuple("Look at this amazing dd", "Sgtcuddle", ""),

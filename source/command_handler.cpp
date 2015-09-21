@@ -50,16 +50,16 @@ void CommandHandler::execute(std::string command) {
 
 
         // For testing purposes:
-        statWriter.createDDTopList();
+//        statWriter.createDDTopList();
         statWriter.createDDDetailedTopList();
-        statWriter.createDDPerOpponent("You");
-        //statWriter.createDDPerOpponent("Nonexisting");
-        //statWriter.createDDOnSpecificOpponent("You", "asshole");
-        statWriter.createDDOnSpecificOpponent("You", "Predator Rogue");
-        statWriter.createDDPerDamageType("You");
-        //statWriter.createDDPerOpponentDetailed("Predator Rogue", "You");
-        statWriter.createDRDetailedTopList();
-        statWriter.createOldDDOverview();
+//        statWriter.createDDPerDamageType("Ass");
+//        statWriter.createDDPerOpponent("You");
+//        statWriter.createDDPerOpponent("Nonexisting");
+//        statWriter.createDDOnSpecificOpponent("You", "Predator Rogue");
+//        statWriter.createDDOnSpecificOpponent("You", "asshole");
+
+//        statWriter.createDRDetailedTopList();
+//        statWriter.createOldDDOverview();
     }
     else if (nrOfOptions == 1) {
         // No extra options on top/dtop/types will print damage dealt
