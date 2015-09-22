@@ -35,14 +35,18 @@ int main(void) {
     // TODO: Remove when done:
     playerVector.startLogging();
 
+    // TODO: Move into parser or new class.
     std::ifstream logstream(config.getLogFilePath());
     if (!logstream.is_open()) {
         errorLog.write("Error: Could not open the log file:");
         errorLog.write("Error: " + config.getLogFilePath());
     }
     logstream.clear();
-    // Read from the end of the file
-    logstream.seekg(0, logstream.end);
+    // Read from the end of the file if true,
+    // otherwise read from the start.
+    if (config.shouldParseFromEnd()) {
+        logstream.seekg(0, logstream.end);
+    }
     std::ios::streampos lastpos = logstream.tellg();
     std::ios::streampos endpos = logstream.tellg();
 

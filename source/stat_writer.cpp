@@ -233,7 +233,7 @@ void StatWriter::createNotFoundMessage(std::string title,
     std::ofstream file(config.getScriptsPath() + "pdd");
     if (!file.is_open()) {
         errorLog.write("Error: Could not open/create \"pdd"
-            "\" for writing. Tried writing it to:");
+                       "\" for writing. Tried writing it to:");
         errorLog.write("Error: " + config.getScriptsPath());
     }
     file << "<a href=\"text://" + message + "<br>" <<
@@ -253,7 +253,7 @@ void StatWriter::writeContentsToFile(
     std::ofstream file(config.getScriptsPath() + "pdd");
     if (!file.is_open()) {
         errorLog.write("Error: Could not open/create \"pdd"
-            "\" for writing. Tried writing it to:");
+                       "\" for writing. Tried writing it to:");
         errorLog.write("Error: " + config.getScriptsPath());
     }
 
@@ -278,20 +278,24 @@ void StatWriter::writeContentsToFile(
         }
 
         // Do the actual writing:
-        writeContents(start,
-            stop,
-            file,
-            title,
-            place,
-            writeHeadings,
-            writeDD);
-        //writeContentsReadable(start,
-        //                      stop,
-        //                      file,
-        //                      title,
-        //                      place,
-        //                      writeHeadings,
-        //                      writeDD);
+        if (config.shouldWriteReadable()) {
+            writeContentsReadable(start,
+                                  stop,
+                                  file,
+                                  title,
+                                  place,
+                                  writeHeadings,
+                                  writeDD);
+        }
+        else {
+            writeContents(start,
+                          stop,
+                          file,
+                          title,
+                          place,
+                          writeHeadings,
+                          writeDD);
+        }
     }
 }
 
@@ -309,10 +313,10 @@ void StatWriter::writeContents(
     in the vector.  */
 
     file << "<a href=\"text://<font color = #FFFF00>" <<
-        title << "</font><br>" <<
-        "<font color = " + yellow + ">";
+            title << "</font><br>";
 
     (this->*writeHeadings)(file);
+    file << "<font color = " + yellow + ">";
 
     for (auto it = start; it != stop; it++) {
         (this->*writeDD)(it->second, file);
@@ -338,11 +342,11 @@ void StatWriter::writeContentsReadable(
     it human readable. */
 
     file << "<a href=\"text://<font color = #FFFF00>" + title <<
-        "</font><br>" << std::endl <<
-        "<font color = " + yellow + ">" << std::endl;
+            "</font><br>" << std::endl;
 
     (this->*writeHeadings)(file);
-    file << std::endl;
+    file << std::endl <<
+            "<font color = " + yellow + ">" << std::endl;
 
     for (auto it = start; it != stop; it++) {
         (this->*writeDD)(it->second, file);
@@ -384,14 +388,17 @@ std::ostream& StatWriter::writeDDDetailedOverviewHeadings(std::ostream& os) {
 
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
-        "<font color = " + lightBlue + ">" <<
-        std::setw(width+1) << " Total " <<
-        std::setw(width-1) << " DPM " <<
-        std::setw(width+1) << " Crit " <<
-        std::setw(width+1) << " Nanobot " <<
-        std::setw(width) << " Miss " <<
-        std::setw(width+2) << " Deflect " <<
-        "</font><br>" << std::setfill(' ');
+        "<font color = " + lightBlue + ">";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    os << std::setw(width+1) << " Total " <<
+          std::setw(width-1) << " DPM " <<
+          std::setw(width+1) << " Crit " <<
+          std::setw(width+1) << " Nanobot " <<
+          std::setw(width) << " Miss " <<
+          std::setw(width+2) << " Deflect " <<
+          "</font><br>" << std::setfill(' ');
 
     return os;
 }

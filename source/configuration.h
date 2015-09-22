@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 
 
 class Configuration {
@@ -16,6 +17,16 @@ public:
             getline(settings, playerRunningProgram);
             getline(settings, logFilePath);
             getline(settings, scriptsPath);
+
+            // Decide wether to read the log form the start or not
+            // (read from the end).
+            // Read the text "true" or "false and store it as a bool.
+            parseFromEnd = getAndConvertToBool(settings);
+            // Decide wether to write the stats to a file that's
+            // human readable or not (write it in AO's format of
+            // one long line).
+            readable = getAndConvertToBool(settings);
+
             return verifyParameters();
         }
         else {
@@ -27,8 +38,17 @@ public:
     std::string& getplayerRunningProgram() {return playerRunningProgram;}
     std::string& getLogFilePath() {return logFilePath;}
     std::string& getScriptsPath() {return scriptsPath;}
+    bool shouldParseFromEnd() {return parseFromEnd;}
+    bool shouldWriteReadable() {return readable;}
 
 private:
+    bool getAndConvertToBool(std::ifstream& settings) {
+        std::string s;
+        bool b;
+        getline(settings, s);
+        std::istringstream(s) >> std::boolalpha >> b;
+        return b;
+    }
     bool verifyParameters() {
         if (playerRunningProgram.size() < 4 ||
             playerRunningProgram.size() > 12) {
@@ -45,6 +65,8 @@ private:
     std::string playerRunningProgram;
     std::string logFilePath;
     std::string scriptsPath;
+    bool parseFromEnd = false;
+    bool readable = false;
 };
 
 
