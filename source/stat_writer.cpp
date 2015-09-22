@@ -82,7 +82,7 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
     // Get the data and sort it:
     std::vector<std::pair<std::string, Damage>>
         allDamageTypesFromAffectedPlayer =
-            pp->getTotalDamageForEveryDamageType();
+            pp->getTotalDamageForEveryDamageTypeReceivedFromPlayer();
     sortByDealt(allDamageTypesFromAffectedPlayer);
 
     // Calculate the number of files needed to write all players
@@ -408,14 +408,17 @@ std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
 
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
-        "<font color = " + lightBlue + ">" <<
-        std::setw(width + 1) << " Total " <<
-        std::setw(width - 1) << " DPM " <<
-        std::setw(width + 1) << " Crit " <<
-        std::setw(width + 1) << " Nanobot " <<
-        std::setw(width) << " Miss " <<
-        std::setw(width + 2) << " Deflect " <<
-        "</font><br>" << std::setfill(' ');
+          "<font color = " + lightBlue + ">";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    os << std::setw(width + 1) << " Total " <<
+          std::setw(width - 1) << " DPM " <<
+          std::setw(width + 1) << " Crit " <<
+          std::setw(width + 1) << " Nanobot " <<
+          std::setw(width) << " Miss " <<
+          std::setw(width + 2) << " Deflect " <<
+          "</font><br>" << std::setfill(' ');
     return os;
 }
 
@@ -423,14 +426,17 @@ std::ostream& StatWriter::writeDDPerDamageTypeHeadings(std::ostream& os) {
 
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
-        "<font color = " + lightBlue + ">" <<
-        std::setw(width + 1) << " Total " <<
-        std::setw(width - 1) << " DPM " <<
-        std::setw(width + 1) << " Crit " <<
-        std::setw(width + 1) << " Nanobot " <<
-        std::setw(width) << " Miss " <<
-        std::setw(width + 2) << " Deflect " <<
-        "</font><br>" << std::setfill(' ');
+          "<font color = " + lightBlue + ">";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    os << std::setw(width + 1) << " Total " <<
+          std::setw(width - 1) << " DPM " <<
+          std::setw(width + 1) << " Crit " <<
+          std::setw(width + 1) << " Nanobot " <<
+          std::setw(width) << " Miss " <<
+          std::setw(width + 2) << " Deflect " <<
+          "</font><br>" << std::setfill(' ');
     return os;
 }
 

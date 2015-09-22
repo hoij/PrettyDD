@@ -28,6 +28,15 @@ public:
     virtual Damage getTotalDamagePerDamageType(std::string callerName,
                                                std::string damageType) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageType(std::string callerName) const;
+
+    std::vector<std::pair<std::string, Damage>>
+    getTotalDamageForEveryDamageTypeReceivedFromPlayer(
+        std::string callerName) const;
+
+    std::vector<std::pair<std::string, Damage>>
+    getTotalDamageForEveryDamageTypeDealtOnPlayer(
+        std::string callerName) const;
+
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
 
@@ -42,6 +51,10 @@ public:
     void incrementPauseDuration(const std::time_t& duration);
 
 private:
+    void addToVector(
+        std::vector<std::pair<std::string, Damage>>& allDamageTypes,
+        std::vector<std::pair<std::string, Damage>>& apsDamageTypes) const;
+
     static bool compareNanoDealt(const std::pair<std::string, Nano>& p1,
                                  const std::pair<std::string, Nano>& p2);
     static bool comparePotentialHeal(const std::pair<std::string, Heal>& p1,
@@ -50,7 +63,8 @@ private:
 
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName) const {
+Damage
+AffectedPlayerVector<C>::getTotalDamage(std::string callerName) const {
     /* The damage belonging to the caller should not be included in the sum
     because it already exists in the other players damage stats. If it  is
     added it will incorrectly increase the values. */
@@ -65,8 +79,11 @@ Damage AffectedPlayerVector<C>::getTotalDamage(std::string callerName) const {
 }
 
 template<class C>
-Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerName,
-                                                            std::string damageType) const {
+Damage
+AffectedPlayerVector<C>::getTotalDamagePerDamageType(
+    std::string callerName,
+    std::string damageType) const {
+
     Damage d;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
@@ -77,7 +94,9 @@ Damage AffectedPlayerVector<C>::getTotalDamagePerDamageType(std::string callerNa
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getTotalDamageForAllAffectedPlayers(std::string callerName) const {
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getTotalDamageForAllAffectedPlayers(
+    std::string callerName) const {
     /* Returns a vector of pairs containing the players name and their
     total damage (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
@@ -99,35 +118,88 @@ AffectedPlayerVector<C>::getTotalDamageForEveryDamageType(
     dealt and received damage. */
     // TODO: Write a test
 
-    std::vector<std::pair<std::string, Damage>> damageTypes;
+    std::vector<std::pair<std::string, Damage>> allDamageTypes;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
             std::vector<std::pair<std::string, Damage>> apsDamageTypes =
                 ap->getAllDamage();
-            for (const auto& damagePair : apsDamageTypes) {
-                // Check if the damage type already exists in the vector
-                auto it = std::find_if(
-                    damageTypes.begin(),
-                    damageTypes.end(),
-                    [&damagePair](const std::pair<std::string, Damage> p) {
-                        return damagePair.first == p.first;});
-
-                if (it != damageTypes.end() ) {
-                    // If it exists, add it to the existing one
-                    it->second += damagePair.second;
-                }
-                else {
-                    // Otherwise create a new one.
-                    damageTypes.push_back(damagePair);
-                }
-            }
+            addToVector(allDamageTypes, apsDamageTypes);
         }
     }
-    return damageTypes;
+    return allDamageTypes;
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getAllDamageFromAffectedPlayer(std::string name) const {
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getTotalDamageForEveryDamageTypeReceivedFromPlayer(
+    std::string callerName) const {
+    /* Returns a vector of pairs containing the damage type name
+    and it's summed damage. The Damage includes all damage types for both
+    dealt and received damage. */
+    // TODO: Write a test
+
+    std::vector<std::pair<std::string, Damage>> allDamageTypes;
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            std::vector<std::pair<std::string, Damage>> apsDamageTypes =
+                ap->getAllDamageReceivedFromPlayer();
+            addToVector(allDamageTypes, apsDamageTypes);
+        }
+    }
+    return allDamageTypes;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getTotalDamageForEveryDamageTypeDealtOnPlayer(
+    std::string callerName) const {
+    /* Returns a vector of pairs containing the damage type name
+    and it's summed damage. The Damage includes all damage types for both
+    dealt and received damage. */
+    // TODO: Write a test
+
+    std::vector<std::pair<std::string, Damage>> allDamageTypes;
+    for (const C ap : this->players) {
+        if (ap->getName() != callerName) {  // If not owner of the vector
+            std::vector<std::pair<std::string, Damage>> apsDamageTypes =
+                ap->getAllDamageDealtOnPlayer();
+            addToVector(allDamageTypes, apsDamageTypes);
+        }
+    }
+    return allDamageTypes;
+}
+
+template<class C>
+void
+AffectedPlayerVector<C>::addToVector(
+    std::vector<std::pair<std::string, Damage>>& allDamageTypes,
+    std::vector<std::pair<std::string, Damage>>& apsDamageTypes) const {
+    /* Adds a string/Damage pair in apsDamageTypes to allDamageTypes */
+
+    for (const auto& damagePair : apsDamageTypes) {
+        // Check if the damage type already exists in the vector
+        auto it = std::find_if(
+            allDamageTypes.begin(),
+            allDamageTypes.end(),
+            [&damagePair](const std::pair<std::string, Damage> p) {
+                return damagePair.first == p.first;});
+
+        if (it != allDamageTypes.end() ) {
+            // If it exists, add it to the existing one
+            it->second += damagePair.second;
+        }
+        else {
+            // Otherwise create a new one.
+            allDamageTypes.push_back(damagePair);
+        }
+    }
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getAllDamageFromAffectedPlayer(
+    std::string name) const {
+
     for (const C ap : this->players) {
         if (ap->getName() == name) {
             return ap->getAllDamage();
@@ -144,7 +216,8 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayerVector<C>::getAllDamag
 }
 
 template<class C>
-Heal AffectedPlayerVector<C>::getTotalHeals(std::string callerName) {
+Heal
+AffectedPlayerVector<C>::getTotalHeals(std::string callerName) {
     Heal h;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
@@ -155,7 +228,8 @@ Heal AffectedPlayerVector<C>::getTotalHeals(std::string callerName) {
 }
 
 template<class C>
-std::vector<std::pair<std::string, Heal>> AffectedPlayerVector<C>::getHealsForAllAffectedPlayers() const {
+std::vector<std::pair<std::string, Heal>>
+AffectedPlayerVector<C>::getHealsForAllAffectedPlayers() const {
     // TODO: This will include the owning player as well. Do I want that?
     std::vector<std::pair<std::string, Heal>> healsPerPlayer;
     for (const C ap : this->players) {
@@ -168,7 +242,8 @@ std::vector<std::pair<std::string, Heal>> AffectedPlayerVector<C>::getHealsForAl
 }
 
 template<class C>
-const Heal& AffectedPlayerVector<C>::getHealFromAffectedPlayer(std::string name) const {
+const Heal&
+AffectedPlayerVector<C>::getHealFromAffectedPlayer(std::string name) const {
     for (const C ap : this->players) {
         if (ap->getName() == name) {
             return ap->getHeal();
@@ -180,7 +255,8 @@ const Heal& AffectedPlayerVector<C>::getHealFromAffectedPlayer(std::string name)
 }
 
 template<class C>
-Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
+Nano
+AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
     Nano n;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
@@ -191,7 +267,8 @@ Nano AffectedPlayerVector<C>::getTotalNano(std::string callerName) const {
 }
 
 template<class C>
-std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForAllAffectedPlayers() const {
+std::vector<std::pair<std::string, Nano>>
+AffectedPlayerVector<C>::getNanoForAllAffectedPlayers() const {
     std::vector<std::pair<std::string, Nano>> nanoPerPlayer;
     for (const C ap : this->players) {
             nanoPerPlayer.emplace_back(ap->getName(), ap->getNano());
@@ -203,7 +280,8 @@ std::vector<std::pair<std::string, Nano>> AffectedPlayerVector<C>::getNanoForAll
 }
 
 template<class C>
-const Nano& AffectedPlayerVector<C>::getNanoFromAffectedPlayer(std::string name) const {
+const Nano&
+AffectedPlayerVector<C>::getNanoFromAffectedPlayer(std::string name) const {
     for (const C ap : this->players) {
         if (ap->getName() == name) {
             return ap->getNano();
@@ -216,21 +294,28 @@ const Nano& AffectedPlayerVector<C>::getNanoFromAffectedPlayer(std::string name)
 }
 
 template<class C>
-bool AffectedPlayerVector<C>::compareNanoDealt(const std::pair<std::string, Nano>& p1,
-                                               const std::pair<std::string, Nano>& p2) {
+bool
+AffectedPlayerVector<C>::compareNanoDealt(
+    const std::pair<std::string, Nano>& p1,
+    const std::pair<std::string, Nano>& p2) {
+
     return p1.second.getTotalDealtOnPlayer() >
            p2.second.getTotalDealtOnPlayer();
 }
 
 template<class C>
-bool AffectedPlayerVector<C>::comparePotentialHeal(const std::pair<std::string, Heal>& p1,
-                                                   const std::pair<std::string, Heal>& p2) {
+bool
+AffectedPlayerVector<C>::comparePotentialHeal(
+    const std::pair<std::string, Heal>& p1,
+    const std::pair<std::string, Heal>& p2) {
+
     return p1.second.getPotentialDealtOnPlayer() >
            p2.second.getPotentialDealtOnPlayer();
 }
 
 template<class C>
-void AffectedPlayerVector<C>::incrementPauseDuration(const std::time_t& duration) {
+void
+AffectedPlayerVector<C>::incrementPauseDuration(const std::time_t& duration) {
     for (C& ap : this->players) {
         ap->incrementPauseDuration(duration);
     }

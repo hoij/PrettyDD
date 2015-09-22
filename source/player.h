@@ -49,6 +49,8 @@ public:
     Damage getTotalDamagePerDamageType(std::string damageType) const;
 
     std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageType() const;
+    std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageTypeReceivedFromPlayer() const;
+    std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageTypeDealtOnPlayer() const;
     std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers() const;
     std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
 

@@ -1,4 +1,5 @@
 #include "affected_player.h"
+#include "logger.h"
 #include "line_info.h"
 #include "my_time.h"
 
@@ -104,6 +105,48 @@ std::vector<std::pair<std::string, Damage>> AffectedPlayer::getAllDamage() const
     std::vector<std::pair<std::string, Damage>> sortableDamage;
     for (const auto& damagePair : damage) {
         sortableDamage.push_back(damagePair);
+    }
+    return sortableDamage;
+}
+
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayer::getAllDamageReceivedFromPlayer() const {
+    // Gets all damage types that the affected player has received
+    // from the owning Player. Stores it in a sortable container.
+    std::vector<std::pair<std::string, Damage>> sortableDamage;
+    for (const auto& damagePair : damage) {
+        if (damagePair.second.getCountReceivedFromPlayer() > 0) {
+            sortableDamage.push_back(damagePair);
+        }
+        // Using this opportunity to check that a Damage in the map
+        // always has a positive count on either or both of
+        // dealt or received.
+        else if (damagePair.second.getCountDealtOnPlayer() <= 0 &&
+                 damagePair.second.getCountReceivedFromPlayer() <= 0) {
+            errorLog.write("Damage of type \"" + damagePair.first +
+                           "\" has 0 count when it should have at least 1.");
+        }
+    }
+    return sortableDamage;
+}
+
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayer::getAllDamageDealtOnPlayer() const {
+    // Gets all damage types that the affected player has dealt
+    // on the owning Player. Stores it in a sortable container.
+    std::vector<std::pair<std::string, Damage>> sortableDamage;
+    for (const auto& damagePair : damage) {
+        if (damagePair.second.getCountDealtOnPlayer() > 0) {
+            sortableDamage.push_back(damagePair);
+        }
+        // Using this opportunity to check that a Damage in the map
+        // always has a positive count on either or both of
+        // dealt or received.
+        else if (damagePair.second.getCountDealtOnPlayer() <= 0 &&
+                 damagePair.second.getCountReceivedFromPlayer() <= 0) {
+            errorLog.write("Damage of type \"" + damagePair.first +
+                           "\" has 0 count when it should have at least 1.");
+        }
     }
     return sortableDamage;
 }
