@@ -60,61 +60,46 @@ public:
 
 private:
     // Damage headings
-    std::ostream& writeDDTopListHeadings(size_t maxNameLength,
-                                         std::ostream& file);
-    std::ostream& writeDDDetailedOverviewHeadings(size_t maxNameLength,
-                                                  std::ostream& os);
-    std::ostream& writeDDOnSpecificOpponentHeadings(size_t maxNameLength,
-                                                    std::ostream& os);
-    std::ostream& writeDDPerDamageTypeHeadings(size_t maxNameLength,
-                                                    std::ostream& os);
+    std::ostream& writeDDTopListHeadings(std::ostream& file);
+    std::ostream& writeDDDetailedOverviewHeadings(std::ostream& os);
+    std::ostream& writeDDOnSpecificOpponentHeadings(std::ostream& os);
+    std::ostream& writeDDPerDamageTypeHeadings(std::ostream& os);
     std::ostream& writeDDHeadings(std::ostream& os);
-    
+
     // Common writes
     void writeContentsToFile(
         std::string titleBase,
         std::vector<std::pair<std::string, Damage>>& v,
         unsigned int nrOfWindows,
         int typesPerWindow,
-        size_t maxNameLength,
-        std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os),
+        std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
         std::ostream& (StatWriter::*writeDD)
-        (const Damage& d, std::ostream& os));
+            (const Damage& d, std::ostream& os));
 
     void writeContents(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::ostream& file,
         std::string title,
-        size_t maxNameLength,
         int& place,
-        std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os),
+        std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
         std::ostream& (StatWriter::*writeDD)
-        (const Damage& d, std::ostream& os));
+            (const Damage& d, std::ostream& os));
 
     void writeContentsReadable(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::ostream& file,
         std::string title,
-        size_t maxNameLength,
         int& place,
-        std::ostream& (StatWriter::*writeHeadings)
-        (size_t maxNameLength, std::ostream& os),
+        std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
         std::ostream& (StatWriter::*writeDD)
-        (const Damage& d, std::ostream& os));
+            (const Damage& d, std::ostream& os));
 
     std::ostream& writePlace(int place, std::ostream& os);
-    std::ostream& writeName(std::string name,
-        size_t maxNameLength,
-        std::ostream& os);
+    std::ostream& writeName(std::string name, std::ostream& os);
 
     // Common headings
-    std::ostream& writeNameHeading(std::string category,
-                                   size_t maxNameLength,
-                                   std::ostream& os);
 
     // Damage writes
     std::ostream& writeDDTopList(const Damage& d, std::ostream& os);

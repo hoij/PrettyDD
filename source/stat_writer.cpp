@@ -36,14 +36,11 @@ void StatWriter::createDDTopList() {
     int nrOfWindows = nrOfPlayers / playersPerWindow +
                       (nrOfPlayers % playersPerWindow != 0);
 
-    size_t maxNameLength = playerVector.getLongestNameLength();
-
     writeContentsToFile(
         titleBase,
         totalDamageForEachPlayer,
         nrOfWindows,
         playersPerWindow,
-        maxNameLength,
         &StatWriter::writeDDTopListHeadings,
         &StatWriter::writeDDTopList);
 }
@@ -62,14 +59,11 @@ void StatWriter::createDDDetailedTopList() {
     int nrOfWindows = nrOfPlayers / playersPerWindow +
                    (nrOfPlayers % playersPerWindow != 0);
 
-    size_t maxNameLength = playerVector.getLongestNameLength();
-
     writeContentsToFile(
         titleBase,
         totalDamageForEachPlayer,
         nrOfWindows,
         playersPerWindow,
-        maxNameLength,
         &StatWriter::writeDDDetailedOverviewHeadings,
         &StatWriter::writeDDDetailedOverview);
 }
@@ -97,15 +91,11 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
     int nrOfWindows = nrOfTypes / typesPerFile +
                    (nrOfTypes % typesPerFile != 0);
 
-    // TODO: This should be the length of the longest damage type
-    size_t longestTypeNameLength = 20;
-
     writeContentsToFile(
         titleBase,
         allDamageTypesFromAffectedPlayer,
         nrOfWindows,
         typesPerFile,
-        longestTypeNameLength,
         &StatWriter::writeDDPerDamageTypeHeadings,
         &StatWriter::writeDDDetailedOverview);
 }
@@ -132,14 +122,11 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
             pp->getTotalDamageForAllAffectedPlayers();
     sortByDealt(totalDamageForEachAffectedPlayer);
 
-    size_t maxNameLength = pp->getLongestAffectedPlayerNameLength();
-
     writeContentsToFile(
         titleBase,
         totalDamageForEachAffectedPlayer,
         nrOfWindows,
         playersPerWindow,
-        maxNameLength,
         &StatWriter::writeDDDetailedOverviewHeadings,
         &StatWriter::writeDDDetailedOverview);
 }
@@ -180,14 +167,11 @@ void StatWriter::createDDOnSpecificOpponent(
     int nrOfWindows = nrOfTypes / typesPerFile +
                    (nrOfTypes % typesPerFile != 0);
 
-    size_t maxNameLength = 20;
-
     writeContentsToFile(
         titleBase,
         allDamageTypesFromAffectedPlayer,
         nrOfWindows,
         typesPerFile,
-        maxNameLength,
         &StatWriter::writeDDOnSpecificOpponentHeadings,
         &StatWriter::writeDDDetailedOverview);
 }
@@ -261,11 +245,9 @@ void StatWriter::writeContentsToFile(
     std::vector<std::pair<std::string, Damage>>& v,
     unsigned int nrOfWindows,
     int typesPerWindow,
-    size_t maxNameLength,
-    std::ostream& (StatWriter::*writeHeadings)
-    (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
     std::ostream& (StatWriter::*writeDD)
-    (const Damage& d, std::ostream& os)) {
+        (const Damage& d, std::ostream& os)) {
 
     // Open the script file pdd here
     std::ofstream file(config.getScriptsPath() + "pdd");
@@ -300,7 +282,6 @@ void StatWriter::writeContentsToFile(
             stop,
             file,
             title,
-            maxNameLength,
             place,
             writeHeadings,
             writeDD);
@@ -308,7 +289,6 @@ void StatWriter::writeContentsToFile(
         //                      stop,
         //                      file,
         //                      title,
-        //                      maxNameLength,
         //                      place,
         //                      writeHeadings,
         //                      writeDD);
@@ -320,10 +300,8 @@ void StatWriter::writeContents(
     std::vector<std::pair<std::string, Damage>>::iterator stop,
     std::ostream& file,
     std::string title,
-    size_t maxNameLength,
     int& place,
-    std::ostream& (StatWriter::*writeHeadings)
-    (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
     std::ostream& (StatWriter::*writeDD)
     (const Damage& d, std::ostream& os)) {
 
@@ -334,12 +312,12 @@ void StatWriter::writeContents(
         title << "</font><br>" <<
         "<font color = " + yellow + ">";
 
-    (this->*writeHeadings)(maxNameLength, file);
+    (this->*writeHeadings)(file);
 
     for (auto it = start; it != stop; it++) {
         (this->*writeDD)(it->second, file);
         writePlace(place++, file);
-        writeName(it->first, maxNameLength, file);
+        writeName(it->first, file);
         file << "<br>";
     }
     file << "</font>\">" + title + "</a>" << std::endl;
@@ -350,10 +328,8 @@ void StatWriter::writeContentsReadable(
     std::vector<std::pair<std::string, Damage>>::iterator stop,
     std::ostream& file,
     std::string title,
-    size_t maxNameLength,
     int& place,
-    std::ostream& (StatWriter::*writeHeadings)
-    (size_t maxNameLength, std::ostream& os),
+    std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
     std::ostream& (StatWriter::*writeDD)
     (const Damage& d, std::ostream& os)) {
 
@@ -365,13 +341,13 @@ void StatWriter::writeContentsReadable(
         "</font><br>" << std::endl <<
         "<font color = " + yellow + ">" << std::endl;
 
-    (this->*writeHeadings)(maxNameLength, file);
+    (this->*writeHeadings)(file);
     file << std::endl;
 
     for (auto it = start; it != stop; it++) {
         (this->*writeDD)(it->second, file);
         writePlace(place++, file);
-        writeName(it->first, maxNameLength, file);
+        writeName(it->first, file);
         file << "<br>";
         file << std::endl;
     }
@@ -385,9 +361,7 @@ std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
     return os;
 }
 
-std::ostream& StatWriter::writeName(std::string name,
-    size_t maxNameLength,
-    std::ostream& os) {
+std::ostream& StatWriter::writeName(std::string name, std::ostream& os) {
     os << " " << name;
     return os;
 }
@@ -396,20 +370,17 @@ std::ostream& StatWriter::writeName(std::string name,
 /* Damage headings */
 /*******************/
 
-std::ostream& StatWriter::writeDDTopListHeadings(size_t maxNameLength,
-                                                 std::ostream& os) {
+std::ostream& StatWriter::writeDDTopListHeadings(std::ostream& os) {
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
           "<font color = " + lightBlue + ">" <<
           std::setw(width + 2) << " Total " <<
-          std::setw(width) << " DPM " << 
+          std::setw(width) << " DPM " <<
           "</font><br>" << std::setfill(' ');
     return os;
 }
 
-std::ostream& StatWriter::writeDDDetailedOverviewHeadings(
-    size_t maxNameLength,
-    std::ostream& os) {
+std::ostream& StatWriter::writeDDDetailedOverviewHeadings(std::ostream& os) {
 
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
@@ -426,7 +397,6 @@ std::ostream& StatWriter::writeDDDetailedOverviewHeadings(
 }
 
 std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
-    size_t maxNameLength,
     std::ostream& os) {
 
     int width = 9;
@@ -442,8 +412,7 @@ std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
     return os;
 }
 
-std::ostream& StatWriter::writeDDPerDamageTypeHeadings (size_t maxNameLength,
-                                                        std::ostream& os) {
+std::ostream& StatWriter::writeDDPerDamageTypeHeadings(std::ostream& os) {
 
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
@@ -479,13 +448,6 @@ std::ostream& StatWriter::writeDDHeadings(std::ostream& os) {
 /* Common headings */
 /*******************/
 
-std::ostream& StatWriter::writeNameHeading(std::string category,
-                                           size_t maxNameLength,
-                                           std::ostream& os) {
-    /* Writes "Name" in the heading. */
-    writeName("     " + category, maxNameLength + 5, os);
-    return os;
-}
 
 /*****************/
 /* Damage writes */
