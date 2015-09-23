@@ -402,7 +402,9 @@ std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
 }
 
 std::ostream& StatWriter::writeName(std::string name, std::ostream& os) {
-    os << " " << name;
+    /* Write the name or %m which is the name of the player executing
+    the script. */
+    os << ((name == "You") ? " %m" : " " + name);
     return os;
 }
 
