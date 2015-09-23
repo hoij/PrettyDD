@@ -53,6 +53,8 @@ public:
     std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageTypeDealtOnPlayer() const;
     std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers() const;
     std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
+    std::vector<std::pair<std::string, Damage>> getAllDamageTakenFromAffectedPlayer(std::string name) const;
+    std::vector<std::pair<std::string, Damage>> getAllDamageDealtOnAffectedPlayer(std::string name) const;
 
     Heal getTotalHeals() const;
     std::vector<std::pair<std::string, Heal>> getHealsForAllAffectedPlayers() const;

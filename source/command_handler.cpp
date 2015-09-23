@@ -51,12 +51,14 @@ void CommandHandler::execute(std::string command) {
 
         // For testing purposes:
 //        statWriter.createDDTopList();
-//        statWriter.createDDDetailedTopList();
-        statWriter.createDDPerDamageType("You");
+        statWriter.createDDDetailedTopList();
+//        statWriter.createDDPerDamageType("You");
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
+//        statWriter.createDDPerOpponent("Predator Rogue");
 //        statWriter.createDDPerOpponent("Nonexisting");
 //        statWriter.createDDOnSpecificOpponent("You", "Predator Rogue");
+//        statWriter.createDDOnSpecificOpponent("Predator Rogue", "You");
 //        statWriter.createDDOnSpecificOpponent("You", "asshole");
 
 //        statWriter.createDRDetailedTopList();

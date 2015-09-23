@@ -40,6 +40,12 @@ public:
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
 
+    std::vector<std::pair<std::string, Damage>>
+    getAllDamageReceivedFromPlayerForAffectedPlayer(std::string name) const;
+
+    std::vector<std::pair<std::string, Damage>>
+    getAllDamageDealtOnPlayerForAffectedPlayer(std::string name) const;
+
     virtual Heal getTotalHeals(std::string callerName);
     virtual std::vector<std::pair<std::string, Heal>> getHealsForAllAffectedPlayers() const;
     virtual const Heal& getHealFromAffectedPlayer(std::string name) const;
@@ -203,6 +209,46 @@ AffectedPlayerVector<C>::getAllDamageFromAffectedPlayer(
     for (const C ap : this->players) {
         if (ap->getName() == name) {
             return ap->getAllDamage();
+        }
+    }
+
+    // An affected player may return an empty vector if no damage has
+    // been done to it. So to differentiate from that case and
+    // a non-existing player a pair with the key "empty" is returned.
+    Damage d;
+    std::vector<std::pair<std::string, Damage>> emptyVector;
+    emptyVector.emplace_back("empty", d);
+    return emptyVector;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getAllDamageReceivedFromPlayerForAffectedPlayer(
+    std::string name) const {
+
+    for (const C ap : this->players) {
+        if (ap->getName() == name) {
+            return ap->getAllDamageReceivedFromPlayer();
+        }
+    }
+
+    // An affected player may return an empty vector if no damage has
+    // been done to it. So to differentiate from that case and
+    // a non-existing player a pair with the key "empty" is returned.
+    Damage d;
+    std::vector<std::pair<std::string, Damage>> emptyVector;
+    emptyVector.emplace_back("empty", d);
+    return emptyVector;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getAllDamageDealtOnPlayerForAffectedPlayer(
+    std::string name) const {
+
+    for (const C ap : this->players) {
+        if (ap->getName() == name) {
+            return ap->getAllDamageDealtOnPlayer();
         }
     }
 

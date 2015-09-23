@@ -64,8 +64,8 @@ void StatWriter::createDDDetailedTopList() {
         totalDamageForEachPlayer,
         nrOfWindows,
         playersPerWindow,
-        &StatWriter::writeDDDetailedOverviewHeadings,
-        &StatWriter::writeDDDetailedOverview);
+        &StatWriter::writeDDDetailedOverviewHeadingsOthers,
+        &StatWriter::writeDDDetailedOverviewOthers);
 }
 
 void StatWriter::createDDPerDamageType(std::string playerName) {
@@ -86,18 +86,30 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
     sortByDealt(allDamageTypesFromAffectedPlayer);
 
     // Calculate the number of files needed to write all players
-    const int typesPerFile = 10;
+    const int typesPerWindow = 10;
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
-    int nrOfWindows = nrOfTypes / typesPerFile +
-                   (nrOfTypes % typesPerFile != 0);
+    int nrOfWindows = nrOfTypes / typesPerWindow +
+                   (nrOfTypes % typesPerWindow != 0);
+
+    writeDDPointer wddp;
+    writeHeadingsPointer whp;
+    if (playerName == "You" ||
+        playerName == config.getplayerRunningProgram()) {
+        wddp = &StatWriter::writeDDDetailedOverviewSelf;
+        whp = &StatWriter::writeDDDetailedOverviewHeadingsSelf;
+    }
+    else {
+        wddp = &StatWriter::writeDDDetailedOverviewOthers;
+        whp = &StatWriter::writeDDDetailedOverviewHeadingsOthers;
+    }
 
     writeContentsToFile(
         titleBase,
         allDamageTypesFromAffectedPlayer,
         nrOfWindows,
-        typesPerFile,
-        &StatWriter::writeDDPerDamageTypeHeadings,
-        &StatWriter::writeDDDetailedOverview);
+        typesPerWindow,
+        whp,
+        wddp);
 }
 
 void StatWriter::createDDPerOpponent(std::string playerName) {
@@ -122,13 +134,25 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
             pp->getTotalDamageForAllAffectedPlayers();
     sortByDealt(totalDamageForEachAffectedPlayer);
 
+    writeDDPointer wddp;
+    writeHeadingsPointer whp;
+    if (playerName == "You" ||
+        playerName == config.getplayerRunningProgram()) {
+        wddp = &StatWriter::writeDDDetailedOverviewSelf;
+        whp = &StatWriter::writeDDDetailedOverviewHeadingsSelf;
+    }
+    else {
+        wddp = &StatWriter::writeDDDetailedOverviewOthers;
+        whp = &StatWriter::writeDDDetailedOverviewHeadingsOthers;
+    }
+
     writeContentsToFile(
         titleBase,
         totalDamageForEachAffectedPlayer,
         nrOfWindows,
         playersPerWindow,
-        &StatWriter::writeDDDetailedOverviewHeadings,
-        &StatWriter::writeDDDetailedOverview);
+        whp,
+        wddp);
 }
 
 void StatWriter::createDDOnSpecificOpponent(
@@ -148,7 +172,7 @@ void StatWriter::createDDOnSpecificOpponent(
     // Get the data and sort it:
     std::vector<std::pair<std::string, Damage>>
         allDamageTypesFromAffectedPlayer =
-            pp->getAllDamageFromAffectedPlayer(opponentName);
+            pp->getAllDamageDealtOnAffectedPlayer(opponentName);
     sortByDealt(allDamageTypesFromAffectedPlayer);
 
     // When the player is not found, a map with the key "empty" is returned.
@@ -162,18 +186,30 @@ void StatWriter::createDDOnSpecificOpponent(
     }
 
     // Calculate the number of files needed to write all players
-    const int typesPerFile = 10;
+    const int typesPerWindow = 10;
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
-    int nrOfWindows = nrOfTypes / typesPerFile +
-                   (nrOfTypes % typesPerFile != 0);
+    int nrOfWindows = nrOfTypes / typesPerWindow +
+                     (nrOfTypes % typesPerWindow != 0);
+
+    writeDDPointer wddp;
+    writeHeadingsPointer whp;
+    if (playerName == "You" ||
+        playerName == config.getplayerRunningProgram()) {
+        wddp = &StatWriter::writeDDDetailedOverviewSelf;
+        whp = &StatWriter::writeDDDetailedOverviewHeadingsSelf;
+    }
+    else {
+        wddp = &StatWriter::writeDDDetailedOverviewOthers;
+        whp = &StatWriter::writeDDDetailedOverviewHeadingsOthers;
+    }
 
     writeContentsToFile(
         titleBase,
         allDamageTypesFromAffectedPlayer,
         nrOfWindows,
-        typesPerFile,
-        &StatWriter::writeDDOnSpecificOpponentHeadings,
-        &StatWriter::writeDDDetailedOverview);
+        typesPerWindow,
+        whp,
+        wddp);
 }
 
 /*******************/
@@ -384,27 +420,21 @@ std::ostream& StatWriter::writeDDTopListHeadings(std::ostream& os) {
     return os;
 }
 
-std::ostream& StatWriter::writeDDDetailedOverviewHeadings(std::ostream& os) {
-
-    int width = 9;
-    os << std::setfill(fillChar) << std::right <<
-        "<font color = " + lightBlue + ">";
-    if (config.shouldWriteReadable()) {
-        os << std::endl;
-    }
-    os << std::setw(width+1) << " Total " <<
-          std::setw(width-1) << " DPM " <<
-          std::setw(width+1) << " Crit " <<
-          std::setw(width+1) << " Nanobot " <<
-          std::setw(width) << " Miss " <<
-          std::setw(width+2) << " Deflect " <<
-          "</font><br>" << std::setfill(' ');
-
-    return os;
+std::ostream& StatWriter::writeDDDetailedOverviewHeadingsOthers(
+    std::ostream& os) {
+    /* Headings without misses as they are not logged by AO for players
+    other than yourself. (Unless they are hitting you) */
+    return writeDDDetailedOverviewHeadings(os, false);
 }
 
-std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
+std::ostream& StatWriter::writeDDDetailedOverviewHeadingsSelf(
     std::ostream& os) {
+    /* As the other detailed overview heading but with info on misses. */
+    return writeDDDetailedOverviewHeadings(os, true);
+}
+
+std::ostream& StatWriter::writeDDDetailedOverviewHeadings(
+    std::ostream& os, bool self) {
 
     int width = 9;
     os << std::setfill(fillChar) << std::right <<
@@ -412,13 +442,16 @@ std::ostream& StatWriter::writeDDOnSpecificOpponentHeadings(
     if (config.shouldWriteReadable()) {
         os << std::endl;
     }
-    os << std::setw(width + 1) << " Total " <<
-          std::setw(width - 1) << " DPM " <<
-          std::setw(width + 1) << " Crit " <<
-          std::setw(width + 1) << " Nanobot " <<
-          std::setw(width) << " Miss " <<
-          std::setw(width + 2) << " Deflect " <<
+    os << std::setw(width+1) << " Total " <<
+          std::setw(width-1) << " DPM " <<
+          std::setw(width+1) << " Crit " <<
+          std::setw(width+1) << " Nanobot ";
+    if (self) {
+        os << std::setw(width) << " Miss ";
+    }
+    os << std::setw(width+2) << " Deflect " <<
           "</font><br>" << std::setfill(' ');
+
     return os;
 }
 
@@ -476,21 +509,38 @@ std::ostream& StatWriter::writeDDTopList(const Damage& d, std::ostream& os) {
     return os;
 }
 
-std::ostream& StatWriter::writeDDDetailedOverview(const Damage& d,
-                                                  std::ostream& os) {
+std::ostream& StatWriter::writeDDDetailedOverviewOthers(const Damage& d,
+                                                        std::ostream& os) {
+    /* Details without misses as they are not logged by AO for players
+    other than yourself. (Unless they are hitting you) */
+    return writeDDDetailedOverview(d, os, false);
+}
 
+std::ostream& StatWriter::writeDDDetailedOverviewSelf(const Damage& d,
+                                                      std::ostream& os) {
+    /* As the other detailed overview but with info on misses. */
+    return writeDDDetailedOverview(d, os, true);
+}
+
+std::ostream& StatWriter::writeDDDetailedOverview(const Damage& d,
+                                                  std::ostream& os,
+                                                  bool self) {
     double critPercentage = percentage(d.getCountReceivedFromPlayer(),
                                        d.getCritCountReceivedFromPlayer());
     double nanobotDamagePercentage = percentage(
                                       d.getTotalReceivedFromPlayer(),
                                       d.getNanobotTotalReceivedFromPlayer());
-    double missPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                       d.getMissesReceivedFromPlayer());
+    std::string misses;
+    if (self) {
+        double missPercentage = percentage(d.getCountReceivedFromPlayer(),
+                                           d.getMissesReceivedFromPlayer());
+        misses = dblToString(missPercentage);
+    }
     double deflectPercentage = percentage(d.getCountReceivedFromPlayer(),
                                           d.getDeflectsReceivedFromPlayer());
     std::string crit = dblToString(critPercentage);
     std::string nanobot = dblToString(nanobotDamagePercentage);
-    std::string misses = dblToString(missPercentage);
+
     std::string deflect = dblToString(deflectPercentage);
 
     const int width = 8;
@@ -500,9 +550,11 @@ std::ostream& StatWriter::writeDDDetailedOverview(const Damage& d,
           std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
           std::fixed << std::setprecision(1) <<
           std::setw(width - critOffset) << " " + crit << '%' << " " <<
-          std::setw(width - critOffset) << " " + nanobot << '%' << " " <<
-          std::setw(width - critOffset) << " " + misses << '%' << " " <<
-          std::setw(width - critOffset) << " " + deflect << '%' << "  " <<
+          std::setw(width - critOffset) << " " + nanobot << '%' << " ";
+    if (self) {
+        os << std::setw(width - critOffset) << " " + misses << '%' << " ";
+    }
+    os << std::setw(width - critOffset) << " " + deflect << '%' << "  " <<
           std::setfill(' ');
     return os;
 }
@@ -592,6 +644,10 @@ std::string StatWriter::dblToString(const double d) {
     return out.str();
 }
 
+
+
+// Remove when done:
+
 /***************/
 /* Comparators */
 /***************/
@@ -606,10 +662,6 @@ bool StatWriter::compareTotalReceived(const Player* p1, const Player* p2) {
            p2->getTotalDamage().getTotalDealtOnPlayer();
 }
 
-
-
-
-// Remove when done:
 
 void StatWriter::createDDOverviewUnsorted() {
     std::ofstream file("damage_dealt_overview_unsorted");

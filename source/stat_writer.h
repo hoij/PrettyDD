@@ -59,22 +59,18 @@ public:
     void createOldDDOverview();
 
 private:
-    // Damage headings
-    std::ostream& writeDDTopListHeadings(std::ostream& file);
-    std::ostream& writeDDDetailedOverviewHeadings(std::ostream& os);
-    std::ostream& writeDDOnSpecificOpponentHeadings(std::ostream& os);
-    std::ostream& writeDDPerDamageTypeHeadings(std::ostream& os);
-    std::ostream& writeDDHeadings(std::ostream& os);
-
     // Common writes
+    typedef std::ostream& (StatWriter::*writeHeadingsPointer)(
+        std::ostream& os);
+    typedef std::ostream& (StatWriter::*writeDDPointer)(const Damage& d,
+                                                        std::ostream& os);
     void writeContentsToFile(
         std::string titleBase,
         std::vector<std::pair<std::string, Damage>>& v,
         unsigned int nrOfWindows,
         int typesPerWindow,
-        std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
-        std::ostream& (StatWriter::*writeDD)
-            (const Damage& d, std::ostream& os));
+        writeHeadingsPointer,
+        writeDDPointer);
 
     void writeContents(
         std::vector<std::pair<std::string, Damage>>::iterator start,
@@ -82,9 +78,8 @@ private:
         std::ostream& file,
         std::string title,
         int& place,
-        std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
-        std::ostream& (StatWriter::*writeDD)
-            (const Damage& d, std::ostream& os));
+        writeHeadingsPointer,
+        writeDDPointer);
 
     void writeContentsReadable(
         std::vector<std::pair<std::string, Damage>>::iterator start,
@@ -92,19 +87,36 @@ private:
         std::ostream& file,
         std::string title,
         int& place,
-        std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
-        std::ostream& (StatWriter::*writeDD)
-            (const Damage& d, std::ostream& os));
+        writeHeadingsPointer,
+        writeDDPointer);
 
     std::ostream& writePlace(int place, std::ostream& os);
     std::ostream& writeName(std::string name, std::ostream& os);
+
+    // Damage headings
+    std::ostream& writeDDTopListHeadings(std::ostream& file);
+    std::ostream& writeDDDetailedOverviewHeadingsOthers(std::ostream& os);
+    std::ostream& writeDDDetailedOverviewHeadingsSelf(std::ostream& os);
+    std::ostream& writeDDDetailedOverviewHeadings(std::ostream& os, bool self);
+    std::ostream& writeDDPerDamageTypeHeadings(std::ostream& os);
+    std::ostream& writeDDHeadings(std::ostream& os);
 
     // Common headings
 
     // Damage writes
     std::ostream& writeDDTopList(const Damage& d, std::ostream& os);
-    std::ostream& writeDDDetailedOverview(const Damage& d, std::ostream& os);
+
+    std::ostream&
+    writeDDDetailedOverviewOthers(const Damage& d, std::ostream& os);
+
+    std::ostream&
+    writeDDDetailedOverviewSelf(const Damage& d, std::ostream& os);
+
+    std::ostream&
+    writeDDDetailedOverview(const Damage& d, std::ostream& os, bool self);
+
     std::ostream& writeDR(const Damage& d, std::ostream& os);
+    std::ostream& writeDRSelf(const Damage& d, std::ostream& os);
     // Remove when done:
     std::ostream& writeDDOld(const Damage& d, std::ostream& os);
 
