@@ -170,12 +170,11 @@ TEST_F(PlayerTest, instantStopResume) {
 }
 
 TEST_F(PlayerTest, amountPerMinute) {
+
     /* Test when the time is not stopped */
     player->startTime = startTime;
     player->pauseDuration = pauseDuration;
-
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(DPMTime));
+    player->timeOfLastAction = DPMTime;
 
     // The active time is 200 s.
     int expected1 = (int)(300001/((float)200/60));
@@ -183,17 +182,13 @@ TEST_F(PlayerTest, amountPerMinute) {
 
 
     /* Test when time is stopped */
-    // Set a stopTime. The active time is still 200 s.
-    player->stopTime = DPMTime;
-    // Now stopTime should be used instead of currentTime().
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .Times(0);
-    EXPECT_EQ(expected1, player->amountPerMinute(300001));
-
+    // Set a stopTime.
+    player->stopTime = stopTime2;
+    int expected2 = (int)(300001/((float)220/60));
+    // Now stopTime should be used instead of timeOfLastAction.
+    EXPECT_EQ(expected2, player->amountPerMinute(300001));
     /* Test 0 */
     EXPECT_EQ(0, player->amountPerMinute(0));
-
-
     /* Start and stop time are the same => an active time of 0. */
     player->stopTime = startTime;
     player->pauseDuration = 0;

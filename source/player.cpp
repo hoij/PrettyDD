@@ -56,6 +56,7 @@ void swap(Player& first, Player& second) {
 }
 
 void Player::add(LineInfo& lineInfo) {
+    timeOfLastAction = lineInfo.time;
     if (startTime == 0) {
         // Set the start time on the first action made.
         // TODO: Change this to getting the current time from the lineInfo object instead.
@@ -196,7 +197,7 @@ std::time_t Player::getTimeActive() const {
     // and it's add() method is called.
     std::time_t timeActive;
     if (stopTime == 0) {
-        timeActive = myTime->currentTime() - startTime - pauseDuration;
+        timeActive = timeOfLastAction - startTime - pauseDuration;
     }
     else {
         timeActive = stopTime - startTime - pauseDuration;

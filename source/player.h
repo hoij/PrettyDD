@@ -81,6 +81,7 @@ private:
 
     std::string name;
     std::time_t startTime = 0;
+    std::time_t timeOfLastAction = 0;
     std::time_t stopTime = 0;
     std::time_t pauseDuration = 0;
 
