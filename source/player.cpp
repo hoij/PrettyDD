@@ -58,7 +58,8 @@ void swap(Player& first, Player& second) {
 void Player::add(LineInfo& lineInfo) {
     if (startTime == 0) {
         // Set the start time on the first action made.
-        startTime = myTime->currentTime();
+        // TODO: Change this to getting the current time from the lineInfo object instead.
+        startTime = lineInfo.time;
     }
     if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
         affectedPlayers->addToPlayers(lineInfo);

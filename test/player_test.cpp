@@ -107,6 +107,7 @@ TEST_F(PlayerTest, timerTest) {
     */
     LineInfo li;
     li.type = "damage";
+    li.time = startTime;
 
     // The start time should be zero when no stats have been added
     // to the player.
@@ -114,8 +115,6 @@ TEST_F(PlayerTest, timerTest) {
 
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(startTime));
 
     player->add(li);
     // Expect a start time to have been set
@@ -151,11 +150,10 @@ TEST_F(PlayerTest, instantStopResume) {
     /* Stop and resume time on the same second */
     LineInfo li;
     li.type = "damage";
+    li.time = startTime;
 
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(startTime));
 
     player->add(li);
 

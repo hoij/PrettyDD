@@ -4,6 +4,7 @@
 
 #include "formatted_line_interface.h"
 
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -12,12 +13,12 @@ class FormattedLine : public FormattedLineInterface {
 public:
     FormattedLine(std::string& line);
 
-    const std::string& getMessage() const {return formattedLine[4];}
-    const std::string& getSender() const {return formattedLine[2];}
     const std::string& getDescription() const {return formattedLine[1];}
     const std::string& getDescriptionCode() const {return formattedLine[0];}
-    int getTime() const {return std::stoi(formattedLine[3]);}
+    const std::string& getMessage() const {return formattedLine[4];}
     const std::string& getOriginalLine() const {return originalLine;}
+    const std::string& getSender() const {return formattedLine[2];}
+    std::time_t getTime() const {return (std::time_t)std::stoi(formattedLine[3]);}
 
     bool isFormatted() const {return formatted;}
 

@@ -54,6 +54,8 @@ void Parser::createFunctionMap() {
 LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
     LineInfo lineInfo;
 
+    lineInfo.time = formattedLine.getTime();
+
     if (formattedLine.getDescription() == "Vicinity" ||
         formattedLine.getDescription() == "Team" ||
         formattedLine.getDescriptionCode() == "00000003000011fc") {

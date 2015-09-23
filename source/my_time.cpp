@@ -2,7 +2,7 @@
 
 
 std::time_t MyTime::currentTime() {
-    /* Returns time since 1970 */
+    /* Returns time in s since 1970 */
     std::chrono::time_point<std::chrono::system_clock> time_p =
         std::chrono::system_clock::now();
     return std::chrono::system_clock::to_time_t(time_p);

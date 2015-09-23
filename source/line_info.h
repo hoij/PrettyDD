@@ -2,6 +2,7 @@
 #define LINE_INFO_H
 
 
+#include <ctime>
 #include <string>
 
 
@@ -14,13 +15,14 @@ public:
     std::string type;
     std::string subtype;
     std::string command;
+    std::string nanoProgramName;
     int amount = 0;
+    std::time_t time;
     bool crit = false;
     bool deflect = false;
     bool miss = false;
     bool nanobots = false;
     bool hasStats = true;
-    std::string nanoProgramName;
 };
 
 
