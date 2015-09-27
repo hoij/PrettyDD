@@ -4,7 +4,7 @@
 #include <vector>
 
 
-void CommandHandler::execute(std::string command) {
+void CommandHandler::execute(const std::string& command) {
     /* Available commands:
     pdd top
         dtop
@@ -82,10 +82,12 @@ void CommandHandler::execute(std::string command) {
         else if (commandParts[1] == "help") {
             // statWriter.createHelp();
         }
-        else if (commandParts[1] == "start") {
+        else if (commandParts[1] == "start" ||
+                 commandParts[1] == "resume") {
             playerVector.startLogging();
         }
-        else if (commandParts[1] == "stop") {
+        else if (commandParts[1] == "stop" ||
+                 commandParts[1] == "pause") {
             playerVector.stopLogging();
         }
         else if (commandParts[1] == "reset") {

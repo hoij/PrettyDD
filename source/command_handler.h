@@ -14,7 +14,7 @@ public:
                    PlayerVector<Player*>& playerVector) :
         statWriter(statWriter), playerVector(playerVector) {}
     CommandHandler& operator=(CommandHandler rhs) = delete;
-    void execute(std::string command);
+    void execute(const std::string& command);
 
 private:
     std::vector<std::string> splitCommand(std::string command);
@@ -24,7 +24,7 @@ private:
     //void testMerge();
 
     StatWriter& statWriter;
-    PlayerVector<Player*> playerVector;
+    PlayerVector<Player*>& playerVector;
 };
 
 

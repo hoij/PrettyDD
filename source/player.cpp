@@ -211,13 +211,12 @@ Nano Player::getTotalNano() const {
 std::time_t Player::getTimeActive() const {
     // Start time is set the first time a player is added to the vector
     // and it's add() method is called.
+
+    // TODO: There will be issues where if pauseDuration is larger than
+    // the timeOfLastAction - startTime. This happens when the player doesn't
+    // do anything after the time has been resumed.
     std::time_t timeActive;
-    if (stopTime == 0) {
-        timeActive = timeOfLastAction - startTime - pauseDuration;
-    }
-    else {
-        timeActive = stopTime - startTime - pauseDuration;
-    }
+    timeActive = timeOfLastAction - startTime - pauseDuration;
     return timeActive;
 }
 

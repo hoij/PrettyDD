@@ -54,8 +54,6 @@ void Parser::createFunctionMap() {
 LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
     LineInfo lineInfo;
 
-    lineInfo.time = formattedLine.getTime();
-
     if (formattedLine.getDescription() == "Vicinity" ||
         formattedLine.getDescription() == "Team" ||
         formattedLine.getDescriptionCode() == "00000003000011fc") {
@@ -83,6 +81,8 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
         }
     }
+    
+    lineInfo.time = formattedLine.getTime();
 
     logWhenPlayerNamesNotFound(lineInfo, formattedLine);
 

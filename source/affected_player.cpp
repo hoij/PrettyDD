@@ -9,7 +9,7 @@ AffectedPlayer::AffectedPlayer(std::string name, MyTime* myTime) :
 
 void AffectedPlayer::add(LineInfo& lineInfo) {
     if (startTime == 0) {
-        startTime = myTime->currentTime();
+        startTime = lineInfo.time;
     }
     if (lineInfo.type == "damage") {
         addDamage(lineInfo);
