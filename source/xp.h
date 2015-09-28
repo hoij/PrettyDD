@@ -12,7 +12,10 @@ class XP {
 public:
     void add(LineInfo& li);
 
+    void setXPM(std::string type, int xpPerMinute);
+
     int getTotalGained(std::string type) const;
+    int getXPM(std::string type) const;
     int getCountGained(std::string type) const;
     int getMaxGained(std::string type) const;
     int getMinGained(std::string type) const;
@@ -26,6 +29,7 @@ private:
     struct XpInfo {
         XpInfo& operator+=(const XpInfo& rhs);
         int total = 0;
+        int xpm = 0;
         int count = 0;
         int max = -1;
         int min = std::numeric_limits<int>::max();

@@ -4,22 +4,15 @@
 
 
 void XP::add(LineInfo& li) {
+    XP::XpInfo incomming;
+    incomming.total = li.amount;
+    incomming.count = 1;
+    incomming.min = li.amount;
+    incomming.max = li.amount;
     if (li.subtype == "gained") {
-        XP::XpInfo incomming;
-        incomming.total = li.amount;
-        incomming.count = 1;
-        incomming.min = li.amount;
-        incomming.max = li.amount;
-
         gained[li.type] += incomming;
     }
     else if (li.subtype == "lost") {
-        XP::XpInfo incomming;
-        incomming.total = li.amount;
-        incomming.count = 1;
-        incomming.min = li.amount;
-        incomming.max = li.amount;
-
         lost[li.type] += incomming;
     }
     else {
@@ -28,84 +21,55 @@ void XP::add(LineInfo& li) {
     }
 }
 
+void XP::setXPM(std::string type, int xpPerMinute) {
+    gained[type].xpm = xpPerMinute;
+}
+
 int XP::getTotalGained(std::string type) const {
     auto it = gained.find(type);
-    if (it != gained.end()) {
-        return it->second.total;
-    }
-    else {
-        return 0;
-    }
+    return (it != gained.end()) ? it->second.total : 0;
+}
+
+int XP::getXPM(std::string type) const {
+    auto it = gained.find(type);
+    return (it == gained.end()) ? 0 : it->second.xpm;
 }
 
 int XP::getCountGained(std::string type) const {
     auto it = gained.find(type);
-    if (it != gained.end()) {
-        return it->second.count;
-    }
-    else {
-        return 0;
-    }
+    return (it == gained.end()) ? 0 : it->second.count;
 }
 
 int XP::getMaxGained(std::string type) const {
     auto it = gained.find(type);
-    if (it != gained.end()) {
-        return it->second.max;
-    }
-    else {
-        return -1;
-    }
+    return (it == gained.end()) ? -1 : it->second.max;
 }
 
 int XP::getMinGained(std::string type) const {
     auto it = gained.find(type);
-    if (it != gained.end()) {
-        return it->second.min;
-    }
-    else {
-        return std::numeric_limits<int>::max();
-    }
+    return (it == gained.end()) ?
+        std::numeric_limits<int>::max() : it->second.min;
 }
 
 int XP::getTotalLost(std::string type) const {
     auto it = lost.find(type);
-    if (it != lost.end()) {
-        return it->second.total;
-    }
-    else {
-        return 0;
-    }
+    return (it == lost.end()) ? 0 : it->second.total;
 }
 
 int XP::getCountLost(std::string type) const {
     auto it = lost.find(type);
-    if (it != lost.end()) {
-        return it->second.count;
-    }
-    else {
-        return 0;
-    }
+    return (it == lost.end()) ? 0 : it->second.count;
 }
 
 int XP::getMaxLost(std::string type) const {
     auto it = lost.find(type);
-    if (it != lost.end()) {
-        return it->second.max;
-    }
-    else {
-        return -1;
-    }
+    return (it == lost.end()) ? -1 : it->second.max;
 }
 
 int XP::getMinLost(std::string type) const {
     auto it = lost.find(type);
-    if (it != lost.end()) {
-        return it->second.min;
-    }
-    else {
-        return std::numeric_limits<int>::max();
-    }
+    return (it == lost.end()) ?
+        std::numeric_limits<int>::max() : it->second.min;
 }
 
 XP::XpInfo& XP::XpInfo::operator+=(const XpInfo& rhs) {
