@@ -37,14 +37,8 @@ public:
     const Heal& getHeal() const;
     const Nano& getNano() const;
 
-    time_t getStartTime() {return startTime;}
-    void incrementPauseDuration(const std::time_t& duration);
-    std::time_t getPauseDuration() {return pauseDuration;}
-
 private:
     std::string name;
-    std::time_t startTime = 0;
-    std::time_t pauseDuration = 0;
 
     void addDamage(LineInfo& li);
     void addHeal(LineInfo& li);

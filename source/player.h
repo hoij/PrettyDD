@@ -68,10 +68,10 @@ public:
     const XP& getXp();
 
     std::time_t getTimeActive() const;
+    std::time_t getPauseDuration() const;
     time_t getStartTime() {return startTime;}
     void stopTimer();
     void resumeTimer();
-    std::time_t getPauseDuration() {return pauseDuration;}
 
     size_t getLongestAffectedPlayerNameLength() const;
     std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers() {
@@ -85,7 +85,11 @@ private:
     std::time_t startTime = 0;
     std::time_t timeOfLastAction = 0;
     std::time_t stopTime = 0;
-    std::time_t pauseDuration = 0;
+    struct Pause {
+        std::time_t start;
+        std::time_t stop;
+    };
+    std::vector<Pause> pauses;
 
     int amountPerMinute(int amount) const;
     void addDPM(std::vector<std::pair<std::string, Damage>>& v) const;

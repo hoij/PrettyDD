@@ -209,15 +209,19 @@ Nano Player::getTotalNano() const {
 }
 
 std::time_t Player::getTimeActive() const {
-    // Start time is set the first time a player is added to the vector
-    // and it's add() method is called.
+    // Start time is set the first time the add method of a new
+    // Player is called.
+    return timeOfLastAction - startTime - getPauseDuration();
+}
 
-    // TODO: There will be issues where if pauseDuration is larger than
-    // the timeOfLastAction - startTime. This happens when the player doesn't
-    // do anything after the time has been resumed.
-    std::time_t timeActive;
-    timeActive = timeOfLastAction - startTime - pauseDuration;
-    return timeActive;
+std::time_t Player::getPauseDuration() const {
+    std::time_t pauseDuration = 0;
+    for (const Pause& pause : pauses) {
+        if (timeOfLastAction >= pause.stop) {
+            pauseDuration += pause.stop - pause.start;
+        }
+    }
+    return pauseDuration;
 }
 
 void Player::stopTimer() {
@@ -225,9 +229,9 @@ void Player::stopTimer() {
 }
 
 void Player::resumeTimer() {
-    pauseDuration += myTime->currentTime() - stopTime;
+    Pause p = {stopTime, myTime->currentTime()};
+    pauses.push_back(p);
     stopTime = 0;
-    affectedPlayers->incrementPauseDuration(pauseDuration);
 }
 
 int Player::amountPerMinute(int amount) const {
