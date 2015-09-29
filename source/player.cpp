@@ -79,7 +79,10 @@ void Player::add(LineInfo& lineInfo) {
             addNanoProgram(nameOfLastNanoProgramCasted, lineInfo.subtype);
         }
     }
-    else if (lineInfo.type == "xp") {
+    else if (lineInfo.type == "xp" ||
+             lineInfo.type == "sk" ||
+             lineInfo.type == "research" ||
+             lineInfo.type == "aixp") {
         addXp(lineInfo);
     }
 }
@@ -201,6 +204,7 @@ const Nano& Player::getNanoFromAffectedPlayer(std::string name) const {
 }
 
 const XP& Player::getXp() {
+    xp.calcXPM(getTimeActive());
     return xp;
 }
 

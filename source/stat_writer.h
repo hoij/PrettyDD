@@ -64,7 +64,7 @@ private:
         std::ostream& os);
     typedef std::ostream& (StatWriter::*writeDDPointer)(const Damage& d,
                                                         std::ostream& os);
-    void writeContentsToFile(
+    void writeDDToFile(
         std::string titleBase,
         std::vector<std::pair<std::string, Damage>>& v,
         unsigned int nrOfWindows,
@@ -72,7 +72,7 @@ private:
         writeHeadingsPointer,
         writeDDPointer);
 
-    void writeContents(
+    void writeDDStats(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::ostream& file,
@@ -81,7 +81,7 @@ private:
         writeHeadingsPointer,
         writeDDPointer);
 
-    void writeContentsReadable(
+    void writeDDStatsReadable(
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::ostream& file,
@@ -100,6 +100,9 @@ private:
     std::ostream& writeDDDetailedOverviewHeadings(std::ostream& os, bool self);
     std::ostream& writeDDPerDamageTypeHeadings(std::ostream& os);
     std::ostream& writeDDHeadings(std::ostream& os);
+
+    std::ostream& writeXPHeadingsOverall(std::ostream& os);
+    std::ostream& writeXPHeadingsDetailed(std::ostream& os);
 
     // Common headings
 
@@ -120,6 +123,14 @@ private:
     // Remove when done:
     std::ostream& writeDDOld(const Damage& d, std::ostream& os);
 
+    std::ostream& writeXPStatsOverview(const XP& xp,
+                                       std::string type,
+                                       std::ostream& os);
+
+    std::ostream& writeXPStatsDetailed(const XP& xp,
+                                       std::string type,
+                                       std::ostream& os);
+
     // Helper functions
     double percentage(int total, int part);
     void createNotFoundMessage(std::string title,
@@ -135,10 +146,12 @@ private:
 
 
     // Colors
+    const std::string lime = "#00FF00";
     const std::string lightBlue = "#3399FF";
-    const std::string yellow = "#00FF00";
+    const std::string yellow = "#FFFF00";
 
     const char fillChar = '_';
+
     PlayerVector<Player*>& playerVector;
     Configuration& config;
 };

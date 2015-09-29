@@ -3,6 +3,7 @@
 #include "logger.h"
 #include "player.h"
 #include "stat_writer.h"
+#include "xp.h"
 
 #include <algorithm>
 #include <fstream>
@@ -36,7 +37,7 @@ void StatWriter::createDDTopList() {
     int nrOfWindows = nrOfPlayers / playersPerWindow +
                       (nrOfPlayers % playersPerWindow != 0);
 
-    writeContentsToFile(
+    writeDDToFile(
         titleBase,
         totalDamageForEachPlayer,
         nrOfWindows,
@@ -59,7 +60,7 @@ void StatWriter::createDDDetailedTopList() {
     int nrOfWindows = nrOfPlayers / playersPerWindow +
                    (nrOfPlayers % playersPerWindow != 0);
 
-    writeContentsToFile(
+    writeDDToFile(
         titleBase,
         totalDamageForEachPlayer,
         nrOfWindows,
@@ -74,8 +75,7 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase,
-                              playerName + " not found.");
+        createNotFoundMessage(titleBase, playerName + " not found.");
         return;
     }
 
@@ -103,7 +103,7 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
         whp = &StatWriter::writeDDDetailedOverviewHeadingsOthers;
     }
 
-    writeContentsToFile(
+    writeDDToFile(
         titleBase,
         allDamageTypesFromAffectedPlayer,
         nrOfWindows,
@@ -146,7 +146,7 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
         whp = &StatWriter::writeDDDetailedOverviewHeadingsOthers;
     }
 
-    writeContentsToFile(
+    writeDDToFile(
         titleBase,
         totalDamageForEachAffectedPlayer,
         nrOfWindows,
@@ -164,8 +164,7 @@ void StatWriter::createDDOnSpecificOpponent(
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase,
-                              playerName + " not found.");
+        createNotFoundMessage(titleBase, playerName + " not found.");
         return;
     }
 
@@ -203,7 +202,7 @@ void StatWriter::createDDOnSpecificOpponent(
         whp = &StatWriter::writeDDDetailedOverviewHeadingsOthers;
     }
 
-    writeContentsToFile(
+    writeDDToFile(
         titleBase,
         allDamageTypesFromAffectedPlayer,
         nrOfWindows,
@@ -254,6 +253,58 @@ void StatWriter::createDRDetailedTopList() {
 /* Create XP files */
 /*******************/
 
+void StatWriter::createXPInfo() {
+
+    std::string title = "XP Info";
+
+    Player* pp = playerVector.getPlayer("You");
+    if (pp == nullptr) {
+        createNotFoundMessage(title, "You not found.");
+        return;
+    }
+
+    XP xp = pp->getXp();
+
+    std::ofstream file(config.getScriptsPath() + "pdd");
+    if (!file.is_open()) {
+        errorLog.write("Error: Could not open/create \"pdd"
+                       "\" for writing. Tried writing it to:");
+        errorLog.write("Error: " + config.getScriptsPath());
+    }
+
+    file << "<a href=\"text://<font color = " + yellow + ">" <<
+            title << "</font><br>";
+    if (config.shouldWriteReadable()) {
+        file << std::endl;
+    }
+
+    writeXPHeadingsOverall(file);
+
+    file << "<font color = " + lime + ">";
+    if (config.shouldWriteReadable()) {
+        file << std::endl;
+    }
+    std::vector<std::string> types = xp.getTypes();
+    for (const auto& type : types) {
+        writeXPStatsOverview(xp, type, file);
+    }
+    file << "</font>>";
+
+    writeXPHeadingsDetailed(file);
+
+    file << "<font color = " + lime + ">";
+    if (config.shouldWriteReadable()) {
+        file << std::endl;
+    }
+    for (const auto& type : types) {
+        writeXPStatsDetailed(xp, type, file);
+    }
+
+    file << "</font>\">" + title + " for %m</a>";
+    if (config.shouldWriteReadable()) {
+        file << std::endl;
+    }
+}
 
 /*****************************/
 /* Create nano program files */
@@ -276,16 +327,15 @@ void StatWriter::createNotFoundMessage(std::string title,
         "\">" + title + "</a>";
 }
 
-void StatWriter::writeContentsToFile(
+void StatWriter::writeDDToFile(
     std::string titleBase,
     std::vector<std::pair<std::string, Damage>>& v,
     unsigned int nrOfWindows,
     int typesPerWindow,
-    std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
-    std::ostream& (StatWriter::*writeDD)
+    std::ostream& (StatWriter::*writeHeadingsPointer)(std::ostream& os),
+    std::ostream& (StatWriter::*writeDDPointer)
         (const Damage& d, std::ostream& os)) {
 
-    // Open the script file pdd here
     std::ofstream file(config.getScriptsPath() + "pdd");
     if (!file.is_open()) {
         errorLog.write("Error: Could not open/create \"pdd"
@@ -315,47 +365,47 @@ void StatWriter::writeContentsToFile(
 
         // Do the actual writing:
         if (config.shouldWriteReadable()) {
-            writeContentsReadable(start,
-                                  stop,
-                                  file,
-                                  title,
-                                  place,
-                                  writeHeadings,
-                                  writeDD);
+            writeDDStatsReadable(start,
+                                 stop,
+                                 file,
+                                 title,
+                                 place,
+                                 writeHeadingsPointer,
+                                 writeDDPointer);
         }
         else {
-            writeContents(start,
-                          stop,
-                          file,
-                          title,
-                          place,
-                          writeHeadings,
-                          writeDD);
+            writeDDStats(start,
+                         stop,
+                         file,
+                         title,
+                         place,
+                         writeHeadingsPointer,
+                         writeDDPointer);
         }
     }
 }
 
-void StatWriter::writeContents(
+void StatWriter::writeDDStats(
     std::vector<std::pair<std::string, Damage>>::iterator start,
     std::vector<std::pair<std::string, Damage>>::iterator stop,
     std::ostream& file,
     std::string title,
     int& place,
-    std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
-    std::ostream& (StatWriter::*writeDD)
-    (const Damage& d, std::ostream& os)) {
+    std::ostream& (StatWriter::*writeHeadingsPointer)(std::ostream& os),
+    std::ostream& (StatWriter::*writeDDPointer)
+        (const Damage& d, std::ostream& os)) {
 
     /* Writes headings and then the DD, place and name for each Damage
     in the vector.  */
 
-    file << "<a href=\"text://<font color = #FFFF00>" <<
+    file << "<a href=\"text://<font color = " + yellow + ">" <<
             title << "</font><br>";
 
-    (this->*writeHeadings)(file);
-    file << "<font color = " + yellow + ">";
+    (this->*writeHeadingsPointer)(file);
 
+    file << "<font color = " + lime + ">";
     for (auto it = start; it != stop; it++) {
-        (this->*writeDD)(it->second, file);
+        (this->*writeDDPointer)(it->second, file);
         writePlace(place++, file);
         writeName(it->first, file);
         file << "<br>";
@@ -363,33 +413,31 @@ void StatWriter::writeContents(
     file << "</font>\">" + title + "</a>" << std::endl;
 }
 
-void StatWriter::writeContentsReadable(
+void StatWriter::writeDDStatsReadable(
     std::vector<std::pair<std::string, Damage>>::iterator start,
     std::vector<std::pair<std::string, Damage>>::iterator stop,
     std::ostream& file,
     std::string title,
     int& place,
-    std::ostream& (StatWriter::*writeHeadings)(std::ostream& os),
-    std::ostream& (StatWriter::*writeDD)
-    (const Damage& d, std::ostream& os)) {
+    std::ostream& (StatWriter::*writeHeadingsPointer)(std::ostream& os),
+    std::ostream& (StatWriter::*writeDDPointer)
+        (const Damage& d, std::ostream& os)) {
 
     /* Writes headings and then the DD, place and name for each Damage
     in the vector. This method places endl's at the end to make
     it human readable. */
 
-    file << "<a href=\"text://<font color = #FFFF00>" + title <<
-            "</font><br>" << std::endl;
+    file << "<a href=\"text://<font color = " + yellow + ">" <<
+            title << "</font><br>" << std::endl;
 
-    (this->*writeHeadings)(file);
-    file << std::endl <<
-            "<font color = " + yellow + ">" << std::endl;
+    (this->*writeHeadingsPointer)(file);
 
+    file << std::endl << "<font color = " + lime + ">" << std::endl;
     for (auto it = start; it != stop; it++) {
-        (this->*writeDD)(it->second, file);
+        (this->*writeDDPointer)(it->second, file);
         writePlace(place++, file);
         writeName(it->first, file);
-        file << "<br>";
-        file << std::endl;
+        file << "<br>" << std::endl;
     }
     file << "</font>\">" + title + "</a>" << std::endl;
 }
@@ -489,6 +537,40 @@ std::ostream& StatWriter::writeDDHeadings(std::ostream& os) {
           std::setw(width) << "Deflects" <<
           std::setw(width) << "Misses" << "<br>" <<
           std::setfill(' ');
+    return os;
+}
+
+std::ostream& StatWriter::writeXPHeadingsOverall(std::ostream& os) {
+    int width = 9;
+    os << std::setfill(fillChar) << std::right <<
+          "<font color = " + lightBlue + ">";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    os << std::setw(width+1) << " Total " <<
+          std::setw(width-1) << " XPM " <<
+          "</font><br>" << std::setfill(' ');
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    return os;
+}
+
+std::ostream& StatWriter::writeXPHeadingsDetailed(std::ostream& os) {
+    int width = 9;
+    os << std::setfill(fillChar) << std::right <<
+          "<font color = " + lightBlue + ">";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    os << std::setw(width+1) << " Total " <<
+          std::setw(width-1) << " XPM " <<
+          std::setw(width+1) << " Max " <<
+          std::setw(width+1) << " Min " <<
+          "</font><br>" << std::setfill(' ');
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
     return os;
 }
 
@@ -604,6 +686,71 @@ std::ostream& StatWriter::writeDDOld(const Damage& d, std::ostream& os) {
           std::setw(width) << d.getDeflectsReceivedFromPlayer() <<
           std::setw(width) << d.getMissesReceivedFromPlayer() << "<br>" <<
           std::setfill(' ');
+    return os;
+}
+
+/*************/
+/* XP writes */
+/*************/
+
+std::ostream& StatWriter::writeXPStatsOverview(const XP& xp,
+                                               std::string type,
+                                               std::ostream& os) {
+    const int width = 8;
+    os << std::setfill(fillChar) <<
+          std::setw(width) << " " + std::to_string(xp.getTotal(type))
+                           << " " <<
+          std::setw(width) << " " + std::to_string(xp.getXPM(type)) << " "
+                           << "<br>" <<
+          std::setfill(' ');
+    writeName(type, os);
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    return os;
+}
+
+std::ostream& StatWriter::writeXPStatsDetailed(const XP& xp,
+                                               std::string type,
+                                               std::ostream& os) {
+
+    int maxGained = (xp.getMaxGained(type) == -1) ?
+                     0 : xp.getMaxGained(type);
+    int minGained = (xp.getMinGained(type) ==
+                     std::numeric_limits<int>::max()) ?
+                         0 : xp.getMinGained(type);
+    int maxLost = (xp.getMaxLost(type) == -1) ?
+                   0 : xp.getMaxLost(type);
+    int minLost = (xp.getMinLost(type) ==
+                   std::numeric_limits<int>::max()) ?
+                       0 : xp.getMinLost(type);
+
+    const int width = 8;
+    os << std::setfill(fillChar) <<
+          std::setw(width) << " " + std::to_string(xp.getTotalGained(type))
+                           << " " <<
+          std::setw(width) << " " + std::to_string(xp.getXPMGained(type))
+                           << " " <<
+          std::setw(width) << " " + std::to_string(maxGained) << " " <<
+          std::setw(width) << " " + std::to_string(minGained) << " " <<
+          std::setfill(' ');
+    writeName(type + " gained", os);
+    os << "<br>";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
+    os << std::setfill(fillChar) <<
+          std::setw(width) << " " + std::to_string(xp.getTotalLost(type))
+                           << " " <<
+          std::setw(width) << " N/A" << " " <<
+          std::setw(width) << " " + std::to_string(maxLost) << " " <<
+          std::setw(width) << " " + std::to_string(minLost) << " " <<
+          std::setfill(' ');
+    writeName(type + " lost", os);
+    os << "<br>";
+    if (config.shouldWriteReadable()) {
+        os << std::endl;
+    }
     return os;
 }
 

@@ -50,8 +50,9 @@ void CommandHandler::execute(const std::string& command) {
 
 
         // For testing purposes:
+        statWriter.createXPInfo();
 //        statWriter.createDDTopList();
-        statWriter.createDDDetailedTopList();
+//        statWriter.createDDDetailedTopList();
 //        statWriter.createDDPerDamageType("You");
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
@@ -77,7 +78,7 @@ void CommandHandler::execute(const std::string& command) {
             statWriter.createDDPerDamageType("You");
         }
         else if (commandParts[1] == "xp") {
-            //statWriter.createXPInfo();
+            statWriter.createXPInfo();
         }
         else if (commandParts[1] == "help") {
             // statWriter.createHelp();

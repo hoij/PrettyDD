@@ -54,8 +54,6 @@ public:
     virtual std::vector<std::pair<std::string, Nano>> getNanoForAllAffectedPlayers() const;
     virtual const Nano& getNanoFromAffectedPlayer(std::string name) const;
 
-    void incrementPauseDuration(const std::time_t& duration);
-
 private:
     void addToVector(
         std::vector<std::pair<std::string, Damage>>& allDamageTypes,
@@ -357,14 +355,6 @@ AffectedPlayerVector<C>::comparePotentialHeal(
 
     return p1.second.getPotentialDealtOnPlayer() >
            p2.second.getPotentialDealtOnPlayer();
-}
-
-template<class C>
-void
-AffectedPlayerVector<C>::incrementPauseDuration(const std::time_t& duration) {
-    for (C& ap : this->players) {
-        ap->incrementPauseDuration(duration);
-    }
 }
 
 
