@@ -57,5 +57,5 @@ INSTANTIATE_TEST_CASE_P(research, ParseTest,
             ExtendedLineInfo("",
                              "You",
                              "research",
-                             "",
+                             "gained",
                              139139)))) ;
