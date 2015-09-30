@@ -6,7 +6,7 @@
 #include "damage.h"
 #include "heal.h"
 #include "nano.h"
-#include "nano_program.h"
+#include "nano_programs.h"
 #include "player_interface.h"
 #include "my_time.h"
 #include "xp.h"
@@ -64,7 +64,7 @@ public:
     std::vector<std::pair<std::string, Nano>> getNanoForAllAffectedPlayers() const;
     const Nano& getNanoFromAffectedPlayer(std::string name) const;
 
-    const std::vector<NanoProgram>& getNanoPrograms() const;
+    const NanoPrograms& getNanoPrograms() const;
     const XP& getXp();
 
     std::time_t getTimeActive() const;
@@ -94,15 +94,13 @@ private:
     int amountPerMinute(int amount) const;
     void addDPM(std::vector<std::pair<std::string, Damage>>& v) const;
 
-    void addNanoProgram(std::string name, std::string subtype);
     void addXp(LineInfo& li);
     Damage sumDamage(bool nanobots);
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
     AffectedPlayerVector<AffectedPlayer*>* affectedPlayers = nullptr;
     MyTimeInterface* myTime = nullptr;
-    std::string nameOfLastNanoProgramCasted;
-	std::vector<NanoProgram> nanoPrograms;
+	NanoPrograms nanoPrograms;
     XP xp;
 };
 

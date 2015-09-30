@@ -34,7 +34,7 @@ public:
     virtual std::vector<std::pair<std::string, Nano>> getNanoForAllAffectedPlayers() const = 0;
     virtual const Nano& getNanoFromAffectedPlayer(std::string name) const = 0;
 
-    virtual const std::vector<NanoProgram>& getNanoPrograms() const = 0;
+    virtual const NanoPrograms& getNanoPrograms() const = 0;
     virtual const XP& getXp() = 0;
 
     virtual size_t getLongestAffectedPlayerNameLength() const = 0;

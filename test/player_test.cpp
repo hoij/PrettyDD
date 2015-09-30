@@ -221,23 +221,24 @@ TEST_F(PlayerTest, add_nano) {
 TEST_F(PlayerTest, add_nanoCast) {
     /* This test uses the real class NanoProgram.
     Add a "nano cast" with a named nano.
-    Expect the nanoPrograms vector to be empty (the nano is saved to a
+    Expect the nano program name list to be empty (the nano is saved to a
     local variable).
     Add another "nano cast" with an empty nano name.
-    Expect the nanoPrograms vector to contain one nano,
+    Expect the nano program name list to contain one nano,
     the named nano added previously. */
     LineInfo li1;
     li1.type = "nano cast";
     li1.nanoProgramName = "Test Program";
     player->add(li1);
-    EXPECT_EQ(0, player->getNanoPrograms().size());
+    EXPECT_EQ(0, player->getNanoPrograms().getNanoProgramNames().size());
 
     LineInfo li2;
     li2.type = "nano cast";
     li2.nanoProgramName = "";
     player->add(li2);
-    EXPECT_EQ(1, player->getNanoPrograms().size());
-    std::string storedNanoName = player->getNanoPrograms()[0].getName();
+    EXPECT_EQ(1, player->getNanoPrograms().getNanoProgramNames().size());
+    std::string storedNanoName =
+        player->getNanoPrograms().getNanoProgramNames()[0];
     EXPECT_EQ(li1.nanoProgramName, storedNanoName);
 }
 
