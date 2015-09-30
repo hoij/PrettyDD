@@ -105,6 +105,9 @@ int Parser::findAmount(const std::string& message) {
         // For XP/SK/Reserach but might match some other line I've missed.
         return std::stoi(d[0]);
     }
+    else if (regex_search(message, d, regex("(?::\\s)(\\d+)"))) {
+        return std::stoi(d[1]);
+    }
     else {
         errorLog.write("Error: Amount not found in: ");
         errorLog.write("Error: Message: " + message);
@@ -114,7 +117,7 @@ int Parser::findAmount(const std::string& message) {
 
 std::string Parser::findDamageSubtype(const std::string& message) {
     /*
-    // These lines still exist?
+    // TODO: These lines still exist?
     ["#000000004200000a#","Other hit by other","",1183505123]Something hit Addicted2 for 49 points of damage by reflect shield.
     ["#000000004200000a#","Other hit by other","",1183504118] Something hit Enfodruid for 1 points of damage by damage shield.
     */
@@ -249,7 +252,7 @@ std::string Parser::findSubtype(const std::string& message, const std::string ty
         return findSKSubtype(message);
     }
     else if (type == "research") {
-        return ""; // No subtype for research.
+        return "gained"; // Can't lose research.
     }
     else if (type == "xp") {
         return findXPSubtype(message);
@@ -258,7 +261,7 @@ std::string Parser::findSubtype(const std::string& message, const std::string ty
         return findAIXPSubtype(message);
     }
     else if (type == "vp") {
-        return "";
+        return "gained";
     }
     else if (type == "nano") {
         return ""; // No subtype for nano.
@@ -793,8 +796,11 @@ LineInfo Parser::meGotNano(const std::string& message) {
 }
 
 LineInfo Parser::victoryPoints(const std::string& message) {
-    // Check what this message looks like.
-    // Maybe it's a system message.
+    // TODO: Maybe the message is different when it's given as a
+    // BS or quest reward. Check it out.
+    /* When clicking a VP reward, this is the message:
+    ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
+    */
     LineInfo li;
     li.type = "vp";
     (void)message;
@@ -813,8 +819,9 @@ LineInfo Parser::system(const std::string& message) {
     ["#0000000040000001#","System","",1442506297]You successfully perform Supressive Horde .
     ["#0000000040000001#","System","",1442506339]You successfully perform Reinforce Slugs.
     ["#0000000040000001#","System","",1442506369]You successfully perform a Jarring Burst attack.
+
+    ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
     */
-    (void)message;
     LineInfo li;
     std::smatch m;
     if (regex_search(message, m, regex("You hit |You Successfully "))) {
@@ -824,6 +831,14 @@ LineInfo Parser::system(const std::string& message) {
         li.receiver_name = "You";
         li.dealer_name = m[1];
         li.nanoProgramName = m[2];
+    }
+    else if (regex_search(message, m, regex("Victory Points"))) {
+        li.receiver_name = "You";
+        li.type = "vp";
+        li.subtype = "gained";
+        li.amount = findAmount(message);
+        li.hasStats = true;
+        return li;
     }
     li.hasStats = false;
     return li;

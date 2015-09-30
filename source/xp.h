@@ -14,17 +14,17 @@ class XP {
 public:
     void add(LineInfo& li);
 
-    // XP Per Minute is not calculated continuously but needs to be
+    // XP Per Hour is not calculated continuously but needs to be
     // called before retreiving the XP instance.
-    void calcXPM(std::time_t timeActive);
+    void calcXPH(std::time_t timeActive);
 
     std::vector<std::string> getTypes() const;
 
     int getTotal(std::string type) const;
-    int getXPM(std::string type) const;
+    int getXPH(std::string type) const;
 
     int getTotalGained(std::string type) const;
-    int getXPMGained(std::string type) const;
+    int getXPHGained(std::string type) const;
     int getCountGained(std::string type) const;
     int getMaxGained(std::string type) const;
     int getMinGained(std::string type) const;
@@ -37,10 +37,10 @@ public:
 private:
     struct XpInfo {
         int total = 0;
-        int xpm = 0;
+        int xph = 0;
 
         int totalGained = 0;
-        int xpmGained = 0;
+        int xphGained = 0;
         int countGained = 0;
         int maxGained = -1;
         int minGained = std::numeric_limits<int>::max();

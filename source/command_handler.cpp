@@ -209,6 +209,8 @@ std::vector<std::string> CommandHandler::mergeQuotedText(std::vector<std::string
                  part.back() == '"' &&
                  part.size() != 1 &&
                  !insideQuote) {
+            part.erase(0, 1);
+            part.erase(part.size() -1);
             result.push_back(part);
         }
         else if (part.front() == '"' && part.size() == 1 && !insideQuote) {

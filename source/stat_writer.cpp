@@ -114,7 +114,7 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
 
 void StatWriter::createDDPerOpponent(std::string playerName) {
 
-    std::string titleBase = "DD Per Opponent For Player " + playerName;
+    std::string titleBase = "DD Per Opponent For " + playerName;
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
@@ -288,7 +288,7 @@ void StatWriter::createXPInfo() {
     for (const auto& type : types) {
         writeXPStatsOverview(xp, type, file);
     }
-    file << "</font>>";
+    file << "</font>";
 
     writeXPHeadingsDetailed(file);
 
@@ -547,8 +547,8 @@ std::ostream& StatWriter::writeXPHeadingsOverall(std::ostream& os) {
     if (config.shouldWriteReadable()) {
         os << std::endl;
     }
-    os << std::setw(width+1) << " Total " <<
-          std::setw(width-1) << " XPM " <<
+    os << std::setw(width+3) << " Total " <<
+          std::setw(width) << " XPH " <<
           "</font><br>" << std::setfill(' ');
     if (config.shouldWriteReadable()) {
         os << std::endl;
@@ -563,10 +563,10 @@ std::ostream& StatWriter::writeXPHeadingsDetailed(std::ostream& os) {
     if (config.shouldWriteReadable()) {
         os << std::endl;
     }
-    os << std::setw(width+1) << " Total " <<
-          std::setw(width-1) << " XPM " <<
-          std::setw(width+1) << " Max " <<
-          std::setw(width+1) << " Min " <<
+    os << std::setw(width + 3) << " Total " <<
+          std::setw(width) << " XPH " <<
+          std::setw(width + 1) << " Max " <<
+          std::setw(width + 1) << " Min " <<
           "</font><br>" << std::setfill(' ');
     if (config.shouldWriteReadable()) {
         os << std::endl;
@@ -696,14 +696,14 @@ std::ostream& StatWriter::writeDDOld(const Damage& d, std::ostream& os) {
 std::ostream& StatWriter::writeXPStatsOverview(const XP& xp,
                                                std::string type,
                                                std::ostream& os) {
-    const int width = 8;
+    const int width = 9;
     os << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(xp.getTotal(type))
-                           << " " <<
-          std::setw(width) << " " + std::to_string(xp.getXPM(type)) << " "
-                           << "<br>" <<
+          std::setw(width + 1) << " " + std::to_string(xp.getTotal(type)) <<
+                                  " " <<
+          std::setw(width) << " " + std::to_string(xp.getXPH(type)) << " " <<
           std::setfill(' ');
     writeName(type, os);
+    os << "<br>";
     if (config.shouldWriteReadable()) {
         os << std::endl;
     }
@@ -725,11 +725,11 @@ std::ostream& StatWriter::writeXPStatsDetailed(const XP& xp,
                    std::numeric_limits<int>::max()) ?
                        0 : xp.getMinLost(type);
 
-    const int width = 8;
+    const int width = 9;
     os << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(xp.getTotalGained(type))
+          std::setw(width + 1) << " " + std::to_string(xp.getTotalGained(type))
                            << " " <<
-          std::setw(width) << " " + std::to_string(xp.getXPMGained(type))
+          std::setw(width) << " " + std::to_string(xp.getXPHGained(type))
                            << " " <<
           std::setw(width) << " " + std::to_string(maxGained) << " " <<
           std::setw(width) << " " + std::to_string(minGained) << " " <<
@@ -740,7 +740,7 @@ std::ostream& StatWriter::writeXPStatsDetailed(const XP& xp,
         os << std::endl;
     }
     os << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(xp.getTotalLost(type))
+          std::setw(width + 1) << " " + std::to_string(xp.getTotalLost(type))
                            << " " <<
           std::setw(width) << " N/A" << " " <<
           std::setw(width) << " " + std::to_string(maxLost) << " " <<

@@ -9,7 +9,8 @@ void XP::add(LineInfo& li) {
         xp.total += li.amount;
         xp.totalGained += li.amount;
         xp.countGained += 1;
-        if (li.amount < xp.minGained) {
+        if (li.amount < xp.minGained &&
+            li.amount != 1) {  // 1 xp is often gotten from grey mobs.
             xp.minGained = li.amount;
         }
         if (li.amount > xp.maxGained) {
@@ -34,18 +35,18 @@ void XP::add(LineInfo& li) {
     }
 }
 
-void XP::calcXPM(time_t timeActive) {
+void XP::calcXPH(time_t timeActive) {
     /* Calculates and sets XP Per Minute */
     for (auto& xp : stats) {
         if (timeActive == 0) {
-            xp.second.xpm = 0;
-            xp.second.xpmGained = 0;
+            xp.second.xph = 0;
+            xp.second.xphGained = 0;
         }
         else {
-            xp.second.xpm =
-                int(xp.second.total / ((double)timeActive / 60));
-            xp.second.xpmGained =
-                int(xp.second.totalGained / ((double)timeActive / 60));
+            xp.second.xph =
+                int(xp.second.total / ((double)timeActive / 3600));
+            xp.second.xphGained =
+                int(xp.second.totalGained / ((double)timeActive / 3600));
         }
     }
 }
@@ -63,9 +64,9 @@ int XP::getTotal(std::string type) const {
     return (it != stats.end()) ? it->second.total : 0;
 }
 
-int XP::getXPM(std::string type) const {
+int XP::getXPH(std::string type) const {
     auto it = stats.find(type);
-    return (it == stats.end()) ? 0 : it->second.xpm;
+    return (it == stats.end()) ? 0 : it->second.xph;
 }
 
 int XP::getTotalGained(std::string type) const {
@@ -73,9 +74,9 @@ int XP::getTotalGained(std::string type) const {
     return (it != stats.end()) ? it->second.totalGained : 0;
 }
 
-int XP::getXPMGained(std::string type) const {
+int XP::getXPHGained(std::string type) const {
     auto it = stats.find(type);
-    return (it == stats.end()) ? 0 : it->second.xpmGained;
+    return (it == stats.end()) ? 0 : it->second.xphGained;
 }
 
 int XP::getCountGained(std::string type) const {

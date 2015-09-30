@@ -107,6 +107,8 @@
 ["#0000000042000013#","Other misses","",1180557880]Keepone tries to attack you with FastAttack, but misses!
 
 
+["#0000000040000001#","System","",1443609378]New Victory Points gained: 95.
+
 ["#0000000042000013#","Unknown message","",1180557880]Testline
 
 

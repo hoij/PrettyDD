@@ -59,7 +59,6 @@ void Player::add(LineInfo& lineInfo) {
     timeOfLastAction = lineInfo.time;
     if (startTime == 0) {
         // Set the start time on the first action made.
-        // TODO: Change this to getting the current time from the lineInfo object instead.
         startTime = lineInfo.time;
     }
     if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
@@ -82,7 +81,8 @@ void Player::add(LineInfo& lineInfo) {
     else if (lineInfo.type == "xp" ||
              lineInfo.type == "sk" ||
              lineInfo.type == "research" ||
-             lineInfo.type == "aixp") {
+             lineInfo.type == "aixp" ||
+             lineInfo.type == "vp") {
         addXp(lineInfo);
     }
 }
@@ -204,7 +204,7 @@ const Nano& Player::getNanoFromAffectedPlayer(std::string name) const {
 }
 
 const XP& Player::getXp() {
-    xp.calcXPM(getTimeActive());
+    xp.calcXPH(getTimeActive());
     return xp;
 }
 
