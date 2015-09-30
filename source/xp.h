@@ -15,7 +15,7 @@ public:
     void add(LineInfo& li);
 
     // XP Per Hour is not calculated continuously but needs to be
-    // called before retreiving the XP instance.
+    // called before retreiving the XP per Hour stats.
     void calcXPH(std::time_t timeActive);
 
     std::vector<std::string> getTypes() const;

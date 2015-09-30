@@ -42,7 +42,7 @@ TEST_F(XPTest, add) {
     int midAIXP1 = 3999;
     int midAIXP2 = 3998;
     int maxAIXP = 4000;
-    int minAIXP = 0;
+    int minAIXP = 1;
     addXP("aixp", "gained", midAIXP1);
     addXP("aixp", "gained", midAIXP2);
     addXP("aixp", "gained", maxAIXP);
@@ -63,7 +63,7 @@ TEST_F(XPTest, add) {
     EXPECT_EQ(midAIXP1 + midAIXP2 + maxAIXP + minAIXP, xp->getTotalGained("aixp"));
     EXPECT_EQ(4, xp->getCountGained("aixp"));
     EXPECT_EQ(maxAIXP, xp->getMaxGained("aixp"));
-    EXPECT_EQ(minAIXP, xp->getMinGained("aixp"));
+    EXPECT_EQ(midAIXP2, xp->getMinGained("aixp"));
 
     EXPECT_EQ(midXPLost + maxXPLost + minXPLost, xp->getTotalLost("xp"));
     EXPECT_EQ(3, xp->getCountLost("xp"));
@@ -71,9 +71,46 @@ TEST_F(XPTest, add) {
     EXPECT_EQ(minXPLost, xp->getMinLost("xp"));
 }
 
+TEST_F(XPTest, xpPerHour) {
+    int midXP1 = 3999;
+    int midXP2 = 3998;
+    int maxXP = 4000;
+    int minXP = 1;
+    addXP("xp", "gained", midXP1);
+    addXP("xp", "gained", midXP2);
+    addXP("xp", "gained", maxXP);
+    addXP("xp", "gained", minXP);
+    xp->calcXPH(29);
+    // Expected: (3999 + 3998 + 4000 + 1) / (29 / 3600)
+    EXPECT_EQ(1489406, xp->getXPH("xp"));
+    EXPECT_EQ(1489406, xp->getXPHGained("xp"));
+
+    int xpLost = 200;
+    addXP("xp", "lost", xpLost);
+    xp->calcXPH(29);
+    // Expected: (3999 + 3998 + 4000 + 1 - 200) / (29 / 3600)
+    EXPECT_EQ(1464579, xp->getXPH("xp"));
+    EXPECT_EQ(1489406, xp->getXPHGained("xp"));
+
+    xp->calcXPH(0);
+    EXPECT_EQ(0, xp->getXPH("xp"));
+    EXPECT_EQ(0, xp->getXPHGained("xp"));
+
+    /* Negative XPH */
+    int xpLost2 = 1000000;
+    addXP("xp", "lost", xpLost2);
+    xp->calcXPH(29);
+    // Expected: (3999 + 3998 + 4000 + 1 - 200 - 1000000) / (29 / 3600)
+    EXPECT_EQ(-122673351, xp->getXPH("xp"));
+    EXPECT_EQ(1489406, xp->getXPHGained("xp"));
+}
+
 TEST_F(XPTest, getNonexistingXPType) {
     /* No "xp" has been added so the getters should return a standard value */
+    EXPECT_EQ(0, xp->getTotal("xp"));
+    EXPECT_EQ(0, xp->getXPH("xp"));
     EXPECT_EQ(0, xp->getTotalGained("xp"));
+    EXPECT_EQ(0, xp->getXPHGained("xp"));
     EXPECT_EQ(0, xp->getCountGained("xp"));
     EXPECT_EQ(-1, xp->getMaxGained("xp"));
     EXPECT_EQ(std::numeric_limits<int>::max(), xp->getMinGained("xp"));
