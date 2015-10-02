@@ -48,11 +48,11 @@ void CommandHandler::execute(const std::string& command) {
         // Write the detailed top list by defualt:
         // statWriter.createDDDetailedTopList();
 
-
+//        statWriter.createNanoProgramsCastedDetailedList();
         // For testing purposes:
-        statWriter.createXPInfo();
+//        statWriter.createXPInfo();
 //        statWriter.createDDTopList();
-//        statWriter.createDDDetailedTopList();
+        statWriter.createDDDetailedTopList();
 //        statWriter.createDDPerDamageType("You");
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
@@ -138,7 +138,7 @@ void CommandHandler::execute(const std::string& command) {
         }
         else if (commandParts[1] == "np") {  // Nano Program
             if (commandParts[2] == "casted") {
-                //statWriter.createNanoProgramsCasted();
+                statWriter.createNanoProgramsCastedDetailedList();
             }
             else if (commandParts[2] == "received") {
                 //statWriter.createNanoProgramsReceived();

@@ -63,27 +63,27 @@ std::vector<std::string> NanoPrograms::getNanoProgramNames() const {
     return nanoProgramNames;
 }
 
-int NanoPrograms::getExecutes(std::string& name) {
+int NanoPrograms::getExecutes(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.executes : 0;
 }
-int NanoPrograms::getLands(std::string& name) {
+int NanoPrograms::getLands(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.lands : 0;
 }
-int NanoPrograms::getResists(std::string& name) {
+int NanoPrograms::getResists(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.resists : 0;
 }
-int NanoPrograms::getAborts(std::string& name) {
+int NanoPrograms::getAborts(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.aborts : 0;
 }
-int NanoPrograms::getCounters(std::string& name) {
+int NanoPrograms::getCounters(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.counters : 0;
 }
-int NanoPrograms::getFumbles(std::string& name) {
+int NanoPrograms::getFumbles(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.fumbles : 0;
 }

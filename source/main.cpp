@@ -3,6 +3,7 @@
 #include "formatted_line.h"
 #include "logger.h"
 #include "my_time.h"
+#include "nano_program_writer.h"
 #include "parser.h"
 #include "player_interface.h"
 #include "player_vector.h"
@@ -29,7 +30,11 @@ int main(void) {
 
     Parser parser(config.getplayerRunningProgram());
     PlayerVector<Player*> playerVector;
-    StatWriter statWriter(playerVector, config);
+
+    std::ofstream file;
+    NanoProgramWriter nanoProgramWriter(config, file);
+    StatWriter statWriter(playerVector, config, nanoProgramWriter, file);
+
     CommandHandler commandHandler(statWriter, playerVector);
 
     // TODO: Remove when done:

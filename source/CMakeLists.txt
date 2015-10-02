@@ -30,8 +30,12 @@ add_library(formatted_linelib formatted_line.cpp)
 target_link_libraries(formatted_linelib loggerlib)
 add_library(parserlib parser.cpp)
 target_link_libraries(parserlib loggerlib)
-add_library(stat_writerlib stat_writer.cpp)
 add_library(configurationlib configuration.cpp)
+add_library(writer_helperlib writer_helper.cpp)
+add_library(nano_program_writerlib nano_program_writer.cpp)
+target_link_libraries(nano_program_writerlib configurationlib writer_helperlib)
+add_library(stat_writerlib stat_writer.cpp)
+target_link_libraries(stat_writerlib configurationlib nano_program_writerlib writer_helperlib)
 add_library(command_handlerlib command_handler.cpp)
 
 target_link_libraries(PrettyDD

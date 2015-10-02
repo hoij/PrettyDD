@@ -15,9 +15,13 @@
 
 
 StatWriter::StatWriter(PlayerVector<Player*>& playerVector,
-                       Configuration& config) :
+                       Configuration& config,
+                       NanoProgramWriter& nanoProgramWriter,
+                       std::ofstream& file) :
+    WriterHelper(config, file),
     playerVector(playerVector),
-    config(config) {}
+    config(config),
+    nanoProgramWriter(nanoProgramWriter) {}
 
 /*******************/
 /* Create DD files */
@@ -34,8 +38,7 @@ void StatWriter::createDDTopList() {
     // Calculate the number of text links (windows) needed to see all players
     const int playersPerWindow = 15;
     int nrOfPlayers = (int)playerVector.size();
-    int nrOfWindows = nrOfPlayers / playersPerWindow +
-                      (nrOfPlayers % playersPerWindow != 0);
+    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeDDToFile(
         titleBase,
@@ -57,8 +60,7 @@ void StatWriter::createDDDetailedTopList() {
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 10;
     int nrOfPlayers = (int)playerVector.size();
-    int nrOfWindows = nrOfPlayers / playersPerWindow +
-                   (nrOfPlayers % playersPerWindow != 0);
+    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeDDToFile(
         titleBase,
@@ -75,7 +77,11 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, playerName + " not found.");
+        if (!openFile()) {
+            return;
+        }
+        createNotFoundMessage(titleBase, playerName + " not found.", file);
+        closeFile();
         return;
     }
 
@@ -88,8 +94,7 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
     // Calculate the number of files needed to write all players
     const int typesPerWindow = 10;
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
-    int nrOfWindows = nrOfTypes / typesPerWindow +
-                   (nrOfTypes % typesPerWindow != 0);
+    int nrOfWindows = calcNrOFWindows(nrOfTypes, typesPerWindow);
 
     writeDDPointer wddp;
     writeHeadingsPointer whp;
@@ -118,16 +123,18 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase,
-                              playerName + " not found.");
+        if (!openFile()) {
+            return;
+        }
+        createNotFoundMessage(titleBase, playerName + " not found.", file);
+        closeFile();
         return;
     }
 
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 10;
     int nrOfPlayers = (int)pp->nrOfAffectedPlayers();
-    int nrOfWindows = nrOfPlayers / playersPerWindow +
-                   (nrOfPlayers % playersPerWindow != 0);
+    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     std::vector<std::pair<std::string, Damage>>
         totalDamageForEachAffectedPlayer =
@@ -164,7 +171,11 @@ void StatWriter::createDDOnSpecificOpponent(
 
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, playerName + " not found.");
+        if (!openFile()) {
+            return;
+        }
+        createNotFoundMessage(titleBase, playerName + " not found.", file);
+        closeFile();
         return;
     }
 
@@ -178,17 +189,21 @@ void StatWriter::createDDOnSpecificOpponent(
     bool notFound = allDamageTypesFromAffectedPlayer.size() == 1 &&
                     (allDamageTypesFromAffectedPlayer[0].first == "empty");
     if (notFound) {
+        if (!openFile()) {
+            return;
+        }
         createNotFoundMessage(titleBase,
                               opponentName + " not found among " +
-                              playerName + "'s opponents.");
+                              playerName + "'s opponents.",
+                              file);
+        closeFile();
         return;
     }
 
     // Calculate the number of files needed to write all players
     const int typesPerWindow = 10;
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
-    int nrOfWindows = nrOfTypes / typesPerWindow +
-                     (nrOfTypes % typesPerWindow != 0);
+    int nrOfWindows = calcNrOFWindows(nrOfTypes, typesPerWindow);
 
     writeDDPointer wddp;
     writeHeadingsPointer whp;
@@ -256,21 +271,18 @@ void StatWriter::createDRDetailedTopList() {
 void StatWriter::createXPInfo() {
 
     std::string title = "XP Info";
-
-    Player* pp = playerVector.getPlayer("You");
-    if (pp == nullptr) {
-        createNotFoundMessage(title, "You not found.");
+    if (!openFile()) {
         return;
     }
 
-    XP xp = pp->getXp();
-
-    std::ofstream file(config.getScriptsPath() + "pdd");
-    if (!file.is_open()) {
-        errorLog.write("Error: Could not open/create \"pdd"
-                       "\" for writing. Tried writing it to:");
-        errorLog.write("Error: " + config.getScriptsPath());
+    Player* pp = playerVector.getPlayer("You");
+    if (pp == nullptr) {
+        createNotFoundMessage(title, "You not found.", file);
+        closeFile();
+        return;
     }
+
+    const XP& xp = pp->getXp();
 
     file << "<a href=\"text://<font color = " + yellow + ">" <<
             title << "</font><br>";
@@ -304,28 +316,38 @@ void StatWriter::createXPInfo() {
     if (config.shouldWriteReadable()) {
         file << std::endl;
     }
+    closeFile();
 }
 
 /*****************************/
 /* Create nano program files */
 /*****************************/
 
+void StatWriter::createNanoProgramsCastedDetailedList() {
+    std::string title = "Casted Nano Program Info";
+
+    if (!openFile()) {
+        return;
+    }
+
+    Player* pp = playerVector.getPlayer("You");
+    if (pp == nullptr) {
+        createNotFoundMessage(title, "You not found.", file);
+        closeFile();
+        return;
+    }
+
+    const NanoPrograms& nanoPrograms = pp->getNanoPrograms();
+
+    nanoProgramWriter.createCastedDetailedList(nanoPrograms);
+
+    closeFile();
+}
+
 
 /*****************/
 /* Common writes */
 /*****************/
-
-void StatWriter::createNotFoundMessage(std::string title,
-    std::string message) {
-    std::ofstream file(config.getScriptsPath() + "pdd");
-    if (!file.is_open()) {
-        errorLog.write("Error: Could not open/create \"pdd"
-                       "\" for writing. Tried writing it to:");
-        errorLog.write("Error: " + config.getScriptsPath());
-    }
-    file << "<a href=\"text://" + message + "<br>" <<
-        "\">" + title + "</a>";
-}
 
 void StatWriter::writeDDToFile(
     std::string titleBase,
@@ -336,22 +358,16 @@ void StatWriter::writeDDToFile(
     std::ostream& (StatWriter::*writeDDPointer)
         (const Damage& d, std::ostream& os)) {
 
-    std::ofstream file(config.getScriptsPath() + "pdd");
-    if (!file.is_open()) {
-        errorLog.write("Error: Could not open/create \"pdd"
-                       "\" for writing. Tried writing it to:");
-        errorLog.write("Error: " + config.getScriptsPath());
+    if (!openFile()) {
+        return;
     }
 
     /* Sets the link name number and calls the write function for
     each link needed. */
     int place = 1;
     for (unsigned int windowNr = 0; windowNr != nrOfWindows; windowNr++) {
-        // Append the interval to the title
-        std::string interval = std::to_string(windowNr * typesPerWindow + 1) +
-            "-" + std::to_string((windowNr + 1) *
-            typesPerWindow);
-        std::string title = titleBase + " " + interval;
+        std::string title =
+            appendInterval(titleBase, windowNr, typesPerWindow);
 
         auto start = v.begin() + windowNr * typesPerWindow;
         auto stop = v.begin();
@@ -383,6 +399,8 @@ void StatWriter::writeDDToFile(
                          writeDDPointer);
         }
     }
+
+    closeFile();
 }
 
 void StatWriter::writeDDStats(
@@ -398,19 +416,18 @@ void StatWriter::writeDDStats(
     /* Writes headings and then the DD, place and name for each Damage
     in the vector.  */
 
-    file << "<a href=\"text://<font color = " + yellow + ">" <<
-            title << "</font><br>";
+    writeStartOfLink(title);
 
     (this->*writeHeadingsPointer)(file);
 
     file << "<font color = " + lime + ">";
     for (auto it = start; it != stop; it++) {
         (this->*writeDDPointer)(it->second, file);
-        writePlace(place++, file);
-        writeName(it->first, file);
+        writePlace(place++);
+        writeName(it->first);
         file << "<br>";
     }
-    file << "</font>\">" + title + "</a>" << std::endl;
+    writeEndOfLink(title);
 }
 
 void StatWriter::writeDDStatsReadable(
@@ -435,25 +452,11 @@ void StatWriter::writeDDStatsReadable(
     file << std::endl << "<font color = " + lime + ">" << std::endl;
     for (auto it = start; it != stop; it++) {
         (this->*writeDDPointer)(it->second, file);
-        writePlace(place++, file);
-        writeName(it->first, file);
+        writePlace(place++);
+        writeName(it->first);
         file << "<br>" << std::endl;
     }
     file << "</font>\">" + title + "</a>" << std::endl;
-}
-
-std::ostream& StatWriter::writePlace(int place, std::ostream& os) {
-    os << std::right << std::setw(3) << std::setfill(fillChar) <<
-        " " + std::to_string(place) <<
-        std::setfill(' ');
-    return os;
-}
-
-std::ostream& StatWriter::writeName(std::string name, std::ostream& os) {
-    /* Write the name or %m which is the name of the player executing
-    the script. */
-    os << ((name == "You") ? " %m" : " " + name);
-    return os;
 }
 
 /*******************/
@@ -609,23 +612,18 @@ std::ostream& StatWriter::writeDDDetailedOverviewSelf(const Damage& d,
 std::ostream& StatWriter::writeDDDetailedOverview(const Damage& d,
                                                   std::ostream& os,
                                                   bool self) {
-    double critPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                       d.getCritCountReceivedFromPlayer());
-    double nanobotDamagePercentage = percentage(
-                                      d.getTotalReceivedFromPlayer(),
-                                      d.getNanobotTotalReceivedFromPlayer());
-    std::string misses;
+    std::string critPercentage = percentage(d.getCountReceivedFromPlayer(),
+                                     d.getCritCountReceivedFromPlayer());
+    std::string nanobotPercentage = percentage(
+                                        d.getTotalReceivedFromPlayer(),
+                                        d.getNanobotTotalReceivedFromPlayer());
+    std::string missPercentage;
     if (self) {
-        double missPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                           d.getMissesReceivedFromPlayer());
-        misses = dblToString(missPercentage);
+        missPercentage = percentage(d.getCountReceivedFromPlayer(),
+                                    d.getMissesReceivedFromPlayer());
     }
-    double deflectPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                          d.getDeflectsReceivedFromPlayer());
-    std::string crit = dblToString(critPercentage);
-    std::string nanobot = dblToString(nanobotDamagePercentage);
-
-    std::string deflect = dblToString(deflectPercentage);
+    std::string deflectPercentage = percentage(d.getCountReceivedFromPlayer(),
+                                               d.getDeflectsReceivedFromPlayer());
 
     const int width = 8;
     const int critOffset = 1;
@@ -633,12 +631,12 @@ std::ostream& StatWriter::writeDDDetailedOverview(const Damage& d,
           std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer()) << " " <<
           std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
           std::fixed << std::setprecision(1) <<
-          std::setw(width - critOffset) << " " + crit << '%' << " " <<
-          std::setw(width - critOffset) << " " + nanobot << '%' << " ";
+          std::setw(width - critOffset) << " " + critPercentage << '%' << " " <<
+          std::setw(width - critOffset) << " " + nanobotPercentage << '%' << " ";
     if (self) {
-        os << std::setw(width - critOffset) << " " + misses << '%' << " ";
+        os << std::setw(width - critOffset) << " " + missPercentage << '%' << " ";
     }
-    os << std::setw(width - critOffset) << " " + deflect << '%' << "  " <<
+    os << std::setw(width - critOffset) << " " + deflectPercentage << '%' << "  " <<
           std::setfill(' ');
     return os;
 }
@@ -702,7 +700,7 @@ std::ostream& StatWriter::writeXPStatsOverview(const XP& xp,
                                   " " <<
           std::setw(width) << " " + std::to_string(xp.getXPH(type)) << " " <<
           std::setfill(' ');
-    writeName(type, os);
+    writeName(type);
     os << "<br>";
     if (config.shouldWriteReadable()) {
         os << std::endl;
@@ -734,7 +732,7 @@ std::ostream& StatWriter::writeXPStatsDetailed(const XP& xp,
           std::setw(width) << " " + std::to_string(maxGained) << " " <<
           std::setw(width) << " " + std::to_string(minGained) << " " <<
           std::setfill(' ');
-    writeName(type + " gained", os);
+    writeName(type + " gained");
     os << "<br>";
     if (config.shouldWriteReadable()) {
         os << std::endl;
@@ -746,7 +744,7 @@ std::ostream& StatWriter::writeXPStatsDetailed(const XP& xp,
           std::setw(width) << " " + std::to_string(maxLost) << " " <<
           std::setw(width) << " " + std::to_string(minLost) << " " <<
           std::setfill(' ');
-    writeName(type + " lost", os);
+    writeName(type + " lost");
     os << "<br>";
     if (config.shouldWriteReadable()) {
         os << std::endl;
@@ -757,15 +755,6 @@ std::ostream& StatWriter::writeXPStatsDetailed(const XP& xp,
 /********************/
 /* Helper functions */
 /********************/
-
-double StatWriter::percentage(int total, int part) {
-    if (part == 0) {
-        return 0;
-    }
-    else {
-        return (double)part * 100 / total;
-    }
-}
 
 void StatWriter::sortByDealt(std::vector<std::pair<std::string, Damage>>& v) {
     std::sort(v.begin(), v.end(),
@@ -786,13 +775,6 @@ void StatWriter::sortByReceived(
                             damagePair2.second.getTotalDealtOnPlayer();
                  });
 }
-
-std::string StatWriter::dblToString(const double d) {
-    std::ostringstream out;
-    out << std::fixed << std::setprecision(1) << d;
-    return out.str();
-}
-
 
 
 // Remove when done:

@@ -15,12 +15,12 @@ public:
 
     std::vector<std::string> getNanoProgramNames() const;
 
-    int getExecutes(std::string& name);
-    int getLands(std::string& name);
-    int getResists(std::string& name);
-    int getAborts(std::string& name);
-    int getCounters(std::string& name);
-    int getFumbles(std::string& name);
+    int getExecutes(std::string& name) const;
+    int getLands(std::string& name) const;
+    int getResists(std::string& name) const;
+    int getAborts(std::string& name) const;
+    int getCounters(std::string& name) const;
+    int getFumbles(std::string& name) const;
 
 private:
     struct NanoProgram {

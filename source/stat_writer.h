@@ -2,8 +2,10 @@
 #define STAT_WRITER_H
 
 
-#include "player_vector.h"
 #include "configuration.h"
+#include "nano_program_writer.h"
+#include "player_vector.h"
+#include "writer_helper.h"
 
 #include <ostream>
 #include <string>
@@ -12,10 +14,13 @@
 class Damage;
 class Player;
 
-class StatWriter {
+class StatWriter : public WriterHelper {
 // TODO: Split into smaller classes
 public:
-    StatWriter(PlayerVector<Player*>& playerVector, Configuration& config);
+    StatWriter(PlayerVector<Player*>& playerVector,
+               Configuration& config,
+               NanoProgramWriter& nanoProgramWriter,
+               std::ofstream& file);
     StatWriter& operator=(StatWriter rhs) = delete;
 
     void createDDTopList();
@@ -43,12 +48,7 @@ public:
     void createNanoReceivedDetailedTopList();
     void createNanoDealtPerReceiver();  // Can only be done for "You".
 
-    void createNanoProgramsCasted();  // Can only be done for "You".
-    void createNanoProgramsCastedPerTarget();  // Can only be done for "You".
-    void createNanoProgramsCastedOnTarget(std::string targetName);  // Can only be done for "You".
-    void createNanoProgramsReceived();  // Can only be done for "You".
-    void createNanoProgramsReceivedPerTarget();  // Can only be done for "You".
-    void createNanoProgramsReceivedFromTarget(std::string targetName);  // Can only be done for "You".
+    void createNanoProgramsCastedDetailedList();  // Can only be done for "You".
 
     void createXPInfo();
 
@@ -90,9 +90,6 @@ private:
         writeHeadingsPointer,
         writeDDPointer);
 
-    std::ostream& writePlace(int place, std::ostream& os);
-    std::ostream& writeName(std::string name, std::ostream& os);
-
     // Damage headings
     std::ostream& writeDDTopListHeadings(std::ostream& file);
     std::ostream& writeDDDetailedOverviewHeadingsOthers(std::ostream& os);
@@ -132,28 +129,17 @@ private:
                                        std::ostream& os);
 
     // Helper functions
-    double percentage(int total, int part);
-    void createNotFoundMessage(std::string title,
-                               std::string message);
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
-    std::string dblToString(const double d);
 
     // Comparators
     // Remove when done:
     static bool compareTotalDealtOld(const Player* p1, const Player* p2);
     static bool compareTotalReceived(const Player* p1, const Player* p2);
 
-
-    // Colors
-    const std::string lime = "#00FF00";
-    const std::string lightBlue = "#3399FF";
-    const std::string yellow = "#FFFF00";
-
-    const char fillChar = '_';
-
     PlayerVector<Player*>& playerVector;
     Configuration& config;
+    NanoProgramWriter& nanoProgramWriter;
 };
 
 
