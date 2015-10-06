@@ -115,6 +115,7 @@ AffectedPlayer::getAllDamageReceivedFromPlayer() const {
         if (damagePair.second.getCountReceivedFromPlayer() > 0) {
             sortableDamage.push_back(damagePair);
         }
+        // TODO: Remove when done:
         // Using this opportunity to check that a Damage in the map
         // always has a positive count on either or both of
         // dealt or received.

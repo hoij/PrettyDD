@@ -4,31 +4,35 @@
 
 #include "configuration.h"
 #include "nano_programs.h"
+#include "player_vector.h"
 #include "writer_helper.h"
 
-#include <ostream>
+#include <fstream>
 
 
 class NanoProgramWriter : public WriterHelper {
 public:
-    NanoProgramWriter(Configuration& config,
-                      std::ofstream& file) : WriterHelper(config, file) {}
+    NanoProgramWriter(PlayerVector<Player*>& playerVector,
+                      Configuration& config,
+                      std::ofstream& file);
+
     // Can only be done for "You".
-    void createCastedDetailedList(const NanoPrograms& nanoPrograms);
+    void createCastedDetailedList();
 
 private:
-    std::ostream& writeDetailedListHeadings(std::ostream& os);
+    void writeDetailedListHeadings();
     std::vector<std::string>::iterator getStopIter(
         std::vector<std::string>& nanoProgramNames,
         unsigned int windowNr,
         unsigned int nanosPerWindow);
-    std::ostream& writeDetailedList(
+    void writeDetailedList(
         std::vector<std::string>::iterator namesStart,
         std::vector<std::string>::iterator namesStop,
-        const NanoPrograms& nanoPrograms,
-        std::ostream& os);
+        const NanoPrograms& nanoPrograms);
     void sortByExecutes(std::vector<std::string>& v,
                         const NanoPrograms& nanoPrograms);
+
+    PlayerVector<Player*>& playerVector;
 };
 
 

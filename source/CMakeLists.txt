@@ -32,10 +32,14 @@ add_library(parserlib parser.cpp)
 target_link_libraries(parserlib loggerlib)
 add_library(configurationlib configuration.cpp)
 add_library(writer_helperlib writer_helper.cpp)
+add_library(damage_writerlib damage_writer.cpp)
+target_link_libraries(damage_writerlib configurationlib writer_helperlib)
 add_library(nano_program_writerlib nano_program_writer.cpp)
 target_link_libraries(nano_program_writerlib configurationlib writer_helperlib)
+add_library(xp_writerlib xp_writer.cpp)
+target_link_libraries(xp_writerlib configurationlib writer_helperlib)
 add_library(stat_writerlib stat_writer.cpp)
-target_link_libraries(stat_writerlib configurationlib nano_program_writerlib writer_helperlib)
+target_link_libraries(stat_writerlib configurationlib nano_program_writerlib damage_writerlib writer_helperlib)
 add_library(command_handlerlib command_handler.cpp)
 
 target_link_libraries(PrettyDD
@@ -49,6 +53,9 @@ target_link_libraries(PrettyDD
   nano_programslib
   loggerlib
   formatted_linelib
+  damage_writerlib
+  nano_program_writerlib
+  xp_writerlib
   stat_writerlib
   configurationlib
   command_handlerlib

@@ -21,6 +21,7 @@ public:
 
     void writePlace(int place);
     void writeName(std::string name);
+    void writeNewlineIfReadableFlagSet();
     std::string appendInterval(std::string titleBase,
                                unsigned int windowNr,
                                unsigned int nanosPerWindow);

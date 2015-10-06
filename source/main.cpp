@@ -1,5 +1,6 @@
 #include "command_handler.h"
 #include "configuration.h"
+#include "damage_writer.h"
 #include "formatted_line.h"
 #include "logger.h"
 #include "my_time.h"
@@ -8,6 +9,7 @@
 #include "player_interface.h"
 #include "player_vector.h"
 #include "stat_writer.h"
+#include "xp_writer.h"
 
 #include <ctime>
 #include <fstream>
@@ -32,8 +34,15 @@ int main(void) {
     PlayerVector<Player*> playerVector;
 
     std::ofstream file;
-    NanoProgramWriter nanoProgramWriter(config, file);
-    StatWriter statWriter(playerVector, config, nanoProgramWriter, file);
+    NanoProgramWriter nanoProgramWriter(playerVector, config, file);
+    DamageWriter damageWriter(playerVector, config, file);
+    XPWriter xpWriter(playerVector, config, file);
+    StatWriter statWriter(playerVector,
+                          config,
+                          nanoProgramWriter,
+                          damageWriter,
+                          xpWriter,
+                          file);
 
     CommandHandler commandHandler(statWriter, playerVector);
 
