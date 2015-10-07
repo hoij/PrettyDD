@@ -55,13 +55,16 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDDetailedTopList();
 
 //        statWriter.createDDPerDamageType("You");
+        statWriter.createDDPerDamageTypeDetailed("You");
 
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
 //        statWriter.createDDPerOpponent("Predator Rogue");
 //        statWriter.createDDPerOpponent("Nonexisting");
 //        statWriter.createDDOnSpecificOpponent("You", "Predator Rogue");
-        statWriter.createDDOnSpecificOpponentDetailed("You", "Predator Rogue");
+
+//        statWriter.createDDOnSpecificOpponentDetailed("You", "Predator Rogue");
+
 //        statWriter.createDDOnSpecificOpponent("Predator Rogue", "You");
 //        statWriter.createDDOnSpecificOpponent("You", "asshole");
 

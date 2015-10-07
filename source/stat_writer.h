@@ -30,6 +30,7 @@ public:
     void createDDTopList();
     void createDDDetailedTopList();
     void createDDPerDamageType(std::string playerName);
+    void createDDPerDamageTypeDetailed(std::string playerName);
     void createDDPerOpponent(std::string playerName);  // Lists all opponents for playerName
     void createDDOnSpecificOpponent(std::string playerName,
                                     std::string opponentName);

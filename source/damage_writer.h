@@ -23,6 +23,7 @@ public:
     void createDDTopList();
     void createDDDetailedTopList();
     void createDDPerDamageType(std::string playerName);
+    void createDDPerDamageTypeDetailed(std::string playerName);
     void createDDPerOpponent(std::string playerName);  // Lists all opponents for playerName
     void createDDOnSpecificOpponent(std::string playerName,
                                     std::string opponentName);
@@ -38,19 +39,22 @@ private:
     typedef void (DamageWriter::*writeHeadingsPointer)();
     typedef void (DamageWriter::*writeDamagePointer)(const std::string& name,
                                                      const Damage& d,
-                                                     unsigned int place);
+                                                     int place);
 
     // Common writes
     void createDamagePerDamageType(std::string playerName,
                                    std::string titleBase,
-                                   bool dealt);
+                                   int typesPerWindow,
+                                   bool dealt,
+                                   bool detailed);
     void createDamagePerOpponent(std::string playerName,
                                  std::string titleBase,
-                                 bool dealt);
+                                 bool dealt,
+                                 bool detailed);
     void createDamageOnSpecificOpponent(std::string playerName,
                                         std::string opponentName,
                                         std::string titleBase,
-                                        unsigned int typesPerWindow,
+                                        int typesPerWindow,
                                         bool detailed);
     void writeToFile(
         std::string titleBase,
@@ -64,34 +68,39 @@ private:
         std::vector<std::pair<std::string, Damage>>::iterator start,
         std::vector<std::pair<std::string, Damage>>::iterator stop,
         std::string title,
-        unsigned int& place,
+        int& place,
         writeHeadingsPointer,
         writeDamagePointer);
 
     // Headings
     void writeTopListHeadings();
-    void writeOverviewHeadingsDetailedOthers();
-    void writeOverviewHeadingsDetailedSelf();
-    void writeOverviewHeadingsDetailed(bool self);
     void writeOverviewHeadingsOthers();
     void writeOverviewHeadingsSelf();
     void writeOverviewHeadings(bool self);
+    void writeOverviewHeadingsDetailed();
     void writePerDamageTypeHeadings();
     void writeDDHeadings();  // TODO: Remove if not to be used.
 
     // Writes
-    void writeDDTopList(const std::string& name, const Damage& d, unsigned int place);
-    void writeDDOverviewDetailedOthers(const std::string& name, const Damage& d, unsigned int place);
-    void writeDDOverviewDetailedSelf(const std::string& name, const Damage& d, unsigned int place);
-    void writeDDOverviewDetailed(const std::string& name, const Damage& d, unsigned int place, bool self);
-    void writeDDOverviewOthers(const std::string& name, const Damage& d, unsigned int place);
-    void writeDDOverviewSelf(const std::string& name, const Damage& d, unsigned int place);
-    void writeDDOverview(const std::string& name, const Damage& d, unsigned int place, bool self);
+    void writeDDTopList(const std::string& name, const Damage& d, int place);
+    void writeDDOverviewDetailedOthers(const std::string& name, const Damage& d, int place);
+    void writeDDOverviewDetailedSelf(const std::string& name, const Damage& d, int place);
+    void writeDDOverviewDetailed(const std::string& name, const Damage& d, int place, bool self);
+    void writeDDOverviewOthers(const std::string& name, const Damage& d, int place);
+    void writeDDOverviewSelf(const std::string& name, const Damage& d, int place);
+    void writeDDOverview(const std::string& name, const Damage& d, int place, bool self);
 
-    void writeDRTopList(const std::string& name, const Damage& d, unsigned int place);
-    void writeDROverviewOthers(const std::string& name, const Damage& d, unsigned int place);
-    void writeDROverviewSelf(const std::string& name, const Damage& d, unsigned int place);
-    void writeDROverview(const std::string& name, const Damage& d, unsigned int place, bool self);
+    void writeDRTopList(const std::string& name, const Damage& d, int place);
+    void writeDROverviewOthers(const std::string& name, const Damage& d, int place);
+    void writeDROverviewSelf(const std::string& name, const Damage& d, int place);
+    void writeDROverview(const std::string& name, const Damage& d, int place, bool self);
+
+    void writeDetailedInfoForType(std::string type,
+                                  std::string hitPercent,
+                                  std::string nrOfhits,
+                                  std::string maxHit,
+                                  std::string minHit,
+                                  std::string dmgPercent);
 
     // Helper functions
     void setDDWriteMethods(std::string playerName,
@@ -101,12 +110,16 @@ private:
                            bool detailed);
     void setDDWriteMethods(std::string playerName,
                            writeHeadingsPointer& whp,
-                           writeDamagePointer& wdp);
+                           writeDamagePointer& wdp,
+                           bool detailed);
     void setDRWriteMethods(std::string playerName,
                            writeHeadingsPointer& whp,
                            writeDamagePointer& wdp);
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
+
+    std::string determineMin(int minDmg);
+    std::string determineMax(int maxDmg);
 
     PlayerVector<Player*>& playerVector;
 };

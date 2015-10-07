@@ -42,6 +42,10 @@ void StatWriter::createDDPerDamageType(std::string playerName) {
     damageWriter.createDDPerDamageType(playerName);
 }
 
+void StatWriter::createDDPerDamageTypeDetailed(std::string playerName) {
+    damageWriter.createDDPerDamageTypeDetailed(playerName);
+}
+
 void StatWriter::createDDPerOpponent(std::string playerName) {
     damageWriter.createDDPerDamageType(playerName);
 }
