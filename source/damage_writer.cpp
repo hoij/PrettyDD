@@ -258,7 +258,8 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
         return;
     }
 
-    Player* pp = playerVector.getPlayer(playerName);
+    std::string pName = checkIfSelf(playerName);
+    Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
         createNotFoundMessage(titleBase, playerName + " not found.", file);
         closeFile();
@@ -305,7 +306,8 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
         return;
     }
 
-    Player* pp = playerVector.getPlayer(playerName);
+    std::string pName = checkIfSelf(playerName);
+    Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
         createNotFoundMessage(titleBase, playerName + " not found.", file);
         closeFile();
@@ -347,6 +349,7 @@ void DamageWriter::setDDWriteMethods(std::string playerName,
                                      writeHeadingsPointer& whp,
                                      writeDamagePointer& wdp,
                                      bool detailed) {
+
     if (playerName == "You" ||
         playerName == config.getplayerRunningProgram() ||
         opponentName == "You" ||
@@ -468,11 +471,11 @@ void DamageWriter::writeStats(
         (this->*writeHeadingsPointer)();
     }
 
-    file << "<font color = " + lime + ">";
-    writeNewlineIfReadableFlagSet();
+    file << "<font color = " + lime + ">" << nl;
     for (auto it = start; it != stop; it++) {
         (this->*writeDamagePointer)(it->first, it->second, place++);
     }
+    file << "</font>";
 
     writeEndOfLink(title);
 }
@@ -484,13 +487,11 @@ void DamageWriter::writeStats(
 void DamageWriter::writeTopListHeadings() {
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
-            "<font color = " + lightBlue + ">";
-    writeNewlineIfReadableFlagSet();
+            "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width + 2) << " Total " <<
             std::setw(width) << " DPM " <<
-            "</font><br>" << std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+            "</font><br>" << std::setfill(' ') << nl;
 }
 
 void DamageWriter::writeOverviewHeadingsOthers() {
@@ -507,40 +508,39 @@ void DamageWriter::writeOverviewHeadingsSelf() {
 void DamageWriter::writeOverviewHeadings(bool self) {
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
-          "<font color = " + lightBlue + ">";
-    writeNewlineIfReadableFlagSet();
+            "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width+1) << " Total " <<
-          std::setw(width-1) << " DPM " <<
-          std::setw(width+1) << " Crit " <<
-          std::setw(width+1) << " Nanobot ";
+            std::setw(6) << "(Cnt) " <<
+            std::setw(width-1) << " DPM " <<
+            std::setw(width+1) << " Crit " <<
+            std::setw(width+1) << " Nanobot ";
     if (self) {
         file << std::setw(width) << " Miss ";
     }
     file << std::setw(width+2) << " Deflect " <<
-          "</font><br>" << std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+            "</font><br>" << std::setfill(' ') << nl;
 }
 
 void DamageWriter::writeOverviewHeadingsDetailed() {
     const int width = 7;
     const int pcWidth = 6;
     const int nrWidth = 3;
+    file << "<font color = " + lightBlue + ">" << nl;
     file << std::setfill(fillChar) << std::right <<
             std::setw(width) << "hit%" << " (" <<
             std::setw(nrWidth) << "cnt" << ") " <<
             std::setw(width) << " Max" << "-" << std::left <<
             std::setw(width) << "Min" << std::right <<
-            std::setw(pcWidth) << "__ dmg%<br>";
-    writeNewlineIfReadableFlagSet();
+            std::setw(pcWidth) << "__ dmg%<br>" << 
+            "</font>" << nl;
 }
 
 void DamageWriter::writePerDamageTypeHeadings() {
 
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
-          "<font color = " + lightBlue + ">";
-    writeNewlineIfReadableFlagSet();
+            "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width + 1) << " Total " <<
           std::setw(width - 1) << " DPM " <<
@@ -548,8 +548,7 @@ void DamageWriter::writePerDamageTypeHeadings() {
           std::setw(width + 1) << " Nanobot " <<
           std::setw(width) << " Miss " <<
           std::setw(width + 2) << " Deflect " <<
-          "</font><br>" << std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+          "</font><br>" << std::setfill(' ') << nl;
 }
 
 void DamageWriter::writeDDHeadings() {
@@ -565,8 +564,7 @@ void DamageWriter::writeDDHeadings() {
             std::setw(width) << "CritMin" <<
             std::setw(width) << "Deflects" <<
             std::setw(width) << "Misses" << "<br>" <<
-            std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+            std::setfill(' ') << nl;
 }
 
 /******************/
@@ -584,8 +582,7 @@ void DamageWriter::writeDDTopList(const std::string& name,
 
     writePlace(place);
     writeName(name);
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }
 
 void DamageWriter::writeDRTopList(const std::string& name,
@@ -599,8 +596,7 @@ void DamageWriter::writeDRTopList(const std::string& name,
 
     writePlace(place);
     writeName(name);
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }
 
 void DamageWriter::writeDDOverviewOthers(const std::string& name,
@@ -637,23 +633,25 @@ void DamageWriter::writeDDOverview(const std::string& name,
                                                d.getDeflectsReceivedFromPlayer());
 
     const int width = 8;
-    const int critOffset = 1;
+    const int nrWidth = 3;
     file << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer()) << " " <<
+          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer())
+                           << " (" <<
+          std::setw(nrWidth) << std::to_string(d.getCountReceivedFromPlayer())
+                           << ") " <<
           std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
           std::fixed << std::setprecision(1) <<
-          std::setw(width - critOffset) << " " + critPercentage << '%' << " " <<
-          std::setw(width - critOffset) << " " + nanobotPercentage << '%' << " ";
+          std::setw(width - 1) << " " + critPercentage << '%' << " " <<
+          std::setw(width - 1) << " " + nanobotPercentage << '%' << " ";
     if (self) {
-        file << std::setw(width - critOffset) << " " + missPercentage << '%' << " ";
+        file << std::setw(width - 1) << " " + missPercentage << '%' << " ";
     }
-    file << std::setw(width - critOffset) << " " + deflectPercentage << '%' << "  " <<
+    file << std::setw(width - 1) << " " + deflectPercentage << '%' << "  " <<
           std::setfill(' ');
 
     writePlace(place);
     writeName(name);
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }
 
 void DamageWriter::writeDDOverviewDetailedOthers(const std::string& name,
@@ -709,13 +707,13 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
     const int pcWidth = 6;
     const int nrWidth = 3;
 
-    file << place << ". " << name << " " <<
+    file << "<font color = " + lightBlue + ">" << nl;
+    file << place << ". " << name << " " << "</font>" <<
             std::right << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalReceivedFromPlayer())
                                << " (" <<
-            std::setw(nrWidth) << " " + std::to_string(d.getCountReceivedFromPlayer())
-                               << ") <br>";
-    writeNewlineIfReadableFlagSet();
+            std::setw(nrWidth) << std::to_string(d.getCountReceivedFromPlayer())
+                               << ") <br>" << nl;
 
     writeDetailedInfoForType("Regular",
                              regularHitPercentage,
@@ -742,8 +740,7 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
         file << std::right <<
                 std::setw(pcWidth) << " " + missPercentage << "% (" <<
                 std::setw(nrWidth) << " " + std::to_string(d.getMissesReceivedFromPlayer())
-                                   << ") " << "Misses<br>";
-                writeNewlineIfReadableFlagSet();
+                                   << ") " << "Misses<br>" << nl;
     }
     file << std::right <<
             std::setw(pcWidth) << " " + deflectHitPercentage << "% (" <<
@@ -751,9 +748,7 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
                                << ") " << "Deflects" <<
             std::setfill(' ');
 
-    file << "<br><br>";
-    writeNewlineIfReadableFlagSet();
-    writeNewlineIfReadableFlagSet();
+    file << "<br><br>" << nl << nl;
 }
 
 void DamageWriter::writeDetailedInfoForType(std::string type,
@@ -769,8 +764,7 @@ void DamageWriter::writeDetailedInfoForType(std::string type,
             std::setw(nrWidth) << " " + nrOfhits << ") " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
             std::setw(width) << minHit + " " << std::right <<
-            std::setw(pcWidth) << dmgPercent << "% " << type << "<br>";
-    writeNewlineIfReadableFlagSet();
+            std::setw(pcWidth) << dmgPercent << "% " << type << "<br>" << nl;
 }
 
 /******************/
@@ -826,8 +820,7 @@ void DamageWriter::writeDROverview(const std::string& name,
 
     writePlace(place);
     writeName(name);
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }
 
 /********************/

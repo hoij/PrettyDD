@@ -32,8 +32,7 @@ void XPWriter::createXPInfo() {
 
     writeXPHeadingsOverall();
 
-    file << "<font color = " + lime + ">";
-    writeNewlineIfReadableFlagSet();
+    file << "<font color = " + lime + ">" << nl;
     std::vector<std::string> types = xp.getTypes();
     for (const auto& type : types) {
         writeXPStatsOverview(xp, type);
@@ -42,11 +41,11 @@ void XPWriter::createXPInfo() {
 
     writeXPHeadingsDetailed();
 
-    file << "<font color = " + lime + ">";
-    writeNewlineIfReadableFlagSet();
+    file << "<font color = " + lime + ">" << nl;
     for (const auto& type : types) {
         writeXPStatsDetailed(xp, type);
     }
+    file << "</font>";
 
     writeEndOfLink(title);
 
@@ -60,27 +59,23 @@ void XPWriter::createXPInfo() {
 void XPWriter::writeXPHeadingsOverall() {
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
-           "<font color = " + lightBlue + ">";
-    writeNewlineIfReadableFlagSet();
+        "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width+3) << " Total " <<
             std::setw(width) << " XPH " <<
-            "</font><br>" << std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+            "</font><br>" << std::setfill(' ') << nl;
 }
 
 void XPWriter::writeXPHeadingsDetailed() {
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
-          "<font color = " + lightBlue + ">";
-    writeNewlineIfReadableFlagSet();
+        "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width + 3) << " Total " <<
             std::setw(width) << " XPH " <<
             std::setw(width + 1) << " Max " <<
             std::setw(width + 1) << " Min " <<
-            "</font><br>" << std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+            "</font><br>" << std::setfill(' ') << nl;
 }
 
 /***************/
@@ -95,8 +90,7 @@ void XPWriter::writeXPStatsOverview(const XP& xp, std::string type) {
             std::setw(width) << " " + std::to_string(xp.getXPH(type)) << " " <<
             std::setfill(' ');
     writeName(type);
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }
 
 void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
@@ -122,8 +116,7 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
             std::setw(width) << " " + std::to_string(minGained) << " " <<
             std::setfill(' ');
     writeName(type + " gained");
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 
     file << std::setfill(fillChar) <<
             std::setw(width + 1) << " " + std::to_string(xp.getTotalLost(type))
@@ -133,6 +126,5 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
             std::setw(width) << " " + std::to_string(minLost) << " " <<
             std::setfill(' ');
     writeName(type + " lost");
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }

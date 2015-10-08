@@ -117,54 +117,63 @@ void StatWriter::writeCommand(std::string command, std::string description) {
     if (!description.empty()) {
         file << " --> " << description;
     }
-    file << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl;
 }
 
 void StatWriter::createHelp() {
     openFile();
 
     writeStartOfLink("Help");
-    file << "Begin the command with \"pdd\" and add one of the following "
-            "options: <br>";
-    file << "Damage dealt:" << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "<br>" << nl <<
+            "Begin the command by saying:<br>" << nl <<
+            "<font color = " + lightBlue + ">" << nl <<
+            "pdd<br>" <<
+            "</font>" << nl <<
+            "Then add one of the below options.<br>" << nl <<
+            "Example:<br>" << nl <<
+            "<font color = " + lightBlue + ">" << nl <<
+            "pdd dr Sgtcuddle<br>" << nl <<
+            "</font>" << nl <<
+            "Show the script by typing:<br>" << nl <<
+            "<font color = " + lightBlue + ">" << nl <<
+            "/pdd<br><br>" <<
+            "</font>" << nl << nl <<
+            "Damage dealt:" << "<br>" << nl <<
+            "<font color = " + lightBlue + ">" << nl;
     writeCommand("top");
     writeCommand("dtop", "More details");
-    writeCommand("[player]", "Overview of \"player\"");
+    writeCommand("[player]", "Overview of player");
     writeCommand("types", "Overview per type");
     writeCommand("dtypes", "Detailed info per type");
     writeCommand("dtypes [player1] [player2]",
                  "Detailed info per type on the damage done to player2 by player 1");
-    writeCommand("types [player]", "Overview per type for \"player\"");
-    writeCommand("[player1] [player2]", "Damage on \"player2\" by \"player1\"");
-    writeNewlineIfReadableFlagSet();
+    writeCommand("types [player]", "Overview per type for player");
+    writeCommand("[player1] [player2]", "Damage on player2 by player1");
+    file << "</font>";
+    file << "<br>" << nl;
 
-    file << "Damage Received:" << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "Damage Received:" << "<br>" << nl;
+    file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("dr top");
     writeCommand("dr dtop");
     writeCommand("dr [player]");
     writeCommand("dr types");
     writeCommand("dr types [player]");
-    writeNewlineIfReadableFlagSet();
+    file << "</font>";
+    file << "<br>" << nl;
 
-//    file << "Heal:" << "<br>";
-//    writeNewlineIfReadableFlagSet();
+//    file << "Heal:" << "<br>" << nl;
 //    writeCommand("h top");
 //    writeCommand("h dtop");
-//    writeCommand("h dealt");
-//    writeNewlineIfReadableFlagSet();
+//    writeCommand("h dealt") << nl;
 
-//    file << "Nano:" << "<br>";
-//    writeNewlineIfReadableFlagSet();
+//    file << "Nano:" << "<br>" << nl;
 //    writeCommand("n top");
 //    writeCommand("n dtop");
-//    writeCommand("n dealt");
-//    writeNewlineIfReadableFlagSet();
+//    writeCommand("n dealt") << nl;
 
-    file << "Nano Program:" << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "Nano Program:" << "<br>" << nl;
+    file << "<font color = " + lightBlue + ">";
     writeCommand("np");
 //    writeCommand("np casted");
 //    writeCommand("np casted t");
@@ -172,16 +181,19 @@ void StatWriter::createHelp() {
 //    writeCommand("np received");
 //    writeCommand("np received t");
 //    writeCommand("np received [player]");
-    writeNewlineIfReadableFlagSet();
+    file << "</font>";
+    file << "<br>" << nl;
 
-    file << "Experience:" << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "Experience:" << "<br>" << nl;
+    file << "<font color = " + lightBlue + ">";
     writeCommand("xp");
-    writeNewlineIfReadableFlagSet();
+    file << "</font>";
+    file << "<br>" << nl;
 
-    file << "Help:" << "<br>";
-    writeNewlineIfReadableFlagSet();
+    file << "Help:" << "<br>" << nl;
+    file << "<font color = " + lightBlue + ">";
     writeCommand("help");
+    file << "</font>";
 
     writeEndOfLink("Help");
 

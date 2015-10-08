@@ -3,6 +3,7 @@
 
 
 #include "configuration.h"
+#include "newline.h"
 
 #include <fstream>
 #include <memory>
@@ -13,15 +14,15 @@
 class WriterHelper {
 public:
     WriterHelper(Configuration& config, std::ofstream& file);
-    //std::unique_ptr<std::ofstream> openFile();
+    WriterHelper& operator=(WriterHelper rhs) = delete;
+
     bool openFile();
     void closeFile();
     void writeStartOfLink(std::string title);
     void writeEndOfLink(std::string title);
-
     void writePlace(int place);
     void writeName(std::string name);
-    void writeNewlineIfReadableFlagSet();
+    std::string checkIfSelf(std::string name);
     std::string appendInterval(std::string titleBase,
                                unsigned int windowNr,
                                unsigned int nanosPerWindow);
@@ -44,6 +45,7 @@ protected:
 
     Configuration& config;
     std::ofstream& file;
+    NewLine nl;
 };
 
 

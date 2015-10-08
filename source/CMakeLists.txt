@@ -10,6 +10,7 @@ add_executable(PrettyDD main.cpp
 	line_info.h
 	formatted_line_interface.h
 	player_interface.h
+	newline.h
 	)
 
 # These libraries are mainly made to make test case linking easier

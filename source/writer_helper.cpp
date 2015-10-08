@@ -6,7 +6,8 @@
 WriterHelper::WriterHelper(Configuration& config,
                            std::ofstream& file) :
                            config(config),
-                           file(file) {}
+                           file(file),
+                           nl(config) {}
 
 bool WriterHelper::openFile() {
     file.open(config.getScriptsPath() + "pdd");
@@ -32,7 +33,7 @@ void WriterHelper::writeStartOfLink(std::string title) {
 }
 
 void WriterHelper::writeEndOfLink(std::string title) {
-    file << "</font>\">" + title + " for %m</a>" << std::endl;
+    file << "\">" + title << std::endl;
 }
 
 void WriterHelper::writePlace(int place) {
@@ -47,10 +48,9 @@ void WriterHelper::writeName(std::string name) {
     file << ((name == "You") ? " %m" : " " + name);
 }
 
-void WriterHelper::writeNewlineIfReadableFlagSet() {
-    if (config.shouldWriteReadable()) {
-        file << std::endl;
-    }
+std::string WriterHelper::checkIfSelf(std::string name) {
+    std::string playerRunningProgram = config.getplayerRunningProgram();
+    return (name == playerRunningProgram ? "You" : name);
 }
 
 std::string WriterHelper::appendInterval(std::string titleBase,

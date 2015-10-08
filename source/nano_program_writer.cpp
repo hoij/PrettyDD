@@ -43,13 +43,11 @@ void NanoProgramWriter::createCastedDetailedList() {
 
         writeDetailedListHeadings();
 
-        file << "<font color = " + lime + ">";
-        writeNewlineIfReadableFlagSet();
-
-
+        file << "<font color = " + lime + ">" << nl;
         auto namesStart = nanoProgramNames.begin() + windowNr * nanosPerWindow;
         auto namesStop = getStopIter(nanoProgramNames, windowNr, nanosPerWindow);
         writeDetailedList(namesStart, namesStop, nanoPrograms);
+        file << "</font>";
 
         writeEndOfLink(title);
     }
@@ -60,17 +58,15 @@ void NanoProgramWriter::createCastedDetailedList() {
 void NanoProgramWriter::writeDetailedListHeadings() {
     int width = 13;
     file << std::setfill(fillChar) << std::right <<
-            "<font color = " + lightBlue + ">";
-    writeNewlineIfReadableFlagSet();
+            "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width - 8) << "Casts " <<
             std::setw(width) << " Lands " <<
-            std::setw(width) << " Resists " <<
-            std::setw(width) << " Aborts " <<
-            std::setw(width) << " Counters " <<
-            std::setw(width) << " Fumbles " <<
-            "</font><br>" << std::setfill(' ');
-    writeNewlineIfReadableFlagSet();
+            std::setw(width+1) << " Resists " <<
+            std::setw(width+1) << " Aborts " <<
+            std::setw(width+1) << " Counters " <<
+            std::setw(width+1) << " Fumbles " <<
+            "</font><br>" << std::setfill(' ') << nl;
 }
 
 std::vector<std::string>::iterator NanoProgramWriter::getStopIter(
@@ -132,8 +128,7 @@ void NanoProgramWriter::writeDetailedList(
                 std::setfill(' ');
 
         writeName(name);
-        file << "<br>";
-        writeNewlineIfReadableFlagSet();
+        file << "<br>" << nl;
     }
 }
 
