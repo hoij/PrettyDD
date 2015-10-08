@@ -57,9 +57,11 @@ public:
     void createHelp();
 
     // Remove when done:
-    void writeDDOld(const Damage& d, std::ostream& os);
+    void writeDDOld(const Damage& d);
 
 private:
+    void writeCommand(std::string command, std::string description = "");
+
     PlayerVector<Player*>& playerVector;
     Configuration& config;
     NanoProgramWriter& nanoProgramWriter;

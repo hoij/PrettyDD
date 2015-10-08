@@ -10,8 +10,10 @@ void CommandHandler::execute(const std::string& command) {
         dtop
         "playerName"
         types
+        dtypes
         types "playerName"
         "playerName1" "playerName2"
+        dtypes "playerName1" "playerName2"
 
         dr top
         dr dtop
@@ -55,7 +57,10 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDDetailedTopList();
 
 //        statWriter.createDDPerDamageType("You");
-        statWriter.createDDPerDamageTypeDetailed("You");
+
+//        statWriter.createDDPerDamageTypeDetailed("You");
+
+        statWriter.createHelp();
 
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
@@ -89,11 +94,17 @@ void CommandHandler::execute(const std::string& command) {
         else if (commandParts[1] == "types") {
             statWriter.createDDPerDamageType("You");
         }
+        else if (commandParts[1] == "dtypes") {
+            statWriter.createDDPerDamageTypeDetailed("You");
+        }
+        else if (commandParts[1] == "np") {
+            statWriter.createNanoProgramsCastedDetailedList();
+        }
         else if (commandParts[1] == "xp") {
             statWriter.createXPInfo();
         }
         else if (commandParts[1] == "help") {
-            // statWriter.createHelp();
+            statWriter.createHelp();
         }
         else if (commandParts[1] == "start" ||
                  commandParts[1] == "resume") {
@@ -114,16 +125,16 @@ void CommandHandler::execute(const std::string& command) {
     else if (nrOfOptions == 2) {
         if (commandParts[1] == "dr") {
             if (commandParts[2] == "top") {
-                //statWriter.createDRTopList();
+                statWriter.createDRTopList();
             }
             else if (commandParts[2] == "dtop") {
                 statWriter.createDRDetailedTopList();
             }
             else if (commandParts[2] == "types") {
-                //statWriter.createDRPerDamageType("You");
+                statWriter.createDRPerDamageType("You");
             }
             else {
-                //statWriter.createDRPerOpponent(commandParts[2]);
+                statWriter.createDRPerOpponent(commandParts[2]);
             }
         }
         else if (commandParts[1] == "h") {  // Heal
@@ -168,7 +179,7 @@ void CommandHandler::execute(const std::string& command) {
     }
     else if (nrOfOptions == 3) {
         if (commandParts[1] == "dr" && commandParts[2] == "types") {
-            //statWriter.createDRPerDamageType(commandParts[3]);
+            statWriter.createDRPerDamageType(commandParts[3]);
         }
         else if (commandParts[1] == "np") {  // Nano Program
             if (commandParts[2] == "casted" &&
@@ -186,6 +197,10 @@ void CommandHandler::execute(const std::string& command) {
                 //statWriter.createNanoProgramsReceivedFromTarget(
                 //    commandParts[3]);
             }
+        }
+        else if (commandParts[1] == "dtop") {
+            statWriter.createDDOnSpecificOpponentDetailed(commandParts[2],
+                                                          commandParts[3]);
         }
     }
     else {
