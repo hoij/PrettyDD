@@ -58,9 +58,10 @@ void CommandHandler::execute(const std::string& command) {
 
 //        statWriter.createDDPerDamageType("You");
 
-//        statWriter.createDDPerDamageTypeDetailed("You");
+        //statWriter.createDDPerDamageTypeDetailed("You");
+        statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
 
-        statWriter.createHelp();
+//        statWriter.createHelp();
 
 //        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
