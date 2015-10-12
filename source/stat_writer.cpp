@@ -21,7 +21,6 @@ StatWriter::StatWriter(PlayerVector<Player*>& playerVector,
                        std::ofstream& file) :
     WriterHelper(config, file),
     playerVector(playerVector),
-    config(config),
     nanoProgramWriter(nanoProgramWriter),
     damageWriter(damageWriter),
     xpWriter(xpWriter) {}
@@ -173,7 +172,7 @@ void StatWriter::createHelp() {
 //    writeCommand("n dealt") << nl;
 
     file << "Nano Program:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">";
+    file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("np");
 //    writeCommand("np casted");
 //    writeCommand("np casted t");
@@ -185,43 +184,17 @@ void StatWriter::createHelp() {
     file << "<br>" << nl;
 
     file << "Experience:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">";
+    file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("xp");
     file << "</font>";
     file << "<br>" << nl;
 
     file << "Help:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">";
+    file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("help");
     file << "</font>";
 
     writeEndOfLink("Help");
 
     closeFile();
-}
-
-/********************/
-/* Remove when done */
-/********************/
-
-void StatWriter::writeDDOld(const Damage& d) {
-    const int width = 8;
-    file << std::right << std::setfill(fillChar) <<
-            std::setw(width) << d.getTotalReceivedFromPlayer() <<
-            std::setw(width) << d.getCountReceivedFromPlayer() <<
-            std::setw(width) << ((d.getRegularMaxReceivedFromPlayer() == -1) ?
-                                  0 : d.getRegularMaxReceivedFromPlayer()) <<
-            std::setw(width) << ((d.getRegularMinReceivedFromPlayer() ==
-                                  std::numeric_limits<int>::max()) ?
-                                  0 : d.getRegularMinReceivedFromPlayer()) <<
-            std::setw(width) << d.getCritTotalReceivedFromPlayer() <<
-            std::setw(width) << d.getCritCountReceivedFromPlayer() <<
-            std::setw(width) << ((d.getCritMaxReceivedFromPlayer() == -1) ?
-                                0 : d.getCritMaxReceivedFromPlayer()) <<
-            std::setw(width) << ((d.getCritMinReceivedFromPlayer() ==
-                                  std::numeric_limits<int>::max()) ?
-                                  0 : d.getCritMinReceivedFromPlayer()) <<
-            std::setw(width) << d.getDeflectsReceivedFromPlayer() <<
-            std::setw(width) << d.getMissesReceivedFromPlayer() << "<br>" <<
-            std::setfill(' ');
 }
