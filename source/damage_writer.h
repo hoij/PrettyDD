@@ -95,6 +95,10 @@ private:
     void writeDROverviewSelf(const std::string& name, const Damage& d, int place);
     void writeDROverview(const std::string& name, const Damage& d, int place, bool self);
 
+    // Detailed type write helper functions
+    void writeDetailedRegularInfo(const Damage& d, bool self);
+    void writeDetailedNanobotInfo(const Damage& d);
+    void writeTotalInfo(int total, int cnt);
     void writeDetailedInfoForType(std::string type,
                                   std::string hitPercent,
                                   std::string nrOfhits,

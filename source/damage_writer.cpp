@@ -82,7 +82,7 @@ void DamageWriter::createDDPerDamageTypeDetailed(std::string playerName) {
     std::string titleBase = "Detailed DD Per Damage Type By " + playerName;
     createDamagePerDamageType(playerName,
                               titleBase,
-                              3,
+                              2,
                               true,
                               true);
 }
@@ -524,15 +524,15 @@ void DamageWriter::writeOverviewHeadings(bool self) {
 
 void DamageWriter::writeOverviewHeadingsDetailed() {
     const int width = 7;
-    const int pcWidth = 6;
+    const int pcWidth = 7;
     const int nrWidth = 3;
     file << "<font color = " + lightBlue + ">" << nl;
     file << std::setfill(fillChar) << std::right <<
-            std::setw(width) << "hit%" << " (" <<
+            std::setw(width+1) << "hit%" << " (" <<
             std::setw(nrWidth) << "cnt" << ") " <<
             std::setw(width) << " Max" << "-" << std::left <<
             std::setw(width) << "Min" << std::right <<
-            std::setw(pcWidth) << "__ dmg%<br>" << 
+            std::setw(pcWidth) << "dmg" << "%<br>" <<
             "</font>" << nl;
 }
 
@@ -630,7 +630,8 @@ void DamageWriter::writeDDOverview(const std::string& name,
                                     d.getMissesReceivedFromPlayer());
     }
     std::string deflectPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                               d.getDeflectsReceivedFromPlayer());
+                                               d.getRegularDeflectCountReceivedFromPlayer() +
+                                               d.getNanobotDeflectCountReceivedFromPlayer());
 
     const int width = 8;
     const int nrWidth = 3;
@@ -673,47 +674,91 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
     /* If the bool self is set then the details will contain misses.
     Misses are not not logged by AO for players other than yourself.
     (Unless they are hitting you) */
+
+    file << "<font color = " + lightBlue + ">" << nl <<
+            place << ". " << name << "<br>" << nl;
+
+    bool hasRegularDmg = d.getRegularCountReceivedFromPlayer() ||
+                         d.getRegularDeflectCountReceivedFromPlayer() ||
+                         d.getCritCountReceivedFromPlayer();
+    bool hasNanobotDmg = d.getNanobotCountReceivedFromPlayer() ||
+                         d.getNanobotDeflectCountReceivedFromPlayer();
+
+    if (hasRegularDmg && hasNanobotDmg) {
+        // Write info on the sum of the regular and nanobot damage only
+        // if they both exist. No point writing this otherwise as it would be
+        // identical to the total info written in respective branch.
+        writeTotalInfo(d.getTotalReceivedFromPlayer(),
+                       d.getCountReceivedFromPlayer());
+        }
+
+    // If there is any regular damage
+    if (hasRegularDmg) {
+        writeDetailedRegularInfo(d, self);
+    }
+
+    // If there is any nanobot damage
+    if (hasNanobotDmg) {
+        writeDetailedNanobotInfo(d);
+    }
+
+    file << "<br><br>" << nl << nl;
+}
+
+void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
+
+    file << (d.isSpecial() ? "" : "Regular <br>") << "</font>" << nl;
+
     // Percentage of total hits
-    std::string regularHitPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                        d.getRegularCountReceivedFromPlayer());
-    std::string critHitPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                     d.getCritCountReceivedFromPlayer());
-    std::string nanobotHitPercentage = percentage(
-                                     d.getCountReceivedFromPlayer(),
-                                     d.getNanobotCountReceivedFromPlayer());
+    std::string regularHitPercentage = percentage(
+        d.getCountReceivedFromPlayer(),
+        d.getRegularCountReceivedFromPlayer());
+
+    std::string critHitPercentage = percentage(
+        d.getRegularCountReceivedFromPlayer() +
+        d.getRegularDeflectCountReceivedFromPlayer(),
+        d.getCritCountReceivedFromPlayer());
+
+    std::string regularDeflectHitPercentage = percentage(
+        d.getCountReceivedFromPlayer(),
+        d.getRegularDeflectCountReceivedFromPlayer());
+
     std::string missPercentage;
     if (self) {
         missPercentage = percentage(d.getCountReceivedFromPlayer(),
                                     d.getMissesReceivedFromPlayer());
     }
-    std::string deflectHitPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                        d.getDeflectsReceivedFromPlayer());
+
     // Percentage of total damage
-    std::string regularDmgPercentage = percentage(d.getTotalReceivedFromPlayer(),
-                                        d.getRegularTotalReceivedFromPlayer());
-    std::string critDmgPercentage = percentage(d.getTotalReceivedFromPlayer(),
-                                     d.getCritTotalReceivedFromPlayer());
-    std::string nanobotDmgPercentage = percentage(
-                                     d.getTotalReceivedFromPlayer(),
-                                     d.getNanobotTotalReceivedFromPlayer());
+    std::string regularDmgPercentage = percentage(
+        d.getTotalReceivedFromPlayer(),
+        d.getRegularTotalReceivedFromPlayer());
+
+    std::string critDmgPercentage = percentage(
+        d.getTotalReceivedFromPlayer(),
+        d.getCritTotalReceivedFromPlayer());
+
+    std::string regularDeflectDmgPercentage = percentage(
+        d.getTotalReceivedFromPlayer(),
+        d.getRegularDeflectTotalReceivedFromPlayer());
+
     // Min/Max
     std::string regularMin = determineMin(d.getRegularMinReceivedFromPlayer());
     std::string regularMax = determineMax(d.getRegularMaxReceivedFromPlayer());
     std::string critMin = determineMin(d.getCritMinReceivedFromPlayer());
     std::string critMax = determineMax(d.getCritMaxReceivedFromPlayer());
-    std::string nanobotMin = determineMin(d.getNanobotMinReceivedFromPlayer());
-    std::string nanobotMax = determineMax(d.getNanobotMaxReceivedFromPlayer());
-    const int width = 7;
-    const int pcWidth = 6;
-    const int nrWidth = 3;
+    std::string regularDeflectMax = determineMax(
+        d.getRegularDeflectMaxReceivedFromPlayer());
+    std::string regularDeflectMin = determineMin(
+        d.getRegularDeflectMinReceivedFromPlayer());
 
-    file << "<font color = " + lightBlue + ">" << nl;
-    file << place << ". " << name << " " << "</font>" <<
-            std::right << std::setfill(fillChar) <<
-            std::setw(width+1) << " " + std::to_string(d.getTotalReceivedFromPlayer())
-                               << " (" <<
-            std::setw(nrWidth) << std::to_string(d.getCountReceivedFromPlayer())
-                               << ") <br>" << nl;
+    // Write it to file
+    writeTotalInfo(d.getRegularTotalReceivedFromPlayer() +
+                   d.getRegularDeflectTotalReceivedFromPlayer() +
+                   d.getCritTotalReceivedFromPlayer(),
+                   d.getRegularCountReceivedFromPlayer() +
+                   d.getRegularDeflectCountReceivedFromPlayer() +
+                   d.getCritCountReceivedFromPlayer());
 
     writeDetailedInfoForType("Regular",
                              regularHitPercentage,
@@ -722,12 +767,69 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
                              regularMin,
                              regularDmgPercentage);
 
-    writeDetailedInfoForType("Crit",
-                             critHitPercentage,
-                             std::to_string(d.getCritCountReceivedFromPlayer()),
-                             critMax,
-                             critMin,
-                             critDmgPercentage);
+    if (!d.isSpecial()) {
+        writeDetailedInfoForType("Crit",
+                                 critHitPercentage,
+                                 std::to_string(d.getCritCountReceivedFromPlayer()),
+                                 critMax,
+                                 critMin,
+                                 critDmgPercentage);
+    }
+
+    writeDetailedInfoForType("Deflect",
+                             regularDeflectHitPercentage,
+                             std::to_string(d.getRegularDeflectCountReceivedFromPlayer()),
+                             regularDeflectMax,
+                             regularDeflectMin,
+                             regularDeflectDmgPercentage);
+
+    if (self) {
+        // Assuming nanobot attacks can't miss.
+        // Only including it for regular attacks
+        const int pcWidth = 7;
+        const int nrWidth = 3;
+        file << std::right <<
+                std::setw(pcWidth) << " " + missPercentage << "% (" <<
+                std::setw(nrWidth) << std::to_string(d.getMissesReceivedFromPlayer())
+                                   << ") " << "Misses<br>" << nl;
+    }
+}
+
+void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
+    file << "<font color = " + lightBlue + ">" << nl <<
+            "Nanobot " << "</font><br>" << nl;
+
+    // Percentage of total hits
+    std::string nanobotHitPercentage = percentage(
+        d.getCountReceivedFromPlayer(),
+        d.getNanobotCountReceivedFromPlayer());
+
+    std::string nanobotDeflectHitPercentage = percentage(
+        d.getCountReceivedFromPlayer(),
+        d.getNanobotDeflectCountReceivedFromPlayer());
+
+    // Percentage of total damage
+    std::string nanobotDmgPercentage = percentage(
+        d.getTotalReceivedFromPlayer(),
+        d.getNanobotTotalReceivedFromPlayer());
+
+    std::string nanobotDeflectDmgPercentage = percentage(
+        d.getTotalReceivedFromPlayer(),
+        d.getNanobotDeflectTotalReceivedFromPlayer());
+
+    // Min/Max
+    std::string nanobotMin = determineMin(d.getNanobotMinReceivedFromPlayer());
+    std::string nanobotMax = determineMax(d.getNanobotMaxReceivedFromPlayer());
+    std::string nanobotDeflectMax = determineMax(
+        d.getNanobotDeflectMaxReceivedFromPlayer());
+    std::string nanobotDeflectMin = determineMin(
+        d.getNanobotDeflectMinReceivedFromPlayer());
+
+    // Write it to file
+    writeTotalInfo(d.getNanobotTotalReceivedFromPlayer() +
+                   d.getNanobotDeflectTotalReceivedFromPlayer(),
+                   d.getNanobotCountReceivedFromPlayer() +
+                   d.getNanobotDeflectCountReceivedFromPlayer());
 
     writeDetailedInfoForType("Nanobot",
                              nanobotHitPercentage,
@@ -736,32 +838,39 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
                              nanobotMin,
                              nanobotDmgPercentage);
 
-    if (self) {
-        file << std::right <<
-                std::setw(pcWidth) << " " + missPercentage << "% (" <<
-                std::setw(nrWidth) << " " + std::to_string(d.getMissesReceivedFromPlayer())
-                                   << ") " << "Misses<br>" << nl;
+    if (d.getNanobotDeflectCountReceivedFromPlayer()) {
+        // Nanobot attacks can probably not deflect.
+        // TODO: Remove this if it turns out to be true.
+        writeDetailedInfoForType("Deflect",
+                                 nanobotDeflectHitPercentage,
+                                 std::to_string(d.getNanobotDeflectCountReceivedFromPlayer()),
+                                 nanobotDeflectMax,
+                                 nanobotDeflectMin,
+                                 nanobotDeflectDmgPercentage);
     }
-    file << std::right <<
-            std::setw(pcWidth) << " " + deflectHitPercentage << "% (" <<
-            std::setw(nrWidth) << " " + std::to_string(d.getMissesReceivedFromPlayer())
-                               << ") " << "Deflects" <<
-            std::setfill(' ');
+}
 
-    file << "<br><br>" << nl << nl;
+void DamageWriter::writeTotalInfo(int total, int cnt) {
+    const int width = 7;
+    const int nrWidth = 3;
+    file << std::right << std::setfill(fillChar) <<
+            std::setw(width+1) << " " + std::to_string(total)
+                               << " (" <<
+            std::setw(nrWidth) << std::to_string(cnt)
+                               << ") " << "Total " << "<br>" << nl;
 }
 
 void DamageWriter::writeDetailedInfoForType(std::string type,
                                             std::string hitPercent,
-                                            std::string nrOfhits,
+                                            std::string nrOfHits,
                                             std::string maxHit,
                                             std::string minHit,
                                             std::string dmgPercent) {
     const int width = 7;
-    const int pcWidth = 6;
+    const int pcWidth = 7;
     const int nrWidth = 3;
     file << std::setw(pcWidth) << " " + hitPercent << "% (" <<
-            std::setw(nrWidth) << " " + nrOfhits << ") " <<
+            std::setw(nrWidth) << nrOfHits << ") " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
             std::setw(width) << minHit + " " << std::right <<
             std::setw(pcWidth) << dmgPercent << "% " << type << "<br>" << nl;
@@ -802,7 +911,8 @@ void DamageWriter::writeDROverview(const std::string& name,
                                     d.getMissesDealtOnPlayer());
     }
     std::string deflectPercentage = percentage(d.getCountDealtOnPlayer(),
-                                               d.getDeflectsDealtOnPlayer());
+                                               d.getRegularDeflectCountDealtOnPlayer() +
+                                               d.getNanobotDeflectCountDealtOnPlayer());
 
     const int width = 8;
     const int critOffset = 1;
