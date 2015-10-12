@@ -43,15 +43,7 @@ private:
     typedef LineInfo (Parser::*pfunc)(const std::string& message);
     std::map<std::string, pfunc> funcMap;
 
-    std::unordered_set<std::string> specials {
-        "Aimed Shot",
-        "Brawling",
-        "Burst",
-        "Dimach",
-        "Fast Attack",
-        "Fling Shot",
-        "Full Auto",
-        "Sneak Attack"};
+    std::unordered_set<std::string> specials;
 
     // Functions within the funcMap
     LineInfo otherAndYourPetHitByOther(const std::string& message);

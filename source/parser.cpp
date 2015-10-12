@@ -20,6 +20,15 @@ using std::regex;
 Parser::Parser(std::string playerRunningProgram) :
     playerRunningProgram(playerRunningProgram) {
     createFunctionMap();
+
+    specials.emplace("Aimed Shot");
+    specials.emplace("Brawling");
+    specials.emplace("Burst");
+    specials.emplace("Dimach");
+    specials.emplace("Fast Attack");
+    specials.emplace("Fling Shot");
+    specials.emplace("Full Auto");
+    specials.emplace("Sneak Attack");
 }
 
 void Parser::createFunctionMap() {
