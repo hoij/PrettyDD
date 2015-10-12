@@ -783,7 +783,7 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
                              regularDeflectMin,
                              regularDeflectDmgPercentage);
 
-    if (self) {
+    if (self && d.getMissesReceivedFromPlayer()) {
         // Assuming nanobot attacks can't miss.
         // Only including it for regular attacks
         const int pcWidth = 7;
