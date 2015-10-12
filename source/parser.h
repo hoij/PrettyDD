@@ -5,6 +5,7 @@
 #include <gtest/gtest_prod.h>
 #include <map>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 
@@ -25,6 +26,7 @@ private:
 
     bool isCrit(const std::string& message);
     bool isDeflect(const std::string& message);
+    bool isSpecial(std::string& type, std::string& subtype);
     int findAmount(const std::string& message);
     std::string findSubtype(const std::string& message, const std::string type);
     std::string findDamageSubtype(const std::string& message);
@@ -40,6 +42,16 @@ private:
     std::string playerRunningProgram;
     typedef LineInfo (Parser::*pfunc)(const std::string& message);
     std::map<std::string, pfunc> funcMap;
+
+    std::unordered_set<std::string> specials {
+        "Aimed Shot",
+        "Brawling",
+        "Burst",
+        "Dimach",
+        "Fast Attack",
+        "Fling Shot",
+        "Full Auto",
+        "Sneak Attack"};
 
     // Functions within the funcMap
     LineInfo otherAndYourPetHitByOther(const std::string& message);

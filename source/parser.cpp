@@ -72,6 +72,7 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             lineInfo = (this->*funcMapIterator->second)(formattedLine.getMessage());
             // findSubtype can be called on any line
             lineInfo.subtype = findSubtype(formattedLine.getMessage(), lineInfo.type);
+            lineInfo.special = isSpecial(lineInfo.type, lineInfo.subtype);
         }
         else {
             // Might want to remove this error message as it could print a lot
@@ -81,7 +82,7 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
         }
     }
-    
+
     lineInfo.time = formattedLine.getTime();
 
     logWhenPlayerNamesNotFound(lineInfo, formattedLine);
@@ -314,6 +315,13 @@ std::string Parser::renameSpecial(std::string subtype) {
         errorLog.write("\", but no match was found.");
         return subtype;
     }
+}
+
+bool Parser::isSpecial(std::string& type, std::string& subtype) {
+    if (type == "damage") {  // To avoid the lookup on a lot of other types.
+        return !(specials.find(subtype) == specials.end());
+    }
+    return false;
 }
 
 void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine) {
