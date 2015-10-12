@@ -10,6 +10,7 @@
 Damage& Damage::operator+=(const Damage& rhs) {
     dealtOnPlayer += rhs.dealtOnPlayer;
     receivedFromPlayer += rhs.receivedFromPlayer;
+    special = rhs.special;
     return *this;
 }
 
@@ -32,6 +33,7 @@ void Damage::setReceivedFromPlayerDPM(int damagePerMinute) {
 void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     di.total += li.amount;
     di.count++;
+    special = li.special;
     if (li.crit) {
         di.critCount++;
         di.critTotal += li.amount;
@@ -45,9 +47,25 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     else if (li.miss) {
         di.misses++;
     }
-    else if (li.deflect) {
-        di.deflects++;
-        di.regularTotal += li.amount;
+    else if (!li.nanobots && li.deflect) {
+        di.regularDeflectTotal += li.amount;
+        di.regularDeflectCount++;
+        if (li.amount > di.regularDeflectMax) {
+            di.regularDeflectMax = li.amount;
+        }
+        if (li.amount < di.regularDeflectMin) {
+            di.regularDeflectMin = li.amount;
+        }
+    }
+    else if (li.nanobots && li.deflect) {
+        di.nanobotDeflectTotal += li.amount;
+        di.nanobotDeflectCount++;
+        if (li.amount > di.nanobotDeflectMax) {
+            di.nanobotDeflectMax = li.amount;
+        }
+        if (li.amount < di.nanobotDeflectMin) {
+            di.nanobotDeflectMin = li.amount;
+        }
     }
     else if (li.nanobots) {
         di.nanobotCount++;
@@ -102,7 +120,21 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
         critMin = rhs.critMin;
     }
 
-    deflects += rhs.deflects;
+    regularDeflectCount += rhs.regularDeflectCount;
+    if (rhs.regularDeflectMax > regularDeflectMax) {
+        regularDeflectMax = rhs.regularDeflectMax;
+    }
+    if (rhs.regularDeflectMin < regularDeflectMin) {
+        regularDeflectMin = rhs.regularDeflectMin;
+    }
+    nanobotDeflectCount += rhs.nanobotDeflectCount;
+    if (rhs.nanobotDeflectMax > nanobotDeflectMax) {
+        nanobotDeflectMax = rhs.nanobotDeflectMax;
+    }
+    if (rhs.nanobotDeflectMin < nanobotDeflectMin) {
+        nanobotDeflectMin = rhs.nanobotDeflectMin;
+    }
+
     misses += rhs.misses;
 
     return *this;
