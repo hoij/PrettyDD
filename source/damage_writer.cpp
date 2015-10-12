@@ -29,7 +29,7 @@ void DamageWriter::createDDTopList() {
 
     // Calculate the number of text links (windows) needed to see all players
     const int playersPerWindow = 15;
-    int nrOfPlayers = (int)playerVector.size();
+    int nrOfPlayers = (int)totalDamageForEachPlayer.size();
     int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
@@ -56,7 +56,7 @@ void DamageWriter::createDDDetailedTopList() {
 
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 10;
-    int nrOfPlayers = (int)playerVector.size();
+    int nrOfPlayers = (int)totalDamageForEachPlayer.size();
     int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
@@ -187,7 +187,7 @@ void DamageWriter::createDRTopList() {
 
     // Calculate the number of text links (windows) needed to see all players
     const int playersPerWindow = 15;
-    int nrOfPlayers = (int)playerVector.size();
+    int nrOfPlayers = (int)totalDamageForEachPlayer.size();
     int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(
@@ -214,8 +214,8 @@ void DamageWriter::createDRDetailedTopList() {
     sortByReceived(totalDamageForEachPlayer);
 
     // Calculate the number of files needed to write all players
-    const int playersPerWindow = 10;
-    int nrOfPlayers = (int)playerVector.size();
+    const int playersPerWindow = 8;
+    int nrOfPlayers = (int)totalDamageForEachPlayer.size();
     int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
@@ -314,24 +314,27 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
         return;
     }
 
-    std::vector<std::pair<std::string, Damage>>
-        totalDamageForEachAffectedPlayer =
-            pp->getTotalDamageForAllAffectedPlayers();
 
+    std::vector<std::pair<std::string, Damage>>
+        totalDamageForEachAffectedPlayer;
     writeDamagePointer wdp;
     writeHeadingsPointer whp;
     if (dealt) { // Damage dealt
+        totalDamageForEachAffectedPlayer =
+            pp->getTotalDamageReceivedFromPlayerForAllAffectedPlayers();
         sortByDealt(totalDamageForEachAffectedPlayer);
         setDDWriteMethods(playerName, whp, wdp, detailed);
     }
     else { // Damage received
+        totalDamageForEachAffectedPlayer =
+            pp->getTotalDamageDealtOnPlayerForAllAffectedPlayers();
         sortByReceived(totalDamageForEachAffectedPlayer);
         setDRWriteMethods(playerName, whp, wdp);
     }
 
     // Calculate the number of files needed to write all players
-    const int playersPerWindow = 10;
-    int nrOfPlayers = (int)pp->nrOfAffectedPlayers();
+    const int playersPerWindow = 8;
+    int nrOfPlayers = (int)totalDamageForEachAffectedPlayer.size();
     int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
@@ -531,8 +534,8 @@ void DamageWriter::writeOverviewHeadingsDetailed() {
             std::setw(width+1) << "hit%" << " (" <<
             std::setw(nrWidth) << "cnt" << ") " <<
             std::setw(width) << " Max" << "-" << std::left <<
-            std::setw(width) << "Min" << std::right <<
-            std::setw(pcWidth) << "dmg" << "%<br>" <<
+            std::setw(width) << "Min " << std::right <<
+            std::setw(pcWidth) << "dmg" << "%<br><br>" <<
             "</font>" << nl;
 }
 
@@ -629,26 +632,28 @@ void DamageWriter::writeDDOverview(const std::string& name,
         missPercentage = percentage(d.getCountReceivedFromPlayer(),
                                     d.getMissesReceivedFromPlayer());
     }
-    std::string deflectPercentage = percentage(d.getCountReceivedFromPlayer(),
-                                               d.getRegularDeflectCountReceivedFromPlayer() +
-                                               d.getNanobotDeflectCountReceivedFromPlayer());
+    std::string deflectPercentage = percentage(
+        d.getCountReceivedFromPlayer(),
+        d.getRegularDeflectCountReceivedFromPlayer() +
+        d.getNanobotDeflectCountReceivedFromPlayer());
 
     const int width = 8;
     const int nrWidth = 3;
     file << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer())
-                           << " (" <<
-          std::setw(nrWidth) << std::to_string(d.getCountReceivedFromPlayer())
-                           << ") " <<
-          std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
-          std::fixed << std::setprecision(1) <<
-          std::setw(width - 1) << " " + critPercentage << '%' << " " <<
-          std::setw(width - 1) << " " + nanobotPercentage << '%' << " ";
+            std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer())
+                             << " (" <<
+            std::setw(nrWidth) << std::to_string(d.getCountReceivedFromPlayer())
+                             << ") " <<
+            std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer())
+                             << " " <<
+            std::fixed << std::setprecision(1) <<
+            std::setw(width - 1) << " " + critPercentage << '%' << " " <<
+            std::setw(width - 1) << " " + nanobotPercentage << '%' << " ";
     if (self) {
         file << std::setw(width - 1) << " " + missPercentage << '%' << " ";
     }
     file << std::setw(width - 1) << " " + deflectPercentage << '%' << "  " <<
-          std::setfill(' ');
+            std::setfill(' ');
 
     writePlace(place);
     writeName(name);
@@ -676,7 +681,7 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
     (Unless they are hitting you) */
 
     file << "<font color = " + lightBlue + ">" << nl <<
-            place << ". " << name << "<br>" << nl;
+            place << ". " << name << "</font><br>" << nl;
 
     bool hasRegularDmg = d.getRegularCountReceivedFromPlayer() ||
                          d.getRegularDeflectCountReceivedFromPlayer() ||
@@ -702,12 +707,16 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
         writeDetailedNanobotInfo(d);
     }
 
-    file << "<br><br>" << nl << nl;
+    file << "<br>" << nl << nl;
 }
 
 void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
 
-    file << (d.isSpecial() ? "" : "Regular <br>") << "</font>" << nl;
+
+    if (!d.isSpecial()) {  // Specials can only have regular damage
+        file << "<font color = " + lightBlue + ">" << nl <<
+            "Regular " << "</font><br>" << nl;
+    }
 
     // Percentage of total hits
     std::string regularHitPercentage = percentage(
@@ -901,7 +910,7 @@ void DamageWriter::writeDROverview(const std::string& name,
     (Unless they are hitting you) */
 
     std::string critPercentage = percentage(d.getCountDealtOnPlayer(),
-                                     d.getCritCountDealtOnPlayer());
+                                         d.getCritCountDealtOnPlayer());
     std::string nanobotPercentage = percentage(
                                         d.getTotalDealtOnPlayer(),
                                         d.getNanobotTotalDealtOnPlayer());
@@ -910,23 +919,28 @@ void DamageWriter::writeDROverview(const std::string& name,
         missPercentage = percentage(d.getCountDealtOnPlayer(),
                                     d.getMissesDealtOnPlayer());
     }
-    std::string deflectPercentage = percentage(d.getCountDealtOnPlayer(),
-                                               d.getRegularDeflectCountDealtOnPlayer() +
-                                               d.getNanobotDeflectCountDealtOnPlayer());
+    std::string deflectPercentage = percentage(
+        d.getCountDealtOnPlayer(),
+        d.getRegularDeflectCountDealtOnPlayer() +
+        d.getNanobotDeflectCountDealtOnPlayer());
 
     const int width = 8;
-    const int critOffset = 1;
+    const int nrWidth = 3;
     file << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer()) << " " <<
-          std::setw(width) << " " + std::to_string(d.getDPMDealtOnPlayer()) << " " <<
-          std::fixed << std::setprecision(1) <<
-          std::setw(width - critOffset) << " " + critPercentage << '%' << " " <<
-          std::setw(width - critOffset) << " " + nanobotPercentage << '%' << " ";
+            std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer())
+                             << " (" <<
+            std::setw(nrWidth) << std::to_string(d.getCountDealtOnPlayer())
+                             << ") " <<
+            std::setw(width) << " " + std::to_string(d.getDPMDealtOnPlayer())
+                             << " " <<
+            std::fixed << std::setprecision(1) <<
+            std::setw(width - 1) << " " + critPercentage << '%' << " " <<
+            std::setw(width - 1) << " " + nanobotPercentage << '%' << " ";
     if (self) {
-        file << std::setw(width - critOffset) << " " + missPercentage << '%' << " ";
+        file << std::setw(width - 1) << " " + missPercentage << '%' << " ";
     }
-    file << std::setw(width - critOffset) << " " + deflectPercentage << '%' << "  " <<
-          std::setfill(' ');
+    file << std::setw(width - 1) << " " + deflectPercentage << '%' << "  " <<
+            std::setfill(' ');
 
     writePlace(place);
     writeName(name);

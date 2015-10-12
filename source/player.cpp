@@ -125,6 +125,22 @@ Player::getTotalDamageForAllAffectedPlayers() const {
     return total;
 }
 
+std::vector<std::pair<std::string, Damage>>
+Player::getTotalDamageReceivedFromPlayerForAllAffectedPlayers() const {
+    std::vector<std::pair<std::string, Damage>> total =
+        affectedPlayers->getTotalDamageReceivedFromPlayerForAllAffectedPlayers(getName());
+    addDPM(total);
+    return total;
+}
+
+std::vector<std::pair<std::string, Damage>>
+Player::getTotalDamageDealtOnPlayerForAllAffectedPlayers() const {
+    std::vector<std::pair<std::string, Damage>> total =
+        affectedPlayers->getTotalDamageDealtOnPlayerForAllAffectedPlayers(getName());
+    addDPM(total);
+    return total;
+}
+
 size_t Player::getLongestAffectedPlayerNameLength() const {
     return affectedPlayers->getLongestNameLength();
 }

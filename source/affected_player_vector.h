@@ -37,6 +37,9 @@ public:
     getTotalDamageForEveryDamageTypeDealtOnPlayer(
         std::string callerName) const;
 
+
+    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageReceivedFromPlayerForAllAffectedPlayers(std::string callerName) const;
+    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageDealtOnPlayerForAllAffectedPlayers(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
 
@@ -108,6 +111,42 @@ AffectedPlayerVector<C>::getTotalDamageForAllAffectedPlayers(
         if (ap->getName() != callerName) {  // If not owner of the vector
             totalDamagePerPlayer.emplace_back(ap->getName(),
                                               ap->getTotalDamage());
+        }
+    }
+    return totalDamagePerPlayer;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getTotalDamageReceivedFromPlayerForAllAffectedPlayers(
+    std::string callerName) const {
+    /* Returns a vector of pairs containing the Affected players name and their
+    total damage (in the form of the Damage class). Only includes
+    Affected players which have received damage from the owning Player */
+    std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
+    for (const C ap : this->players) {
+        Damage d = ap->getTotalDamage();
+        if (ap->getName() != callerName &&  // If not owner of the vector
+            d.getCountReceivedFromPlayer() != 0) {
+            totalDamagePerPlayer.emplace_back(ap->getName(), d);
+        }
+    }
+    return totalDamagePerPlayer;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayerVector<C>::getTotalDamageDealtOnPlayerForAllAffectedPlayers(
+    std::string callerName) const {
+    /* Returns a vector of pairs containing the Affected players name and their
+    total damage (in the form of the Damage class). Only includes
+    Affected players which have dealt damage on the owning Player */
+    std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
+    for (const C ap : this->players) {
+        Damage d = ap->getTotalDamage();
+        if (ap->getName() != callerName &&  // If not owner of the vector
+            d.getCountDealtOnPlayer() != 0) {
+            totalDamagePerPlayer.emplace_back(ap->getName(), d);
         }
     }
     return totalDamagePerPlayer;
