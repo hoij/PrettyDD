@@ -80,16 +80,20 @@ void Player::addXp(LineInfo& lineInfo) {
 
 Damage Player::getTotalDamage() const {
     Damage total = affectedPlayers->getTotalDamage(getName());
-    int dpm = amountPerMinute(total.getTotalReceivedFromPlayer());
-    total.setReceivedFromPlayerDPM(dpm);
+    int dpmR = amountPerMinute(total.getTotalReceivedFromPlayer());
+    total.setReceivedFromPlayerDPM(dpmR);
+    int dpmD = amountPerMinute(total.getTotalDealtOnPlayer());
+    total.setDealtOnPlayerDPM(dpmD);
     return total;
 }
 
 Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
     Damage total = affectedPlayers->getTotalDamagePerDamageType(getName(),
                                                                 damageType);
-    int dpm = amountPerMinute(total.getTotalReceivedFromPlayer());
-    total.setReceivedFromPlayerDPM(dpm);
+    int dpmR = amountPerMinute(total.getTotalReceivedFromPlayer());
+    total.setReceivedFromPlayerDPM(dpmR);
+    int dpmD = amountPerMinute(total.getTotalDealtOnPlayer());
+    total.setDealtOnPlayerDPM(dpmD);
     return total;
 }
 
