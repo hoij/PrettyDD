@@ -9,28 +9,22 @@ void NanoPrograms::add(LineInfo& li) {
         // message. So in this case, the name is only saved.
         nameOfLastNanoProgramCasted = li.nanoProgramName;
     }
-    else if (!nameOfLastNanoProgramCasted.empty()){
+    else if (!nameOfLastNanoProgramCasted.empty() &&
+             !li.subtype.empty()) {
         // If nano casted successfully/resisted/countered/aborted/fumble,
         // the message won't contain a name. The previously saved name
         // is added with the new subtype info (the success info).
-        //
+        
         // When a proc fires or when certain nanos execute two programs on
         // one cast, the nano program status message (executed/countered etc.)
         // will appear twice or more after the "Executing Nano Program:"
         // message. To prevent incrementing the same nano again, the name of
         // the last nano program is cleared.
+        // Note that if a proc fires before the nano status message arrives
+        // the subtype set for the nano program may be wrong. I don't know
+        // if this can actually happen.
         addNanoProgram(li.subtype);
         nameOfLastNanoProgramCasted.clear();
-    }
-    else {
-        // TODO: Remove this once tested that it works.
-        // TODO: Check log after a raid to see that only the correct
-        // messages are put here.
-        errorLog.write("Warning: The NanoProgram info below should "
-            "correspond to \"Nano program executed successfully.\":");
-        errorLog.write("\tName: " + li.nanoProgramName);
-        errorLog.write("\tType: " + li.type);
-        errorLog.write("\tSubtype: " + li.subtype);
     }
 }
 
@@ -52,6 +46,9 @@ void NanoPrograms::addNanoProgram(std::string& subtype) {
     }
     else if (subtype == "fumble") {
         nanoProgram.fumbles += 1;
+    }
+    else if (subtype == "fullncu") {
+        nanoProgram.fullncus += 1;
     }
 }
 
@@ -86,4 +83,8 @@ int NanoPrograms::getCounters(std::string& name) const {
 int NanoPrograms::getFumbles(std::string& name) const {
     auto it = nanoPrograms.find(name);
     return (it != nanoPrograms.end()) ? it->second.fumbles : 0;
+}
+int NanoPrograms::getFullNCUs(std::string& name) const {
+    auto it = nanoPrograms.find(name);
+    return (it != nanoPrograms.end()) ? it->second.fullncus : 0;
 }

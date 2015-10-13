@@ -21,6 +21,7 @@ public:
     int getAborts(std::string& name) const;
     int getCounters(std::string& name) const;
     int getFumbles(std::string& name) const;
+    int getFullNCUs(std::string& name) const;
 
 private:
     struct NanoProgram {
@@ -30,6 +31,7 @@ private:
         int aborts = 0;
         int counters = 0;
         int fumbles = 0;
+        int fullncus = 0;
     };
 
     void addNanoProgram(std::string& subtype);

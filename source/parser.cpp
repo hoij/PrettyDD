@@ -28,7 +28,7 @@ Parser::Parser(std::string playerRunningProgram) :
     specials.emplace("Fast Attack");
     specials.emplace("Fling Shot");
     specials.emplace("Full Auto");
-    specials.emplace("Sneak Attack");
+    specials.emplace("Sneak Atck");
 }
 
 void Parser::createFunctionMap() {
@@ -192,8 +192,12 @@ std::string Parser::findNanoCastSubtype(const std::string& message) {
     else if (message == "Your target countered the nano program.") {
         return "counter";
     }
-    else if (message == "You fumbled.") {  // Find one of these log messages
+    else if (message.find("You fumbled.") != std::string::npos) {  // TODO: Find one of these log messages
         return "fumble";
+    }
+    // "Target does not have enough nano controlling units(NCU) left."
+    else if (message.find("Target does not") != std::string::npos) {
+        return "fullncu";
     }
     else {
         errorLog.write("Error: Could not find a nano cast subtype in:");
@@ -416,21 +420,29 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
 
 LineInfo Parser::otherHitByNano(const std::string& message) {
     /*
-    Can this crit? Deflect?
     ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
     ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
+    ["#0000000042000004#","Other hit by nano","",1444750507]Xan Spirit of Redemption was attacked with nanobots for 2162 points of unknown damage.
     */
     LineInfo li;
     li.type = "damage";
     std::smatch m;
-    if (regex_search(message, m, regex("(?:from )(.*?)(?= for)")) ||
-        regex_search(message, m, regex("(?:of )(.*?)(?= damage)"))) {
+    if (regex_search(message, m, regex("(?:from )(.*?)(?= for)"))) {
+        li.dealer_name = m[1];
+    }
+    else if (regex_search(message, m, regex("(?:of )(unknown)(?= damage)"))) {
         if (m[1] == "unknown") {
             li.dealer_name = "Unknown";
         }
         else {
-            li.dealer_name = m[1];
+            errorLog.write("Message should have matched \"unknown\" dealer "
+                           "but matched something else:");
+            errorLog.write("\t" + message);
         }
+    }
+    else {
+        errorLog.write("Could not find a dealer in: ");
+        errorLog.write("\t" + message);
     }
     if (regex_search(message, m, regex("(.*?)(?= was attacked)"))) {
         li.receiver_name = m[0];

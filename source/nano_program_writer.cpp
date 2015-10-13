@@ -66,6 +66,7 @@ void NanoProgramWriter::writeDetailedListHeadings() {
             std::setw(width+1) << " Aborts " <<
             std::setw(width+1) << " Counters " <<
             std::setw(width+1) << " Fumbles " <<
+            std::setw(width+1) << " FullNCUs " <<
             "</font><br>" << std::setfill(' ') << nl;
 }
 
@@ -105,6 +106,8 @@ void NanoProgramWriter::writeDetailedList(
                                                 nanoPrograms.getCounters(name));
         std::string fumblePercentage = percentage(nanoPrograms.getExecutes(name),
                                                 nanoPrograms.getFumbles(name));
+        std::string fullNCUPercentage = percentage(nanoPrograms.getExecutes(name),
+                                                nanoPrograms.getFullNCUs(name));
 
         file << std::setfill(fillChar) <<
                 std::setw(nrWidth + 1) << " " +
@@ -124,6 +127,9 @@ void NanoProgramWriter::writeDetailedList(
                                    << ") " <<
                 std::setw(pcWidth) << " " + fumblePercentage << "% (" <<
                 std::setw(nrWidth) << std::to_string(nanoPrograms.getFumbles(name))
+                                   << ") " <<
+                std::setw(pcWidth) << " " + fullNCUPercentage << "% (" <<
+                std::setw(nrWidth) << std::to_string(nanoPrograms.getFullNCUs(name))
                                    << ") " <<
                 std::setfill(' ');
 
