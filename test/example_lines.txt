@@ -107,12 +107,37 @@
 ["#0000000042000013#","Other misses","",1180557880]Keepone tries to attack you with FastAttack, but misses!
 
 
+["#0000000042000007#","Me hit by player","",1444739742]Maskirovka hit you for 6396 points of Sneak Atck damage.
+
+
+["#0000000042000018#","Me Cast Nano","",1444741366]Executing programs is currently unavailable.
+
+["#0000000042000018#","Me Cast Nano","",1444741366]Unable to execute nano program. You can't execute this nano on the target.
+
+
+["#0000000042000018#","Me Cast Nano","",1444740384]NCU error: Better nano program already running.
+
+
+
+
+["#0000000042000018#","Me Cast Nano","",1444740431]Executing Nano Program: Augmented Mirror Shield MK III.
+["#0000000042000018#","Me Cast Nano","",1444740432]Target does not have enough nano controlling units (NCU) left.
+
+
+
+["#0000000042000018#","Me Cast Nano","",1444740431]Executing Nano Program: Augmented Mirror Shield MK V.
+["#0000000042000018#","Me Cast Nano","",1444740283]Wait for current nano program execution to finish.
+["#0000000042000018#","Me Cast Nano","",1434562393]Nano program executed successfully.
+
+
+["#0000000042000004#","Other hit by nano","",1444750507]Xan Spirit of Redemption was attacked with nanobots for 2162 points of unknown damage.
+
+
 ["#0000000040000001#","System","",1443609378]New Victory Points gained: 95.
 
 ["#0000000042000013#","Unknown message","",1180557880]Testline
 
 
-["#00000003000011fc#","Pantheon","Sgtcuddle",1436182488]pdd
+["#00000003000011fc#","Pantheon","Sgtcuddle",1436182488]pdd help
 ["#00000003000011fc#","Pantheon","Someone",1436182488]pdd
-
 
