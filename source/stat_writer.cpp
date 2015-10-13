@@ -120,23 +120,33 @@ void StatWriter::writeCommand(std::string command, std::string description) {
 }
 
 void StatWriter::createHelp() {
-    openFile();
+    if (!openFile()) {
+        return;
+    }
 
-    writeStartOfLink("Help");
+    createCommands();
+    createInfo();
+
+    closeFile();
+}
+
+void StatWriter::createCommands() {
+
+    writeStartOfLink("PDD Commands");
     file << "<br>" << nl <<
             "Begin the command by saying:<br>" << nl <<
-            "<font color = " + lightBlue + ">" << nl <<
-            "pdd<br>" <<
-            "</font>" << nl <<
+            "<font color = " + lightBlue + ">" << nl;
+    writeCommand("pdd");
+    file << "</font>" << nl <<
             "Then add one of the below options.<br>" << nl <<
             "Example:<br>" << nl <<
-            "<font color = " + lightBlue + ">" << nl <<
-            "pdd dr Sgtcuddle<br>" << nl <<
-            "</font>" << nl <<
+            "<font color = " + lightBlue + ">" << nl;
+    writeCommand("pdd dr Sgtcuddle");
+    file << "</font>" << nl <<
             "Show the script by typing:<br>" << nl <<
-            "<font color = " + lightBlue + ">" << nl <<
-            "/pdd<br><br>" <<
-            "</font>" << nl << nl <<
+            "<font color = " + lightBlue + ">" << nl;
+    writeCommand("/pdd<br>");
+    file << "</font>" << nl << nl <<
             "Damage dealt:" << "<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
     writeCommand("top");
@@ -194,7 +204,31 @@ void StatWriter::createHelp() {
     writeCommand("help");
     file << "</font>";
 
-    writeEndOfLink("Help");
+    writeEndOfLink("PDD Commands");
+}
 
-    closeFile();
+void StatWriter::createInfo() {
+
+    writeStartOfLink("PDD Info");
+
+    file << "<br>" << nl
+         << "Crit Info<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The crit hit rate is calculated in the following way:<br>" << nl
+         << "     nr of crits / (nr of normal hits + crits + deflects + misses)<br>" << nl
+         << "Special and shield hits are excluded.<br><br>" << nl << nl
+         << "</font>"
+         << "Miss Info<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The miss rate is calculated in the following way:<br>" << nl
+         << "     nr of misses / (nr of normal hits + crits + deflects + misses)<br>" << nl
+         << "Special and shield hits are excluded.<br><br>" << nl << nl
+         << "</font>"
+         << "Nanobot Info<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The nanobot % is a percentage of total damage done unless<br>" << nl
+         << "otherwise stated.<br><br>" << nl << nl
+         << "</font>";
+
+    writeEndOfLink("PDD Info");
 }
