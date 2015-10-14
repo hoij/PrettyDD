@@ -234,6 +234,7 @@ TEST_F(PlayerTest, add_nanoCast) {
 
     LineInfo li2;
     li2.type = "nano cast";
+    li2.subtype = "execute";
     li2.nanoProgramName = "";
     player->add(li2);
     EXPECT_EQ(1, player->getNanoPrograms().getNanoProgramNames().size());

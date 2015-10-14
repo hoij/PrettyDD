@@ -31,7 +31,7 @@ public:
     MOCK_CONST_METHOD1(getTotalDamagePerDamageType,
                        Damage(std::string damageType));
 
-    MOCK_CONST_METHOD0(getTotalDamageForEachPlayer,
+    MOCK_CONST_METHOD0(getTotalDamageForAllAffectedPlayers,
                        std::vector<std::pair<std::string, Damage>>(void));
     MOCK_CONST_METHOD0(getTotalHeals, Heal(void));
 };
@@ -200,7 +200,7 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
         .WillOnce(::testing::Return(d4));
 
     std::vector<std::pair<std::string, Damage>> result;
-    result = playerVector.getTotalDamageForEachPlayer();
+    result = playerVector.getTotalDamageDealtForEachPlayer();
 
     // Assuming the order is the same as when added which could be untrue.
     EXPECT_EQ(d1.getTotalReceivedFromPlayer(),

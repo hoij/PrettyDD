@@ -138,6 +138,6 @@
 ["#0000000042000013#","Unknown message","",1180557880]Testline
 
 
-["#00000003000011fc#","Pantheon","Sgtcuddle",1436182488]pdd help
+["#00000003000011fc#","Pantheon","Sgtcuddle",1436182488]pdd
 ["#00000003000011fc#","Pantheon","Someone",1436182488]pdd
 
