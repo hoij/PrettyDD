@@ -17,10 +17,6 @@ DamageWriter::DamageWriter(PlayerVector<Player*>& playerVector,
 
 void DamageWriter::createDDTopList() {
 
-    if (!openFile()) {
-        return;
-    }
-
     std::string titleBase = "DD Top List";
 
     std::vector<std::pair<std::string, Damage>> totalDamageDealtForEachPlayer =
@@ -30,7 +26,7 @@ void DamageWriter::createDDTopList() {
     // Calculate the number of text links (windows) needed to see all players
     const int playersPerWindow = 15;
     int nrOfPlayers = (int)totalDamageDealtForEachPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
                 totalDamageDealtForEachPlayer,
@@ -38,15 +34,9 @@ void DamageWriter::createDDTopList() {
                 playersPerWindow,
                 &DamageWriter::writeTopListHeadings,
                 &DamageWriter::writeDDTopList);
-
-    closeFile();
 }
 
 void DamageWriter::createDDDetailedTopList() {
-
-    if (!openFile()) {
-        return;
-    }
 
     std::string titleBase = "DD Detailed Top List";
 
@@ -57,7 +47,7 @@ void DamageWriter::createDDDetailedTopList() {
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 10;
     int nrOfPlayers = (int)totalDamageDealtForEachPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
                 totalDamageDealtForEachPlayer,
@@ -66,7 +56,6 @@ void DamageWriter::createDDDetailedTopList() {
                 &DamageWriter::writeOverviewHeadingsOthers,
                 &DamageWriter::writeDDOverviewOthers);
 
-    closeFile();
 }
 
 void DamageWriter::createDDPerDamageType(std::string playerName) {
@@ -121,10 +110,6 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
                                                   int typesPerWindow,
                                                   bool detailed) {
 
-    if (!openFile()) {
-        return;
-    }
-
     Player* pp = playerVector.getPlayer(playerName);
     if (pp == nullptr) {
         createNotFoundMessage(titleBase, playerName + " not found.", file);
@@ -157,7 +142,7 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
 
     // Calculate the number of files needed to write all players
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfTypes, typesPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfTypes, typesPerWindow);
 
     writeToFile(titleBase,
                 allDamageTypesFromAffectedPlayer,
@@ -165,8 +150,6 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
                 typesPerWindow,
                 whp,
                 wdp);
-
-    closeFile();
 }
 
 /******/
@@ -174,10 +157,6 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
 /******/
 
 void DamageWriter::createDRTopList() {
-
-    if (!openFile()) {
-        return;
-    }
 
     std::string titleBase = "Damage Received Top List";
 
@@ -187,7 +166,7 @@ void DamageWriter::createDRTopList() {
 
     const int playersPerWindow = 15;
     int nrOfPlayers = (int)totalDamageReceivedForEachPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(
         titleBase,
@@ -196,15 +175,9 @@ void DamageWriter::createDRTopList() {
         playersPerWindow,
         &DamageWriter::writeTopListHeadings,
         &DamageWriter::writeDRTopList);
-
-    closeFile();
 }
 
 void DamageWriter::createDRDetailedTopList() {
-
-    if (!openFile()) {
-        return;
-    }
 
     std::string titleBase = "Damage Received Detailed Top List";
 
@@ -215,7 +188,7 @@ void DamageWriter::createDRDetailedTopList() {
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 8;
     int nrOfPlayers = (int)totalDamageReceivedForEachPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
                 totalDamageReceivedForEachPlayer,
@@ -223,8 +196,6 @@ void DamageWriter::createDRDetailedTopList() {
                 playersPerWindow,
                 &DamageWriter::writeOverviewHeadingsOthers,
                 &DamageWriter::writeDROverviewOthers);
-
-    closeFile();
 }
 
 void DamageWriter::createDRPerDamageType(std::string playerName) {
@@ -253,10 +224,6 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
                                              bool dealt,
                                              bool detailed) {
 
-    if (!openFile()) {
-        return;
-    }
-
     std::string pName = checkIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
@@ -283,7 +250,7 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
 
     // Calculate the number of links needed to write all players
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfTypes, typesPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfTypes, typesPerWindow);
 
     writeToFile(titleBase,
                 allDamageTypesFromAffectedPlayer,
@@ -291,8 +258,6 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
                 typesPerWindow,
                 whp,
                 wdp);
-
-    closeFile();
 }
 
 void DamageWriter::createDamagePerOpponent(std::string playerName,
@@ -301,9 +266,6 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
                                            bool detailed) {
     /* Writes damage received or damage dealt depending on the bool "dealt".
     */
-    if (!openFile()) {
-        return;
-    }
 
     std::string pName = checkIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
@@ -334,7 +296,7 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 8;
     int nrOfPlayers = (int)totalDamageForEachAffectedPlayer.size();
-    int nrOfWindows = calcNrOFWindows(nrOfPlayers, playersPerWindow);
+    int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
                 totalDamageForEachAffectedPlayer,
@@ -342,8 +304,6 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
                 playersPerWindow,
                 whp,
                 wdp);
-
-    closeFile();
 }
 
 void DamageWriter::setDDWriteMethods(std::string playerName,
@@ -428,29 +388,55 @@ void DamageWriter::writeToFile(
                                              const Damage& d,
                                              int place)) {
 
-    /* Sets the link name number and calls the write function for
-    each link needed. */
+
+    // The script file limit in AO is 4kb. So if the nrOfWindows is
+    // greater than 4 a new file will be created (as each window link
+    // is designed to (wrost case) be as close to 1kb as possible).
     int place = 1;
-    for (unsigned int windowNr = 0; windowNr != nrOfWindows; windowNr++) {
-        std::string title =
-            appendInterval(titleBase, windowNr, typesPerWindow);
+    unsigned int nrOfFiles = calcNrOfFiles(nrOfWindows, 4);
+    for (unsigned int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
 
-        auto start = v.begin() + windowNr * typesPerWindow;
-        auto stop = v.begin();  // Just to set the right type on stop.
-        // Stop at either the end or the nr of types per file.
-        if (v.size() < (windowNr + 1) * typesPerWindow) {
-            stop = v.end();
-        }
-        else {
-            stop = v.begin() + (windowNr + 1) * typesPerWindow;
+        std::string fileName = "pdd" + std::to_string(fileNr);
+
+        if (!openFile(fileName)) {
+            return;
         }
 
-        writeStats(start,
-                   stop,
-                   title,
-                   place,
-                   writeHeadingsPointer,
-                   writeDamagePointer);
+        /* Sets the link name number and calls the write function for
+        each link needed. */
+        const unsigned int windowsPerFile = 4;
+        for (unsigned int windowNr = 0; windowNr != windowsPerFile &&
+                                        windowNr != nrOfWindows &&
+                                        place <= (int)v.size(); windowNr++) {
+
+            int startOffset = windowNr * typesPerWindow +
+                              (fileNr - 1) * typesPerWindow * windowsPerFile;
+            auto start = v.begin() + startOffset;
+            auto stop = v.begin();  // Just to set the right type on stop.
+            // Stop at either the end or the nr of types per file.
+            //if (v.size() < (windowNr + 1) * typesPerWindow * fileNr) {
+            int stopOffset = startOffset + typesPerWindow;
+            if ((int)v.size() < stopOffset) {
+                stop = v.end();
+            }
+            else {
+                stop = v.begin() + stopOffset;
+                //stop = v.begin() + (windowNr + 1) * typesPerWindow;
+            }
+
+            std::string title =
+                appendInterval(titleBase, startOffset, stopOffset);
+
+            writeStats(start,
+                       stop,
+                       title,
+                       place,
+                       writeHeadingsPointer,
+                       writeDamagePointer);
+            //windowNr++;
+        }
+
+        closeFile();
     }
 }
 

@@ -13,7 +13,7 @@ XPWriter::XPWriter(PlayerVector<Player*>& playerVector,
 
 void XPWriter::createXPInfo() {
 
-    if (!openFile()) {
+    if (!openFile("pdd1")) {
         return;
     }
 

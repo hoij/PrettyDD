@@ -9,10 +9,10 @@ WriterHelper::WriterHelper(Configuration& config,
                            file(file),
                            nl(config) {}
 
-bool WriterHelper::openFile() {
-    file.open(config.getScriptsPath() + "pdd");
+bool WriterHelper::openFile(std::string fileName) {
+    file.open(config.getScriptsPath() + fileName);
     if (!file.is_open()) {
-        errorLog.write("Error: Could not open/create \"pdd"
+        errorLog.write("Error: Could not open/create: \"" + fileName +
                        "\" for writing. Tried writing it to:");
         errorLog.write("Error:\t" + config.getScriptsPath());
         return false;
@@ -54,10 +54,10 @@ std::string WriterHelper::checkIfSelf(std::string name) {
 }
 
 std::string WriterHelper::appendInterval(std::string titleBase,
-                                         unsigned int windowNr,
-                                         unsigned int nanosPerWindow) {
-    std::string interval = std::to_string(windowNr * nanosPerWindow + 1) +
-        "-" + std::to_string((windowNr + 1) * nanosPerWindow);
+                                         int startOffset,
+                                         int stopOffset) {
+    std::string interval = std::to_string(1 + startOffset) +
+        "-" + std::to_string(stopOffset);
     return titleBase + " " + interval;
 }
 
@@ -69,9 +69,14 @@ void WriterHelper::createNotFoundMessage(std::string title,
           "\">" + title + "</a>";
 }
 
-unsigned int WriterHelper::calcNrOFWindows(unsigned int amount,
+unsigned int WriterHelper::calcNrOfWindows(unsigned int amount,
                                            unsigned int amountPerWindow) {
     return amount / amountPerWindow + (amount % amountPerWindow != 0);
+}
+
+unsigned int WriterHelper::calcNrOfFiles(unsigned int nrOfWindows,
+                                         unsigned int windowsPerFile) {
+    return nrOfWindows / windowsPerFile + (nrOfWindows % windowsPerFile != 0);
 }
 
 std::string WriterHelper::percentage(int total, int part) {

@@ -16,7 +16,7 @@ public:
     WriterHelper(Configuration& config, std::ofstream& file);
     WriterHelper& operator=(WriterHelper rhs) = delete;
 
-    bool openFile();
+    bool openFile(std::string fileName);
     void closeFile();
     void writeStartOfLink(std::string title);
     void writeEndOfLink(std::string title);
@@ -24,14 +24,16 @@ public:
     void writeName(std::string name);
     std::string checkIfSelf(std::string name);
     std::string appendInterval(std::string titleBase,
-                               unsigned int windowNr,
-                               unsigned int nanosPerWindow);
+                               int startOffset,
+                               int stopOffset);
     void createNotFoundMessage(std::string title,
                                std::string message,
                                std::ostream& os);
 
-    unsigned int calcNrOFWindows(unsigned int nrOfType,
+    unsigned int calcNrOfWindows(unsigned int nrOfType,
                                  unsigned int typesPerWindow);
+    unsigned int calcNrOfFiles(unsigned int nrOfWindows,
+                                 unsigned int windowsPerFile);
     std::string percentage(int total, int part);
     std::string dblToString(const double d);
 

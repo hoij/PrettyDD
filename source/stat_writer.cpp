@@ -120,7 +120,7 @@ void StatWriter::writeCommand(std::string command, std::string description) {
 }
 
 void StatWriter::createHelp() {
-    if (!openFile()) {
+    if (!openFile("pdd1")) {
         return;
     }
 

@@ -57,8 +57,8 @@ public:
     void createHelp();
 
 private:
-    void StatWriter::createCommands();
-    void StatWriter::createInfo();
+    void createCommands();
+    void createInfo();
     void writeCommand(std::string command, std::string description = "");
 
     PlayerVector<Player*>& playerVector;

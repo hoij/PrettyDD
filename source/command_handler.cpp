@@ -48,7 +48,7 @@ void CommandHandler::execute(const std::string& command) {
 
     if (nrOfOptions == 0) {
         // Write the detailed top list by defualt:
-        // statWriter.createDDDetailedTopList();
+         statWriter.createDDDetailedTopList();
 
 //        statWriter.createNanoProgramsCastedDetailedList();
         // For testing purposes:
@@ -59,7 +59,7 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDPerDamageType("You");
 
         //statWriter.createDDPerDamageTypeDetailed("You");
-        statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
+        //statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
 
 //        statWriter.createHelp();
 

@@ -13,7 +13,9 @@ NanoProgramWriter::NanoProgramWriter(PlayerVector<Player*>& playerVector,
 
 void NanoProgramWriter::createCastedDetailedList() {
 
-    if (!openFile()) {
+
+    // TODO: Create multiple files.
+    if (!openFile("pdd1")) {
         return;
     }
 
@@ -33,11 +35,13 @@ void NanoProgramWriter::createCastedDetailedList() {
 
     const unsigned int nanosPerWindow = 5;
     unsigned int nrOfNanos = (unsigned int)nanoPrograms.getNanoProgramNames().size();
-    unsigned int nrOfWindows = calcNrOFWindows(nrOfNanos, nanosPerWindow);
+    unsigned int nrOfWindows = calcNrOfWindows(nrOfNanos, nanosPerWindow);
 
     for (unsigned int windowNr = 0; windowNr != nrOfWindows; windowNr++) {
         std::string title =
-            appendInterval(titleBase, windowNr, nanosPerWindow);
+            appendInterval(titleBase,
+                           windowNr * nanosPerWindow,
+                           (windowNr + 1) * nanosPerWindow);
 
         writeStartOfLink(title);
 
