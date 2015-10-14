@@ -393,7 +393,8 @@ void DamageWriter::writeToFile(
     // greater than 4 a new file will be created (as each window link
     // is designed to (wrost case) be as close to 1kb as possible).
     int place = 1;
-    unsigned int nrOfFiles = calcNrOfFiles(nrOfWindows, 4);
+    const unsigned int windowsPerFile = 4;
+    unsigned int nrOfFiles = calcNrOfFiles(nrOfWindows, windowsPerFile);
     for (unsigned int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
 
         std::string fileName = "pdd" + std::to_string(fileNr);
@@ -404,7 +405,6 @@ void DamageWriter::writeToFile(
 
         /* Sets the link name number and calls the write function for
         each link needed. */
-        const unsigned int windowsPerFile = 4;
         for (unsigned int windowNr = 0; windowNr != windowsPerFile &&
                                         windowNr != nrOfWindows &&
                                         place <= (int)v.size(); windowNr++) {

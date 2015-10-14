@@ -13,12 +13,6 @@ NanoProgramWriter::NanoProgramWriter(PlayerVector<Player*>& playerVector,
 
 void NanoProgramWriter::createCastedDetailedList() {
 
-
-    // TODO: Create multiple files.
-    if (!openFile("pdd1")) {
-        return;
-    }
-
     std::string titleBase = "Casted Nano Program Info";
 
     Player* pp = playerVector.getPlayer("You");
@@ -29,34 +23,69 @@ void NanoProgramWriter::createCastedDetailedList() {
     }
 
     const NanoPrograms& nanoPrograms = pp->getNanoPrograms();
-    std::vector<std::string> nanoProgramNames =
+    std::vector<std::string> v =
         nanoPrograms.getNanoProgramNames();
-    sortByExecutes(nanoProgramNames, nanoPrograms);
+    sortByExecutes(v, nanoPrograms);
 
     const unsigned int nanosPerWindow = 5;
     unsigned int nrOfNanos = (unsigned int)nanoPrograms.getNanoProgramNames().size();
     unsigned int nrOfWindows = calcNrOfWindows(nrOfNanos, nanosPerWindow);
 
-    for (unsigned int windowNr = 0; windowNr != nrOfWindows; windowNr++) {
-        std::string title =
-            appendInterval(titleBase,
-                           windowNr * nanosPerWindow,
-                           (windowNr + 1) * nanosPerWindow);
 
-        writeStartOfLink(title);
+    int place = 1;
+    const unsigned int windowsPerFile = 4;
+    unsigned int nrOfFiles = calcNrOfFiles(nrOfWindows, windowsPerFile);
+    for (unsigned int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
 
-        writeDetailedListHeadings();
+        std::string fileName = "pdd" + std::to_string(fileNr);
 
-        file << "<font color = " + lime + ">" << nl;
-        auto namesStart = nanoProgramNames.begin() + windowNr * nanosPerWindow;
-        auto namesStop = getStopIter(nanoProgramNames, windowNr, nanosPerWindow);
-        writeDetailedList(namesStart, namesStop, nanoPrograms);
-        file << "</font>";
+        if (!openFile(fileName)) {
+            return;
+        }
 
-        writeEndOfLink(title);
-    }
+        /* Sets the link name number and calls the write function for
+        each link needed. */
+        for (unsigned int windowNr = 0; windowNr != windowsPerFile &&
+                                        windowNr != nrOfWindows &&
+                                        place <= (int)v.size(); windowNr++) {
+
+            int startOffset = windowNr * nanosPerWindow +
+                              (fileNr - 1) * nanosPerWindow * windowsPerFile;
+            auto start = v.begin() + startOffset;
+            auto stop = v.begin();  // Just to set the right type on stop.
+            // Stop at either the end or the nr of nanos per file.
+            int stopOffset = startOffset + nanosPerWindow;
+            if ((int)v.size() < stopOffset) {
+                stop = v.end();
+            }
+            else {
+                stop = v.begin() + stopOffset;
+            }
+
+            std::string title =
+                appendInterval(titleBase,
+                               windowNr * nanosPerWindow,
+                               (windowNr + 1) * nanosPerWindow);
+            if (nrOfFiles > 1 && fileNr != nrOfFiles) {
+                // Hint that there's more to see in the next script.
+                title.append(" /ppd" +
+                             std::to_string(fileNr + 1) +
+                             " for more");
+            }
+
+            writeStartOfLink(title);
+
+            writeDetailedListHeadings();
+
+            file << "<font color = " + lime + ">" << nl;
+            writeDetailedList(start, stop, nanoPrograms);
+            file << "</font>";
+
+            writeEndOfLink(title);
+        }
 
     closeFile();
+    }
 }
 
 void NanoProgramWriter::writeDetailedListHeadings() {
