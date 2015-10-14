@@ -110,10 +110,10 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
                                                   int typesPerWindow,
                                                   bool detailed) {
 
-    Player* pp = playerVector.getPlayer(playerName);
+    std::string pName = checkIfSelf(playerName);
+    Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, playerName + " not found.", file);
-        closeFile();
+        createNotFoundMessage(titleBase, playerName + " not found.");
         return;
     }
 
@@ -130,9 +130,7 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
     if (notFound) {
         createNotFoundMessage(titleBase,
                               opponentName + " not found among " +
-                              playerName + "'s opponents.",
-                              file);
-        closeFile();
+                              playerName + "'s opponents.");
         return;
     }
 
@@ -227,8 +225,7 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
     std::string pName = checkIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, playerName + " not found.", file);
-        closeFile();
+        createNotFoundMessage(titleBase, playerName + " not found.");
         return;
     }
 
@@ -270,8 +267,7 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
     std::string pName = checkIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, playerName + " not found.", file);
-        closeFile();
+        createNotFoundMessage(titleBase, playerName + " not found.");
         return;
     }
 
@@ -391,7 +387,7 @@ void DamageWriter::writeToFile(
 
     // The script file limit in AO is 4kb. So if the nrOfWindows is
     // greater than 4 a new file will be created (as each window link
-    // is designed to (wrost case) be as close to 1kb as possible).
+    // is designed to (worst case) be as close to 1kb as possible).
     int place = 1;
     const unsigned int windowsPerFile = 4;
     unsigned int nrOfFiles = calcNrOfFiles(nrOfWindows, windowsPerFile);
@@ -502,7 +498,7 @@ void DamageWriter::writeOverviewHeadings(bool self) {
             "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width+1) << " Total " <<
-            std::setw(6) << "(Cnt) " <<
+            std::setw(6) << "(_Cnt) " <<
             std::setw(width-1) << " DPM " <<
             std::setw(width+1) << " Crit " <<
             std::setw(width+1) << " Nanobot ";
@@ -516,11 +512,11 @@ void DamageWriter::writeOverviewHeadings(bool self) {
 void DamageWriter::writeOverviewHeadingsDetailed() {
     const int width = 7;
     const int pcWidth = 7;
-    const int nrWidth = 3;
+    const int nrWidth = 4;
     file << "<font color = " + lightBlue + ">" << nl;
     file << std::setfill(fillChar) << std::right <<
             std::setw(width+1) << "hit%" << " (" <<
-            std::setw(nrWidth) << "cnt" << ") " <<
+            std::setw(nrWidth) << "_Cnt" << ") " <<
             std::setw(width) << " Max" << "-" << std::left <<
             std::setw(width) << "Min " << std::right <<
             std::setw(pcWidth) << "dmg" << "%<br><br>" <<
@@ -633,7 +629,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
         d.getNanobotDeflectCountReceivedFromPlayer());
 
     const int width = 8;
-    const int nrWidth = 3;
+    const int nrWidth = 4;
     file << std::setfill(fillChar) <<
             std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer())
                              << " (" <<
@@ -797,7 +793,7 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
         // Assuming nanobot attacks can't miss.
         // Only including it for regular attacks
         const int pcWidth = 7;
-        const int nrWidth = 3;
+        const int nrWidth = 4;
         file << std::right <<
                 std::setw(pcWidth) << " " + missPercentage << "% (" <<
                 std::setw(nrWidth) << std::to_string(d.getMissesReceivedFromPlayer())
@@ -860,13 +856,13 @@ void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
     }
 }
 
-void DamageWriter::writeTotalInfo(int total, int cnt) {
+void DamageWriter::writeTotalInfo(int total, int count) {
     const int width = 7;
-    const int nrWidth = 3;
+    const int nrWidth = 4;
     file << std::right << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(total)
                                << " (" <<
-            std::setw(nrWidth) << std::to_string(cnt)
+            std::setw(nrWidth) << std::to_string(count)
                                << ") " << "Total " << "<br>" << nl;
 }
 
@@ -878,7 +874,7 @@ void DamageWriter::writeDetailedInfoForType(std::string type,
                                             std::string dmgPercent) {
     const int width = 7;
     const int pcWidth = 7;
-    const int nrWidth = 3;
+    const int nrWidth = 4;
     file << std::setw(pcWidth) << " " + hitPercent << "% (" <<
             std::setw(nrWidth) << nrOfHits << ") " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
@@ -933,7 +929,7 @@ void DamageWriter::writeDROverview(const std::string& name,
         d.getNanobotDeflectCountDealtOnPlayer());
 
     const int width = 8;
-    const int nrWidth = 3;
+    const int nrWidth = 4;
     file << std::setfill(fillChar) <<
             std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer())
                              << " (" <<

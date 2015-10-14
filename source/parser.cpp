@@ -86,9 +86,16 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
         else {
             // Might want to remove this error message as it could print a lot
             // if the user choses to log many other messages not found in the map
-            errorLog.write("Warning: No match for description: ", false);
-            errorLog.write(formattedLine.getDescription());
-            errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
+
+            // Temporarily ignoring Tell Messages:
+            if (formattedLine.getDescription() == "Tell Messages") {
+                ;
+            }
+            else {
+                errorLog.write("Warning: No match for description: ", false);
+                errorLog.write(formattedLine.getDescription());
+                errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
+            }
         }
     }
 
@@ -100,13 +107,6 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
 }
 
 int Parser::findAmount(const std::string& message) {
-    //if (logLine.getDescription() == "Me Cast Nano" ||
-    //    logLine.getDescription() == "System" ||
-    //    logLine.getDescription() == "Vicinity" ||
-    //    logLine.getDescription() == "Me Cast Nano" ||
-    //    logLine.getDescription() == "00000003000011fc" ||) {
-    //    return 0;
-    //}
     std::smatch d;
     if (regex_search(message, d, regex("(\\d+)( points)"))) {
         return std::stoi(d[1]);
@@ -343,6 +343,8 @@ void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterfa
     // Just to capture anything I might have missed.
     if (formattedLine.getDescription() == "System" ||
         formattedLine.getDescription() == "Vicinity" ||
+        formattedLine.getDescription() == "Team" ||
+        formattedLine.getDescription() == "Tell Messages" ||
         formattedLine.getDescription() == "Me got health" ||
         formattedLine.getDescriptionCode() == "00000003000011fc") {
         return;

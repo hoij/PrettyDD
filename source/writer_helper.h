@@ -27,8 +27,7 @@ public:
                                int startOffset,
                                int stopOffset);
     void createNotFoundMessage(std::string title,
-                               std::string message,
-                               std::ostream& os);
+                               std::string message);
 
     unsigned int calcNrOfWindows(unsigned int nrOfType,
                                  unsigned int typesPerWindow);

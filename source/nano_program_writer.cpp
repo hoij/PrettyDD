@@ -17,8 +17,7 @@ void NanoProgramWriter::createCastedDetailedList() {
 
     Player* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, "You not found.", file);
-        closeFile();
+        createNotFoundMessage(titleBase, "You not found.");
         return;
     }
 
@@ -63,9 +62,7 @@ void NanoProgramWriter::createCastedDetailedList() {
             }
 
             std::string title =
-                appendInterval(titleBase,
-                               windowNr * nanosPerWindow,
-                               (windowNr + 1) * nanosPerWindow);
+                appendInterval(titleBase, startOffset, stopOffset);
             if (nrOfFiles > 1 && fileNr != nrOfFiles) {
                 // Hint that there's more to see in the next script.
                 title.append(" /ppd" +
@@ -82,6 +79,8 @@ void NanoProgramWriter::createCastedDetailedList() {
             file << "</font>";
 
             writeEndOfLink(title);
+
+            place += nanosPerWindow;
         }
 
     closeFile();

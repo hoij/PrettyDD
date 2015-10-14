@@ -26,14 +26,11 @@ void WriterHelper::closeFile() {
 
 void WriterHelper::writeStartOfLink(std::string title) {
     file << "<a href=\"text://<font color = " + yellow + ">" <<
-            title << "</font><br>";
-    if (config.shouldWriteReadable()) {
-        file << std::endl;
-    }
+            title << "</font><br>" << nl;
 }
 
 void WriterHelper::writeEndOfLink(std::string title) {
-    file << "\">" + title << std::endl;
+    file << "\">" + title << nl;
 }
 
 void WriterHelper::writePlace(int place) {
@@ -62,11 +59,13 @@ std::string WriterHelper::appendInterval(std::string titleBase,
 }
 
 void WriterHelper::createNotFoundMessage(std::string title,
-                                         std::string message,
-                                         std::ostream& os) {
-
-    os << "<a href=\"text://" + message + "<br>" <<
-          "\">" + title + "</a>";
+                                         std::string message) {
+    if (!openFile("pdd1")) {
+        return;
+    }
+    file << "<a href=\"text://" + message + "<br>" <<
+            "\">" + title + "</a>";
+    closeFile();
 }
 
 unsigned int WriterHelper::calcNrOfWindows(unsigned int amount,

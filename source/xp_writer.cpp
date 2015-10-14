@@ -21,8 +21,7 @@ void XPWriter::createXPInfo() {
 
     Player* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
-        createNotFoundMessage(title, "You not found.", file);
-        closeFile();
+        createNotFoundMessage(title, "You not found.");
         return;
     }
 
