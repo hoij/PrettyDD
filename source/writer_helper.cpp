@@ -58,7 +58,7 @@ std::string WriterHelper::appendInterval(std::string titleBase,
                                          int stopOffset) {
     std::string interval = std::to_string(1 + startOffset) +
         "-" + std::to_string(stopOffset);
-    return titleBase + " " + interval;
+    return titleBase + " " + interval + ".";
 }
 
 void WriterHelper::createNotFoundMessage(std::string title,

@@ -414,18 +414,22 @@ void DamageWriter::writeToFile(
             auto start = v.begin() + startOffset;
             auto stop = v.begin();  // Just to set the right type on stop.
             // Stop at either the end or the nr of types per file.
-            //if (v.size() < (windowNr + 1) * typesPerWindow * fileNr) {
             int stopOffset = startOffset + typesPerWindow;
             if ((int)v.size() < stopOffset) {
                 stop = v.end();
             }
             else {
                 stop = v.begin() + stopOffset;
-                //stop = v.begin() + (windowNr + 1) * typesPerWindow;
             }
 
             std::string title =
                 appendInterval(titleBase, startOffset, stopOffset);
+            if (nrOfFiles > 1 && fileNr != nrOfFiles) {
+                // Hint that there's more to see in the next script.
+                title.append(" /ppd" +
+                             std::to_string(fileNr + 1) +
+                             " for more");
+            }
 
             writeStats(start,
                        stop,
@@ -433,7 +437,6 @@ void DamageWriter::writeToFile(
                        place,
                        writeHeadingsPointer,
                        writeDamagePointer);
-            //windowNr++;
         }
 
         closeFile();
