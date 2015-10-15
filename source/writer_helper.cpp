@@ -30,7 +30,7 @@ void WriterHelper::writeStartOfLink(std::string title) {
 }
 
 void WriterHelper::writeEndOfLink(std::string title) {
-    file << "\">" + title << nl;
+    file << "\">" << title << "</a>" << std::endl;
 }
 
 void WriterHelper::writePlace(int place) {

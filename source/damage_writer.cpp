@@ -62,7 +62,7 @@ void DamageWriter::createDDPerDamageType(std::string playerName) {
     std::string titleBase = "DD Per Damage Type By " + playerName;
     createDamagePerDamageType(playerName,
                               titleBase,
-                              10,
+                              8,
                               true,
                               false);
 }
@@ -87,7 +87,7 @@ void DamageWriter::createDDOnSpecificOpponent(std::string playerName,
     createDamageOnSpecificOpponent(playerName,
                                    opponentName,
                                    titleBase,
-                                   10,
+                                   8,
                                    false);
 }
 
@@ -405,6 +405,7 @@ void DamageWriter::writeToFile(
                                         windowNr != nrOfWindows &&
                                         place <= (int)v.size(); windowNr++) {
 
+            // TODO: Break out into a function:
             int startOffset = windowNr * typesPerWindow +
                               (fileNr - 1) * typesPerWindow * windowsPerFile;
             auto start = v.begin() + startOffset;
@@ -420,12 +421,6 @@ void DamageWriter::writeToFile(
 
             std::string title =
                 appendInterval(titleBase, startOffset, stopOffset);
-            if (nrOfFiles > 1 && fileNr != nrOfFiles) {
-                // Hint that there's more to see in the next script.
-                title.append(" /ppd" +
-                             std::to_string(fileNr + 1) +
-                             " for more");
-            }
 
             writeStats(start,
                        stop,
@@ -433,6 +428,16 @@ void DamageWriter::writeToFile(
                        place,
                        writeHeadingsPointer,
                        writeDamagePointer);
+
+            // To prevent AO's flood protection from kicking in
+            file << "/delay 1000" << std::endl;
+        }
+
+        // Write the command to execute the next file
+        // (if it exists) at the end of the current file.
+        if (fileNr < nrOfFiles) {
+            file << "/delay 3000" << std::endl;
+            file << "/pdd" << std::to_string(fileNr + 1) << std::endl;
         }
 
         closeFile();
@@ -497,7 +502,7 @@ void DamageWriter::writeOverviewHeadings(bool self) {
     file << std::setfill(fillChar) << std::right <<
             "<font color = " + lightBlue + ">" << nl;
 
-    file << std::setw(width+1) << " Total " <<
+    file << std::setw(width+2) << " Total " <<
             std::setw(6) << "(_Cnt) " <<
             std::setw(width-1) << " DPM " <<
             std::setw(width+1) << " Crit " <<
@@ -631,7 +636,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
     const int width = 8;
     const int nrWidth = 4;
     file << std::setfill(fillChar) <<
-            std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer())
+            std::setw(width+1) << " " + std::to_string(d.getTotalReceivedFromPlayer())
                              << " (" <<
             std::setw(nrWidth) << std::to_string(d.getCountReceivedFromPlayer())
                              << ") " <<
@@ -931,7 +936,7 @@ void DamageWriter::writeDROverview(const std::string& name,
     const int width = 8;
     const int nrWidth = 4;
     file << std::setfill(fillChar) <<
-            std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer())
+            std::setw(width+1) << " " + std::to_string(d.getTotalDealtOnPlayer())
                              << " (" <<
             std::setw(nrWidth) << std::to_string(d.getCountDealtOnPlayer())
                              << ") " <<
@@ -984,4 +989,13 @@ std::string DamageWriter::determineMax(int maxDmg) {
     return std::to_string((maxDmg == -1) ? 0 : maxDmg);
 }
 
+std::string DamageWriter::calcCritHitPercentage(Damage&d) {
+    int regularHits = d.getRegularCountReceivedFromPlayer() +
+        d.getCritCountReceivedFromPlayer() +
+        d.getRegularDeflectCountReceivedFromPlayer() +
+        d.getMissesReceivedFromPlayer();
+    int crits = d.getCritCountReceivedFromPlayer();
 
+    return percentage(regularHits, crits);
+
+}

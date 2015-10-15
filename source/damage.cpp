@@ -10,6 +10,7 @@
 Damage& Damage::operator+=(const Damage& rhs) {
     dealtOnPlayer += rhs.dealtOnPlayer;
     receivedFromPlayer += rhs.receivedFromPlayer;
+    shield = rhs.shield;
     special = rhs.special;
     return *this;
 }
@@ -33,7 +34,11 @@ void Damage::setReceivedFromPlayerDPM(int damagePerMinute) {
 void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     di.total += li.amount;
     di.count++;
+    // TODO: Set these bools on construction only and not
+    // on each addition.
+    shield = li.shield;
     special = li.special;
+
     if (li.crit) {
         di.critCount++;
         di.critTotal += li.amount;

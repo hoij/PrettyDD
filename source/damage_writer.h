@@ -125,6 +125,8 @@ private:
     std::string determineMin(int minDmg);
     std::string determineMax(int maxDmg);
 
+    std::string calcCritHitPercentage(Damage&d);
+
     PlayerVector<Player*>& playerVector;
 };
 

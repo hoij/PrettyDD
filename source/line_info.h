@@ -22,6 +22,7 @@ public:
     bool deflect = false;
     bool miss = false;
     bool nanobots = false;
+    bool shield = false;
     bool special = false;
     bool hasStats = true;
 };

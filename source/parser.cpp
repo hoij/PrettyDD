@@ -81,7 +81,10 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             lineInfo = (this->*funcMapIterator->second)(formattedLine.getMessage());
             // findSubtype can be called on any line
             lineInfo.subtype = findSubtype(formattedLine.getMessage(), lineInfo.type);
-            lineInfo.special = isSpecial(lineInfo.type, lineInfo.subtype);
+            if (lineInfo.type == "damage") {
+                lineInfo.special = isSpecial(lineInfo.subtype);
+                lineInfo.shield = isShield(lineInfo.subtype);
+            }
         }
         else {
             // Might want to remove this error message as it could print a lot
@@ -142,7 +145,7 @@ std::string Parser::findDamageSubtype(const std::string& message) {
     }
     else if (regex_search(message, m, regex("(?: with )(.*)(?=, but )"))) {
         // Looks for special damage in case of a miss.
-        return renameSpecial(m[1]);  // Specials in misses have a different name
+        return renameSpecial(m[1]);  // Some specials in misses have a different name
     }
     else if (regex_search(message, m, regex(" tried to hit "))) {
         return "regular miss";
@@ -330,11 +333,16 @@ std::string Parser::renameSpecial(std::string subtype) {
     }
 }
 
-bool Parser::isSpecial(std::string& type, std::string& subtype) {
-    if (type == "damage") {  // To avoid the lookup on a lot of other types.
-        return !(specials.find(subtype) == specials.end());
+bool Parser::isShield(std::string& subtype) {
+    if (subtype == "reflect shield" ||
+        subtype == "damage shield") {
+        return true;
     }
     return false;
+}
+
+bool Parser::isSpecial(std::string& subtype) {
+    return !(specials.find(subtype) == specials.end());
 }
 
 void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine) {

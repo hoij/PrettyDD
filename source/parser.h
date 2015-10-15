@@ -26,7 +26,8 @@ private:
 
     bool isCrit(const std::string& message);
     bool isDeflect(const std::string& message);
-    bool isSpecial(std::string& type, std::string& subtype);
+    bool isShield(std::string& subtype);
+    bool isSpecial(std::string& subtype);
     int findAmount(const std::string& message);
     std::string findSubtype(const std::string& message, const std::string type);
     std::string findDamageSubtype(const std::string& message);

@@ -17,7 +17,9 @@ public:
 
     void setDealtOnPlayerDPM(int damagePerMinute);
     void setReceivedFromPlayerDPM(int damagePerMinute);
+    void setShield() {shield = true;}
     void setSpecial() {special = true;}
+    bool isShield() const { return shield; }
     bool isSpecial() const {return special;}
 
     // TODO: This is shit, just make the data public.
@@ -101,6 +103,7 @@ private:
         int misses = 0;
     };
 
+    bool shield = false;
     bool special = false;
     DamageInfo dealtOnPlayer;
     DamageInfo receivedFromPlayer;
