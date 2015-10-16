@@ -505,12 +505,12 @@ void DamageWriter::writeOverviewHeadings(bool self) {
     file << std::setw(width+2) << " Total " <<
             std::setw(6) << "(_Cnt) " <<
             std::setw(width-1) << " DPM " <<
-            std::setw(width+1) << " Crit " <<
-            std::setw(width+1) << " Nanobot ";
+            std::setw(width) << " Crit " <<
+            std::setw(width) << " Nanobot ";
     if (self) {
-        file << std::setw(width) << " Miss ";
+        file << std::setw(width-1) << " Miss ";
     }
-    file << std::setw(width+2) << " Deflect " <<
+    file << std::setw(width+1) << " Deflect " <<
             "</font><br>" << std::setfill(' ') << nl;
 }
 
@@ -634,6 +634,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
         d.getNanobotDeflectCountReceivedFromPlayer());
 
     const int width = 8;
+    const int pcWidth = 6;
     const int nrWidth = 4;
     file << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalReceivedFromPlayer())
@@ -643,12 +644,12 @@ void DamageWriter::writeDDOverview(const std::string& name,
             std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer())
                              << " " <<
             std::fixed << std::setprecision(1) <<
-            std::setw(width - 1) << " " + critHitPercentage << '%' << " " <<
-            std::setw(width - 1) << " " + nanobotDmgPercentage << '%' << " ";
+            std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
+            std::setw(pcWidth) << " " + nanobotDmgPercentage << '%' << " ";
     if (self) {
-        file << std::setw(width - 1) << " " + missPercentage << '%' << " ";
+        file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
     }
-    file << std::setw(width - 1) << " " + deflectPercentage << '%' << "  " <<
+    file << std::setw(pcWidth) << " " + deflectPercentage << '%' << " " <<
             std::setfill(' ');
 
     writePlace(place);
@@ -878,13 +879,13 @@ void DamageWriter::writeDetailedInfoForType(std::string type,
                                             std::string minHit,
                                             std::string dmgPercent) {
     const int width = 7;
-    const int pcWidth = 7;
+    const int pcWidth = 6;
     const int nrWidth = 4;
-    file << std::setw(pcWidth) << " " + hitPercent << "% (" <<
+    file << std::setw(pcWidth+1) << " " + hitPercent << "% (" <<
             std::setw(nrWidth) << nrOfHits << ") " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
             std::setw(width) << minHit + " " << std::right <<
-            std::setw(pcWidth) << dmgPercent << "% " << type << "<br>" << nl;
+            std::setw(pcWidth) << " " + dmgPercent << "% " << type << "<br>" << nl;
 }
 
 /******************/
@@ -934,6 +935,7 @@ void DamageWriter::writeDROverview(const std::string& name,
         d.getNanobotDeflectCountDealtOnPlayer());
 
     const int width = 8;
+    const int pcWidth = 6;
     const int nrWidth = 4;
     file << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalDealtOnPlayer())
@@ -943,12 +945,12 @@ void DamageWriter::writeDROverview(const std::string& name,
             std::setw(width) << " " + std::to_string(d.getDPMDealtOnPlayer())
                              << " " <<
             std::fixed << std::setprecision(1) <<
-            std::setw(width - 1) << " " + critHitPercentage << '%' << " " <<
-            std::setw(width - 1) << " " + nanobotDmgPercentage << '%' << " ";
+            std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
+            std::setw(pcWidth) << " " + nanobotDmgPercentage << '%' << " ";
     if (self) {
-        file << std::setw(width - 1) << " " + missPercentage << '%' << " ";
+        file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
     }
-    file << std::setw(width - 1) << " " + deflectPercentage << '%' << "  " <<
+    file << std::setw(pcWidth) << " " + deflectPercentage << '%' << " " <<
             std::setfill(' ');
 
     writePlace(place);
