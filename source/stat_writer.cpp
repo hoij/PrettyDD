@@ -155,7 +155,7 @@ void StatWriter::createCommands() {
     writeCommand("types", "Overview per type");
     writeCommand("dtypes", "Detailed info per type");
     writeCommand("dtypes [player1] [player2]",
-                 "Detailed info per type on the damage done to player2 by player 1");
+                 "Detailed info for damage on player2 by player 1");
     writeCommand("types [player]", "Overview per type for player");
     writeCommand("[player1] [player2]", "Damage on player2 by player1");
     file << "</font>";
@@ -212,22 +212,23 @@ void StatWriter::createInfo() {
     writeStartOfLink("PDD Info");
 
     file << "<br>" << nl
-         << "Crit Info<br>" << nl
+         << "Crit/Miss/Deflect Hit Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The crit hit rate is calculated in the following way:<br>" << nl
-         << "     nr of crits / (nr of normal hits + crits + deflects + misses)<br>" << nl
-         << "Special and shield hits are excluded.<br><br>" << nl << nl
-         << "</font>"
-         << "Miss Info<br>" << nl
-         << "<font color = " + lightBlue + ">" << nl
-         << "The miss rate is calculated in the following way:<br>" << nl
-         << "     nr of misses / (nr of normal hits + crits + deflects + misses)<br>" << nl
-         << "Special and shield hits are excluded.<br><br>" << nl << nl
+         << "The hit rate for these is calculated in the following way:<br>" << nl
+         << "  nr of X / (nr of normal hits + crits + deflects + misses)<br>" << nl
+         << "Nanobot, special and shield hits are excluded.<br><br>" << nl << nl
          << "</font>"
          << "Nanobot Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "The nanobot % is a percentage of total damage done unless<br>" << nl
          << "otherwise stated.<br><br>" << nl << nl
+         << "</font>"
+         << "Detailed info per type<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The regular and nanobot hit% is % of total hits.<br>" << nl
+         << "The crit, deflect and miss hit % is % of hits that can<br>" << nl
+         << "  crit, i.e. only regular attacks. <br>" << nl
+         << "The damage % is % of total damage done.<br><br>" << nl << nl
          << "</font>";
 
     writeEndOfLink("PDD Info");

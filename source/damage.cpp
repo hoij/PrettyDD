@@ -125,6 +125,7 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
         critMin = rhs.critMin;
     }
 
+    regularDeflectTotal += rhs.regularDeflectTotal;
     regularDeflectCount += rhs.regularDeflectCount;
     if (rhs.regularDeflectMax > regularDeflectMax) {
         regularDeflectMax = rhs.regularDeflectMax;
@@ -132,6 +133,8 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     if (rhs.regularDeflectMin < regularDeflectMin) {
         regularDeflectMin = rhs.regularDeflectMin;
     }
+
+    nanobotDeflectTotal += rhs.nanobotDeflectTotal;
     nanobotDeflectCount += rhs.nanobotDeflectCount;
     if (rhs.nanobotDeflectMax > nanobotDeflectMax) {
         nanobotDeflectMax = rhs.nanobotDeflectMax;

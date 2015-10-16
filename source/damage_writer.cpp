@@ -516,7 +516,7 @@ void DamageWriter::writeOverviewHeadings(bool self) {
 
 void DamageWriter::writeOverviewHeadingsDetailed() {
     const int width = 7;
-    const int pcWidth = 7;
+    const int pcWidth = 6;
     const int nrWidth = 4;
     file << "<font color = " + lightBlue + ">" << nl;
     file << std::setfill(fillChar) << std::right <<
@@ -524,7 +524,7 @@ void DamageWriter::writeOverviewHeadingsDetailed() {
             std::setw(nrWidth) << "_Cnt" << ") " <<
             std::setw(width) << " Max" << "-" << std::left <<
             std::setw(width) << "Min " << std::right <<
-            std::setw(pcWidth) << "dmg" << "%<br><br>" <<
+            std::setw(pcWidth) << " dmg" << "%<br><br>" <<
             "</font>" << nl;
 }
 
@@ -628,10 +628,13 @@ void DamageWriter::writeDDOverview(const std::string& name,
                                     d.getMissesReceivedFromPlayer(),
                                     d.getMissesReceivedFromPlayer());
     }
-    std::string deflectPercentage = percentage(
-        d.getCountReceivedFromPlayer(),
+
+    std::string deflectHitPercentage = percentage(
+        d.getRegularCountReceivedFromPlayer() +
+        d.getCritCountReceivedFromPlayer() +
         d.getRegularDeflectCountReceivedFromPlayer() +
-        d.getNanobotDeflectCountReceivedFromPlayer());
+        d.getMissesReceivedFromPlayer(),
+        d.getRegularDeflectCountReceivedFromPlayer());
 
     const int width = 8;
     const int pcWidth = 6;
@@ -649,7 +652,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
     if (self) {
         file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
     }
-    file << std::setw(pcWidth) << " " + deflectPercentage << '%' << " " <<
+    file << std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " " <<
             std::setfill(' ');
 
     writePlace(place);
@@ -728,8 +731,11 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
         d.getMissesReceivedFromPlayer(),
         d.getCritCountReceivedFromPlayer());
 
-    std::string regularDeflectHitPercentage = percentage(
-        d.getCountReceivedFromPlayer(),
+    std::string deflectHitPercentage = percentage(
+        d.getRegularCountReceivedFromPlayer() +
+        d.getCritCountReceivedFromPlayer() +
+        d.getRegularDeflectCountReceivedFromPlayer() +
+        d.getMissesReceivedFromPlayer(),
         d.getRegularDeflectCountReceivedFromPlayer());
 
     std::string missPercentage;
@@ -750,7 +756,7 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
         d.getTotalReceivedFromPlayer(),
         d.getCritTotalReceivedFromPlayer());
 
-    std::string regularDeflectDmgPercentage = percentage(
+    std::string deflectDmgPercentage = percentage(
         d.getTotalReceivedFromPlayer(),
         d.getRegularDeflectTotalReceivedFromPlayer());
 
@@ -789,11 +795,11 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d, bool self) {
     }
 
     writeDetailedInfoForType("Deflect",
-                             regularDeflectHitPercentage,
+                             deflectHitPercentage,
                              std::to_string(d.getRegularDeflectCountReceivedFromPlayer()),
                              regularDeflectMax,
                              regularDeflectMin,
-                             regularDeflectDmgPercentage);
+                             deflectDmgPercentage);
 
     if (self && d.getMissesReceivedFromPlayer()) {
         // Assuming nanobot attacks can't miss.
@@ -816,6 +822,8 @@ void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
         d.getCountReceivedFromPlayer(),
         d.getNanobotCountReceivedFromPlayer());
 
+    // Percentage of nanobot hits that were deflected
+    // TODO: Remove this as nanobots can't deflect.
     std::string nanobotDeflectHitPercentage = percentage(
         d.getCountReceivedFromPlayer(),
         d.getNanobotDeflectCountReceivedFromPlayer());
@@ -852,7 +860,7 @@ void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
 
     if (d.getNanobotDeflectCountReceivedFromPlayer()) {
         // Nanobot attacks can probably not deflect.
-        // TODO: Remove this if it turns out to be true.
+        // TODO: Remove this as nanobots can't deflect.
         writeDetailedInfoForType("Deflect",
                                  nanobotDeflectHitPercentage,
                                  std::to_string(d.getNanobotDeflectCountReceivedFromPlayer()),
@@ -929,10 +937,12 @@ void DamageWriter::writeDROverview(const std::string& name,
                                     d.getMissesDealtOnPlayer(),
                                     d.getMissesDealtOnPlayer());
     }
-    std::string deflectPercentage = percentage(
-        d.getCountDealtOnPlayer(),
+    std::string deflectHitPercentage = percentage(
+        d.getRegularCountDealtOnPlayer() +
+        d.getCritCountDealtOnPlayer() +
         d.getRegularDeflectCountDealtOnPlayer() +
-        d.getNanobotDeflectCountDealtOnPlayer());
+        d.getMissesDealtOnPlayer(),
+        d.getRegularDeflectCountDealtOnPlayer());
 
     const int width = 8;
     const int pcWidth = 6;
@@ -950,7 +960,7 @@ void DamageWriter::writeDROverview(const std::string& name,
     if (self) {
         file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
     }
-    file << std::setw(pcWidth) << " " + deflectPercentage << '%' << " " <<
+    file << std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " " <<
             std::setfill(' ');
 
     writePlace(place);
