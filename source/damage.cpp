@@ -52,7 +52,7 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     else if (li.miss) {
         di.misses++;
     }
-    else if (!li.nanobots && li.deflect) {
+    else if (li.deflect) {
         di.regularDeflectTotal += li.amount;
         di.regularDeflectCount++;
         if (li.amount > di.regularDeflectMax) {
@@ -60,16 +60,6 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
         }
         if (li.amount < di.regularDeflectMin) {
             di.regularDeflectMin = li.amount;
-        }
-    }
-    else if (li.nanobots && li.deflect) {
-        di.nanobotDeflectTotal += li.amount;
-        di.nanobotDeflectCount++;
-        if (li.amount > di.nanobotDeflectMax) {
-            di.nanobotDeflectMax = li.amount;
-        }
-        if (li.amount < di.nanobotDeflectMin) {
-            di.nanobotDeflectMin = li.amount;
         }
     }
     else if (li.nanobots) {
@@ -132,15 +122,6 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     }
     if (rhs.regularDeflectMin < regularDeflectMin) {
         regularDeflectMin = rhs.regularDeflectMin;
-    }
-
-    nanobotDeflectTotal += rhs.nanobotDeflectTotal;
-    nanobotDeflectCount += rhs.nanobotDeflectCount;
-    if (rhs.nanobotDeflectMax > nanobotDeflectMax) {
-        nanobotDeflectMax = rhs.nanobotDeflectMax;
-    }
-    if (rhs.nanobotDeflectMin < nanobotDeflectMin) {
-        nanobotDeflectMin = rhs.nanobotDeflectMin;
     }
 
     misses += rhs.misses;

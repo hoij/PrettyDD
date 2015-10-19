@@ -38,10 +38,6 @@ public:
     int getNanobotCountDealtOnPlayer() const {return dealtOnPlayer.nanobotCount;}
     int getNanobotMaxDealtOnPlayer() const {return dealtOnPlayer.nanobotMax;}
     int getNanobotMinDealtOnPlayer() const {return dealtOnPlayer.nanobotMin;}
-    int getNanobotDeflectTotalDealtOnPlayer() const {return dealtOnPlayer.nanobotDeflectTotal;}
-    int getNanobotDeflectCountDealtOnPlayer() const {return dealtOnPlayer.nanobotDeflectCount;}
-    int getNanobotDeflectMaxDealtOnPlayer() const {return dealtOnPlayer.nanobotDeflectMax;}
-    int getNanobotDeflectMinDealtOnPlayer() const {return dealtOnPlayer.nanobotDeflectMin;}
     int getCritTotalDealtOnPlayer() const {return dealtOnPlayer.critTotal;}
     int getCritCountDealtOnPlayer() const {return dealtOnPlayer.critCount;}
     int getCritMaxDealtOnPlayer() const {return dealtOnPlayer.critMax;}
@@ -63,10 +59,6 @@ public:
     int getNanobotCountReceivedFromPlayer() const {return receivedFromPlayer.nanobotCount;}
     int getNanobotMaxReceivedFromPlayer() const {return receivedFromPlayer.nanobotMax;}
     int getNanobotMinReceivedFromPlayer() const {return receivedFromPlayer.nanobotMin;}
-    int getNanobotDeflectTotalReceivedFromPlayer() const {return receivedFromPlayer.nanobotDeflectTotal;}
-    int getNanobotDeflectCountReceivedFromPlayer() const {return receivedFromPlayer.nanobotDeflectCount;}
-    int getNanobotDeflectMaxReceivedFromPlayer() const {return receivedFromPlayer.nanobotDeflectMax;}
-    int getNanobotDeflectMinReceivedFromPlayer() const {return receivedFromPlayer.nanobotDeflectMin;}
     int getCritTotalReceivedFromPlayer() const {return receivedFromPlayer.critTotal;}
     int getCritCountReceivedFromPlayer() const {return receivedFromPlayer.critCount;}
     int getCritMaxReceivedFromPlayer() const {return receivedFromPlayer.critMax;}
@@ -92,10 +84,6 @@ private:
         int nanobotCount = 0;
         int nanobotMax = -1;
         int nanobotMin = std::numeric_limits<int>::max();
-        int nanobotDeflectTotal = 0;
-        int nanobotDeflectCount = 0;
-        int nanobotDeflectMax = -1;
-        int nanobotDeflectMin = std::numeric_limits<int>::max();
         int critTotal = 0;
 		int critCount = 0;
 		int critMax = -1;

@@ -33,10 +33,6 @@ void verifyReceivedFromPlayerIsZero(Damage& d) {
     EXPECT_EQ(0, d.getNanobotCountReceivedFromPlayer());
     EXPECT_EQ(-1, d.getNanobotMaxReceivedFromPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d.getRegularMinReceivedFromPlayer());
-    EXPECT_EQ(0, d.getNanobotDeflectTotalReceivedFromPlayer());
-    EXPECT_EQ(0, d.getNanobotDeflectCountReceivedFromPlayer());
-    EXPECT_EQ(-1, d.getNanobotDeflectMaxReceivedFromPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d.getNanobotDeflectMinReceivedFromPlayer());
     EXPECT_EQ(0, d.getCritTotalReceivedFromPlayer());
     EXPECT_EQ(0, d.getCritCountReceivedFromPlayer());
     EXPECT_EQ(-1, d.getCritMaxReceivedFromPlayer());
@@ -76,10 +72,6 @@ TEST_F(DamageTest, addDamageDealtOnPlayer_regularNonCrit) {
     EXPECT_EQ(0, d->getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d->getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d->getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getCritMaxDealtOnPlayer());
@@ -125,10 +117,6 @@ TEST_F(DamageTest, addDamageDealtOnPlayer_nanobots) {
     EXPECT_EQ(li3.amount, d->getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(li2.amount, d->getNanobotMinDealtOnPlayer());
     // Default values:
-    EXPECT_EQ(0, d->getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d->getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d->getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getCritMaxDealtOnPlayer());
@@ -175,10 +163,6 @@ TEST_F(DamageTest, addDamageDealtOnPlayer_crit) {
     EXPECT_EQ(0, d->getRegularDeflectCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getRegularDeflectMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d->getRegularDeflectMinDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinDealtOnPlayer());
     // Values that should have changed:
     EXPECT_EQ(li1.amount + li2.amount + li3.amount,
               d->getCritTotalDealtOnPlayer());
@@ -215,10 +199,6 @@ TEST_F(DamageTest, addDamageDealtOnPlayer_twoMisses) {
     EXPECT_EQ(0, d->getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d->getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d->getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getCritMaxDealtOnPlayer());
@@ -254,10 +234,6 @@ TEST_F(DamageTest, addDamageDealtOnPlayer_twoDeflects) {
     EXPECT_EQ(0, d->getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d->getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d->getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getCritMaxDealtOnPlayer());
@@ -292,10 +268,6 @@ TEST_F(DamageTest, addDamageReceivedFromPlayer_nonCrit) {
     EXPECT_EQ(0, d->getNanobotCountReceivedFromPlayer());
     EXPECT_EQ(-1, d->getNanobotMaxReceivedFromPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotMinReceivedFromPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectTotalReceivedFromPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountReceivedFromPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxReceivedFromPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinReceivedFromPlayer());
     EXPECT_EQ(0, d->getCritTotalReceivedFromPlayer());
     EXPECT_EQ(0, d->getCritCountReceivedFromPlayer());
     EXPECT_EQ(-1, d->getCritMaxReceivedFromPlayer());
@@ -318,10 +290,6 @@ TEST_F(DamageTest, addDamageReceivedFromPlayer_nonCrit) {
     EXPECT_EQ(0, d->getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d->getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d->getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d->getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d->getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d->getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d->getCritMaxDealtOnPlayer());
@@ -360,10 +328,6 @@ TEST(DamageOperatorPlusTest, nonCritNewMax) {
     EXPECT_EQ(0, d3.getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d3.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getCritMaxDealtOnPlayer());
@@ -401,10 +365,6 @@ TEST(DamageOperatorPlusTest, addNonCritToEmptyDamage) {
     EXPECT_EQ(0, d3.getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d3.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getCritMaxDealtOnPlayer());
@@ -459,10 +419,6 @@ TEST(DamageOperatorPlusTest, nanobots) {
     EXPECT_EQ(li3.amount, d4.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(li1.amount, d4.getNanobotMinDealtOnPlayer());
     // Default Values
-    EXPECT_EQ(0, d4.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d4.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d4.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d4.getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d4.getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d4.getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d4.getCritMaxDealtOnPlayer());
@@ -505,10 +461,6 @@ TEST(DamageOperatorPlusTest, critNewMax) {
     EXPECT_EQ(0, d3.getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d3.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotDeflectMinDealtOnPlayer());
     // Values that should have changed:
     EXPECT_EQ(li1.amount + li2.amount, d3.getCritTotalDealtOnPlayer());
     EXPECT_EQ(2, d3.getCritCountDealtOnPlayer());
@@ -550,10 +502,6 @@ TEST(DamageOperatorPlusTest, addCritToEmptyDamage) {
     EXPECT_EQ(0, d3.getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d3.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotDeflectMinDealtOnPlayer());
     // Values that should have changed:
     EXPECT_EQ(1, d3.getCritCountDealtOnPlayer());
     EXPECT_EQ(14, d3.getCritMaxDealtOnPlayer());
@@ -596,10 +544,6 @@ TEST(DamageOperatorPlusTest, addMiss) {
     EXPECT_EQ(0, d3.getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(-1, d3.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getCritMaxDealtOnPlayer());
@@ -618,7 +562,6 @@ TEST(DamageOperatorPlusTest, addDeflect) {
     li2.deflect = true;
     li1.amount = 999;
     li2.amount = 101;
-    li2.nanobots = true;
 
     Damage d1;
     Damage d2;
@@ -634,18 +577,14 @@ TEST(DamageOperatorPlusTest, addDeflect) {
     EXPECT_EQ(0, d3.getRegularCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getRegularMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getRegularMinDealtOnPlayer());
-    EXPECT_EQ(li1.amount, d3.getRegularDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(1, d3.getRegularDeflectCountDealtOnPlayer());
+    EXPECT_EQ(li1.amount + li2.amount, d3.getRegularDeflectTotalDealtOnPlayer());
+    EXPECT_EQ(2, d3.getRegularDeflectCountDealtOnPlayer());
     EXPECT_EQ(li1.amount, d3.getRegularDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(li1.amount, d3.getRegularDeflectMinDealtOnPlayer());
+    EXPECT_EQ(li2.amount, d3.getRegularDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d3.getNanobotTotalDealtOnPlayer());
     EXPECT_EQ(0, d3.getNanobotCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getNanobotMaxDealtOnPlayer());
     EXPECT_EQ(std::numeric_limits<int>::max(), d3.getNanobotMinDealtOnPlayer());
-    EXPECT_EQ(0, d3.getNanobotDeflectTotalDealtOnPlayer());
-    EXPECT_EQ(1, d3.getNanobotDeflectCountDealtOnPlayer());
-    EXPECT_EQ(li2.amount, d3.getNanobotDeflectMaxDealtOnPlayer());
-    EXPECT_EQ(li2.amount, d3.getNanobotDeflectMinDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritTotalDealtOnPlayer());
     EXPECT_EQ(0, d3.getCritCountDealtOnPlayer());
     EXPECT_EQ(-1, d3.getCritMaxDealtOnPlayer());

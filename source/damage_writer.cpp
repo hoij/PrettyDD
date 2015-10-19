@@ -687,8 +687,7 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
                          d.getRegularDeflectCountReceivedFromPlayer() ||
                          d.getCritCountReceivedFromPlayer() ||
                          d.getMissesReceivedFromPlayer();
-    bool hasNanobotDmg = d.getNanobotCountReceivedFromPlayer() ||
-                         d.getNanobotDeflectCountReceivedFromPlayer();
+    bool hasNanobotDmg = d.getNanobotCountReceivedFromPlayer();
 
     if (hasRegularDmg && hasNanobotDmg) {
         // Write info on the sum of the regular and nanobot damage only
@@ -822,34 +821,18 @@ void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
         d.getCountReceivedFromPlayer(),
         d.getNanobotCountReceivedFromPlayer());
 
-    // Percentage of nanobot hits that were deflected
-    // TODO: Remove this as nanobots can't deflect.
-    std::string nanobotDeflectHitPercentage = percentage(
-        d.getCountReceivedFromPlayer(),
-        d.getNanobotDeflectCountReceivedFromPlayer());
-
     // Percentage of total damage
     std::string nanobotDmgPercentage = percentage(
         d.getTotalReceivedFromPlayer(),
         d.getNanobotTotalReceivedFromPlayer());
 
-    std::string nanobotDeflectDmgPercentage = percentage(
-        d.getTotalReceivedFromPlayer(),
-        d.getNanobotDeflectTotalReceivedFromPlayer());
-
     // Min/Max
     std::string nanobotMin = determineMin(d.getNanobotMinReceivedFromPlayer());
     std::string nanobotMax = determineMax(d.getNanobotMaxReceivedFromPlayer());
-    std::string nanobotDeflectMax = determineMax(
-        d.getNanobotDeflectMaxReceivedFromPlayer());
-    std::string nanobotDeflectMin = determineMin(
-        d.getNanobotDeflectMinReceivedFromPlayer());
 
     // Write it to file
-    writeTotalInfo(d.getNanobotTotalReceivedFromPlayer() +
-                   d.getNanobotDeflectTotalReceivedFromPlayer(),
-                   d.getNanobotCountReceivedFromPlayer() +
-                   d.getNanobotDeflectCountReceivedFromPlayer());
+    writeTotalInfo(d.getNanobotTotalReceivedFromPlayer(),
+                   d.getNanobotCountReceivedFromPlayer());
 
     writeDetailedInfoForType("Nanobot",
                              nanobotHitPercentage,
@@ -857,17 +840,6 @@ void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
                              nanobotMax,
                              nanobotMin,
                              nanobotDmgPercentage);
-
-    if (d.getNanobotDeflectCountReceivedFromPlayer()) {
-        // Nanobot attacks can probably not deflect.
-        // TODO: Remove this as nanobots can't deflect.
-        writeDetailedInfoForType("Deflect",
-                                 nanobotDeflectHitPercentage,
-                                 std::to_string(d.getNanobotDeflectCountReceivedFromPlayer()),
-                                 nanobotDeflectMax,
-                                 nanobotDeflectMin,
-                                 nanobotDeflectDmgPercentage);
-    }
 }
 
 void DamageWriter::writeTotalInfo(int total, int count) {
