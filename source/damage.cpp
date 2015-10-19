@@ -1,17 +1,21 @@
 #include "damage.h"
 #include "line_info.h"
 
-#include <iomanip>
-#include <limits>
+#include <algorithm>
 #include <ostream>
-#include <string>
 
 
 Damage& Damage::operator+=(const Damage& rhs) {
+    for (auto const& category : receivedFromPlayer) {
+        for (auto const& damageType : category.second) {
+            if (damageType.first) {
+                rhs. += damageType;
+            }
+        }
+        sum.push_back(di);
+    }
     dealtOnPlayer += rhs.dealtOnPlayer;
     receivedFromPlayer += rhs.receivedFromPlayer;
-    shield = rhs.shield;
-    special = rhs.special;
     return *this;
 }
 
@@ -84,47 +88,68 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     }
 }
 
+std::vector<DamageInfo> Damage::getTotalDamage() const {
+    // Or return just an int for the total.
+
+}
+
+std::vector<std::pair<std::string, DamageInfo>>
+Damage::getTotalReceivedFromPlayerPerCategory() const {
+
+}
+
+std::vector<std::pair<std::string, DamageInfo>>
+Damage::getTotalDealtOnPlayerPerCategory() const {
+
+}
+
+std::vector<std::pair<std::string, DamageInfo>>
+getTotalPerCategory(std::vector<std::pair<std::string, std::pair<
+                        std::string, DamageInfo>>> v) {
+    std::vector<std::pair<std::string, DamageInfo>> sum;
+    for (auto const& category : v) {
+        DamageInfo di;
+        for (auto const& damageType : category) {
+            di += damageType;
+        }
+        sum.push_back(di);
+    }
+}
+
+std::vector<std::pair<std::string, DamageInfo>>
+Damage::getTotalReceivedFromPlayerPerDamageType() const;
+
+std::vector<std::pair<std::string, DamageInfo>>
+Damage::getTotalDealtOnPlayerPerDamageType() const;
+
+
+// Flips position of damageType and category.
+std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
+Damage::getReceivedFromPlayerPerType(const std::string damageType) const;
+// Flips position of damageType and category.
+std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
+Damage::getDealtOnPlayerPerType(const std::string damageType) const;
+
+std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
+Damage::getDamageReceivedFromPlayer() const {
+    return receivedFromPlayer;
+}
+
+std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
+Damage::getDamageDealtOnPlayer() const {
+    return dealtOnPlayer;
+}
+
 Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     total += rhs.total;
     count += rhs.count;
 
-    regularTotal += rhs.regularTotal;
-    regularCount += rhs.regularCount;
-    if (rhs.regularMax > regularMax) {
-        regularMax = rhs.regularMax;
+    if (rhs.max > max) {
+        max = rhs.max;
     }
-    if (rhs.regularMin < regularMin) {
-        regularMin = rhs.regularMin;
+    if (rhs.min < min) {
+        min = rhs.min;
     }
-
-    nanobotTotal += rhs.nanobotTotal;
-    nanobotCount += rhs.nanobotCount;
-    if (rhs.nanobotMax > nanobotMax) {
-        nanobotMax = rhs.nanobotMax;
-    }
-    if (rhs.nanobotMin < nanobotMin) {
-        nanobotMin = rhs.nanobotMin;
-    }
-
-    critTotal += rhs.critTotal;
-    critCount += rhs.critCount;
-    if (rhs.critMax > critMax) {
-        critMax = rhs.critMax;
-    }
-    if (rhs.critMin < critMin) {
-        critMin = rhs.critMin;
-    }
-
-    regularDeflectTotal += rhs.regularDeflectTotal;
-    regularDeflectCount += rhs.regularDeflectCount;
-    if (rhs.regularDeflectMax > regularDeflectMax) {
-        regularDeflectMax = rhs.regularDeflectMax;
-    }
-    if (rhs.regularDeflectMin < regularDeflectMin) {
-        regularDeflectMin = rhs.regularDeflectMin;
-    }
-
-    misses += rhs.misses;
 
     return *this;
 }
