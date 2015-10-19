@@ -10,21 +10,16 @@ class LineInfo {
 public:
     virtual ~LineInfo() {}
 
+    bool hasStats = true;
+    int amount = 0;
+    std::time_t time;
     std::string dealer_name;
     std::string receiver_name;
     std::string type;
+    std::string damageCategory;
     std::string subtype;
     std::string command;
     std::string nanoProgramName;
-    int amount = 0;
-    std::time_t time;
-    bool crit = false;
-    bool deflect = false;
-    bool miss = false;
-    bool nanobots = false;
-    bool shield = false;
-    bool special = false;
-    bool hasStats = true;
 };
 
 

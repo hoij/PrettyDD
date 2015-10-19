@@ -6,16 +6,16 @@
 
 
 Damage& Damage::operator+=(const Damage& rhs) {
-    for (auto const& category : receivedFromPlayer) {
-        for (auto const& damageType : category.second) {
-            if (damageType.first) {
-                rhs. += damageType;
-            }
+    for (const auto& category : rhs.receivedFromPlayer) {
+        for (const auto& subtype : category.second) {
+            receivedFromPlayer[category.first][subtype.first] += subtype.second;
         }
-        sum.push_back(di);
     }
-    dealtOnPlayer += rhs.dealtOnPlayer;
-    receivedFromPlayer += rhs.receivedFromPlayer;
+    for (auto const& category : rhs.dealtOnPlayer) {
+        for (const auto& subtype : category.second) {
+            dealtOnPlayer[category.first][subtype.first] += subtype.second;
+        }
+    }
     return *this;
 }
 
@@ -27,117 +27,141 @@ void Damage::addDamageReceivedFromPlayer(LineInfo& li) {
     addDamage(li, receivedFromPlayer);
 }
 
-void Damage::setDealtOnPlayerDPM(int damagePerMinute) {
-    dealtOnPlayer.dpm = damagePerMinute;
+void Damage::addDamage(LineInfo& li,
+    std::map<std::string, std::map<std::string, DamageInfo>>& di) {
+
+    di[li.damageCategory][li.subtype].add(li.amount);
 }
 
-void Damage::setReceivedFromPlayerDPM(int damagePerMinute) {
-    receivedFromPlayer.dpm = damagePerMinute;
+Damage::DamageInfo Damage::getTotalReceivedFromPlayer() const {
+    return getTotal(receivedFromPlayer);
 }
 
-void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
-    di.total += li.amount;
-    di.count++;
-    // TODO: Set these bools on construction only and not
-    // on each addition.
-    shield = li.shield;
-    special = li.special;
-
-    if (li.crit) {
-        di.critCount++;
-        di.critTotal += li.amount;
-        if (li.amount > di.critMax) {
-            di.critMax = li.amount;
-        }
-        if (li.amount < di.critMin) {
-            di.critMin = li.amount;
-        }
-    }
-    else if (li.miss) {
-        di.misses++;
-    }
-    else if (li.deflect) {
-        di.regularDeflectTotal += li.amount;
-        di.regularDeflectCount++;
-        if (li.amount > di.regularDeflectMax) {
-            di.regularDeflectMax = li.amount;
-        }
-        if (li.amount < di.regularDeflectMin) {
-            di.regularDeflectMin = li.amount;
-        }
-    }
-    else if (li.nanobots) {
-        di.nanobotCount++;
-        di.nanobotTotal += li.amount;
-        if (li.amount > di.nanobotMax) {
-            di.nanobotMax = li.amount;
-        }
-        if (li.amount < di.nanobotMin) {
-            di.nanobotMin = li.amount;
-        }
-    }
-    else {
-        di.regularCount++;
-        di.regularTotal += li.amount;
-        if (li.amount > di.regularMax) {
-            di.regularMax = li.amount;
-        }
-        if (li.amount < di.regularMin) {
-            di.regularMin = li.amount;
-        }
-    }
+Damage::DamageInfo Damage::getTotalDealtOnPlayer() const {
+    return getTotal(dealtOnPlayer);
 }
 
-std::vector<DamageInfo> Damage::getTotalDamage() const {
+Damage::DamageInfo
+Damage::getTotal(const damageMap& m) const {
     // Or return just an int for the total.
-
-}
-
-std::vector<std::pair<std::string, DamageInfo>>
-Damage::getTotalReceivedFromPlayerPerCategory() const {
-
-}
-
-std::vector<std::pair<std::string, DamageInfo>>
-Damage::getTotalDealtOnPlayerPerCategory() const {
-
-}
-
-std::vector<std::pair<std::string, DamageInfo>>
-getTotalPerCategory(std::vector<std::pair<std::string, std::pair<
-                        std::string, DamageInfo>>> v) {
-    std::vector<std::pair<std::string, DamageInfo>> sum;
-    for (auto const& category : v) {
-        DamageInfo di;
-        for (auto const& damageType : category) {
-            di += damageType;
+    Damage::DamageInfo di;
+    for (const auto& category : m) {
+        for (const auto& subtype : category.second) {
+            di += subtype.second;
         }
-        sum.push_back(di);
     }
+    return di;
 }
 
-std::vector<std::pair<std::string, DamageInfo>>
-Damage::getTotalReceivedFromPlayerPerDamageType() const;
+std::vector<std::pair<std::string, Damage::DamageInfo>>
+Damage::getTotalReceivedFromPlayerPerCategory() const {
+    return getTotalPerCategory(receivedFromPlayer);
+}
 
-std::vector<std::pair<std::string, DamageInfo>>
-Damage::getTotalDealtOnPlayerPerDamageType() const;
+std::vector<std::pair<std::string, Damage::DamageInfo>>
+Damage::getTotalDealtOnPlayerPerCategory() const {
+    return getTotalPerCategory(dealtOnPlayer);
+}
 
+std::vector<std::pair<std::string, Damage::DamageInfo>>
+Damage::getTotalPerCategory(const damageMap& m) const {
+    /* Returns a vector of pairs containing the name
+    of the category and it's total damage summed over
+    all subtypes. */
 
-// Flips position of damageType and category.
-std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
-Damage::getReceivedFromPlayerPerType(const std::string damageType) const;
-// Flips position of damageType and category.
-std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
-Damage::getDealtOnPlayerPerType(const std::string damageType) const;
+    std::vector<std::pair<std::string, Damage::DamageInfo>> summedCategories;
+    for (const auto& category : m) {
+        DamageInfo di;
+        for (const auto& subtype : category.second) {
+            di += subtype.second;
+        }
+        summedCategories.emplace_back(std::make_pair(category.first, di));
+    }
+    return summedCategories;
+}
 
-std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
-Damage::getDamageReceivedFromPlayer() const {
+std::vector<std::pair<std::string, Damage::DamageInfo>>
+Damage::getTotalReceivedFromPlayerPerDamageType() const {
+    return getTotalPerSubtype(receivedFromPlayer);
+}
+
+std::vector<std::pair<std::string, Damage::DamageInfo>>
+Damage::getTotalDealtOnPlayerPerDamageType() const {
+    return getTotalPerSubtype(dealtOnPlayer);
+}
+
+std::vector<std::pair<std::string, Damage::DamageInfo>>
+Damage::getTotalPerSubtype(const damageMap& m) const {
+    /* Returns a vector of pairs containing the name
+    of the subtype and it's total damage summed over
+    all categories. */
+
+    std::map<std::string, Damage::DamageInfo> tmp;
+    std::vector<std::pair<std::string, Damage::DamageInfo>> summedSubtypes;
+    for (const auto& category : m) {
+        for (const auto& subtype : category.second) {
+
+            tmp[subtype.first] += subtype.second;
+
+//            auto it = std::find_if(summedSubtypes.begin(),
+//                          summedSubtypes.end(),
+//                          [subtype](
+//                              std::pair<std::string, Damage::DamageInfo>& p){
+//                                  return p.first == subtype.first;});
+//            if (it != summedSubtypes.end()) {
+//                it->second += subtype.second;
+//            }
+//            else {
+//                summedSubtypes.emplace_back(
+//                    std::make_pair(subtype.first, subtype.second));
+//            }
+        }
+    }
+    for (const auto& subtype : tmp) {
+        summedSubtypes.emplace_back(
+            std::make_pair(subtype.first, subtype.second));
+    }
+    return summedSubtypes;
+}
+
+Damage::damageMap Damage::getReceivedFromPlayerPerSubtype() const {
+    return getPerSubtype(receivedFromPlayer);
+}
+
+Damage::damageMap
+Damage::getDealtOnPlayerPerSubtype() const {
+    return getPerSubtype(dealtOnPlayer);
+}
+
+Damage::damageMap Damage::getPerSubtype(const damageMap& m) const {
+    // Flips position of subtype and category.
+    Damage::damageMap perSubtype;
+    for (const auto& category : m) {
+        for (const auto& subtype : category.second) {
+            perSubtype[subtype.first][category.first] += (subtype.second);
+        }
+    }
+    return perSubtype;
+}
+
+Damage::damageMap Damage::getReceivedFromPlayer() const {
     return receivedFromPlayer;
 }
 
-std::vector<std::pair<std::string, std::pair<std::string, DamageInfo>>>
-Damage::getDamageDealtOnPlayer() const {
+Damage::damageMap Damage::getDealtOnPlayer() const {
     return dealtOnPlayer;
+}
+
+void Damage::DamageInfo::add(int amount) {
+    total += amount;
+    count += 1;
+
+    if (amount > max) {
+        max = amount;
+    }
+    if (amount < min) {
+        min = amount;
+    }
 }
 
 Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {

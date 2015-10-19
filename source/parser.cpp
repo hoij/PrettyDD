@@ -81,9 +81,10 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             lineInfo = (this->*funcMapIterator->second)(formattedLine.getMessage());
             // findSubtype can be called on any line
             lineInfo.subtype = findSubtype(formattedLine.getMessage(), lineInfo.type);
-            if (lineInfo.type == "damage") {
-                lineInfo.special = isSpecial(lineInfo.subtype);
-                lineInfo.shield = isShield(lineInfo.subtype);
+            // category is sometimes set earlier.
+            if (lineInfo.type == "damage" && lineInfo.category.is_empty()) {
+                lineInfo.category = findDamageCategory(li.subtype,
+                                        formattedLine.getMessage());
             }
         }
         else {
@@ -125,6 +126,27 @@ int Parser::findAmount(const std::string& message) {
         errorLog.write("Error: Amount not found in: ");
         errorLog.write("Error: Message: " + message);
         return 0;
+    }
+}
+
+std::string Parser::findDamageCategory(std::string& subtype,
+                                       std::string& message) {
+
+    std::string category;
+    if (isSpecial(subtype)) {
+        category = "special"
+    }
+    else if (isCrit(message)) {
+        category = "crit";
+    }
+    else if (isShield(subtype)) {
+        category = "shield";
+    }
+    else if (isDeflect(message)) {
+        category = "deflect";
+    }
+    else {
+        category = "regular";
     }
 }
 
@@ -462,7 +484,7 @@ LineInfo Parser::otherHitByNano(const std::string& message) {
         errorLog.write("\t" + message);
     }
     li.amount = findAmount(message);
-    li.nanobots = true;
+    li.category = "nanobot";
     return li;
 }
 
@@ -511,7 +533,7 @@ LineInfo Parser::youHitOtherWithNano(const std::string& message) {
     }
     li.amount = findAmount(message);
     // TODO: Can this deflect?
-    li.nanobots = true;
+    li.category = "nanobot";
     return li;
 }
 
@@ -605,7 +627,7 @@ LineInfo Parser::meHitByNano(const std::string& message) {
         errorLog.write("\t" + message);
     }
     li.amount = findAmount(message);
-    li.nanobots = true;
+    li.category = "nanobot";
     return li;
 }
 
@@ -645,7 +667,7 @@ LineInfo Parser::otherMisses(const std::string& message) {
             li.receiver_name = "You";
         }
     }
-    li.miss = true;
+    li.category = "miss";
     return li;
 }
 
@@ -662,7 +684,7 @@ LineInfo Parser::yourMisses(const std::string& message) {
         regex_search(message, m, regex("(?:hit )(.*)(?:, but missed!)"))) {
         li.receiver_name = m[1];
     }
-    li.miss = true;
+    li.category = "miss";
     return li;
 }
 
