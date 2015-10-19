@@ -119,6 +119,9 @@ private:
     void setDRWriteMethods(std::string playerName,
                            writeHeadingsPointer& whp,
                            writeDamagePointer& wdp);
+
+    std::vector<std::pair<std::string, Damage>> makeSortable(std::map<std::string, Damage>& m);
+
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
 
@@ -126,6 +129,7 @@ private:
     std::string determineMax(int maxDmg);
 
     std::string calcCritHitPercentage(Damage&d);
+
 
     PlayerVector<Player*>& playerVector;
 };

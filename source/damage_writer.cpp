@@ -19,17 +19,19 @@ void DamageWriter::createDDTopList() {
 
     std::string titleBase = "DD Top List";
 
-    std::vector<std::pair<std::string, Damage>> totalDamageDealtForEachPlayer =
-        playerVector.getTotalDamageDealtForEachPlayer();
-    sortByDealt(totalDamageDealtForEachPlayer);
+    std::map<std::string, Damage> damageForEachPlayer =
+        playerVector.getDamageForEachPlayer();
+    std::vector<std::pair<std::string, Damage>> sortableDamageForEachPlayer =
+        makeSortable(damageForEachPlayer);
+    sortByDealt(sortableDamageForEachPlayer);
 
     // Calculate the number of text links (windows) needed to see all players
     const int playersPerWindow = 15;
-    int nrOfPlayers = (int)totalDamageDealtForEachPlayer.size();
+    int nrOfPlayers = (int)sortableDamageForEachPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
-                totalDamageDealtForEachPlayer,
+                sortableDamageForEachPlayer,
                 nrOfWindows,
                 playersPerWindow,
                 &DamageWriter::writeTopListHeadings,
@@ -40,17 +42,19 @@ void DamageWriter::createDDDetailedTopList() {
 
     std::string titleBase = "DD Detailed Top List";
 
-    std::vector<std::pair<std::string, Damage>> totalDamageDealtForEachPlayer =
-        playerVector.getTotalDamageDealtForEachPlayer();
-    sortByDealt(totalDamageDealtForEachPlayer);
+    std::map<std::string, Damage> damageForEachPlayer =
+        playerVector.getDamageForEachPlayer();
+    std::vector<std::pair<std::string, Damage>> sortableDamageForEachPlayer =
+        makeSortable(damageForEachPlayer);
+    sortByDealt(sortableDamageForEachPlayer);
 
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 10;
-    int nrOfPlayers = (int)totalDamageDealtForEachPlayer.size();
+    int nrOfPlayers = (int)sortableDamageForEachPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
-                totalDamageDealtForEachPlayer,
+                sortableDamageForEachPlayer,
                 nrOfWindows,
                 playersPerWindow,
                 &DamageWriter::writeOverviewHeadingsOthers,
@@ -158,17 +162,19 @@ void DamageWriter::createDRTopList() {
 
     std::string titleBase = "Damage Received Top List";
 
-    std::vector<std::pair<std::string, Damage>> totalDamageReceivedForEachPlayer =
-        playerVector.getTotalDamageReceivedForEachPlayer();
-    sortByReceived(totalDamageReceivedForEachPlayer);
+    std::map<std::string, Damage> damageForEachPlayer =
+        playerVector.getDamageForEachPlayer();
+    std::vector<std::pair<std::string, Damage>> sortableDamageForEachPlayer =
+        makeSortable(damageForEachPlayer);
+    sortByDealt(sortableDamageForEachPlayer);
 
     const int playersPerWindow = 15;
-    int nrOfPlayers = (int)totalDamageReceivedForEachPlayer.size();
+    int nrOfPlayers = (int)sortableDamageForEachPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(
         titleBase,
-        totalDamageReceivedForEachPlayer,
+        sortableDamageForEachPlayer,
         nrOfWindows,
         playersPerWindow,
         &DamageWriter::writeTopListHeadings,
@@ -179,17 +185,19 @@ void DamageWriter::createDRDetailedTopList() {
 
     std::string titleBase = "Damage Received Detailed Top List";
 
-    std::vector<std::pair<std::string, Damage>> totalDamageReceivedForEachPlayer =
-        playerVector.getTotalDamageReceivedForEachPlayer();
-    sortByReceived(totalDamageReceivedForEachPlayer);
+    std::map<std::string, Damage> damageForEachPlayer =
+        playerVector.getDamageForEachPlayer();
+    std::vector<std::pair<std::string, Damage>> sortableDamageForEachPlayer =
+        makeSortable(damageForEachPlayer);
+    sortByDealt(sortableDamageForEachPlayer);
 
     // Calculate the number of files needed to write all players
     const int playersPerWindow = 8;
-    int nrOfPlayers = (int)totalDamageReceivedForEachPlayer.size();
+    int nrOfPlayers = (int)sortableDamageForEachPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
     writeToFile(titleBase,
-                totalDamageReceivedForEachPlayer,
+                sortableDamageForEachPlayer,
                 nrOfWindows,
                 playersPerWindow,
                 &DamageWriter::writeOverviewHeadingsOthers,
@@ -568,8 +576,8 @@ void DamageWriter::writeDDTopList(const std::string& name,
                                   int place) {
     const int width = 9;
     file << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer()) << " " <<
-          std::setw(width) << " " + std::to_string(d.getDPMReceivedFromPlayer()) << " " <<
+          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer().total) << " " <<
+          std::setw(width) << " " + std::to_string(d.getTotalReceivedFromPlayer().dpm) << " " <<
           std::setfill(' ');
 
     writePlace(place);
@@ -582,8 +590,8 @@ void DamageWriter::writeDRTopList(const std::string& name,
                                   int place) {
     const int width = 9;
     file << std::setfill(fillChar) <<
-          std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer()) << " " <<
-          std::setw(width) << " " + std::to_string(d.getDPMDealtOnPlayer()) << " " <<
+          std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer().total) << " " <<
+          std::setw(width) << " " + std::to_string(d.getTotalDealtOnPlayer().dpm) << " " <<
           std::setfill(' ');
 
     writePlace(place);
@@ -943,6 +951,14 @@ void DamageWriter::writeDROverview(const std::string& name,
 /********************/
 /* Helper functions */
 /********************/
+
+std::vector<std::pair<std::string, Damage>> makeSortable(std::map<std::string, Damage>& m) {
+    std::vector<std::pair<std::string, Damage>> sortable;
+    for (const auto& p : m) {
+        sortable.emplace_back(std::make_pair(p.first, p.second));
+    }
+    return sortable;
+}
 
 void DamageWriter::sortByDealt(std::vector<std::pair<std::string, Damage>>& v) {
     std::sort(v.begin(), v.end(),

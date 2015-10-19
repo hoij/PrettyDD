@@ -43,7 +43,6 @@ Damage::DamageInfo Damage::getTotalDealtOnPlayer() const {
 
 Damage::DamageInfo
 Damage::getTotal(const damageMap& m) const {
-    // Or return just an int for the total.
     Damage::DamageInfo di;
     for (const auto& category : m) {
         for (const auto& subtype : category.second) {
@@ -53,73 +52,50 @@ Damage::getTotal(const damageMap& m) const {
     return di;
 }
 
-std::vector<std::pair<std::string, Damage::DamageInfo>>
+std::map<std::string, Damage::DamageInfo>
 Damage::getTotalReceivedFromPlayerPerCategory() const {
     return getTotalPerCategory(receivedFromPlayer);
 }
 
-std::vector<std::pair<std::string, Damage::DamageInfo>>
+std::map<std::string, Damage::DamageInfo>
 Damage::getTotalDealtOnPlayerPerCategory() const {
     return getTotalPerCategory(dealtOnPlayer);
 }
 
-std::vector<std::pair<std::string, Damage::DamageInfo>>
+std::map<std::string, Damage::DamageInfo>
 Damage::getTotalPerCategory(const damageMap& m) const {
-    /* Returns a vector of pairs containing the name
-    of the category and it's total damage summed over
-    all subtypes. */
+    /* Returns a map containing the name of the category
+    and it's total damage summed over all subtypes. */
 
-    std::vector<std::pair<std::string, Damage::DamageInfo>> summedCategories;
+    std::map<std::string, DamageInfo> summedCategories;
     for (const auto& category : m) {
-        DamageInfo di;
         for (const auto& subtype : category.second) {
-            di += subtype.second;
+            summedCategories[category.first] += subtype.second;
         }
-        summedCategories.emplace_back(std::make_pair(category.first, di));
     }
     return summedCategories;
 }
 
-std::vector<std::pair<std::string, Damage::DamageInfo>>
+std::map<std::string, Damage::DamageInfo>
 Damage::getTotalReceivedFromPlayerPerDamageType() const {
     return getTotalPerSubtype(receivedFromPlayer);
 }
 
-std::vector<std::pair<std::string, Damage::DamageInfo>>
+std::map<std::string, Damage::DamageInfo>
 Damage::getTotalDealtOnPlayerPerDamageType() const {
     return getTotalPerSubtype(dealtOnPlayer);
 }
 
-std::vector<std::pair<std::string, Damage::DamageInfo>>
+std::map<std::string, Damage::DamageInfo>
 Damage::getTotalPerSubtype(const damageMap& m) const {
-    /* Returns a vector of pairs containing the name
-    of the subtype and it's total damage summed over
-    all categories. */
+    /* Returns a map containing the name of the subtype
+    and it's total damage summed over all categories. */
 
-    std::map<std::string, Damage::DamageInfo> tmp;
-    std::vector<std::pair<std::string, Damage::DamageInfo>> summedSubtypes;
+    std::map<std::string, Damage::DamageInfo> summedSubtypes;
     for (const auto& category : m) {
         for (const auto& subtype : category.second) {
-
-            tmp[subtype.first] += subtype.second;
-
-//            auto it = std::find_if(summedSubtypes.begin(),
-//                          summedSubtypes.end(),
-//                          [subtype](
-//                              std::pair<std::string, Damage::DamageInfo>& p){
-//                                  return p.first == subtype.first;});
-//            if (it != summedSubtypes.end()) {
-//                it->second += subtype.second;
-//            }
-//            else {
-//                summedSubtypes.emplace_back(
-//                    std::make_pair(subtype.first, subtype.second));
-//            }
+            summedSubtypes[subtype.first] += subtype.second;
         }
-    }
-    for (const auto& subtype : tmp) {
-        summedSubtypes.emplace_back(
-            std::make_pair(subtype.first, subtype.second));
     }
     return summedSubtypes;
 }
@@ -150,6 +126,31 @@ Damage::damageMap Damage::getReceivedFromPlayer() const {
 
 Damage::damageMap Damage::getDealtOnPlayer() const {
     return dealtOnPlayer;
+}
+
+void Damage::setReceivedFromPlayerDPM(int t) {
+    setDPM(t, receivedFromPlayer);
+}
+
+void Damage::setDealtOnPlayerDPM(int t) {
+    setDPM(t, dealtOnPlayer);
+}
+
+void Damage::setDPM(int t, damageMap m) {
+    for (auto& category : m) {
+        for (auto& subtype : category.second) {
+            subtype.second.dpm = calcDPM(subtype.second.total, t);
+        }
+    }
+}
+
+int Damage::calcDPM(int amount, int t) {
+    if (t == 0) {
+        return 0;
+    }
+    else {
+        return int(amount / ((double)t / 60));
+    }
 }
 
 void Damage::DamageInfo::add(int amount) {

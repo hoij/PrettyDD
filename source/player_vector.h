@@ -28,9 +28,10 @@ public:
 
     virtual Damage getTotalDamage() const;
     virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
-    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageDealtForEachPlayer() const;
-    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageReceivedForEachPlayer() const;
+    virtual std::map<std::string, Damage> getDamageForEachPlayer() const;
+
     virtual Heal getTotalHeals() const;
+
     virtual void startLogging();
     virtual void stopLogging();
     virtual void reset();
@@ -89,31 +90,15 @@ Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType) cons
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageDealtForEachPlayer() const {
-    /* Returns a vector of pairs containing the players name and their
-    total damage (in the form of the Damage class). */
-    std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
+std::map<std::string, Damage>
+PlayerVector<C>::getDamageForEachPlayer() const {
+    /* Returns a map containing the players name and their
+    damage. */
+    std::map<std::string, Damage> damagePerPlayer;
     for (const C p : this->players) {
-        Damage d = p->getTotalDamage();
-        if (d.getCountReceivedFromPlayer() != 0) {
-            totalDamagePerPlayer.emplace_back(p->getName(), d);
-        }
+        damagePerPlayer[p->getName()] = p->getDamage();
     }
-    return totalDamagePerPlayer;
-}
-
-template<class C>
-std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageReceivedForEachPlayer() const {
-    /* Returns a vector of pairs containing the players name and their
-    total damage (in the form of the Damage class). */
-    std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
-    for (const C p : this->players) {
-        Damage d = p->getTotalDamage();
-        if (d.getCountDealtOnPlayer() != 0) {
-            totalDamagePerPlayer.emplace_back(p->getName(), d);
-        }
-    }
-    return totalDamagePerPlayer;
+    return damagePerPlayer;
 }
 
 template<class C>

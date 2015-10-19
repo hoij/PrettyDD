@@ -21,6 +21,7 @@ private:
         int total = 0;
         int max = -1;
         int min = std::numeric_limits<int>::max();
+        int dpm = 0;
     };
 
     //              <   category,         <    subtype, stats     >>
@@ -32,19 +33,19 @@ public:
     void addDamageDealtOnPlayer(LineInfo& li);
     void addDamageReceivedFromPlayer(LineInfo& li);
 
-    DamageInfo getTotalReceivedFromPlayer() const;  // Or just an int for the total.
-    DamageInfo getTotalDealtOnPlayer() const;  // Or just an int for the total.
+    DamageInfo getTotalReceivedFromPlayer() const;
+    DamageInfo getTotalDealtOnPlayer() const;
 
-    std::vector<std::pair<std::string, DamageInfo>>
+    std::map<std::string, DamageInfo>
     getTotalReceivedFromPlayerPerCategory() const;
 
-    std::vector<std::pair<std::string, DamageInfo>>
+    std::map<std::string, DamageInfo>
     getTotalDealtOnPlayerPerCategory() const;
 
-    std::vector<std::pair<std::string, DamageInfo>>
+    std::map<std::string, DamageInfo>
     getTotalReceivedFromPlayerPerDamageType() const;
 
-    std::vector<std::pair<std::string, DamageInfo>>
+    std::map<std::string, DamageInfo>
     getTotalDealtOnPlayerPerDamageType() const;
 
 
@@ -56,28 +57,27 @@ public:
     damageMap getReceivedFromPlayer() const;
     damageMap getDealtOnPlayer() const;
 
-    void setDealtOnPlayerDPM(int damagePerMinute);
-    void setReceivedFromPlayerDPM(int damagePerMinute);
+    void setDealtOnPlayerDPM(int duration);
+    void setReceivedFromPlayerDPM(int duration);
 
 private:
     void addDamage(LineInfo& li, damageMap& di);
     DamageInfo getTotal(const std::map<std::string, std::map<
                             std::string, DamageInfo>>& m) const;
 
-    std::vector<std::pair<std::string, DamageInfo>>
+    std::map<std::string, DamageInfo>
     getTotalPerCategory(const damageMap& m) const;
 
-    std::vector<std::pair<std::string, Damage::DamageInfo>>
+    std::map<std::string, DamageInfo>
     getTotalPerSubtype(const damageMap& m) const;
 
     damageMap getPerSubtype(const damageMap& m) const;
 
+    void setDPM(int duration, damageMap m);
+    int calcDPM(int amount, int t);
+
     damageMap receivedFromPlayer;
     damageMap dealtOnPlayer;
-
-    //                   <   category,                      < subtype, stats     >>
-    //std::vector<std::pair<std::string, std::vector<std::pair<std::string, DamageInfo>>>> receivedFromPlayer;
-    //std::vector<std::pair<std::string, std::vector<std::pair<std::string, DamageInfo>>>> dealtOnPlayer;
 };
 
 
