@@ -58,8 +58,8 @@ void CommandHandler::execute(const std::string& command) {
 
 //        statWriter.createDDPerDamageType("You");
 
-//        statWriter.createDDPerDamageTypeDetailed("You");
-        statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
+        statWriter.createDDPerDamageTypeDetailed("You");
+//        statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
 
 //        statWriter.createHelp();
 
@@ -74,14 +74,12 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDOnSpecificOpponent("Predator Rogue", "You");
 //        statWriter.createDDOnSpecificOpponent("You", "asshole");
 
-//        statWriter.createDDTopList();
+//        statWriter.createDRTopList();
 //        statWriter.createDRDetailedTopList();
 
 //        statWriter.createDRPerDamageType("You");
 
 //        statWriter.createDRPerOpponent("You");
-
-//        statWriter.createOldDDOverview();
     }
     else if (nrOfOptions == 1) {
         // No extra options on top/dtop/types will print damage dealt

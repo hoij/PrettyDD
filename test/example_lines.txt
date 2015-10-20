@@ -1,4 +1,8 @@
 ["#0000000042000008#","You hit other","",1425326282]You hit Predator Rogue for 2357 points of poison damage.
+
+["#0000000042000008#","You hit other","",1425326282]You hit Predator Rogue for 2357 points of projectile damage.
+["#0000000042000008#","You hit other","",1425326291]You hit Predator Rogue for 3911 points of projectile damage.Critical hit!
+
 ["#0000000042000008#","You hit other","",1425326284]You hit Predator Rogue for 2329 points of chemical damage.
 ["#0000000042000008#","You hit other","",1425326288]You hit Predator Rogue for 2357 points of Fast Attack damage.
 ["#0000000042000008#","You hit other","",1425326293]You hit Predator Rogue for 1942 points of Brawling damage.
@@ -7,6 +11,8 @@
 ["#0000000042000008#","You hit other","",1434561648]You hit Field Operator - Cha'Ra for 778 points of projectile damage. Glancing hit.
 ["#0000000042000008#","You hit other","",1425326284]Your reflect shield hit Predator Rogue for 49 points of damage.
 ["#0000000042000008#","You hit other","",1425326284]Your damage shield hit Predator Rogue for 163 points of damage.
+["#0000000042000008#","You hit other","",1425326284]Your damage shield hit Predator Rogue for 163 points of damage.
+
 ["#0000000042000002#","Me hit by nano","",1425326283]You were attacked with nanobots from Predator Rogue for 875 points of poison damage.
 ["#0000000042000002#","Me hit by nano","",1434406043]You were attacked with nanobots from Balas for 1742 points of cold damage.
 
@@ -22,6 +28,9 @@
 ["#0000000042000013#","Other misses","",1425326282]Predator Rogue tried to hit you, but missed!
 
 ["#0000000042000012#","Your misses","",1425666157]You try to attack Peal Thunder with Brawl, but you miss!
+
+["#0000000042000008#","You hit other","",1434561648]You hit Peal Thunder for 778 points of Brawling damage. Glancing hit.
+
 ["#0000000042000012#","Your misses","",1426199923]You tried to hit Stim Fiend, but missed!
 
 ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.

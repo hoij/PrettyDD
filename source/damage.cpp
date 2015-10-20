@@ -38,6 +38,7 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     // on each addition.
     shield = li.shield;
     special = li.special;
+    regularMiss = li.miss && !li.special;
 
     if (li.crit) {
         di.critCount++;
@@ -49,10 +50,13 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
             di.critMin = li.amount;
         }
     }
-    else if (li.miss) {
-        di.misses++;
+    else if (li.miss && li.special) {
+        di.specialMisses++;
     }
-    else if (li.deflect) {
+    else if (li.miss) {
+        di.regularMisses++;
+    }
+    else if (li.deflect && !li.special) {
         di.regularDeflectTotal += li.amount;
         di.regularDeflectCount++;
         if (li.amount > di.regularDeflectMax) {
@@ -60,6 +64,26 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
         }
         if (li.amount < di.regularDeflectMin) {
             di.regularDeflectMin = li.amount;
+        }
+    }
+    else if (li.deflect && li.special) {
+        di.specialDeflectTotal += li.amount;
+        di.specialDeflectCount++;
+        if (li.amount > di.specialDeflectMax) {
+            di.specialDeflectMax = li.amount;
+        }
+        if (li.amount < di.specialDeflectMin) {
+            di.specialDeflectMin = li.amount;
+        }
+    }
+    else if (li.special) {
+        di.specialCount++;
+        di.specialTotal += li.amount;
+        if (li.amount > di.specialMax) {
+            di.specialMax = li.amount;
+        }
+        if (li.amount < di.specialMin) {
+            di.specialMin = li.amount;
         }
     }
     else if (li.nanobots) {
@@ -70,6 +94,16 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
         }
         if (li.amount < di.nanobotMin) {
             di.nanobotMin = li.amount;
+        }
+    }
+    else if (li.shield) {
+        di.shieldCount++;
+        di.shieldTotal += li.amount;
+        if (li.amount > di.shieldMax) {
+            di.shieldMax = li.amount;
+        }
+        if (li.amount < di.shieldMin) {
+            di.shieldMin = li.amount;
         }
     }
     else {
@@ -124,7 +158,35 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
         regularDeflectMin = rhs.regularDeflectMin;
     }
 
-    misses += rhs.misses;
+    specialTotal += rhs.specialTotal;
+    specialCount += rhs.specialCount;
+    if (rhs.specialMax > specialMax) {
+        specialMax = rhs.specialMax;
+    }
+    if (rhs.specialMin < specialMin) {
+        specialMin = rhs.specialMin;
+    }
+
+    specialDeflectTotal += rhs.specialDeflectTotal;
+    specialDeflectCount += rhs.specialDeflectCount;
+    if (rhs.specialDeflectMax > specialDeflectMax) {
+        specialDeflectMax = rhs.specialDeflectMax;
+    }
+    if (rhs.specialDeflectMin < specialDeflectMin) {
+        specialDeflectMin = rhs.specialDeflectMin;
+    }
+
+    shieldTotal += rhs.shieldTotal;
+    shieldCount += rhs.shieldCount;
+    if (rhs.shieldMax > shieldMax) {
+        shieldMax = rhs.shieldMax;
+    }
+    if (rhs.shieldMin < shieldMin) {
+        shieldMin = rhs.shieldMin;
+    }
+
+    regularMisses += rhs.regularMisses;
+    specialMisses += rhs.specialMisses;
 
     return *this;
 }

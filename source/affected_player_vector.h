@@ -37,7 +37,6 @@ public:
     getTotalDamageForEveryDamageTypeDealtOnPlayer(
         std::string callerName) const;
 
-
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageReceivedFromPlayerForAllAffectedPlayers(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageDealtOnPlayerForAllAffectedPlayers(std::string callerName) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers(std::string callerName) const;

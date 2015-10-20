@@ -78,7 +78,9 @@ private:
     void writeOverviewHeadingsSelf();
     void writeOverviewHeadings(bool self);
     void writeOverviewHeadingsDetailed();
-    void writePerDamageTypeHeadings();
+    void writePerTypeOverviewHeadingsOthers();
+    void writePerTypeOverviewHeadingsSelf();
+    void writePerTypeOverviewHeadings(bool self);
     void writeDDHeadings();  // TODO: Remove if not to be used.
 
     // Writes
@@ -90,6 +92,15 @@ private:
     void writeDDOverviewSelf(const std::string& name, const Damage& d, int place);
     void writeDDOverview(const std::string& name, const Damage& d, int place, bool self);
 
+    void writeDDPerTypeOverviewOthers(const std::string& name, const Damage& d, int place);
+    void writeDDPerTypeOverviewSelf(const std::string& name, const Damage& d, int place);
+    void writeDDPerTypeOverview(const std::string& name, const Damage& d, int place, bool self);
+
+    void writeDRPerTypeOverviewOthers(const std::string& name, const Damage& d, int place);
+    void writeDRPerTypeOverviewSelf(const std::string& name, const Damage& d, int place);
+    void writeDRPerTypeOverview(const std::string& name, const Damage& d, int place, bool self);
+
+
     void writeDRTopList(const std::string& name, const Damage& d, int place);
     void writeDROverviewOthers(const std::string& name, const Damage& d, int place);
     void writeDROverviewSelf(const std::string& name, const Damage& d, int place);
@@ -98,13 +109,16 @@ private:
     // Detailed type write helper functions
     void writeDetailedRegularInfo(const Damage& d, bool self);
     void writeDetailedNanobotInfo(const Damage& d);
+    void writeDetailedSpecialInfo(const Damage& d, bool self);
+    void writeDetailedShieldInfo(const Damage& d);
     void writeTotalInfo(int total, int count);
     void writeDetailedInfoForType(std::string type,
-                                  std::string hitPercent,
-                                  std::string nrOfhits,
+                                  int total,
+                                  int nrOfhits,
+                                  std::string dmgPercent,
                                   std::string maxHit,
                                   std::string minHit,
-                                  std::string dmgPercent);
+                                  std::string hitPercent);
 
     // Helper functions
     void setDDWriteMethods(std::string playerName,
@@ -116,6 +130,13 @@ private:
                            writeHeadingsPointer& whp,
                            writeDamagePointer& wdp,
                            bool detailed);
+    void setDDPerTypeWriteMethods(std::string playerName,
+                                  writeHeadingsPointer& whp,
+                                  writeDamagePointer& wdp,
+                                  bool detailed);
+    void setDRPerTypeWriteMethods(std::string playerName,
+                                  writeHeadingsPointer& whp,
+                                  writeDamagePointer& wdp);
     void setDRWriteMethods(std::string playerName,
                            writeHeadingsPointer& whp,
                            writeDamagePointer& wdp);
@@ -125,7 +146,25 @@ private:
     std::string determineMin(int minDmg);
     std::string determineMax(int maxDmg);
 
-    std::string calcCritHitPercentage(Damage&d);
+    std::string calcCritHitPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcMissPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcRegularMissPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcSpecialMissPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcDeflectHitPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcSpecialDeflectHitPercentageReceivedFromPlayer(const Damage&d);
+    int calcRegularAndSpecialHitsReceivedFromPlayer(const Damage&d);
+    std::string calcRegularDmgPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcSpecialDmgPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcNanobotDmgPercentageReceivedFromPlayer(const Damage&d);
+
+    std::string calcCritHitPercentageDealtOnPlayer(const Damage&d);
+    std::string calcMissPercentageDealtOnPlayer(const Damage&d);
+    std::string calcDeflectHitPercentageDealtOnPlayer(const Damage&d);
+    int calcRegularAndSpecialHitsDealtOnPlayer(const Damage&d);
+    std::string calcRegularDmgPercentageDealtOnPlayer(const Damage&d);
+    std::string calcSpecialDmgPercentageDealtOnPlayer(const Damage&d);
+    std::string calcNanobotDmgPercentageDealtOnPlayer(const Damage&d);
+
 
     PlayerVector<Player*>& playerVector;
 };

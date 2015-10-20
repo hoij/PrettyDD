@@ -17,12 +17,12 @@ public:
 
     void setDealtOnPlayerDPM(int damagePerMinute);
     void setReceivedFromPlayerDPM(int damagePerMinute);
-    void setShield() {shield = true;}
-    void setSpecial() {special = true;}
-    bool isShield() const { return shield; }
-    bool isSpecial() const {return special;}
 
-    // TODO: This is shit, just make the data public.
+    bool isShield() const {return shield;}
+    bool isSpecial() const {return special;}
+    bool isRegularMiss() const {return regularMiss;}
+
+    // TODO: This is shit, just rework everything.
     int getTotalDealtOnPlayer() const {return dealtOnPlayer.total;}
     int getDPMDealtOnPlayer() const {return dealtOnPlayer.dpm;}
     int getCountDealtOnPlayer() const {return dealtOnPlayer.count;}
@@ -34,6 +34,14 @@ public:
     int getRegularDeflectCountDealtOnPlayer() const {return dealtOnPlayer.regularDeflectCount;}
     int getRegularDeflectMaxDealtOnPlayer() const {return dealtOnPlayer.regularDeflectMax;}
     int getRegularDeflectMinDealtOnPlayer() const {return dealtOnPlayer.regularDeflectMin;}
+    int getSpecialTotalDealtOnPlayer() const {return dealtOnPlayer.specialTotal;}
+    int getSpecialCountDealtOnPlayer() const {return dealtOnPlayer.specialCount;}
+    int getSpecialMaxDealtOnPlayer() const {return dealtOnPlayer.specialMax;}
+    int getSpecialMinDealtOnPlayer() const {return dealtOnPlayer.specialMin;}
+    int getSpecialDeflectTotalDealtOnPlayer() const {return dealtOnPlayer.specialDeflectTotal;}
+    int getSpecialDeflectCountDealtOnPlayer() const {return dealtOnPlayer.specialDeflectCount;}
+    int getSpecialDeflectMaxDealtOnPlayer() const {return dealtOnPlayer.specialDeflectMax;}
+    int getSpecialDeflectMinDealtOnPlayer() const {return dealtOnPlayer.specialDeflectMin;}
     int getNanobotTotalDealtOnPlayer() const {return dealtOnPlayer.nanobotTotal;}
     int getNanobotCountDealtOnPlayer() const {return dealtOnPlayer.nanobotCount;}
     int getNanobotMaxDealtOnPlayer() const {return dealtOnPlayer.nanobotMax;}
@@ -42,7 +50,12 @@ public:
     int getCritCountDealtOnPlayer() const {return dealtOnPlayer.critCount;}
     int getCritMaxDealtOnPlayer() const {return dealtOnPlayer.critMax;}
     int getCritMinDealtOnPlayer() const {return dealtOnPlayer.critMin;}
-    int getMissesDealtOnPlayer() const {return dealtOnPlayer.misses;}
+    int getShieldTotalDealtOnPlayer() const {return dealtOnPlayer.shieldTotal;}
+    int getShieldCountDealtOnPlayer() const {return dealtOnPlayer.shieldCount;}
+    int getShieldMaxDealtOnPlayer() const {return dealtOnPlayer.shieldMax;}
+    int getShieldMinDealtOnPlayer() const {return dealtOnPlayer.shieldMin;}
+    int getRegularMissesDealtOnPlayer() const {return dealtOnPlayer.regularMisses;}
+    int getSpecialMissesDealtOnPlayer() const {return dealtOnPlayer.specialMisses;}
 
     int getTotalReceivedFromPlayer() const {return receivedFromPlayer.total;}
     int getDPMReceivedFromPlayer() const {return receivedFromPlayer.dpm;}
@@ -55,6 +68,14 @@ public:
     int getRegularDeflectCountReceivedFromPlayer() const {return receivedFromPlayer.regularDeflectCount;}
     int getRegularDeflectMaxReceivedFromPlayer() const {return receivedFromPlayer.regularDeflectMax;}
     int getRegularDeflectMinReceivedFromPlayer() const {return receivedFromPlayer.regularDeflectMin;}
+    int getSpecialTotalReceivedFromPlayer() const {return receivedFromPlayer.specialTotal;}
+    int getSpecialCountReceivedFromPlayer() const {return receivedFromPlayer.specialCount;}
+    int getSpecialMaxReceivedFromPlayer() const {return receivedFromPlayer.specialMax;}
+    int getSpecialMinReceivedFromPlayer() const {return receivedFromPlayer.specialMin;}
+    int getSpecialDeflectTotalReceivedFromPlayer() const {return receivedFromPlayer.specialDeflectTotal;}
+    int getSpecialDeflectCountReceivedFromPlayer() const {return receivedFromPlayer.specialDeflectCount;}
+    int getSpecialDeflectMaxReceivedFromPlayer() const {return receivedFromPlayer.specialDeflectMax;}
+    int getSpecialDeflectMinReceivedFromPlayer() const {return receivedFromPlayer.specialDeflectMin;}
     int getNanobotTotalReceivedFromPlayer() const {return receivedFromPlayer.nanobotTotal;}
     int getNanobotCountReceivedFromPlayer() const {return receivedFromPlayer.nanobotCount;}
     int getNanobotMaxReceivedFromPlayer() const {return receivedFromPlayer.nanobotMax;}
@@ -63,7 +84,12 @@ public:
     int getCritCountReceivedFromPlayer() const {return receivedFromPlayer.critCount;}
     int getCritMaxReceivedFromPlayer() const {return receivedFromPlayer.critMax;}
     int getCritMinReceivedFromPlayer() const {return receivedFromPlayer.critMin;}
-    int getMissesReceivedFromPlayer() const {return receivedFromPlayer.misses;}
+    int getShieldTotalReceivedFromPlayer() const {return receivedFromPlayer.shieldTotal;}
+    int getShieldCountReceivedFromPlayer() const {return receivedFromPlayer.shieldCount;}
+    int getShieldMaxReceivedFromPlayer() const {return receivedFromPlayer.shieldMax;}
+    int getShieldMinReceivedFromPlayer() const {return receivedFromPlayer.shieldMin;}
+    int getRegularMissesReceivedFromPlayer() const {return receivedFromPlayer.regularMisses;}
+    int getSpecialMissesReceivedFromPlayer() const {return receivedFromPlayer.specialMisses;}
 
 private:
 	struct DamageInfo {
@@ -80,6 +106,14 @@ private:
         int regularDeflectCount = 0;
         int regularDeflectMax = -1;
         int regularDeflectMin = std::numeric_limits<int>::max();
+        int specialTotal = 0;
+        int specialCount = 0;
+        int specialMax = -1;
+        int specialMin = std::numeric_limits<int>::max();
+        int specialDeflectTotal = 0;
+        int specialDeflectCount = 0;
+        int specialDeflectMax = -1;
+        int specialDeflectMin = std::numeric_limits<int>::max();
         int nanobotTotal = 0;
         int nanobotCount = 0;
         int nanobotMax = -1;
@@ -88,11 +122,18 @@ private:
 		int critCount = 0;
 		int critMax = -1;
 		int critMin = std::numeric_limits<int>::max();
-        int misses = 0;
+        int shieldTotal = 0;
+        int shieldCount = 0;
+        int shieldMax = -1;
+        int shieldMin = std::numeric_limits<int>::max();
+        int regularMisses = 0;
+        int specialMisses = 0;
     };
 
     bool shield = false;
     bool special = false;
+    bool regularMiss = false;
+
     DamageInfo dealtOnPlayer;
     DamageInfo receivedFromPlayer;
 

@@ -46,7 +46,7 @@ void StatWriter::createDDPerDamageTypeDetailed(std::string playerName) {
 }
 
 void StatWriter::createDDPerOpponent(std::string playerName) {
-    damageWriter.createDDPerDamageType(playerName);
+    damageWriter.createDDPerOpponent(playerName);
 }
 
 void StatWriter::createDDOnSpecificOpponent(std::string playerName,
@@ -212,17 +212,31 @@ void StatWriter::createInfo() {
     writeStartOfLink("PDD Info");
 
     file << "<br>" << nl
-         << "Crit/Miss/Deflect Hit Info<br>" << nl
+         << "Crit Hit Rate Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The hit rate for these is calculated in the following way:<br>" << nl
-         << "  nr of X / (nr of normal hits + crits + deflects + misses)<br>" << nl
+         << "The crit rate is calculated in the following way:<br>" << nl
+         << "  nr of crits / (normal hits + crits + normal deflects + normal misses)<br>" << nl
          << "Nanobot, special and shield hits are excluded.<br><br>" << nl << nl
          << "</font>"
+
+         << "Miss/Deflect Rate Info<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The miss rate is calculated in the following way:<br>" << nl
+         << "  nr of misses (or deflects) ( for normals and specials) / <br>"
+         << "  (all attacks/deflects/misses except for nanobots and shields)"
+         << "<br><br>" << nl << nl
+         << "</font>"
+
          << "Nanobot Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The nanobot % is a percentage of total damage done unless<br>" << nl
-         << "otherwise stated.<br><br>" << nl << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The regular/special/nanobot % shows the % of total damage done<br>." << nl
+         << "The following is included in each damage category:<br>" << nl
+         << "  Regular: regular hits, crits and regular deflects<br>" << nl
+         << "  Special: Special hits and special deflects<br>" << nl
+         << "  Nanobot: Nanobot hits<br>" << nl
          << "</font>"
+
          << "Detailed info per type<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "The regular and nanobot hit% is % of total hits.<br>" << nl
