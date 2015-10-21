@@ -160,10 +160,18 @@ void StatWriter::createCommands1() {
     writeCommand("types [player1] [player2]", "Damage per type on player2 by player1");
     writeCommand("[player1] [player2]", "As above");
     writeCommand("dtypes", "Detailed damage per type for you");
+    writeCommand("dtypes [player1]", "Detailed damage per type for player");
     writeCommand("dtypes [player1] [player2]",
                  "Detailed damage per type on player2 by player1");
     file << "</font>";
     file << "<br>" << nl;
+
+    writeEndOfLink("PDD Commands 1(2)");
+}
+
+void StatWriter::createCommands2() {
+
+    writeStartOfLink("PDD Commands 2(2)");
 
     file << "Damage Received:" << "<br>" << nl;
     file << "<font color = " + lightBlue + ">" << nl;
@@ -175,13 +183,6 @@ void StatWriter::createCommands1() {
     writeCommand("dr types [player]");
     file << "</font>";
     file << "<br>" << nl;
-
-    writeEndOfLink("PDD Commands 1(2)");
-}
-
-void StatWriter::createCommands2() {
-
-    writeStartOfLink("PDD Commands 2(2)");
 
     file << "Nano Program:" << "<br>" << nl;
     file << "<font color = " + lightBlue + ">" << nl;

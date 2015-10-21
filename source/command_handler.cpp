@@ -126,6 +126,9 @@ void CommandHandler::execute(const std::string& command) {
         if (commandParts[1] == "opp") {
             statWriter.createDDPerOpponent(commandParts[2]);
         }
+        else if (commandParts[1] == "dtypes") {
+            statWriter.createDDPerDamageTypeDetailed(commandParts[2]);
+        }
         else if (commandParts[1] == "dr") {
             if (commandParts[2] == "top") {
                 statWriter.createDRTopList();
