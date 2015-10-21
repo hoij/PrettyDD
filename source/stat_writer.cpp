@@ -155,8 +155,6 @@ void StatWriter::createCommands() {
     writeCommand("[player]", "Overview of player");
     writeCommand("types", "Overview per type");
     writeCommand("dtypes", "Detailed info per type");
-    writeCommand("dtypes [player1] [player2]",
-                 "Detailed info for damage on player2 by player 1");
     writeCommand("types [player]", "Overview per type for player");
     writeCommand("[player1] [player2]", "Damage on player2 by player1");
     file << "</font>";
@@ -232,7 +230,7 @@ void StatWriter::createInfo1() {
          << "Nanobot Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The regular/special/nanobot % shows the % of total damage done<br>." << nl
+         << "The regular/special/nanobot % shows the % of total damage done.<br>" << nl
          << "The following is included in each damage category:<br>" << nl
          << "  Regular: regular hits, crits and regular deflects<br>" << nl
          << "  Special: Special hits and special deflects<br>" << nl
@@ -247,21 +245,23 @@ void StatWriter::createInfo2() {
     writeStartOfLink("PDD Info 2(2)");
 
     file << "<br>" << nl
-         << "Info per Type<br>" << nl
+         << "Info per Type (types)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The regular and nanobot % is % of total damage for<br>" << nl
-         << "that type<br>" << nl
-         << "The crit, deflect and miss hit % is % of total hits<br>" << nl
-         << "for that type<br>." << nl
-         << "A blank line means that stat is not available<br><br>" << nl << nl
+         << "* Regular and nanobot % is % of total damage for"
+            "that type<br>" << nl
+         << "* Crit, deflect and miss hit % is % of total hits"
+            "for that type.<br>" << nl
+         << "* A blank line means that stat is not available<br>" << nl
+         << "* If the sum of regular, special, nanobot % does not add up "
+            "to 100%. The remaining % is most likely shield damage.<br><br>" << nl << nl
          << "</font>"
 
-         << "Detailed info per type<br>" << nl
+         << "Detailed info per type (dtypes)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The regular and nanobot hit% is % of total hits.<br>" << nl
-         << "The crit, deflect and miss hit % is % of hits that can<br>" << nl
-         << "  crit, i.e. only regular attacks. <br>" << nl
-         << "The damage % is % of total damage done.<br><br>" << nl << nl
+         << "* Regular and nanobot hit% is % of total hits.<br>" << nl
+         << "* Crit, deflect and miss hit % is % of hits that can "
+            "crit, i.e. only regular attacks. <br>" << nl
+         << "* Damage % is % of total damage done.<br><br>" << nl << nl
          << "</font>";
 
     writeEndOfLink("PDD Info 2(2)");

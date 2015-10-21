@@ -212,7 +212,7 @@ void DamageWriter::createDRPerDamageType(std::string playerName) {
                             playerName;
     createDamagePerDamageType(playerName,
                               titleBase,
-                              10,
+                              8,
                               false,
                               false);
 }
@@ -309,7 +309,7 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
                 playerName == config.getplayerRunningProgram();
 
     // Calculate the number of files needed to write all players
-    const int playersPerWindow = 8;
+    const int playersPerWindow = 7;
     int nrOfPlayers = (int)totalDamageForEachAffectedPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
@@ -492,7 +492,7 @@ void DamageWriter::writeOverviewHeadings(bool self) {
             std::setw(width) << " Crit " <<
             std::setw(width+1) << " Deflect ";
     if (self) {
-        file << std::setw(width-1) << " Miss ";
+        file << std::setw(width) << " Miss ";
     }
     file << "</font><br>" << std::setfill(' ') << nl;
 }
@@ -524,10 +524,10 @@ void DamageWriter::writeOverviewHeadingsDetailed(bool self) {
     file << std::setfill(fillChar) << std::right <<
             std::setw(width+1) << " Dmg" << " (" <<
             std::setw(nrWidth) << "_Cnt" << ") " <<
-            std::setw(pcWidth) << " Dmg" << "% " <<
-            std::setw(width) << " Max" << "-" << std::left <<
+            std::setw(pcWidth-1) << " Dmg" << "% " <<
+            std::setw(width-1) << " Max" << "-" << std::left <<
             std::setw(width) << "Min " << std::right <<
-            std::setw(pcWidth) << " Hit" << "%<br><br>" <<
+            std::setw(pcWidth+1) << " Hit" << "%<br><br>" <<
             "</font>" << nl;
 }
 
@@ -581,6 +581,7 @@ void DamageWriter::writeDDPerTypeOverview(const std::string& name,
     const int width = 8;
     const int pcWidth = 6;
     const int nrWidth = 4;
+    std::string na = " __._";
     file << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalReceivedFromPlayer())
                              << " (" <<
@@ -590,9 +591,9 @@ void DamageWriter::writeDDPerTypeOverview(const std::string& name,
                              << " " <<
             std::fixed << std::setprecision(1);
     if (d.hasSpecialReceivedFromPlayer()) {
-        file << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
+        file << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
              << std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
         if (self) {
             std::string missPercentage = calcMissPercentageReceivedFromPlayer(d);
@@ -601,12 +602,12 @@ void DamageWriter::writeDDPerTypeOverview(const std::string& name,
     }
     else if (d.hasShieldReceivedFromPlayer() ||
              d.hasRegularMissReceivedFromPlayer()) {
-        file << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " ";
+        file << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% ";
         if (self) {
-            file << std::setw(pcWidth+1) << "" << " ";
+            file << std::setw(pcWidth) << na << "% ";
         }
     }
     else {
@@ -621,7 +622,7 @@ void DamageWriter::writeDDPerTypeOverview(const std::string& name,
              << std::setw(pcWidth) << " " + critHitPercentage << '%' << " "
              << std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
         if (self) {
-            file << std::setw(pcWidth+1) << "" << " ";
+            file << std::setw(pcWidth) << na << "% ";
         }
     }
 
@@ -646,6 +647,7 @@ void DamageWriter::writeDRPerTypeOverview(const std::string& name,
     const int width = 8;
     const int pcWidth = 6;
     const int nrWidth = 4;
+    std::string na = " __._";
     file << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalDealtOnPlayer())
                              << " (" <<
@@ -655,23 +657,23 @@ void DamageWriter::writeDRPerTypeOverview(const std::string& name,
                              << " " <<
             std::fixed << std::setprecision(1);
     if (d.hasSpecialDealtOnPlayer()) {
-        file << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
+        file << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << " " + deflectHitPercentage << "% ";
         if (self) {
             std::string missPercentage = calcMissPercentageDealtOnPlayer(d);
-            file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
+            file << std::setw(pcWidth) << " " + missPercentage << "% ";
         }
     }
     else if (d.hasShieldDealtOnPlayer() ||
              d.hasRegularMissDealtOnPlayer()) {
-        file << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " "
-             << std::setw(pcWidth+1) << "" << " ";
+        file << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% "
+             << std::setw(pcWidth) << na << "% ";
         if (self) {
-            file << std::setw(pcWidth+1) << "" << " ";
+            file << std::setw(pcWidth) << na << "% ";
         }
     }
     else {
@@ -681,12 +683,12 @@ void DamageWriter::writeDRPerTypeOverview(const std::string& name,
             calcNanobotDmgPercentageDealtOnPlayer(d);
         std::string critHitPercentage =
             calcCritHitPercentageDealtOnPlayer(d);
-        file << std::setw(pcWidth) << " " + regularDmgPercentage << '%' << " "
-             << std::setw(pcWidth) << " " + nanobotDmgPercentage << '%' << " "
-             << std::setw(pcWidth) << " " + critHitPercentage << '%' << " "
-             << std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
+        file << std::setw(pcWidth) << " " + regularDmgPercentage << "% "
+             << std::setw(pcWidth) << " " + nanobotDmgPercentage << "% "
+             << std::setw(pcWidth) << " " + critHitPercentage << "% "
+             << std::setw(pcWidth) << " " + deflectHitPercentage << "% ";
         if (self) {
-            file << std::setw(pcWidth+1) << "" << " ";
+            file << std::setw(pcWidth) << na << "% ";
         }
     }
 
@@ -715,6 +717,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
     const int width = 8;
     const int pcWidth = 6;
     const int nrWidth = 4;
+    std::string na = " __._";
     file << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalReceivedFromPlayer())
                              << " (" <<
@@ -729,8 +732,13 @@ void DamageWriter::writeDDOverview(const std::string& name,
             std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
     if (self) {
-        std::string missPercentage = calcMissPercentageReceivedFromPlayer(d);
-        file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
+        if (d.hasSpecialReceivedFromPlayer()) {
+            std::string missPercentage = calcMissPercentageReceivedFromPlayer(d);
+            file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
+        }
+        else {
+            file << std::setw(pcWidth) << na << "% ";
+        }
     }
     file << std::setfill(' ');
 
@@ -757,6 +765,7 @@ void DamageWriter::writeDROverview(const std::string& name,
     const int width = 8;
     const int pcWidth = 6;
     const int nrWidth = 4;
+    std::string na = " __._";
     file << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(d.getTotalDealtOnPlayer())
                              << " (" <<
@@ -771,8 +780,13 @@ void DamageWriter::writeDROverview(const std::string& name,
             std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
     if (self) {
-        std::string missPercentage = calcMissPercentageDealtOnPlayer(d);
-        file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
+        if (d.hasSpecialDealtOnPlayer()) {
+            std::string missPercentage = calcMissPercentageDealtOnPlayer(d);
+            file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
+        }
+        else {
+            file << std::setw(pcWidth) << na << "% ";
+        }
     }
     file << std::setfill(' ');
 
@@ -993,11 +1007,13 @@ void DamageWriter::writeDetailedShieldInfo(const Damage& d) {
     const int width = 7;
     const int pcWidth = 6;
     const int nrWidth = 4;
+    std::string na = " __._";
     file << std::setw(pcWidth+2) << " " + shieldDmg << " (" <<
             std::setw(nrWidth) << shieldCount << ") " <<
+            std::setw(pcWidth) << na << "% " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
             std::setw(width) << minHit + " " << std::right <<
-            std::setw(pcWidth+1) << "" << " " << "Normal" << "<br>" << nl;
+            std::setw(pcWidth) << na << "% " << "Normal" << "<br>" << nl;
 
 }
 

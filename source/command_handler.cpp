@@ -13,7 +13,6 @@ void CommandHandler::execute(const std::string& command) {
         dtypes
         types "playerName"
         "playerName1" "playerName2"
-        dtypes "playerName1" "playerName2"
 
         dr top
         dr dtop
