@@ -10,8 +10,6 @@
 Damage& Damage::operator+=(const Damage& rhs) {
     dealtOnPlayer += rhs.dealtOnPlayer;
     receivedFromPlayer += rhs.receivedFromPlayer;
-    shield = rhs.shield;
-    special = rhs.special;
     return *this;
 }
 
@@ -31,14 +29,58 @@ void Damage::setReceivedFromPlayerDPM(int damagePerMinute) {
     receivedFromPlayer.dpm = damagePerMinute;
 }
 
+
+bool Damage::hasShieldReceivedFromPlayer() const {
+    return receivedFromPlayer.shieldCount > 0;
+}
+
+bool Damage::hasShieldDealtOnPlayer() const {
+    return dealtOnPlayer.shieldCount > 0;
+}
+
+bool Damage::hasSpecialReceivedFromPlayer() const {
+    return receivedFromPlayer.specialCount > 0 ||
+           receivedFromPlayer.specialDeflectCount > 0 ||
+           receivedFromPlayer.specialMisses > 0;
+}
+
+bool Damage::hasSpecialDealtOnPlayer() const {
+    return dealtOnPlayer.specialCount > 0 ||
+           dealtOnPlayer.specialDeflectCount > 0 ||
+           dealtOnPlayer.specialMisses > 0;
+}
+
+bool Damage::hasRegularMissReceivedFromPlayer() const {
+    return receivedFromPlayer.regularMisses > 0;
+}
+
+bool Damage::hasRegularMissDealtOnPlayer() const {
+    return dealtOnPlayer.regularMisses > 0;
+}
+
+bool Damage::hasRegularReceivedFromPlayer() const {
+    return receivedFromPlayer.regularCount > 0 ||
+           receivedFromPlayer.regularDeflectCount > 0 ||
+           receivedFromPlayer.critCount > 0;
+}
+
+bool Damage::hasRegularDealtOnPlayer() const {
+    return dealtOnPlayer.regularCount > 0 ||
+           dealtOnPlayer.regularDeflectCount > 0 ||
+           dealtOnPlayer.critCount > 0;
+}
+
+bool Damage::hasNanobotReceivedFromPlayer() const {
+    return receivedFromPlayer.nanobotCount > 0;
+}
+
+bool Damage::hasNanobotDealtOnPlayer() const {
+    return dealtOnPlayer.nanobotCount > 0;
+}
+
 void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
     di.total += li.amount;
     di.count++;
-    // TODO: Set these bools on construction only and not
-    // on each addition.
-    shield = li.shield;
-    special = li.special;
-    regularMiss = li.miss && !li.special;
 
     if (li.crit) {
         di.critCount++;

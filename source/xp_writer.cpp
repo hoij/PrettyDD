@@ -120,7 +120,7 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
     file << std::setfill(fillChar) <<
             std::setw(width + 1) << " " + std::to_string(xp.getTotalLost(type))
                              << " " <<
-            std::setw(width) << " N/A" << " " <<
+            std::setw(width) << "" << " " <<
             std::setw(width) << " " + std::to_string(maxLost) << " " <<
             std::setw(width) << " " + std::to_string(minLost) << " " <<
             std::setfill(' ');

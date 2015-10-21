@@ -57,13 +57,15 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDDetailedTopList();
 
 //        statWriter.createDDPerDamageType("You");
+//        statWriter.createDDPerDamageType("Predator Rogue");
+//        statWriter.createDDPerDamageType("Ass");
 
-        statWriter.createDDPerDamageTypeDetailed("You");
+//        statWriter.createDDPerDamageTypeDetailed("You");
+//        statWriter.createDDPerDamageTypeDetailed("Predator Rogue");
 //        statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
 
 //        statWriter.createHelp();
 
-//        statWriter.createDDPerDamageType("Ass");
 //        statWriter.createDDPerOpponent("You");
 //        statWriter.createDDPerOpponent("Predator Rogue");
 //        statWriter.createDDPerOpponent("Nonexisting");
@@ -77,7 +79,7 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDRTopList();
 //        statWriter.createDRDetailedTopList();
 
-//        statWriter.createDRPerDamageType("You");
+        statWriter.createDRPerDamageType("You");
 
 //        statWriter.createDRPerOpponent("You");
     }

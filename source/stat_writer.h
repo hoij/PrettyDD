@@ -58,7 +58,8 @@ public:
 
 private:
     void createCommands();
-    void createInfo();
+    void createInfo1();
+    void createInfo2();
     void writeCommand(std::string command, std::string description = "");
 
     PlayerVector<Player*>& playerVector;

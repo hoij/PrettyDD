@@ -18,9 +18,16 @@ public:
     void setDealtOnPlayerDPM(int damagePerMinute);
     void setReceivedFromPlayerDPM(int damagePerMinute);
 
-    bool isShield() const {return shield;}
-    bool isSpecial() const {return special;}
-    bool isRegularMiss() const {return regularMiss;}
+    bool hasShieldReceivedFromPlayer() const;
+    bool hasSpecialReceivedFromPlayer() const;
+    bool hasRegularMissReceivedFromPlayer() const;
+    bool hasRegularReceivedFromPlayer() const;
+    bool hasNanobotReceivedFromPlayer() const;
+    bool hasShieldDealtOnPlayer() const;
+    bool hasSpecialDealtOnPlayer() const;
+    bool hasRegularMissDealtOnPlayer() const;
+    bool hasRegularDealtOnPlayer() const;
+    bool hasNanobotDealtOnPlayer() const;
 
     // TODO: This is shit, just rework everything.
     int getTotalDealtOnPlayer() const {return dealtOnPlayer.total;}
@@ -129,10 +136,6 @@ private:
         int regularMisses = 0;
         int specialMisses = 0;
     };
-
-    bool shield = false;
-    bool special = false;
-    bool regularMiss = false;
 
     DamageInfo dealtOnPlayer;
     DamageInfo receivedFromPlayer;

@@ -2,6 +2,7 @@
 
 ["#0000000042000008#","You hit other","",1425326282]You hit Predator Rogue for 2357 points of projectile damage.
 ["#0000000042000008#","You hit other","",1425326291]You hit Predator Rogue for 3911 points of projectile damage.Critical hit!
+["#0000000042000008#","You hit other","",1425326291]You hit Predator Rogue for 3911 points of radiation damage.Critical hit!
 
 ["#0000000042000008#","You hit other","",1425326284]You hit Predator Rogue for 2329 points of chemical damage.
 ["#0000000042000008#","You hit other","",1425326288]You hit Predator Rogue for 2357 points of Fast Attack damage.

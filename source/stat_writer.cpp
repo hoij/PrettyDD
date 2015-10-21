@@ -125,7 +125,8 @@ void StatWriter::createHelp() {
     }
 
     createCommands();
-    createInfo();
+    createInfo1();
+    createInfo2();
 
     closeFile();
 }
@@ -207,11 +208,12 @@ void StatWriter::createCommands() {
     writeEndOfLink("PDD Commands");
 }
 
-void StatWriter::createInfo() {
+void StatWriter::createInfo1() {
 
-    writeStartOfLink("PDD Info");
+    writeStartOfLink("PDD Info 1(2)");
 
     file << "<br>" << nl
+         << "Overview per Player<br>" << nl
          << "Crit Hit Rate Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "The crit rate is calculated in the following way:<br>" << nl
@@ -235,6 +237,23 @@ void StatWriter::createInfo() {
          << "  Regular: regular hits, crits and regular deflects<br>" << nl
          << "  Special: Special hits and special deflects<br>" << nl
          << "  Nanobot: Nanobot hits<br>" << nl
+         << "</font>";
+
+    writeEndOfLink("PDD Info 1(2)");
+}
+
+void StatWriter::createInfo2() {
+
+    writeStartOfLink("PDD Info 2(2)");
+
+    file << "<br>" << nl
+         << "Info per Type<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "The regular and nanobot % is % of total damage for<br>" << nl
+         << "that type<br>" << nl
+         << "The crit, deflect and miss hit % is % of total hits<br>" << nl
+         << "for that type<br>." << nl
+         << "A blank line means that stat is not available<br><br>" << nl << nl
          << "</font>"
 
          << "Detailed info per type<br>" << nl
@@ -245,5 +264,5 @@ void StatWriter::createInfo() {
          << "The damage % is % of total damage done.<br><br>" << nl << nl
          << "</font>";
 
-    writeEndOfLink("PDD Info");
+    writeEndOfLink("PDD Info 2(2)");
 }
