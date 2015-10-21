@@ -45,7 +45,7 @@ void WriterHelper::writeName(std::string name) {
     file << ((name == "You") ? " %m" : " " + name);
 }
 
-std::string WriterHelper::checkIfSelf(std::string name) {
+std::string WriterHelper::renameIfSelf(std::string name) {
     std::string playerRunningProgram = config.getplayerRunningProgram();
     return (name == playerRunningProgram ? "You" : name);
 }

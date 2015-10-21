@@ -46,7 +46,7 @@ void DamageWriter::createDDDetailedTopList() {
     sortByDealt(totalDamageDealtForEachPlayer);
 
     // Calculate the number of files needed to write all players
-    const int playersPerWindow = 8;
+    const int playersPerWindow = 7;
     int nrOfPlayers = (int)totalDamageDealtForEachPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
@@ -89,7 +89,7 @@ void DamageWriter::createDDOnSpecificOpponent(std::string playerName,
     createDamageOnSpecificOpponent(playerName,
                                    opponentName,
                                    titleBase,
-                                   8,
+                                   7,
                                    false);
 }
 
@@ -97,12 +97,13 @@ void DamageWriter::createDDOnSpecificOpponentDetailed(
     std::string playerName,
     std::string opponentName) {
 
-    std::string titleBase = "Detailed DD On " + opponentName + " By " +
+    std::string titleBase = "Detailed DD Per Damage Type On " +
+                            opponentName + " By " +
                             playerName;
     createDamageOnSpecificOpponent(playerName,
                                    opponentName,
                                    titleBase,
-                                   3,
+                                   2,
                                    true);
 }
 
@@ -112,7 +113,7 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
                                                   int typesPerWindow,
                                                   bool detailed) {
 
-    std::string pName = checkIfSelf(playerName);
+    std::string pName = renameIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
         createNotFoundMessage(titleBase, playerName + " not found.");
@@ -120,9 +121,10 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
     }
 
     // Get the data and sort it:
+    std::string oppName = renameIfSelf(opponentName);
     std::vector<std::pair<std::string, Damage>>
         allDamageTypesFromAffectedPlayer =
-            pp->getAllDamageDealtOnAffectedPlayer(opponentName);
+            pp->getAllDamageDealtOnAffectedPlayer(oppName);
     sortByDealt(allDamageTypesFromAffectedPlayer);
 
     // Check if the opponent was found.
@@ -144,7 +146,7 @@ void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
 
     writeDamagePointer wdp;
     writeHeadingsPointer whp;
-    setDDWriteMethods(whp, wdp, detailed);
+    setDDPerTypeWriteMethods(whp, wdp, detailed);
 
     // Calculate the number of files needed to write all players
     int nrOfTypes = (int)allDamageTypesFromAffectedPlayer.size();
@@ -194,7 +196,7 @@ void DamageWriter::createDRDetailedTopList() {
     sortByReceived(totalDamageReceivedForEachPlayer);
 
     // Calculate the number of files needed to write all players
-    const int playersPerWindow = 8;
+    const int playersPerWindow = 7;
     int nrOfPlayers = (int)totalDamageReceivedForEachPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
@@ -233,7 +235,7 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
                                              bool dealt,
                                              bool detailed) {
 
-    std::string pName = checkIfSelf(playerName);
+    std::string pName = renameIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
         createNotFoundMessage(titleBase, playerName + " not found.");
@@ -280,7 +282,7 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
     /* Writes damage received or damage dealt depending on the bool "dealt".
     */
 
-    std::string pName = checkIfSelf(playerName);
+    std::string pName = renameIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
     if (pp == nullptr) {
         createNotFoundMessage(titleBase, playerName + " not found.");
@@ -309,7 +311,7 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
                 playerName == config.getplayerRunningProgram();
 
     // Calculate the number of files needed to write all players
-    const int playersPerWindow = 7;
+    const int playersPerWindow = 6;
     int nrOfPlayers = (int)totalDamageForEachAffectedPlayer.size();
     int nrOfWindows = calcNrOfWindows(nrOfPlayers, playersPerWindow);
 
@@ -487,10 +489,11 @@ void DamageWriter::writeOverviewHeadings(bool self) {
             std::setw(6) << "(_Cnt) " <<
             std::setw(width-1) << " DPM " <<
             std::setw(width) << " Regular " <<
-            std::setw(width) << " Special " <<
+            std::setw(width+1) << " Special " <<
             std::setw(width) << " Nanobot " <<
+            std::setw(width) << " Shield " <<
             std::setw(width) << " Crit " <<
-            std::setw(width+1) << " Deflect ";
+            std::setw(width) << " Deflect ";
     if (self) {
         file << std::setw(width) << " Miss ";
     }
@@ -710,6 +713,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
     std::string regularDmgPercentage = calcRegularDmgPercentageReceivedFromPlayer(d);
     std::string specialDmgPercentage = calcSpecialDmgPercentageReceivedFromPlayer(d);
     std::string nanobotDmgPercentage = calcNanobotDmgPercentageReceivedFromPlayer(d);
+    std::string shieldDmgPercentage = calcShieldDmgPercentageReceivedFromPlayer(d);
 
     std::string critHitPercentage = calcCritHitPercentageReceivedFromPlayer(d);
     std::string deflectHitPercentage = calcDeflectHitPercentageReceivedFromPlayer(d);
@@ -729,6 +733,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
             std::setw(pcWidth) << " " + regularDmgPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + specialDmgPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + nanobotDmgPercentage << '%' << " " <<
+            std::setw(pcWidth) << " " + shieldDmgPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
     if (self) {
@@ -758,6 +763,7 @@ void DamageWriter::writeDROverview(const std::string& name,
     std::string regularDmgPercentage = calcRegularDmgPercentageDealtOnPlayer(d);
     std::string specialDmgPercentage = calcSpecialDmgPercentageDealtOnPlayer(d);
     std::string nanobotDmgPercentage = calcNanobotDmgPercentageDealtOnPlayer(d);
+    std::string shieldDmgPercentage = calcShieldDmgPercentageDealtOnPlayer(d);
 
     std::string critHitPercentage = calcCritHitPercentageDealtOnPlayer(d);
     std::string deflectHitPercentage = calcDeflectHitPercentageDealtOnPlayer(d);
@@ -777,6 +783,7 @@ void DamageWriter::writeDROverview(const std::string& name,
             std::setw(pcWidth) << " " + regularDmgPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + specialDmgPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + nanobotDmgPercentage << '%' << " " <<
+            std::setw(pcWidth) << " " + shieldDmgPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
     if (self) {
@@ -1244,4 +1251,18 @@ std::string DamageWriter::calcNanobotDmgPercentageDealtOnPlayer(const Damage&d) 
     int nanobotDmg = d.getNanobotTotalDealtOnPlayer();
 
     return percentage(totalDmg, nanobotDmg);
+}
+
+std::string DamageWriter::calcShieldDmgPercentageReceivedFromPlayer(const Damage&d) {
+    int totalDmg = d.getTotalReceivedFromPlayer();
+    int shieldDmg = d.getShieldTotalReceivedFromPlayer();
+
+    return percentage(totalDmg, shieldDmg);
+}
+
+std::string DamageWriter::calcShieldDmgPercentageDealtOnPlayer(const Damage&d) {
+    int totalDmg = d.getTotalDealtOnPlayer();
+    int shieldDmg = d.getShieldTotalDealtOnPlayer();
+
+    return percentage(totalDmg, shieldDmg);
 }

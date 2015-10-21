@@ -57,7 +57,8 @@ public:
     void createHelp();
 
 private:
-    void createCommands();
+    void createCommands1();
+    void createCommands2();
     void createInfo1();
     void createInfo2();
     void writeCommand(std::string command, std::string description = "");

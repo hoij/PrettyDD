@@ -77,12 +77,8 @@ private:
 
     // Headings
     void writeTopListHeadings(bool self);
-    void writeOverviewHeadingsOthers();
-    void writeOverviewHeadingsSelf();
     void writeOverviewHeadings(bool self);
     void writeOverviewHeadingsDetailed(bool self);
-    void writePerTypeOverviewHeadingsOthers();
-    void writePerTypeOverviewHeadingsSelf();
     void writePerTypeOverviewHeadings(bool self);
 
     // Writes
@@ -141,6 +137,7 @@ private:
     std::string calcRegularDmgPercentageReceivedFromPlayer(const Damage&d);
     std::string calcSpecialDmgPercentageReceivedFromPlayer(const Damage&d);
     std::string calcNanobotDmgPercentageReceivedFromPlayer(const Damage&d);
+    std::string calcShieldDmgPercentageReceivedFromPlayer(const Damage&d);
 
     std::string calcCritHitPercentageDealtOnPlayer(const Damage&d);
     std::string calcMissPercentageDealtOnPlayer(const Damage&d);
@@ -149,6 +146,7 @@ private:
     std::string calcRegularDmgPercentageDealtOnPlayer(const Damage&d);
     std::string calcSpecialDmgPercentageDealtOnPlayer(const Damage&d);
     std::string calcNanobotDmgPercentageDealtOnPlayer(const Damage&d);
+    std::string calcShieldDmgPercentageDealtOnPlayer(const Damage&d);
 
 
     PlayerVector<Player*>& playerVector;

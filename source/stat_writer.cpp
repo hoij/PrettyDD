@@ -124,39 +124,44 @@ void StatWriter::createHelp() {
         return;
     }
 
-    createCommands();
+    createCommands1();
+    createCommands2();
     createInfo1();
     createInfo2();
 
     closeFile();
 }
 
-void StatWriter::createCommands() {
+void StatWriter::createCommands1() {
 
-    writeStartOfLink("PDD Commands");
+    writeStartOfLink("PDD Commands 1(2)");
     file << "<br>" << nl <<
-            "Begin the command by saying:<br>" << nl <<
+            "Begin a command by saying:<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
     writeCommand("pdd");
     file << "</font>" << nl <<
-            "Then add one of the below options.<br>" << nl <<
+            "Then add one of the options in the command list.<br>" << nl <<
             "Example:<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
     writeCommand("pdd dr Sgtcuddle");
     file << "</font>" << nl <<
             "Show the script by typing:<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
-    writeCommand("/pdd<br>");
+    writeCommand("/pdd1<br>");
     file << "</font>" << nl << nl <<
             "Damage dealt:" << "<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
     writeCommand("top");
-    writeCommand("dtop", "More details");
-    writeCommand("[player]", "Overview of player");
-    writeCommand("types", "Overview per type");
-    writeCommand("dtypes", "Detailed info per type");
-    writeCommand("types [player]", "Overview per type for player");
-    writeCommand("[player1] [player2]", "Damage on player2 by player1");
+    writeCommand("dtop", "Detailed top list");
+    writeCommand("opp [player]", "Damage per opponent for player");
+    writeCommand("[player]", "As above");
+    writeCommand("types", "Damage per type for you");
+    writeCommand("types [player]", "Damage per type for player");
+    writeCommand("types [player1] [player2]", "Damage per type on player2 by player1");
+    writeCommand("[player1] [player2]", "As above");
+    writeCommand("dtypes", "Detailed damage per type for you");
+    writeCommand("dtypes [player1] [player2]",
+                 "Detailed damage per type on player2 by player1");
     file << "</font>";
     file << "<br>" << nl;
 
@@ -164,31 +169,23 @@ void StatWriter::createCommands() {
     file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("dr top");
     writeCommand("dr dtop");
+    writeCommand("dr opp [player]");
     writeCommand("dr [player]");
     writeCommand("dr types");
     writeCommand("dr types [player]");
     file << "</font>";
     file << "<br>" << nl;
 
-//    file << "Heal:" << "<br>" << nl;
-//    writeCommand("h top");
-//    writeCommand("h dtop");
-//    writeCommand("h dealt") << nl;
+    writeEndOfLink("PDD Commands 1(2)");
+}
 
-//    file << "Nano:" << "<br>" << nl;
-//    writeCommand("n top");
-//    writeCommand("n dtop");
-//    writeCommand("n dealt") << nl;
+void StatWriter::createCommands2() {
+
+    writeStartOfLink("PDD Commands 2(2)");
 
     file << "Nano Program:" << "<br>" << nl;
     file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("np");
-//    writeCommand("np casted");
-//    writeCommand("np casted t");
-//    writeCommand("np casted [player]");
-//    writeCommand("np received");
-//    writeCommand("np received t");
-//    writeCommand("np received [player]");
     file << "</font>";
     file << "<br>" << nl;
 
@@ -203,7 +200,7 @@ void StatWriter::createCommands() {
     writeCommand("help");
     file << "</font>";
 
-    writeEndOfLink("PDD Commands");
+    writeEndOfLink("PDD Commands 2(2)");
 }
 
 void StatWriter::createInfo1() {
@@ -211,7 +208,7 @@ void StatWriter::createInfo1() {
     writeStartOfLink("PDD Info 1(2)");
 
     file << "<br>" << nl
-         << "Overview per Player<br>" << nl
+         << "Info About Damage per Player<br>" << nl
          << "Crit Hit Rate Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "The crit rate is calculated in the following way:<br>" << nl
@@ -245,7 +242,7 @@ void StatWriter::createInfo2() {
     writeStartOfLink("PDD Info 2(2)");
 
     file << "<br>" << nl
-         << "Info per Type (types)<br>" << nl
+         << "Info About Damage per Type (types)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "* Regular and nanobot % is % of total damage for"
             "that type<br>" << nl
@@ -256,7 +253,7 @@ void StatWriter::createInfo2() {
             "to 100%. The remaining % is most likely shield damage.<br><br>" << nl << nl
          << "</font>"
 
-         << "Detailed info per type (dtypes)<br>" << nl
+         << "Info About Detailed Damage per Type (dtypes)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "* Regular and nanobot hit% is % of total hits.<br>" << nl
          << "* Crit, deflect and miss hit % is % of hits that can "
