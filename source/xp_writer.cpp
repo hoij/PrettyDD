@@ -84,7 +84,7 @@ void XPWriter::writeXPHeadingsDetailed() {
 void XPWriter::writeXPStatsOverview(const XP& xp, std::string type) {
     const int width = 9;
     file << std::setfill(fillChar) <<
-            std::setw(width + 1) << " " + std::to_string(xp.getTotal(type)) <<
+            std::setw(width + 2) << " " + std::to_string(xp.getTotal(type)) <<
                                     " " <<
             std::setw(width) << " " + std::to_string(xp.getXPH(type)) << " " <<
             std::setfill(' ');
@@ -107,7 +107,7 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
 
     const int width = 9;
     file << std::setfill(fillChar) <<
-            std::setw(width + 1) << " " + std::to_string(xp.getTotalGained(type))
+            std::setw(width + 2) << " " + std::to_string(xp.getTotalGained(type))
                              << " " <<
             std::setw(width) << " " + std::to_string(xp.getXPHGained(type))
                              << " " <<
@@ -118,7 +118,7 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
     file << "<br>" << nl;
 
     file << std::setfill(fillChar) <<
-            std::setw(width + 1) << " " + std::to_string(xp.getTotalLost(type))
+            std::setw(width + 2) << " " + std::to_string(xp.getTotalLost(type))
                              << " " <<
             std::setw(width) << "" << " " <<
             std::setw(width) << " " + std::to_string(maxLost) << " " <<
