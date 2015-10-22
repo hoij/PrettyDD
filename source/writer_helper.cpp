@@ -61,7 +61,7 @@ std::string WriterHelper::appendInterval(std::string titleBase,
 
 void WriterHelper::createNotFoundMessage(std::string title,
                                          std::string message) {
-    if (!openFile("pdd1")) {
+    if (!openFile("pdd")) {
         return;
     }
     file << "<a href=\"text://" + message + "<br>" <<

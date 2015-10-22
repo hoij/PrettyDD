@@ -383,7 +383,10 @@ void DamageWriter::writeToFile(
     unsigned int nrOfFiles = calcNrOfFiles(nrOfWindows, windowsPerFile);
     for (unsigned int fileNr = 1; fileNr <= nrOfFiles; fileNr++) {
 
-        std::string fileName = "pdd" + std::to_string(fileNr);
+        std::string fileName = "pdd";
+        if (fileNr > 1) {
+            fileName += std::to_string(fileNr);
+        }
 
         if (!openFile(fileName)) {
             return;

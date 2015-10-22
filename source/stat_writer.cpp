@@ -120,7 +120,7 @@ void StatWriter::writeCommand(std::string command, std::string description) {
 }
 
 void StatWriter::createHelp() {
-    if (!openFile("pdd1")) {
+    if (!openFile("pdd")) {
         return;
     }
 
@@ -147,7 +147,7 @@ void StatWriter::createCommands1() {
     file << "</font>" << nl <<
             "Show the script by typing:<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
-    writeCommand("/pdd1<br>");
+    writeCommand("/pdd<br>");
     file << "</font>" << nl << nl <<
             "Damage dealt:" << "<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
