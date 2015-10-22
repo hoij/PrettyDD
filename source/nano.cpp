@@ -1,6 +1,5 @@
 #include "nano.h"
 
-#include <limits>
 #include <string>
 
 

@@ -1,6 +1,7 @@
 #include "writer_helper.h"
 
 #include <iomanip>
+#include <limits>
 
 
 WriterHelper::WriterHelper(Configuration& config,
