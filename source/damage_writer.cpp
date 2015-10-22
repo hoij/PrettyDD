@@ -1094,15 +1094,6 @@ void DamageWriter::sortByReceived(
                  });
 }
 
-std::string DamageWriter::determineMin(int minDmg) {
-    return std::to_string((minDmg == std::numeric_limits<int>::max()) ?
-                           0 : minDmg);
-}
-
-std::string DamageWriter::determineMax(int maxDmg) {
-    return std::to_string((maxDmg == -1) ? 0 : maxDmg);
-}
-
 std::string DamageWriter::calcCritHitPercentageReceivedFromPlayer(const Damage&d) {
     /* Based on attacks that have the potential to crit */
     int regularHits = d.getRegularCountReceivedFromPlayer() +

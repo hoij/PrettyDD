@@ -36,6 +36,9 @@ public:
     std::string percentage(int total, int part);
     std::string dblToString(const double d);
 
+    std::string determineMin(int amount);
+    std::string determineMax(int amount);
+
 protected:
     // Colors
     const std::string lime = "#00FF00";

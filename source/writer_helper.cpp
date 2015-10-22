@@ -92,3 +92,12 @@ std::string WriterHelper::dblToString(const double d) {
     out << std::fixed << std::setprecision(1) << d;
     return out.str();
 }
+
+std::string WriterHelper::determineMin(int amount) {
+    return std::to_string((amount == std::numeric_limits<int>::max()) ?
+        0 : amount);
+}
+
+std::string WriterHelper::determineMax(int amount) {
+    return std::to_string((amount == -1) ? 0 : amount);
+}
