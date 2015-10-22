@@ -56,7 +56,6 @@ void Parser::createFunctionMap() {
     funcMap["Research"] = &Parser::research;
     funcMap["You gave nano"] = &Parser::youGaveNano;
     funcMap["Me got nano"] = &Parser::meGotNano;
-    funcMap["Victory Points"] = &Parser::victoryPoints;
     funcMap["System"] = &Parser::system;
 }
 
@@ -115,7 +114,8 @@ int Parser::findAmount(const std::string& message) {
         return std::stoi(d[1]);
     }
     else if (regex_search(message, d, regex("\\d+\\s"))) {
-        // For XP/SK/Reserach but might match some other line I've missed.
+        // For XP/SK/Reserach/PVP Score but might match some other line
+        // I've missed.
         return std::stoi(d[0]);
     }
     else if (regex_search(message, d, regex("(?::\\s)(\\d+)"))) {
@@ -125,6 +125,45 @@ int Parser::findAmount(const std::string& message) {
         errorLog.write("Error: Amount not found in: ");
         errorLog.write("Error: Message: " + message);
         return 0;
+    }
+}
+
+std::string Parser::findSubtype(const std::string& message, const std::string type) {
+    if (type == "damage") {
+        return findDamageSubtype(message);
+    }
+    else if (type == "nano cast") {
+        return findNanoCastSubtype(message);
+    }
+    else if (type == "heal") {
+        return findHealSubtype(message);
+    }
+    else if (type == "sk") {
+        return findSKSubtype(message);
+    }
+    else if (type == "research") {
+        return "gained"; // Can't lose research.
+    }
+    else if (type == "xp") {
+        return findXPSubtype(message);
+    }
+    else if (type == "aixp") {
+        return findAIXPSubtype(message);
+    }
+    else if (type == "vp") {
+        return "gained";
+    }
+    else if (type == "PVP Solo Score" ||
+             type == "PVP Team Score") {
+        return "gained";
+    }
+    else if (type == "nano") {
+        return ""; // No subtype for nano.
+    }
+    else {
+        errorLog.write("Error: Could not find a type in:");
+        errorLog.write("Error: Message: " + message);
+        return "";
     }
 }
 
@@ -250,41 +289,6 @@ std::string Parser::findAIXPSubtype(const std::string& message) {
     }
     else {
         errorLog.write("Error: Could not find an AIXP subtype in:");
-        errorLog.write("Error: Message: " + message);
-        return "";
-    }
-}
-
-std::string Parser::findSubtype(const std::string& message, const std::string type) {
-    if (type == "damage") {
-        return findDamageSubtype(message);
-    }
-    else if (type == "nano cast") {
-        return findNanoCastSubtype(message);
-    }
-    else if (type == "heal") {
-        return findHealSubtype(message);
-    }
-    else if (type == "sk") {
-        return findSKSubtype(message);
-    }
-    else if (type == "research") {
-        return "gained"; // Can't lose research.
-    }
-    else if (type == "xp") {
-        return findXPSubtype(message);
-    }
-    else if (type == "aixp") {
-        return findAIXPSubtype(message);
-    }
-    else if (type == "vp") {
-        return "gained";
-    }
-    else if (type == "nano") {
-        return ""; // No subtype for nano.
-    }
-    else {
-        errorLog.write("Error: Could not find a type in:");
         errorLog.write("Error: Message: " + message);
         return "";
     }
@@ -768,14 +772,22 @@ LineInfo Parser::meGotSK(const std::string& message) {
 LineInfo Parser::meGotXP(const std::string& message) {
     /*
     ["#000000004200000b#","Me got XP","",1426200654]You lost 9822 xp.
-    ["#000000004200000b#","Me got XP","",1425993638]You gained 2562 new Alien Experience Points.
     ["#000000004200000b#","Me got XP","",1426199427]You received 247 xp.
+    ["#000000004200000b#","Me got XP","",1425993638]You gained 2562 new Alien Experience Points.
+    ["#000000004200000b#","Me got XP","",1444740647]You gained 100 PVP Solo Score.
+    ["#000000004200000b#","Me got XP","",1445100355]You gained 101 PVP Team Score.
     */
     LineInfo li;
     li.receiver_name = "You";
     std::smatch m;
     if (regex_search(message, m, regex("Alien Experience"))) {
         li.type = "aixp";
+    }
+    else if (regex_search(message, m, regex("Solo Score"))) {
+        li.type = "PVP Solo Score";
+    }
+    else if (regex_search(message, m, regex("Team Score"))) {
+        li.type = "PVP Team Score";
     }
     else {
         li.type = "xp";
@@ -840,24 +852,6 @@ LineInfo Parser::meGotNano(const std::string& message) {
     return li;
 }
 
-LineInfo Parser::victoryPoints(const std::string& message) {
-    // This is ignored for now.
-    // TODO: Find out why these messages are different. Maybe it's
-    // todo with wuest reward, double clicking pvp vp item to pick it up,
-    // pressing E to pick it up, killing notum miner or looting VP rewards
-    // from AI missions.
-    /* When clicking a VP reward, this is the message:
-    This first line is faulty?
-    ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
-    ["#0000000040000001#","System","",1444744688]New Victory Points gained: 95.
-    ["#0000000040000001#","System","",1444856587]New Victory Points gained.
-    */
-    LineInfo li;
-    //li.type = "vp";
-    (void)message;
-    return li;
-}
-
 LineInfo Parser::system(const std::string& message) {
     /*
     ["#0000000040000001#", "System", "", 1442506644]Muwe executes Bodily Invigoration within your NCU...
@@ -883,14 +877,24 @@ LineInfo Parser::system(const std::string& message) {
         li.dealer_name = m[1];
         li.nanoProgramName = m[2];
     }
-    else if (regex_search(message, m, regex("Victory Points"))) {
-        li.receiver_name = "You";
-        li.type = "vp";
-        li.subtype = "gained";
-        li.amount = findAmount(message);
-        li.hasStats = true;
-        return li;
-    }
+//    else if (regex_search(message, m, regex("Victory Points"))) {
+    // This is ignored for now.
+    // TODO: Find out why these messages are different. Maybe it's
+    // todo with quest reward, double clicking pvp vp item to pick it up,
+    // pressing E to pick it up, killing notum miner or looting VP rewards
+    // from AI missions.
+    /* When clicking a VP reward, this is the message (really? with a space?):
+    ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
+    Other variants:
+    ["#0000000040000001#","System","",1444744688]New Victory Points gained: 95.
+    ["#0000000040000001#","System","",1444856587]New Victory Points gained.
+    */
+//        li.receiver_name = "You";
+//        li.type = "vp";
+//        li.subtype = "gained";
+//        li.amount = findAmount(message);
+//        li.hasStats = true;
+//    }
     li.hasStats = false;
     return li;
 }

@@ -28,7 +28,23 @@ INSTANTIATE_TEST_CASE_P(meGotXP, ParseTest,
                              "You",
                              "xp",
                              "lost",
-                             9822))));
+                             9822)),
+        std::make_tuple(
+            FormattedLineStub("Me got XP",
+                              "You gained 100 PVP Solo Score."),
+            ExtendedLineInfo("",
+                             "You",
+                             "PVP Solo Score",
+                             "gained",
+                             100)),
+        std::make_tuple(
+            FormattedLineStub("Me got XP",
+                              "You gained 101 PVP Team Score."),
+            ExtendedLineInfo("",
+                             "You",
+                             "PVP Team Score",
+                             "gained",
+                             101))));
 
 INSTANTIATE_TEST_CASE_P(meGotSK, ParseTest,
     testing::Values(
@@ -58,4 +74,12 @@ INSTANTIATE_TEST_CASE_P(research, ParseTest,
                              "You",
                              "research",
                              "gained",
-                             139139)))) ;
+                             139139)),
+        std::make_tuple(
+            FormattedLineStub("Research",
+                              "You have completed your research on \"Force Recon 9\"."),
+            ExtendedLineInfo("",
+                             "",
+                             "",
+                             "",
+                             0))));

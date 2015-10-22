@@ -69,7 +69,8 @@ void Player::add(LineInfo& lineInfo) {
              lineInfo.type == "sk" ||
              lineInfo.type == "research" ||
              lineInfo.type == "aixp" ||
-             lineInfo.type == "vp") {
+             lineInfo.type == "PVP Solo Score" ||
+             lineInfo.type == "PVP Team Score") {
         addXp(lineInfo);
     }
 }

@@ -94,30 +94,35 @@ void XPWriter::writeXPStatsOverview(const XP& xp, std::string type) {
 
 void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
 
+    int totalGained = xp.getTotalGained(type);
     std::string maxGained = determineMax(xp.getMaxGained(type));
     std::string minGained = determineMin(xp.getMinGained(type));
+    const int width = 9;
+    if (xp.getCountGained(type) > 0) {
+        file << std::setfill(fillChar) <<
+                std::setw(width + 2) << " " + std::to_string(totalGained)
+                                 << " " <<
+                std::setw(width) << " " + std::to_string(xp.getXPHGained(type))
+                                 << " " <<
+                std::setw(width) << " " + maxGained << " " <<
+                std::setw(width) << " " + minGained << " " <<
+                std::setfill(' ');
+        writeName(type + " gained");
+        file << "<br>" << nl;
+    }
+
+    int totalLost = xp.getTotalLost(type);
     std::string maxLost = determineMax(xp.getMaxLost(type));
     std::string minLost = determineMin(xp.getMinLost(type));
-
-    const int width = 9;
-    file << std::setfill(fillChar) <<
-            std::setw(width + 2) << " " + std::to_string(xp.getTotalGained(type))
-                             << " " <<
-            std::setw(width) << " " + std::to_string(xp.getXPHGained(type))
-                             << " " <<
-            std::setw(width) << " " + maxGained << " " <<
-            std::setw(width) << " " + minGained << " " <<
-            std::setfill(' ');
-    writeName(type + " gained");
-    file << "<br>" << nl;
-
-    file << std::setfill(fillChar) <<
-            std::setw(width + 2) << " " + std::to_string(xp.getTotalLost(type))
-                             << " " <<
-            std::setw(width) << "" << " " <<
-            std::setw(width) << " " + maxLost << " " <<
-            std::setw(width) << " " + minLost << " " <<
-            std::setfill(' ');
-    writeName(type + " lost");
-    file << "<br>" << nl;
+    if (xp.getCountLost(type) > 0) {
+        file << std::setfill(fillChar) <<
+                std::setw(width + 2) << " " + std::to_string(totalLost)
+                                 << " " <<
+                std::setw(width) << "" << " " <<
+                std::setw(width) << " " + maxLost << " " <<
+                std::setw(width) << " " + minLost << " " <<
+                std::setfill(' ');
+        writeName(type + " lost");
+        file << "<br>" << nl;
+    }
 }
