@@ -51,7 +51,7 @@ void CommandHandler::execute(const std::string& command) {
 
 //        statWriter.createNanoProgramsCastedDetailedList();
         // For testing purposes:
-//        statWriter.createXPInfo();
+        statWriter.createXPInfo();
 //        statWriter.createDDTopList();
 //        statWriter.createDDDetailedTopList();
 
@@ -78,7 +78,7 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDRTopList();
 //        statWriter.createDRDetailedTopList();
 
-        statWriter.createDRPerDamageType("You");
+//        statWriter.createDRPerDamageType("You");
 
 //        statWriter.createDRPerOpponent("You");
     }

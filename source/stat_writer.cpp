@@ -220,9 +220,9 @@ void StatWriter::createInfo1() {
          << "Miss/Deflect Rate Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "The miss rate is calculated in the following way:<br>" << nl
-         << "  nr of misses (or deflects) ( for normals and specials) / <br>"
+         << "  nr of misses (or deflects) ( for normals and specials) / <br>" << nl
          << "  (all attacks/deflects/misses except for nanobots and shields)"
-         << "<br><br>" << nl << nl
+            "<br><br>" << nl << nl
          << "</font>"
 
          << "Nanobot Info<br>" << nl
@@ -251,7 +251,8 @@ void StatWriter::createInfo2() {
             "for that type.<br>" << nl
          << "* A blank line means that stat is not available<br>" << nl
          << "* If the sum of regular, special, nanobot % does not add up "
-            "to 100%. The remaining % is most likely shield damage.<br><br>" << nl << nl
+            "to 100%. The remaining % is most likely shield damage.<br><br>"
+         << nl << nl
          << "</font>"
 
          << "Info About Detailed Damage per Type (dtypes)<br>" << nl
@@ -260,6 +261,11 @@ void StatWriter::createInfo2() {
          << "* Crit, deflect and miss hit % is % of hits that can "
             "crit, i.e. only regular attacks. <br>" << nl
          << "* Damage % is % of total damage done.<br><br>" << nl << nl
+         << "</font>"
+
+         << "Info About XP (xp)<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
          << "</font>";
 
     writeEndOfLink("PDD Info 2(2)");

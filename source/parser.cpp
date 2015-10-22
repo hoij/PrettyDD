@@ -786,13 +786,19 @@ LineInfo Parser::meGotXP(const std::string& message) {
 
 LineInfo Parser::research(const std::string& message) {
     /*
-    There is also global research. Ignore it for now.
+    There is also global research. Ignoring it for now as there
+    hasn't been anything to research for years.
     ["#000000004200001c#","Research","",1425326289]139139 of your XP were allocated to your personal research.<br>
+    ["#000000004200001c#","Research","",1444757023]You have completed your research on "Force Recon 9".
+    Also want to ignore the completed research message above so a search is needed.
     */
     LineInfo li;
-    li.type = "research";
-    li.receiver_name = "You";
-    li.amount = findAmount(message);
+    std::smatch m;
+    if (regex_search(message, m, regex("personal"))) {
+        li.type = "research";
+        li.receiver_name = "You";
+        li.amount = findAmount(message);
+    }
     return li;
 }
 
@@ -835,13 +841,19 @@ LineInfo Parser::meGotNano(const std::string& message) {
 }
 
 LineInfo Parser::victoryPoints(const std::string& message) {
-    // TODO: Maybe the message is different when it's given as a
-    // BS or quest reward. Check it out.
+    // This is ignored for now.
+    // TODO: Find out why these messages are different. Maybe it's
+    // todo with wuest reward, double clicking pvp vp item to pick it up,
+    // pressing E to pick it up, killing notum miner or looting VP rewards
+    // from AI missions.
     /* When clicking a VP reward, this is the message:
+    This first line is faulty?
     ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
+    ["#0000000040000001#","System","",1444744688]New Victory Points gained: 95.
+    ["#0000000040000001#","System","",1444856587]New Victory Points gained.
     */
     LineInfo li;
-    li.type = "vp";
+    //li.type = "vp";
     (void)message;
     return li;
 }
