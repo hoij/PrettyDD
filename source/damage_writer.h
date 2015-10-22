@@ -124,9 +124,6 @@ private:
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
 
-    std::string determineMin(int minDmg);
-    std::string determineMax(int maxDmg);
-
     std::string calcCritHitPercentageReceivedFromPlayer(const Damage&d);
     std::string calcMissPercentageReceivedFromPlayer(const Damage&d);
     std::string calcRegularMissPercentageReceivedFromPlayer(const Damage&d);
