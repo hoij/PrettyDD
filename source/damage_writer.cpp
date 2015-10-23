@@ -530,10 +530,11 @@ void DamageWriter::writeOverviewHeadingsDetailed(bool self) {
     file << std::setfill(fillChar) << std::right <<
             std::setw(width+1) << " Dmg" << " (" <<
             std::setw(nrWidth) << "_Cnt" << ") " <<
-            std::setw(pcWidth-1) << " Dmg" << "% " <<
+            std::setw(pcWidth-1) << " Dmg" << "%  " <<
             std::setw(width-1) << " Max" << "-" << std::left <<
             std::setw(width) << "Min " << std::right <<
-            std::setw(pcWidth+1) << " Hit" << "%<br><br>" <<
+            std::setw(pcWidth+1) << " TotHit" << "%" <<
+            std::setw(pcWidth+1) << "  CatHit" << "%<br><br>" <<
             "</font>" << nl;
 }
 
@@ -822,8 +823,10 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
         // if they both exist. No point writing this otherwise as it would be
         // identical to the total info written in respective branch.
         writeTotalInfo(d.getTotalReceivedFromPlayer(),
-                       d.getCountReceivedFromPlayer());
-        }
+                       d.getCountReceivedFromPlayer(),
+                       "");
+        file << "<br>" << nl;
+    }
 
     // If there is any regular damage
     if (d.hasRegularReceivedFromPlayer()) {
@@ -852,43 +855,55 @@ void DamageWriter::writeDDOverviewDetailed(const std::string& name,
 
 void DamageWriter::writeDetailedRegularInfo(const Damage& d) {
 
-    file << "<font color = " + lightBlue + ">" << nl <<
-            "Regular " << "</font><br>" << nl;
-
-    int totalRegularDmg = d.getRegularTotalReceivedFromPlayer() +
+    int totalRegularDmg = d.getNormalTotalReceivedFromPlayer() +
                           d.getRegularDeflectTotalReceivedFromPlayer() +
                           d.getCritTotalReceivedFromPlayer();
-    int totalRegularCount = d.getRegularCountReceivedFromPlayer() +
+    int totalRegularCount = d.getNormalCountReceivedFromPlayer() +
                             d.getRegularDeflectCountReceivedFromPlayer() +
                             d.getCritCountReceivedFromPlayer() +
                             d.getRegularMissesReceivedFromPlayer();
-    writeTotalInfo(totalRegularDmg, totalRegularCount);
+    writeTotalInfo(totalRegularDmg, totalRegularCount, "Regular");
 
-    // Normal. Regular hits that are neither crits nor deflects.
-    if (d.getRegularCountReceivedFromPlayer() > 0) {
-        std::string normalHitPercentage = percentage(
+    // Normal hits. Regular hits that are neither crits nor deflects.
+    if (d.getNormalCountReceivedFromPlayer() > 0) {
+        // Percentage of total hits for the type
+        std::string normalHitPercentageOfType = percentage(
             d.getCountReceivedFromPlayer(),
-            d.getRegularCountReceivedFromPlayer());
-        std::string normalDmgPercentage = percentage(
+            d.getNormalCountReceivedFromPlayer());
+        // Percentage of regular hits
+        std::string normalHitPercentageOfCategory = percentage(
+            d.getNormalCountReceivedFromPlayer() +
+            d.getCritCountReceivedFromPlayer() +
+            d.getRegularDeflectCountReceivedFromPlayer() +
+            d.getRegularMissesReceivedFromPlayer(),
+            d.getNormalCountReceivedFromPlayer());
+        // Percentage of total damage for the type
+        std::string normalDmgPercentageOfType = percentage(
             d.getTotalReceivedFromPlayer(),
-            d.getRegularTotalReceivedFromPlayer());
-        std::string normalMin = determineMin(d.getRegularMinReceivedFromPlayer());
-        std::string normalMax = determineMax(d.getRegularMaxReceivedFromPlayer());
+            d.getNormalTotalReceivedFromPlayer());
+        std::string normalMin = determineMin(d.getNormalMinReceivedFromPlayer());
+        std::string normalMax = determineMax(d.getNormalMaxReceivedFromPlayer());
         writeDetailedInfoForType("Normal",
-                                 d.getRegularTotalReceivedFromPlayer(),
-                                 d.getRegularCountReceivedFromPlayer(),
-                                 normalDmgPercentage,
+                                 d.getNormalTotalReceivedFromPlayer(),
+                                 d.getNormalCountReceivedFromPlayer(),
+                                 normalDmgPercentageOfType,
                                  normalMax,
                                  normalMin,
-                                 normalHitPercentage);
+                                 normalHitPercentageOfType,
+                                 normalHitPercentageOfCategory);
     }
 
     // Crit
     if (d.getCritCountReceivedFromPlayer() > 0) {
-        std::string critHitPercentage = percentage(
+        // Percentage of total hits for the type
+        std::string critHitPercentageOfType = percentage(
             d.getCountReceivedFromPlayer(),
             d.getCritCountReceivedFromPlayer());
-        std::string critDmgPercentage = percentage(
+        // Percentage of regular hits
+        std::string critHitPercentageOfCategory =
+            calcCritHitPercentageReceivedFromPlayer(d);
+        // Percentage of total damage for the type
+        std::string critDmgPercentageOfType = percentage(
             d.getTotalReceivedFromPlayer(),
             d.getCritTotalReceivedFromPlayer());
         std::string critMin = determineMin(d.getCritMinReceivedFromPlayer());
@@ -896,18 +911,24 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d) {
         writeDetailedInfoForType("Crit",
                                  d.getCritTotalReceivedFromPlayer(),
                                  d.getCritCountReceivedFromPlayer(),
-                                 critDmgPercentage,
+                                 critDmgPercentageOfType,
                                  critMax,
                                  critMin,
-                                 critHitPercentage);
+                                 critHitPercentageOfType,
+                                 critHitPercentageOfCategory);
     }
 
     // Deflect
     if (d.getRegularDeflectCountReceivedFromPlayer() > 0) {
-        std::string deflectHitPercentage = percentage(
+        // Percentage of total hits for the type
+        std::string deflectHitPercentageOfType = percentage(
             d.getCountReceivedFromPlayer(),
             d.getRegularDeflectCountReceivedFromPlayer());
-        std::string deflectDmgPercentage = percentage(
+        // Percentage of regular hits
+        std::string deflectHitPercentageOfCategory =
+            calcDeflectHitPercentageReceivedFromPlayer(d);
+        // Percentage of total damage for the type
+        std::string deflectDmgPercentageOfType = percentage(
             d.getTotalReceivedFromPlayer(),
             d.getRegularDeflectTotalReceivedFromPlayer());
         std::string regularDeflectMax = determineMax(
@@ -917,24 +938,28 @@ void DamageWriter::writeDetailedRegularInfo(const Damage& d) {
         writeDetailedInfoForType("Deflect",
                                  d.getRegularDeflectTotalReceivedFromPlayer(),
                                  d.getRegularDeflectCountReceivedFromPlayer(),
-                                 deflectDmgPercentage,
+                                 deflectDmgPercentageOfType,
                                  regularDeflectMax,
                                  regularDeflectMin,
-                                 deflectHitPercentage);
+                                 deflectHitPercentageOfType,
+                                 deflectHitPercentageOfCategory);
+    }
+
+    if (d.hasNanobotReceivedFromPlayer()) {
+        // Write an extra line to separate regular from nanobot.
+        file << "<br>" << nl;
     }
 }
 
 void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
-    file << "<font color = " + lightBlue + ">" << nl <<
-            "Nanobot " << "</font><br>" << nl;
 
-    // Percentage of total hits
-    std::string nanobotHitPercentage = percentage(
+    // Percentage of total hits for the type/category (the same in this case)
+    std::string nanobotHitPercentageOfType = percentage(
         d.getCountReceivedFromPlayer(),
         d.getNanobotCountReceivedFromPlayer());
 
-    // Percentage of total damage
-    std::string nanobotDmgPercentage = calcNanobotDmgPercentageReceivedFromPlayer(d);
+    // Percentage of total damage for the type
+    std::string nanobotDmgPercentageOfType = calcNanobotDmgPercentageReceivedFromPlayer(d);
 
     std::string nanobotMin = determineMin(d.getNanobotMinReceivedFromPlayer());
     std::string nanobotMax = determineMax(d.getNanobotMaxReceivedFromPlayer());
@@ -942,26 +967,33 @@ void DamageWriter::writeDetailedNanobotInfo(const Damage& d) {
     writeDetailedInfoForType("Nanobot",
                              d.getNanobotTotalReceivedFromPlayer(),
                              d.getNanobotCountReceivedFromPlayer(),
-                             nanobotDmgPercentage,
+                             nanobotDmgPercentageOfType,
                              nanobotMax,
                              nanobotMin,
-                             nanobotHitPercentage);
+                             nanobotHitPercentageOfType);
 }
 
 void DamageWriter::writeDetailedSpecialInfo(const Damage& d, bool self) {
 
-    writeTotalInfo(d.getSpecialTotalReceivedFromPlayer() +
-                   d.getSpecialDeflectTotalReceivedFromPlayer(),
-                   d.getSpecialCountReceivedFromPlayer() +
-                   d.getSpecialDeflectCountReceivedFromPlayer() +
-                   d.getSpecialMissesReceivedFromPlayer());
+    // Only write the total info incase both normal and deflected
+    // special damage exists. Otherwise the total displays duplicate info.
+    if (d.hasSpecialReceivedFromPlayer() &&
+        d.getSpecialDeflectTotalReceivedFromPlayer() > 0) {
+
+        writeTotalInfo(d.getSpecialTotalReceivedFromPlayer() +
+                       d.getSpecialDeflectTotalReceivedFromPlayer(),
+                       d.getSpecialCountReceivedFromPlayer() +
+                       d.getSpecialDeflectCountReceivedFromPlayer() +
+                       d.getSpecialMissesReceivedFromPlayer(),
+                       "");
+    }
 
     if (d.getSpecialCountReceivedFromPlayer() > 0) {
-        // Percentage of total hits
-        std::string specialHitPercentage = percentage(
+        // Percentage of total hits for the type/category (the same in this case)
+        std::string specialHitPercentageOfType = percentage(
             d.getCountReceivedFromPlayer(),
             d.getSpecialCountReceivedFromPlayer());
-        // Percentage of total damage
+        // Percentage of total damage for the type
         std::string specialDmgPercentage = percentage(
             d.getTotalReceivedFromPlayer(),
             d.getSpecialTotalReceivedFromPlayer());
@@ -974,14 +1006,18 @@ void DamageWriter::writeDetailedSpecialInfo(const Damage& d, bool self) {
                                  specialDmgPercentage,
                                  specialMax,
                                  specialMin,
-                                 specialHitPercentage);
+                                 specialHitPercentageOfType);
     }
 
     if (d.getSpecialDeflectCountReceivedFromPlayer() > 0) {
-        std::string deflectHitPercentage = calcSpecialDeflectHitPercentageReceivedFromPlayer(d);
+        // Percentage of total hits for the type/category (the same in this case)
+        std::string deflectHitPercentageOfType =
+            calcSpecialDeflectHitPercentageReceivedFromPlayer(d);
+        // Percentage of total damage for the category
         std::string deflectDmgPercentage = percentage(
             d.getTotalReceivedFromPlayer(),
             d.getSpecialDeflectTotalReceivedFromPlayer());
+
         std::string specialDeflectMax = determineMax(
             d.getSpecialDeflectMaxReceivedFromPlayer());
         std::string specialDeflectMin = determineMin(
@@ -992,18 +1028,20 @@ void DamageWriter::writeDetailedSpecialInfo(const Damage& d, bool self) {
                                  deflectDmgPercentage,
                                  specialDeflectMax,
                                  specialDeflectMin,
-                                 deflectHitPercentage);
+                                 deflectHitPercentageOfType);
     }
 
     int misses = d.getSpecialMissesReceivedFromPlayer();
     if (self && misses > 0) {
         std::string missPercentage = calcSpecialMissPercentageReceivedFromPlayer(d);
-        const int pcWidth = 7;
-        const int nrWidth = 4;
-        file << std::right <<
-                std::setw(pcWidth) << " " + missPercentage << "% (" <<
-                std::setw(nrWidth) << std::to_string(misses)
-                                   << ") " << "Miss<br>" << nl;
+        std::string na = "__._";
+        writeDetailedInfoForType("Miss",
+                                 -1,
+                                 misses,
+                                 na,
+                                 "",
+                                 "",
+                                 missPercentage);
     }
 }
 
@@ -1013,18 +1051,14 @@ void DamageWriter::writeDetailedShieldInfo(const Damage& d) {
     int shieldCount = d.getShieldCountReceivedFromPlayer();
     std::string minHit = determineMin(d.getShieldMinReceivedFromPlayer());
     std::string maxHit = determineMax(d.getShieldMaxReceivedFromPlayer());
+    std::string na = "__._";
 
-    const int width = 7;
-    const int pcWidth = 6;
-    const int nrWidth = 4;
-    std::string na = " __._";
-    file << std::setw(pcWidth+2) << " " + shieldDmg << " (" <<
-            std::setw(nrWidth) << shieldCount << ") " <<
-            std::setw(pcWidth) << na << "% " <<
-            std::setw(width) << " " + maxHit << "-" << std::left <<
-            std::setw(width) << minHit + " " << std::right <<
-            std::setw(pcWidth) << na << "% " << "Normal" << "<br>" << nl;
-
+    writeDetailedInfoForType("Normal",
+                             -1,
+                             shieldCount,
+                             na,
+                             maxHit,
+                             minHit);
 }
 
 void DamageWriter::writeDetailedMissInfo(const Damage& d, bool self) {
@@ -1037,20 +1071,20 @@ void DamageWriter::writeDetailedMissInfo(const Damage& d, bool self) {
         const int width = 7;
         const int nrWidth = 4;
         file << std::right <<
-                std::setw(width+1) << "" << " (" <<
+                std::setw(width) << "" << "  (" <<
                 std::setw(nrWidth) << std::to_string(misses)
                                    << ") " << "Miss<br>" << nl;
     }
 }
 
-void DamageWriter::writeTotalInfo(int total, int count) {
+void DamageWriter::writeTotalInfo(int total, int count, std::string category) {
     const int width = 7;
     const int nrWidth = 4;
     file << std::right << std::setfill(fillChar) <<
             std::setw(width+1) << " " + std::to_string(total)
                                << " (" <<
             std::setw(nrWidth) << std::to_string(count)
-                               << ") " << "Total " << "<br>" << nl;
+                               << ") " << category << " Total" << "<br>" << nl;
 }
 
 void DamageWriter::writeDetailedInfoForType(std::string type,
@@ -1059,18 +1093,35 @@ void DamageWriter::writeDetailedInfoForType(std::string type,
                                             std::string dmgPercent,
                                             std::string maxHit,
                                             std::string minHit,
-                                            std::string hitPercent) {
+                                            std::string hitPercentOfType,
+                                            std::string hitPercentOfCategory) {
+    /* hitPercentOfCategory should be the hit rate of normal, crit,
+    deflect and miss within the category. This is only applicable to
+    the "regular" category. For nanobots and specials, the
+    hitPercentOfCategory will be identical to the hitPercentOfType
+    and in that case, no stat will be shown for hitPercentOfType.
+    hitPercentOfType should for regular attacks be the hit rate per
+    regular and nanobot attacks combined. (If they both exist within
+    the type). */
+
     const int width = 7;
     const int pcWidth = 6;
     const int nrWidth = 4;
-    std::string tot = std::to_string(total);
+    std::string tot = total == -1 ? "" : std::to_string(total);
+    
     std::string hits = std::to_string(nrOfHits);
     file << std::setw(width+1) << " " + tot << " (" <<
             std::setw(nrWidth) << hits << ") " <<
             std::setw(pcWidth) << " " + dmgPercent << "% " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
-            std::setw(width) << minHit + " " << std::right <<
-            std::setw(pcWidth) << " " + hitPercent << "% " << type << "<br>" << nl;
+            std::setw(width) << minHit + " " << " " << std::right;
+    if (!hitPercentOfType.empty()) {
+        file << std::setw(pcWidth) << " " + hitPercentOfType << "% " << nl;
+    }
+    if (!hitPercentOfCategory.empty()) {
+        file << std::setw(pcWidth) << " " + hitPercentOfCategory << "% ";
+    }
+    file << type << "<br>" << nl;
 }
 
 /********************/
@@ -1099,7 +1150,7 @@ void DamageWriter::sortByReceived(
 
 std::string DamageWriter::calcCritHitPercentageReceivedFromPlayer(const Damage&d) {
     /* Based on attacks that have the potential to crit */
-    int regularHits = d.getRegularCountReceivedFromPlayer() +
+    int regularHits = d.getNormalCountReceivedFromPlayer() +
                       d.getCritCountReceivedFromPlayer() +
                       d.getRegularDeflectCountReceivedFromPlayer() +
                       d.getRegularMissesReceivedFromPlayer();
@@ -1110,7 +1161,7 @@ std::string DamageWriter::calcCritHitPercentageReceivedFromPlayer(const Damage&d
 
 std::string DamageWriter::calcCritHitPercentageDealtOnPlayer(const Damage&d) {
     /* Based on attacks that have the potential to crit */
-    int regularHits = d.getRegularCountDealtOnPlayer() +
+    int regularHits = d.getNormalCountDealtOnPlayer() +
                       d.getCritCountDealtOnPlayer() +
                       d.getRegularDeflectCountDealtOnPlayer() +
                       d.getRegularMissesDealtOnPlayer();
@@ -1161,7 +1212,7 @@ std::string DamageWriter::calcMissPercentageDealtOnPlayer(const Damage&d) {
 }
 
 std::string DamageWriter::calcRegularMissPercentageReceivedFromPlayer(const Damage&d) {
-    int regularHits = d.getRegularCountReceivedFromPlayer() +
+    int regularHits = d.getNormalCountReceivedFromPlayer() +
                       d.getCritCountReceivedFromPlayer() +
                       d.getRegularDeflectCountReceivedFromPlayer() +
                       d.getRegularMissesReceivedFromPlayer();
@@ -1180,7 +1231,7 @@ std::string DamageWriter::calcSpecialMissPercentageReceivedFromPlayer(const Dama
 }
 
 int DamageWriter::calcRegularAndSpecialHitsReceivedFromPlayer(const Damage&d) {
-    return d.getRegularCountReceivedFromPlayer() +
+    return d.getNormalCountReceivedFromPlayer() +
            d.getCritCountReceivedFromPlayer() +
            d.getRegularDeflectCountReceivedFromPlayer() +
            d.getSpecialCountReceivedFromPlayer() +
@@ -1190,7 +1241,7 @@ int DamageWriter::calcRegularAndSpecialHitsReceivedFromPlayer(const Damage&d) {
 }
 
 int DamageWriter::calcRegularAndSpecialHitsDealtOnPlayer(const Damage&d) {
-    return d.getRegularCountDealtOnPlayer() +
+    return d.getNormalCountDealtOnPlayer() +
            d.getCritCountDealtOnPlayer() +
            d.getRegularDeflectCountDealtOnPlayer() +
            d.getSpecialCountDealtOnPlayer() +
@@ -1201,7 +1252,7 @@ int DamageWriter::calcRegularAndSpecialHitsDealtOnPlayer(const Damage&d) {
 
 std::string DamageWriter::calcRegularDmgPercentageReceivedFromPlayer(const Damage&d) {
     int totalDmg = d.getTotalReceivedFromPlayer();
-    int regularDmg = d.getRegularTotalReceivedFromPlayer() +
+    int regularDmg = d.getNormalTotalReceivedFromPlayer() +
                      d.getRegularDeflectTotalReceivedFromPlayer() +
                      d.getCritTotalReceivedFromPlayer();
 
@@ -1210,7 +1261,7 @@ std::string DamageWriter::calcRegularDmgPercentageReceivedFromPlayer(const Damag
 
 std::string DamageWriter::calcRegularDmgPercentageDealtOnPlayer(const Damage&d) {
     int totalDmg = d.getTotalDealtOnPlayer();
-    int regularDmg = d.getRegularTotalDealtOnPlayer() +
+    int regularDmg = d.getNormalTotalDealtOnPlayer() +
                      d.getRegularDeflectTotalDealtOnPlayer() +
                      d.getCritTotalDealtOnPlayer();
 

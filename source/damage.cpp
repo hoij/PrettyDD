@@ -58,13 +58,13 @@ bool Damage::hasRegularMissDealtOnPlayer() const {
 }
 
 bool Damage::hasRegularReceivedFromPlayer() const {
-    return receivedFromPlayer.regularCount > 0 ||
+    return receivedFromPlayer.normalCount > 0 ||
            receivedFromPlayer.regularDeflectCount > 0 ||
            receivedFromPlayer.critCount > 0;
 }
 
 bool Damage::hasRegularDealtOnPlayer() const {
-    return dealtOnPlayer.regularCount > 0 ||
+    return dealtOnPlayer.normalCount > 0 ||
            dealtOnPlayer.regularDeflectCount > 0 ||
            dealtOnPlayer.critCount > 0;
 }
@@ -148,13 +148,13 @@ void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
         }
     }
     else {
-        di.regularCount++;
-        di.regularTotal += li.amount;
-        if (li.amount > di.regularMax) {
-            di.regularMax = li.amount;
+        di.normalCount++;
+        di.normalTotal += li.amount;
+        if (li.amount > di.normalMax) {
+            di.normalMax = li.amount;
         }
-        if (li.amount < di.regularMin) {
-            di.regularMin = li.amount;
+        if (li.amount < di.normalMin) {
+            di.normalMin = li.amount;
         }
     }
 }
@@ -163,13 +163,13 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     total += rhs.total;
     count += rhs.count;
 
-    regularTotal += rhs.regularTotal;
-    regularCount += rhs.regularCount;
-    if (rhs.regularMax > regularMax) {
-        regularMax = rhs.regularMax;
+    normalTotal += rhs.normalTotal;
+    normalCount += rhs.normalCount;
+    if (rhs.normalMax > normalMax) {
+        normalMax = rhs.normalMax;
     }
-    if (rhs.regularMin < regularMin) {
-        regularMin = rhs.regularMin;
+    if (rhs.normalMin < normalMin) {
+        normalMin = rhs.normalMin;
     }
 
     nanobotTotal += rhs.nanobotTotal;

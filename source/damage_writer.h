@@ -100,14 +100,15 @@ private:
     void writeDetailedSpecialInfo(const Damage& d, bool self);
     void writeDetailedShieldInfo(const Damage& d);
     void writeDetailedMissInfo(const Damage& d, bool self);
-    void writeTotalInfo(int total, int count);
+    void writeTotalInfo(int total, int count, std::string category);
     void writeDetailedInfoForType(std::string type,
                                   int total,
                                   int nrOfhits,
                                   std::string dmgPercent,
                                   std::string maxHit,
                                   std::string minHit,
-                                  std::string hitPercent);
+                                  std::string hitPercentOfType = "",
+                                  std::string hitPercentOfCategory = "");
 
     // Helper functions
     void setDDWriteMethods(writeHeadingsPointer& whp,

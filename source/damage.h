@@ -33,10 +33,10 @@ public:
     int getTotalDealtOnPlayer() const {return dealtOnPlayer.total;}
     int getDPMDealtOnPlayer() const {return dealtOnPlayer.dpm;}
     int getCountDealtOnPlayer() const {return dealtOnPlayer.count;}
-    int getRegularTotalDealtOnPlayer() const {return dealtOnPlayer.regularTotal;}
-    int getRegularCountDealtOnPlayer() const {return dealtOnPlayer.regularCount;}
-    int getRegularMaxDealtOnPlayer() const {return dealtOnPlayer.regularMax;}
-    int getRegularMinDealtOnPlayer() const {return dealtOnPlayer.regularMin;}
+    int getNormalTotalDealtOnPlayer() const {return dealtOnPlayer.normalTotal;}
+    int getNormalCountDealtOnPlayer() const {return dealtOnPlayer.normalCount;}
+    int getNormalMaxDealtOnPlayer() const {return dealtOnPlayer.normalMax;}
+    int getNormalMinDealtOnPlayer() const {return dealtOnPlayer.normalMin;}
     int getRegularDeflectTotalDealtOnPlayer() const {return dealtOnPlayer.regularDeflectTotal;}
     int getRegularDeflectCountDealtOnPlayer() const {return dealtOnPlayer.regularDeflectCount;}
     int getRegularDeflectMaxDealtOnPlayer() const {return dealtOnPlayer.regularDeflectMax;}
@@ -67,10 +67,10 @@ public:
     int getTotalReceivedFromPlayer() const {return receivedFromPlayer.total;}
     int getDPMReceivedFromPlayer() const {return receivedFromPlayer.dpm;}
     int getCountReceivedFromPlayer() const {return receivedFromPlayer.count;}
-    int getRegularTotalReceivedFromPlayer() const {return receivedFromPlayer.regularTotal;}
-    int getRegularCountReceivedFromPlayer() const {return receivedFromPlayer.regularCount;}
-    int getRegularMaxReceivedFromPlayer() const {return receivedFromPlayer.regularMax;}
-    int getRegularMinReceivedFromPlayer() const {return receivedFromPlayer.regularMin;}
+    int getNormalTotalReceivedFromPlayer() const {return receivedFromPlayer.normalTotal;}
+    int getNormalCountReceivedFromPlayer() const {return receivedFromPlayer.normalCount;}
+    int getNormalMaxReceivedFromPlayer() const {return receivedFromPlayer.normalMax;}
+    int getNormalMinReceivedFromPlayer() const {return receivedFromPlayer.normalMin;}
     int getRegularDeflectTotalReceivedFromPlayer() const {return receivedFromPlayer.regularDeflectTotal;}
     int getRegularDeflectCountReceivedFromPlayer() const {return receivedFromPlayer.regularDeflectCount;}
     int getRegularDeflectMaxReceivedFromPlayer() const {return receivedFromPlayer.regularDeflectMax;}
@@ -105,10 +105,10 @@ private:
         int total = 0;
         int dpm = 0;
         int count = 0;
-        int regularTotal = 0;
-        int regularCount = 0;
-        int regularMax = -1;
-        int regularMin = std::numeric_limits<int>::max();
+        int normalTotal = 0;
+        int normalCount = 0;
+        int normalMax = -1;
+        int normalMin = std::numeric_limits<int>::max();
         int regularDeflectTotal = 0;
         int regularDeflectCount = 0;
         int regularDeflectMax = -1;

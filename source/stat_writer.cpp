@@ -149,7 +149,7 @@ void StatWriter::createCommands1() {
             "<font color = " + lightBlue + ">" << nl;
     writeCommand("/pdd<br>");
     file << "</font>" << nl << nl <<
-            "Damage dealt:" << "<br>" << nl <<
+            "Damage Dealt:" << "<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
     writeCommand("top");
     writeCommand("dtop", "Detailed top list");
@@ -209,30 +209,31 @@ void StatWriter::createInfo1() {
     writeStartOfLink("PDD Info 1(2)");
 
     file << "<br>" << nl
-         << "Info About Damage per Player<br>" << nl
-         << "Crit Hit Rate Info<br>" << nl
+         << "Stats Info<br><br>" << nl << nl
+
+         << "CatHit% (Category Hit %) for Normal, Crit, Deflect and Miss<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The crit rate is calculated in the following way:<br>" << nl
-         << "  nr of crits / (normal hits + crits + normal deflects + normal misses)<br>" << nl
-         << "Nanobot, special and shield hits are excluded.<br><br>" << nl << nl
+         << "* Category hit rate is calculated in the following way:<br>" << nl
+         << "   nr of x / "
+            "(normal hits + crits (if existing) + deflects + misses)<br><br>"
+         << nl << nl
          << "</font>"
 
-         << "Miss/Deflect Rate Info<br>" << nl
+         << "TotHit% (Total Hit %)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "The miss rate is calculated in the following way:<br>" << nl
-         << "  nr of misses (or deflects) ( for normals and specials) / <br>" << nl
-         << "  (all attacks/deflects/misses except for nanobots and shields)"
+         << "* Total hit rate is calculated in the following way:<br>" << nl
+         << "   nr of x / all attacks for that type<br><br>" << nl << nl
+         << "</font>"
+
+         << "DPM<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "* DPM is calculated from the first attack to the last attack"
             "<br><br>" << nl << nl
          << "</font>"
 
-         << "Nanobot Info<br>" << nl
+         << "XP (xp) Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "<font color = " + lightBlue + ">" << nl
-         << "The regular/special/nanobot % shows the % of total damage done.<br>" << nl
-         << "The following is included in each damage category:<br>" << nl
-         << "  Regular: regular hits, crits and regular deflects<br>" << nl
-         << "  Special: Special hits and special deflects<br>" << nl
-         << "  Nanobot: Nanobot hits<br>" << nl
+         << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
          << "</font>";
 
     writeEndOfLink("PDD Info 1(2)");
@@ -243,29 +244,31 @@ void StatWriter::createInfo2() {
     writeStartOfLink("PDD Info 2(2)");
 
     file << "<br>" << nl
-         << "Info About Damage per Type (types)<br>" << nl
+         << "Damage per Player / Opponent and Detailed Top List(dtop) Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "* Regular and nanobot % is % of total damage for"
-            "that type<br>" << nl
-         << "* Crit, deflect and miss hit % is % of total hits"
-            "for that type.<br>" << nl
-         << "* A blank line means that stat is not available<br>" << nl
-         << "* If the sum of regular, special, nanobot % does not add up "
-            "to 100%. The remaining % is most likely shield damage.<br><br>"
-         << nl << nl
+         << "* Regular, special, nanobot and shield % is % of total damage<br>" << nl
+         << "* Crit, deflect and miss % is % of hits that can "
+            "crit, deflect or miss (CatHit%)<br><br>" << nl << nl
          << "</font>"
 
-         << "Info About Detailed Damage per Type (dtypes)<br>" << nl
+         << "Damage per Type (types) Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "* Regular and nanobot hit% is % of total hits.<br>" << nl
-         << "* Crit, deflect and miss hit % is % of hits that can "
-            "crit, i.e. only regular attacks. <br>" << nl
-         << "* Damage % is % of total damage done.<br><br>" << nl << nl
+         << "* Regular and nanobot % is % of total damage<br>" << nl
+         << "* Crit, deflect and miss % is % of hits that can "
+            "crit, deflect or miss (CatHit%)<br>" << nl
+         << "* A blank line means that the stat isn't possible to log "
+            "or doesn't exist<br>"
+         << "* Misses from regular attacks have no type info and can't "
+            "be logged per type. Regular misses are instead "
+            "shown as a separate type<br><br>" << nl << nl
          << "</font>"
 
-         << "Info About XP (xp)<br>" << nl
+         << "Detailed Damage per Type (dtypes) Info<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
-         << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
+         << "* Regular Total is the sum of normal, crit and deflect<br>" << nl
+         << "* Damage % is % of total damage<br>" << nl
+         << "* TotHit% - See info 1<br>" << nl
+         << "* CatHit% - See info 1<br>" << nl
          << "</font>";
 
     writeEndOfLink("PDD Info 2(2)");

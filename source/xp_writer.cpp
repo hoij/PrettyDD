@@ -60,7 +60,7 @@ void XPWriter::writeXPHeadingsOverall() {
     file << std::setfill(fillChar) << std::right <<
         "<font color = " + lightBlue + ">" << nl;
 
-    file << std::setw(width+3) << " Total " <<
+    file << std::setw(width+4) << " Total " <<
             std::setw(width) << " XPH " <<
             "</font><br>" << std::setfill(' ') << nl;
 }
@@ -70,9 +70,9 @@ void XPWriter::writeXPHeadingsDetailed() {
     file << std::setfill(fillChar) << std::right <<
         "<font color = " + lightBlue + ">" << nl;
 
-    file << std::setw(width + 3) << " Total " <<
-            std::setw(width) << " XPH " <<
-            std::setw(width + 1) << " Max " <<
+    file << std::setw(width + 4) << " Total " <<
+            std::setw(width + 1) << " XPH " <<
+            std::setw(width) << " Max " <<
             std::setw(width + 1) << " Min " <<
             "</font><br>" << std::setfill(' ') << nl;
 }
