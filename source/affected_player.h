@@ -45,7 +45,8 @@ private:
     void addNano(LineInfo& li);
 
     // Name of the type and it's Damage.
-    std::map<std::string, Damage> damage;
+    std::map<std::string, Damage> damageReceivedFromPlayer;
+    std::map<std::string, Damage> damageDealtOnPlayer;
 
     Heal heal;
     Nano nano;

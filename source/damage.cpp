@@ -7,159 +7,6 @@
 
 
 Damage& Damage::operator+=(const Damage& rhs) {
-    dealtOnPlayer += rhs.dealtOnPlayer;
-    receivedFromPlayer += rhs.receivedFromPlayer;
-    return *this;
-}
-
-void Damage::addDamageDealtOnPlayer(LineInfo& li) {
-    addDamage(li, dealtOnPlayer);
-}
-
-void Damage::addDamageReceivedFromPlayer(LineInfo& li) {
-    addDamage(li, receivedFromPlayer);
-}
-
-void Damage::setDealtOnPlayerDPM(int damagePerMinute) {
-    dealtOnPlayer.dpm = damagePerMinute;
-}
-
-void Damage::setReceivedFromPlayerDPM(int damagePerMinute) {
-    receivedFromPlayer.dpm = damagePerMinute;
-}
-
-
-bool Damage::hasShieldReceivedFromPlayer() const {
-    return receivedFromPlayer.shieldCount > 0;
-}
-
-bool Damage::hasShieldDealtOnPlayer() const {
-    return dealtOnPlayer.shieldCount > 0;
-}
-
-bool Damage::hasSpecialReceivedFromPlayer() const {
-    return receivedFromPlayer.specialCount > 0 ||
-           receivedFromPlayer.specialDeflectCount > 0 ||
-           receivedFromPlayer.specialMisses > 0;
-}
-
-bool Damage::hasSpecialDealtOnPlayer() const {
-    return dealtOnPlayer.specialCount > 0 ||
-           dealtOnPlayer.specialDeflectCount > 0 ||
-           dealtOnPlayer.specialMisses > 0;
-}
-
-bool Damage::hasRegularMissReceivedFromPlayer() const {
-    return receivedFromPlayer.regularMisses > 0;
-}
-
-bool Damage::hasRegularMissDealtOnPlayer() const {
-    return dealtOnPlayer.regularMisses > 0;
-}
-
-bool Damage::hasRegularReceivedFromPlayer() const {
-    return receivedFromPlayer.normalCount > 0 ||
-           receivedFromPlayer.regularDeflectCount > 0 ||
-           receivedFromPlayer.critCount > 0;
-}
-
-bool Damage::hasRegularDealtOnPlayer() const {
-    return dealtOnPlayer.normalCount > 0 ||
-           dealtOnPlayer.regularDeflectCount > 0 ||
-           dealtOnPlayer.critCount > 0;
-}
-
-bool Damage::hasNanobotReceivedFromPlayer() const {
-    return receivedFromPlayer.nanobotCount > 0;
-}
-
-bool Damage::hasNanobotDealtOnPlayer() const {
-    return dealtOnPlayer.nanobotCount > 0;
-}
-
-void Damage::addDamage(LineInfo& li, Damage::DamageInfo& di) {
-    di.total += li.amount;
-    di.count++;
-
-    if (li.crit) {
-        di.critCount++;
-        di.critTotal += li.amount;
-        if (li.amount > di.critMax) {
-            di.critMax = li.amount;
-        }
-        if (li.amount < di.critMin) {
-            di.critMin = li.amount;
-        }
-    }
-    else if (li.miss && li.special) {
-        di.specialMisses++;
-    }
-    else if (li.miss) {
-        di.regularMisses++;
-    }
-    else if (li.deflect && !li.special) {
-        di.regularDeflectTotal += li.amount;
-        di.regularDeflectCount++;
-        if (li.amount > di.regularDeflectMax) {
-            di.regularDeflectMax = li.amount;
-        }
-        if (li.amount < di.regularDeflectMin) {
-            di.regularDeflectMin = li.amount;
-        }
-    }
-    else if (li.deflect && li.special) {
-        di.specialDeflectTotal += li.amount;
-        di.specialDeflectCount++;
-        if (li.amount > di.specialDeflectMax) {
-            di.specialDeflectMax = li.amount;
-        }
-        if (li.amount < di.specialDeflectMin) {
-            di.specialDeflectMin = li.amount;
-        }
-    }
-    else if (li.special) {
-        di.specialCount++;
-        di.specialTotal += li.amount;
-        if (li.amount > di.specialMax) {
-            di.specialMax = li.amount;
-        }
-        if (li.amount < di.specialMin) {
-            di.specialMin = li.amount;
-        }
-    }
-    else if (li.nanobots) {
-        di.nanobotCount++;
-        di.nanobotTotal += li.amount;
-        if (li.amount > di.nanobotMax) {
-            di.nanobotMax = li.amount;
-        }
-        if (li.amount < di.nanobotMin) {
-            di.nanobotMin = li.amount;
-        }
-    }
-    else if (li.shield) {
-        di.shieldCount++;
-        di.shieldTotal += li.amount;
-        if (li.amount > di.shieldMax) {
-            di.shieldMax = li.amount;
-        }
-        if (li.amount < di.shieldMin) {
-            di.shieldMin = li.amount;
-        }
-    }
-    else {
-        di.normalCount++;
-        di.normalTotal += li.amount;
-        if (li.amount > di.normalMax) {
-            di.normalMax = li.amount;
-        }
-        if (li.amount < di.normalMin) {
-            di.normalMin = li.amount;
-        }
-    }
-}
-
-Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     total += rhs.total;
     count += rhs.count;
 
@@ -230,4 +77,114 @@ Damage::DamageInfo& Damage::DamageInfo::operator+=(const DamageInfo& rhs) {
     specialMisses += rhs.specialMisses;
 
     return *this;
+}
+
+void Damage::addDamage(LineInfo& li) {
+    total += li.amount;
+    count++;
+
+    if (li.crit) {
+        critCount++;
+        critTotal += li.amount;
+        if (li.amount > critMax) {
+            critMax = li.amount;
+        }
+        if (li.amount < critMin) {
+            critMin = li.amount;
+        }
+    }
+    else if (li.miss && li.special) {
+        specialMisses++;
+    }
+    else if (li.miss) {
+        regularMisses++;
+    }
+    else if (li.deflect && !li.special) {
+        regularDeflectTotal += li.amount;
+        regularDeflectCount++;
+        if (li.amount > regularDeflectMax) {
+            regularDeflectMax = li.amount;
+        }
+        if (li.amount < regularDeflectMin) {
+            regularDeflectMin = li.amount;
+        }
+    }
+    else if (li.deflect && li.special) {
+        specialDeflectTotal += li.amount;
+        specialDeflectCount++;
+        if (li.amount > specialDeflectMax) {
+            specialDeflectMax = li.amount;
+        }
+        if (li.amount < specialDeflectMin) {
+            specialDeflectMin = li.amount;
+        }
+    }
+    else if (li.special) {
+        specialCount++;
+        specialTotal += li.amount;
+        if (li.amount > specialMax) {
+            specialMax = li.amount;
+        }
+        if (li.amount < specialMin) {
+            specialMin = li.amount;
+        }
+    }
+    else if (li.nanobots) {
+        nanobotCount++;
+        nanobotTotal += li.amount;
+        if (li.amount > nanobotMax) {
+            nanobotMax = li.amount;
+        }
+        if (li.amount < nanobotMin) {
+            nanobotMin = li.amount;
+        }
+    }
+    else if (li.shield) {
+        shieldCount++;
+        shieldTotal += li.amount;
+        if (li.amount > shieldMax) {
+            shieldMax = li.amount;
+        }
+        if (li.amount < shieldMin) {
+            shieldMin = li.amount;
+        }
+    }
+    else {
+        normalCount++;
+        normalTotal += li.amount;
+        if (li.amount > normalMax) {
+            normalMax = li.amount;
+        }
+        if (li.amount < normalMin) {
+            normalMin = li.amount;
+        }
+    }
+}
+
+void Damage::setDPM(int damagePerMinute) {
+    dpm = damagePerMinute;
+}
+
+bool Damage::hasShield() const {
+    return shieldCount > 0;
+}
+
+bool Damage::hasSpecial() const {
+    return specialCount > 0 ||
+           specialDeflectCount > 0 ||
+           specialMisses > 0;
+}
+
+bool Damage::hasRegularMiss() const {
+    return regularMisses > 0;
+}
+
+bool Damage::hasRegular() const {
+    return normalCount > 0 ||
+           regularDeflectCount > 0 ||
+           critCount > 0;
+}
+
+bool Damage::hasNanobot() const {
+    return nanobotCount > 0;
 }
