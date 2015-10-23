@@ -68,12 +68,12 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDPerOpponent("You");
 //        statWriter.createDDPerOpponent("Predator Rogue");
 //        statWriter.createDDPerOpponent("Nonexisting");
-//        statWriter.createDDOnSpecificOpponent("You", "Predator Rogue");
+//        statWriter.createDDPerTypeOnSpecificOpponent("You", "Predator Rogue");
 
-//        statWriter.createDDOnSpecificOpponentDetailed("You", "Predator Rogue");
+//        statWriter.createDDPerTypeDetailedOnSpecificOpponent("You", "Predator Rogue");
 
-//        statWriter.createDDOnSpecificOpponent("Predator Rogue", "You");
-//        statWriter.createDDOnSpecificOpponent("You", "asshole");
+//        statWriter.createDDPerTypeOnSpecificOpponent("Predator Rogue", "You");
+//        statWriter.createDDPerTypeOnSpecificOpponent("You", "asshole");
 
 //        statWriter.createDRTopList();
 //        statWriter.createDRDetailedTopList();
@@ -177,8 +177,8 @@ void CommandHandler::execute(const std::string& command) {
                 statWriter.createDDPerDamageType(commandParts[2]);
         }
         else {
-            statWriter.createDDOnSpecificOpponent(commandParts[1],
-                                                  commandParts[2]);
+            statWriter.createDDPerTypeOnSpecificOpponent(commandParts[1],
+                                                         commandParts[2]);
         }
     }
     else if (nrOfOptions == 3) {
@@ -208,16 +208,16 @@ void CommandHandler::execute(const std::string& command) {
             }
         }
         else if (commandParts[1] == "types") {
-            statWriter.createDDOnSpecificOpponent(commandParts[2],
-                                                  commandParts[3]);
+            statWriter.createDDPerTypeOnSpecificOpponent(commandParts[2],
+                                                         commandParts[3]);
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDOnSpecificOpponentDetailed(commandParts[2],
-                                                          commandParts[3]);
+            statWriter.createDDPerTypeDetailedOnSpecificOpponent(commandParts[2],
+                                                                 commandParts[3]);
         }
         else {
-            statWriter.createDDOnSpecificOpponentDetailed(commandParts[2],
-                                                          commandParts[3]);
+            statWriter.createDDPerTypeDetailedOnSpecificOpponent(commandParts[2],
+                                                                 commandParts[3]);
         }
     }
     else {

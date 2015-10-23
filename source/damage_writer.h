@@ -25,10 +25,10 @@ public:
     void createDDPerDamageType(std::string playerName);
     void createDDPerDamageTypeDetailed(std::string playerName);
     void createDDPerOpponent(std::string playerName);  // Lists all opponents for playerName
-    void createDDOnSpecificOpponent(std::string playerName,
-                                    std::string opponentName);
-    void createDDOnSpecificOpponentDetailed(std::string playerName,
-                                            std::string opponentName);
+    void createDDPerTypeOnSpecificOpponent(std::string playerName,
+                                           std::string opponentName);
+    void createDDPerTypeDetailedOnSpecificOpponent(std::string playerName,
+                                                   std::string opponentName);
 
     void createDRTopList();
     void createDRDetailedTopList();
@@ -52,11 +52,11 @@ private:
                                  std::string titleBase,
                                  bool dealt,
                                  bool detailed);
-    void createDamageOnSpecificOpponent(std::string playerName,
-                                        std::string opponentName,
-                                        std::string titleBase,
-                                        int typesPerWindow,
-                                        bool detailed);
+    void createDamagePerTypeOnSpecificOpponent(std::string playerName,
+                                               std::string opponentName,
+                                               std::string titleBase,
+                                               int typesPerWindow,
+                                               bool detailed);
     void writeToFile(
         std::string titleBase,
         std::vector<std::pair<std::string, Damage>>& v,
@@ -77,30 +77,27 @@ private:
 
     // Headings
     void writeTopListHeadings(bool self);
-    void writeOverviewHeadings(bool self);
-    void writeOverviewHeadingsDetailed(bool self);
-    void writePerTypeOverviewHeadings(bool self);
+    void writePerPlayerHeadings(bool self);
+    void writePerTypeHeadings(bool self);
+    void writePerTypeDetailedHeadings(bool self);
 
     // Writes
     void writeDDTopList(const std::string& name, const Damage& d, int place, bool self);
-    void writeDDOverviewDetailed(const std::string& name, const Damage& d, int place, bool self);
-    void writeDDOverview(const std::string& name, const Damage& d, int place, bool self);
-
-    void writeDDPerTypeOverview(const std::string& name, const Damage& d, int place, bool self);
-
-    void writeDRPerTypeOverview(const std::string& name, const Damage& d, int place, bool self);
-
+    void writeDDPerPlayer(const std::string& name, const Damage& d, int place, bool self);
+    void writeDDPerType(const std::string& name, const Damage& d, int place, bool self);
+    void writeDDPerTypeDetailed(const std::string& name, const Damage& d, int place, bool self);
 
     void writeDRTopList(const std::string& name, const Damage& d, int place, bool self);
-    void writeDROverview(const std::string& name, const Damage& d, int place, bool self);
+    void writeDRPerType(const std::string& name, const Damage& d, int place, bool self);
+    void writeDRPerPlayer(const std::string& name, const Damage& d, int place, bool self);
 
-    // Detailed type write helper functions
+    // WriteDDPerTypeDetailed helper methods
+    void writeTotalInfo(int total, int count, std::string category);
     void writeDetailedRegularInfo(const Damage& d);
     void writeDetailedNanobotInfo(const Damage& d);
     void writeDetailedSpecialInfo(const Damage& d, bool self);
     void writeDetailedShieldInfo(const Damage& d);
     void writeDetailedMissInfo(const Damage& d, bool self);
-    void writeTotalInfo(int total, int count, std::string category);
     void writeDetailedInfoForType(std::string type,
                                   int total,
                                   int nrOfhits,
@@ -110,17 +107,13 @@ private:
                                   std::string hitPercentOfType = "",
                                   std::string hitPercentOfCategory = "");
 
-    // Helper functions
+    // Helper methods
     void setDDWriteMethods(writeHeadingsPointer& whp,
                            writeDamagePointer& wdp,
                            bool detailed);
     void setDDPerTypeWriteMethods(writeHeadingsPointer& whp,
                                   writeDamagePointer& wdp,
                                   bool detailed);
-    void setDRWriteMethods(writeHeadingsPointer& whp,
-                           writeDamagePointer& wdp);
-    void setDRPerTypeWriteMethods(writeHeadingsPointer& whp,
-                                  writeDamagePointer& wdp);
 
     void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);

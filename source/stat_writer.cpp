@@ -49,16 +49,16 @@ void StatWriter::createDDPerOpponent(std::string playerName) {
     damageWriter.createDDPerOpponent(playerName);
 }
 
-void StatWriter::createDDOnSpecificOpponent(std::string playerName,
+void StatWriter::createDDPerTypeOnSpecificOpponent(std::string playerName,
                                             std::string opponentName) {
-    damageWriter.createDDOnSpecificOpponent(playerName, opponentName);
+    damageWriter.createDDPerTypeOnSpecificOpponent(playerName, opponentName);
 }
 
-void StatWriter::createDDOnSpecificOpponentDetailed(
+void StatWriter::createDDPerTypeDetailedOnSpecificOpponent(
     std::string playerName,
     std::string opponentName) {
 
-    damageWriter.createDDOnSpecificOpponentDetailed(playerName, opponentName);
+    damageWriter.createDDPerTypeDetailedOnSpecificOpponent(playerName, opponentName);
 }
 
 /******/

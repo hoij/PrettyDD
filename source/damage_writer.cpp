@@ -55,8 +55,8 @@ void DamageWriter::createDDDetailedTopList() {
                 nrOfWindows,
                 playersPerWindow,
                 false,
-                &DamageWriter::writeOverviewHeadings,
-                &DamageWriter::writeDDOverview);
+                &DamageWriter::writePerPlayerHeadings,
+                &DamageWriter::writeDDPerPlayer);
 
 }
 
@@ -83,35 +83,36 @@ void DamageWriter::createDDPerOpponent(std::string playerName) {
     createDamagePerOpponent(playerName, titleBase, true, false);
 }
 
-void DamageWriter::createDDOnSpecificOpponent(std::string playerName,
+void DamageWriter::createDDPerTypeOnSpecificOpponent(std::string playerName,
                                               std::string opponentName) {
     std::string titleBase = "DD On " + opponentName + " By " + playerName;
-    createDamageOnSpecificOpponent(playerName,
-                                   opponentName,
-                                   titleBase,
-                                   7,
-                                   false);
+    createDamagePerTypeOnSpecificOpponent(playerName,
+                                          opponentName,
+                                          titleBase,
+                                          7,
+                                          false);
 }
 
-void DamageWriter::createDDOnSpecificOpponentDetailed(
+void DamageWriter::createDDPerTypeDetailedOnSpecificOpponent(
     std::string playerName,
     std::string opponentName) {
 
     std::string titleBase = "Detailed DD Per Damage Type On " +
                             opponentName + " By " +
                             playerName;
-    createDamageOnSpecificOpponent(playerName,
+    createDamagePerTypeOnSpecificOpponent(playerName,
                                    opponentName,
                                    titleBase,
                                    2,
                                    true);
 }
 
-void DamageWriter::createDamageOnSpecificOpponent(std::string playerName,
-                                                  std::string opponentName,
-                                                  std::string titleBase,
-                                                  int typesPerWindow,
-                                                  bool detailed) {
+void DamageWriter::createDamagePerTypeOnSpecificOpponent(
+    std::string playerName,
+    std::string opponentName,
+    std::string titleBase,
+    int typesPerWindow,
+    bool detailed) {
 
     std::string pName = renameIfSelf(playerName);
     Player* pp = playerVector.getPlayer(pName);
@@ -205,8 +206,8 @@ void DamageWriter::createDRDetailedTopList() {
                 nrOfWindows,
                 playersPerWindow,
                 false,
-                &DamageWriter::writeOverviewHeadings,
-                &DamageWriter::writeDROverview);
+                &DamageWriter::writePerPlayerHeadings,
+                &DamageWriter::writeDRPerPlayer);
 }
 
 void DamageWriter::createDRPerDamageType(std::string playerName) {
@@ -255,7 +256,8 @@ void DamageWriter::createDamagePerDamageType(std::string playerName,
         allDamageTypesFromAffectedPlayer =
             pp->getTotalDamageForEveryDamageTypeDealtOnPlayer();
         sortByReceived(allDamageTypesFromAffectedPlayer);
-        setDRPerTypeWriteMethods(whp, wdp);
+        whp = &DamageWriter::writePerTypeHeadings;
+        wdp = &DamageWriter::writeDRPerType;
     }
 
     // Check if the name is you who are running the program.
@@ -303,7 +305,8 @@ void DamageWriter::createDamagePerOpponent(std::string playerName,
         totalDamageForEachAffectedPlayer =
             pp->getTotalDamageDealtOnPlayerForAllAffectedPlayers();
         sortByReceived(totalDamageForEachAffectedPlayer);
-        setDRWriteMethods(whp, wdp);
+        whp = &DamageWriter::writePerPlayerHeadings;
+        wdp = &DamageWriter::writeDRPerPlayer;
     }
 
     // Check if the name is you who are running the program.
@@ -328,12 +331,12 @@ void DamageWriter::setDDWriteMethods(writeHeadingsPointer& whp,
                                      writeDamagePointer& wdp,
                                      bool detailed) {
     if (detailed) {
-        whp = &DamageWriter::writeOverviewHeadingsDetailed;
-        wdp = &DamageWriter::writeDDOverviewDetailed;
+        whp = &DamageWriter::writePerTypeDetailedHeadings;
+        wdp = &DamageWriter::writeDDPerTypeDetailed;
     }
     else {
-        whp = &DamageWriter::writeOverviewHeadings;
-        wdp = &DamageWriter::writeDDOverview;
+        whp = &DamageWriter::writePerPlayerHeadings;
+        wdp = &DamageWriter::writeDDPerPlayer;
     }
 }
 
@@ -341,25 +344,13 @@ void DamageWriter::setDDPerTypeWriteMethods(writeHeadingsPointer& whp,
                                             writeDamagePointer& wdp,
                                             bool detailed) {
     if (detailed) {
-        whp = &DamageWriter::writeOverviewHeadingsDetailed;
-        wdp = &DamageWriter::writeDDOverviewDetailed;
+        whp = &DamageWriter::writePerTypeDetailedHeadings;
+        wdp = &DamageWriter::writeDDPerTypeDetailed;
     }
     else {
-        whp = &DamageWriter::writePerTypeOverviewHeadings;
-        wdp = &DamageWriter::writeDDPerTypeOverview;
+        whp = &DamageWriter::writePerTypeHeadings;
+        wdp = &DamageWriter::writeDDPerType;
     }
-}
-
-void DamageWriter::setDRPerTypeWriteMethods(writeHeadingsPointer& whp,
-                                            writeDamagePointer& wdp) {
-        whp = &DamageWriter::writePerTypeOverviewHeadings;
-        wdp = &DamageWriter::writeDRPerTypeOverview;
-}
-
-void DamageWriter::setDRWriteMethods(writeHeadingsPointer& whp,
-                                     writeDamagePointer& wdp) {
-        whp = &DamageWriter::writeOverviewHeadings;
-        wdp = &DamageWriter::writeDROverview;
 }
 
 void DamageWriter::writeToFile(
@@ -483,7 +474,7 @@ void DamageWriter::writeTopListHeadings(bool self) {
             "</font><br>" << std::setfill(' ') << nl;
 }
 
-void DamageWriter::writeOverviewHeadings(bool self) {
+void DamageWriter::writePerPlayerHeadings(bool self) {
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
             "<font color = " + lightBlue + ">" << nl;
@@ -503,7 +494,7 @@ void DamageWriter::writeOverviewHeadings(bool self) {
     file << "</font><br>" << std::setfill(' ') << nl;
 }
 
-void DamageWriter::writePerTypeOverviewHeadings(bool self) {
+void DamageWriter::writePerTypeHeadings(bool self) {
     int width = 9;
     file << std::setfill(fillChar) << std::right <<
             "<font color = " + lightBlue + ">" << nl;
@@ -521,7 +512,7 @@ void DamageWriter::writePerTypeOverviewHeadings(bool self) {
     file << "</font><br>" << std::setfill(' ') << nl;
 }
 
-void DamageWriter::writeOverviewHeadingsDetailed(bool self) {
+void DamageWriter::writePerTypeDetailedHeadings(bool self) {
     (void)self;
     const int width = 7;
     const int pcWidth = 6;
@@ -574,7 +565,7 @@ void DamageWriter::writeDRTopList(const std::string& name,
     file << "<br>" << nl;
 }
 
-void DamageWriter::writeDDPerTypeOverview(const std::string& name,
+void DamageWriter::writeDDPerType(const std::string& name,
                                           const Damage& d,
                                           int place,
                                           bool self) {
@@ -640,7 +631,7 @@ void DamageWriter::writeDDPerTypeOverview(const std::string& name,
     file << "<br>" << nl;
 }
 
-void DamageWriter::writeDRPerTypeOverview(const std::string& name,
+void DamageWriter::writeDRPerType(const std::string& name,
                                           const Damage& d,
                                           int place,
                                           bool self) {
@@ -706,7 +697,7 @@ void DamageWriter::writeDRPerTypeOverview(const std::string& name,
     file << "<br>" << nl;
 }
 
-void DamageWriter::writeDDOverview(const std::string& name,
+void DamageWriter::writeDDPerPlayer(const std::string& name,
                                    const Damage& d,
                                    int place,
                                    bool self) {
@@ -756,7 +747,7 @@ void DamageWriter::writeDDOverview(const std::string& name,
     file << "<br>" << nl;
 }
 
-void DamageWriter::writeDROverview(const std::string& name,
+void DamageWriter::writeDRPerPlayer(const std::string& name,
                                    const Damage& d,
                                    int place,
                                    bool self) {
@@ -806,7 +797,7 @@ void DamageWriter::writeDROverview(const std::string& name,
     file << "<br>" << nl;
 }
 
-void DamageWriter::writeDDOverviewDetailed(const std::string& name,
+void DamageWriter::writeDDPerTypeDetailed(const std::string& name,
                                            const Damage& d,
                                            int place,
                                            bool self) {
@@ -1108,7 +1099,7 @@ void DamageWriter::writeDetailedInfoForType(std::string type,
     const int pcWidth = 6;
     const int nrWidth = 4;
     std::string tot = total == -1 ? "" : std::to_string(total);
-    
+
     std::string hits = std::to_string(nrOfHits);
     file << std::setw(width+1) << " " + tot << " (" <<
             std::setw(nrWidth) << hits << ") " <<
