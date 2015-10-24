@@ -69,16 +69,26 @@ void StatWriter::createDRPerOpponent(std::string playerName) {
     damageWriter.createDRPerOpponent(playerName);
 }
 
-void StatWriter::createDamagePerType(std::string playerName,
-                                     std::string opponentName) {
-    damageWriter.createDamagePerType(playerName, opponentName);
+void StatWriter::createDDPerType(std::string playerName,
+                                 std::string opponentName) {
+    damageWriter.createDDPerType(playerName, opponentName);
 }
 
-void StatWriter::createDamagePerTypeDetailed(
-    std::string playerName,
-    std::string opponentName) {
+void StatWriter::createDRPerType(std::string playerName,
+                                 std::string opponentName) {
+    damageWriter.createDRPerType(playerName, opponentName);
+}
 
-    damageWriter.createDamagePerTypeDetailed(playerName, opponentName);
+void StatWriter::createDDPerTypeDetailed(std::string playerName,
+                                         std::string opponentName) {
+
+    damageWriter.createDDPerTypeDetailed(playerName, opponentName);
+}
+
+void StatWriter::createDRPerTypeDetailed(std::string playerName,
+                                         std::string opponentName) {
+
+    damageWriter.createDRPerTypeDetailed(playerName, opponentName);
 }
 
 /*********************/
@@ -135,6 +145,7 @@ void StatWriter::createHelp() {
 void StatWriter::createCommands1() {
 
     writeStartOfLink("PDD Commands 1(2)");
+
     file << "<br>" << nl <<
             "Begin a command by saying:<br>" << nl <<
             "<font color = " + lightBlue + ">" << nl;
@@ -172,33 +183,33 @@ void StatWriter::createCommands2() {
 
     writeStartOfLink("PDD Commands 2(2)");
 
-    file << "Damage Received:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">" << nl;
+    file << "Damage Received" << "<br>" << nl;
     file << "All the damage dealt commands are available when showing "
-            "damage received. Put a \"dr\" behind \"pdd\" then follow "
+            "damage received. Put a \\\"dr\\\" behind \\\"pdd\\\" then follow "
             "with a command from the damage dealt list. Example:<br>" << nl;
+    file << "<font color = " + lightBlue + ">" << nl;
     writeCommand("pdd dr dtypes [player1] [player2]", "Which btw is the "
-                 "same as \"pdd dtypes [player2] [player1]\"");
+                 "same as \\\"pdd dtypes [player2] [player1]\\\"");
     file << "</font><br>" << nl
 
-         << "Nano Program:" << "<br>" << nl
+         << "Nano Program" << "<br>" << nl
          << "<font color = " + lightBlue + ">" << nl;
     writeCommand("np");
     file << "</font><br>" << nl;
 
-    file << "Experience:" << "<br>" << nl
+    file << "Experience" << "<br>" << nl
          << "<font color = " + lightBlue + ">" << nl;
     writeCommand("xp");
     file << "</font><br>" << nl;
 
-    file << "PrettyDD commands:" << "<br>" << nl
+    file << "Time" << "<br>" << nl
          << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("pause", "Or \"stop\" pauses the timer used to calc DPM");
-    writeCommand("resume", "Or \"start\" resumes the timer");
+    writeCommand("pause", "Or \\\"stop\\\" pauses the timer used to calc DPM");
+    writeCommand("resume", "Or \\\"start\\\" resumes the timer");
     writeCommand("reset", "Clears everything logged and starts anew directly");
     file << "</font><br>" << nl;
 
-    file << "Help:" << "<br>" << nl
+    file << "Help" << "<br>" << nl
          << "<font color = " + lightBlue + ">" << nl;
     writeCommand("help", "Shows this help");
     file << "</font>";
@@ -211,32 +222,27 @@ void StatWriter::createInfo1() {
     writeStartOfLink("PDD Info 1(2)");
 
     file << "<br>" << nl
-         << "Stats Info<br><br>" << nl << nl
+        << "Stats Info<br><br>" << nl << nl
 
-         << "CatHit% (Category Hit %) for Normal, Crit, Deflect and Miss<br>" << nl
-         << "<font color = " + lightBlue + ">" << nl
-         << "* Category hit rate is calculated in the following way:<br>" << nl
-         << "   nr of x / "
-            "(normal hits + crits (if existing) + deflects + misses)<br><br>"
-         << nl << nl
-         << "</font>"
+        << "CatHit% (Category Hit %) for Normal, Crit, Deflect and Miss<br>" << nl
+        << "<font color = " + lightBlue + ">" << nl
+        << "* Category hit rate is calculated in the following way:<br>" << nl
+        << "   nr of x / "
+        "(normal hits + crits (if existing) + deflects + misses)<br><br>"
+        << nl << nl
+        << "</font>"
 
-         << "TotHit% (Total Hit %)<br>" << nl
-         << "<font color = " + lightBlue + ">" << nl
-         << "* Total hit rate is calculated in the following way:<br>" << nl
-         << "   nr of x / all attacks for that type<br><br>" << nl << nl
-         << "</font>"
+        << "TotHit% (Total Hit %)<br>" << nl
+        << "<font color = " + lightBlue + ">" << nl
+        << "* Total hit rate is calculated in the following way:<br>" << nl
+        << "   nr of x / all attacks for that type<br><br>" << nl << nl
+        << "</font>"
 
-         << "DPM<br>" << nl
-         << "<font color = " + lightBlue + ">" << nl
-         << "* DPM is calculated from the first attack to the last attack"
-            "<br><br>" << nl << nl
-         << "</font>"
-
-         << "XP (xp) Info<br>" << nl
-         << "<font color = " + lightBlue + ">" << nl
-         << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
-         << "</font>";
+        << "DPM<br>" << nl
+        << "<font color = " + lightBlue + ">" << nl
+        << "* DPM is calculated from the first attack to the last attack"
+        "<br><br>" << nl << nl
+        << "</font>";
 
     writeEndOfLink("PDD Info 1(2)");
 }
@@ -246,14 +252,14 @@ void StatWriter::createInfo2() {
     writeStartOfLink("PDD Info 2(2)");
 
     file << "<br>" << nl
-         << "Damage per Player / Opponent and Detailed Top List(dtop) Info<br>" << nl
+         << "Damage per Player, Opponent and Detailed Top List<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "* Regular, special, nanobot and shield % is % of total damage<br>" << nl
          << "* Crit, deflect and miss % is % of hits that can "
             "crit, deflect or miss (CatHit%)<br><br>" << nl << nl
          << "</font>"
 
-         << "Damage per Type (types) Info<br>" << nl
+         << "Damage per Type (types)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "* Regular and nanobot % is % of total damage<br>" << nl
          << "* Crit, deflect and miss % is % of hits that can "
@@ -265,12 +271,17 @@ void StatWriter::createInfo2() {
             "shown as a separate type<br><br>" << nl << nl
          << "</font>"
 
-         << "Detailed Damage per Type (dtypes) Info<br>" << nl
+         << "Detailed Damage per Type (dtypes)<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "* Regular Total is the sum of normal, crit and deflect<br>" << nl
          << "* Damage % is % of total damage<br>" << nl
          << "* TotHit% - See info 1<br>" << nl
          << "* CatHit% - See info 1<br>" << nl
+         << "</font>"
+
+         << "XP Info<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
          << "</font>";
 
     writeEndOfLink("PDD Info 2(2)");

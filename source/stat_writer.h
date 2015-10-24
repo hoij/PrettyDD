@@ -29,18 +29,29 @@ public:
 
     void createDDTopList();
     void createDRTopList();
+
     void createDDDetailedTopList();
     void createDRDetailedTopList();
+
     void createDDPerType(std::string playerName);
     void createDRPerType(std::string playerName);
+
+    void createDDPerType(std::string playerName,
+        std::string opponentName);
+    void createDRPerType(std::string playerName,
+        std::string opponentName);
+
     void createDDPerTypeDetailed(std::string playerName);
     void createDRPerTypeDetailed(std::string playerName);
+
+    void createDDPerTypeDetailed(std::string playerName,
+        std::string opponentName);
+    void createDRPerTypeDetailed(std::string playerName,
+        std::string opponentName);
+
     void createDDPerOpponent(std::string playerName);
     void createDRPerOpponent(std::string playerName);
-    void createDamagePerType(std::string playerName,
-                             std::string opponentName);
-    void createDamagePerTypeDetailed(std::string playerName,
-                                     std::string opponentName);
+
 
     void createHealReceivedTopList();
     void createHealReceivedDetailedTopList();

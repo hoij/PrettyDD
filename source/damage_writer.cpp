@@ -29,21 +29,21 @@ void DamageWriter::createDRTopList() {
 }
 
 void DamageWriter::createDDDetailedTopList() {
-    std::string titleBase = "Damage Dealt Detailed Top List";
+    std::string titleBase = "Detailed Damage Dealt Top List";
     std::vector<std::pair<std::string, Damage>> totalDamageDealtPerPlayer =
         playerVector.getTotalDamageDealtPerPlayer();
     createDetailedTopList(titleBase, totalDamageDealtPerPlayer);
 }
 
 void DamageWriter::createDRDetailedTopList() {
-    std::string titleBase = "Damage Received Detailed Top List";
+    std::string titleBase = "Detailed Damage Received Top List";
     std::vector<std::pair<std::string, Damage>> totalDamageReceivedPerPlayer =
         playerVector.getTotalDamageReceivedPerPlayer();
     createDetailedTopList(titleBase, totalDamageReceivedPerPlayer);
 }
 
 void DamageWriter::createDDPerType(std::string playerName) {
-    std::string titleBase = "DD Per Damage Type By " + playerName;
+    std::string titleBase = "Damage Dealt Per Type By " + playerName;
     std::vector<std::pair<std::string, Damage>> damageDealtPerType =
         playerVector.getDamageDealtPerType(playerName);
     createDamagePerType(playerName,
@@ -54,8 +54,7 @@ void DamageWriter::createDDPerType(std::string playerName) {
 }
 
 void DamageWriter::createDRPerType(std::string playerName) {
-    std::string titleBase = "Damage Received Per Damage Type By " +
-                            playerName;
+    std::string titleBase = "Damage Received Per Type By " + playerName;
     std::vector<std::pair<std::string, Damage>> damageReceivedPerType =
         playerVector.getDamageDealtPerType(playerName);
     createDamagePerType(playerName,
@@ -66,7 +65,7 @@ void DamageWriter::createDRPerType(std::string playerName) {
 }
 
 void DamageWriter::createDDPerTypeDetailed(std::string playerName) {
-    std::string titleBase = "Detailed DD Per Damage Type By " + playerName;
+    std::string titleBase = "Detailed Damage Dealt Per Type By " + playerName;
     std::vector<std::pair<std::string, Damage>> damageDealtPerType =
         playerVector.getDamageDealtPerType(playerName);
     createDamagePerType(playerName,
@@ -77,9 +76,10 @@ void DamageWriter::createDDPerTypeDetailed(std::string playerName) {
 }
 
 void DamageWriter::createDRPerTypeDetailed(std::string playerName) {
-    std::string titleBase = "Detailed DD Per Damage Type By " + playerName;
+    std::string titleBase = "Detailed Damage Received Per Type By " +
+                            playerName;
     std::vector<std::pair<std::string, Damage>> damageReceivedPerType =
-        playerVector.getDamageDealtPerType(playerName);
+        playerVector.getDamageReceivedPerType(playerName);
     createDamagePerType(playerName,
                         titleBase,
                         damageReceivedPerType,
@@ -88,7 +88,7 @@ void DamageWriter::createDRPerTypeDetailed(std::string playerName) {
 }
 
 void DamageWriter::createDDPerOpponent(std::string playerName) {
-    std::string titleBase = "DD Per Opponent For " + playerName;
+    std::string titleBase = "Damage Dealt Per Opponent For " + playerName;
     std::vector<std::pair<std::string, Damage>> damageDealtPerOpponent =
         playerVector.getDamageDealtPerOpponent(playerName);
     createDamagePerOpponent(playerName,
@@ -107,9 +107,24 @@ void DamageWriter::createDRPerOpponent(std::string playerName) {
                             false);
 }
 
-void DamageWriter::createDamagePerType(std::string playerName,
+void DamageWriter::createDDPerType(std::string playerName,
+                                   std::string opponentName) {
+    std::string titleBase = "Damage Dealt On " + opponentName + " By " +
+                            playerName;
+    createDamagePerType(titleBase, playerName, opponentName);
+}
+
+void DamageWriter::createDRPerType(std::string playerName,
+    std::string opponentName) {
+    std::string titleBase = "Damage Received by " + playerName + " From " +
+                            opponentName;
+    createDamagePerType(titleBase, opponentName, playerName);
+}
+
+void DamageWriter::createDamagePerType(std::string titleBase,
+                                       std::string playerName,
                                        std::string opponentName) {
-    std::string titleBase = "DD On " + opponentName + " By " + playerName;
+
     std::vector<std::pair<std::string, Damage>> damageDealtPerType =
         playerVector.getDamageDealtPerType(playerName, opponentName);
     createDamagePerType(playerName,
@@ -120,13 +135,25 @@ void DamageWriter::createDamagePerType(std::string playerName,
                         false);
 }
 
+void DamageWriter::createDDPerTypeDetailed(std::string playerName,
+                                           std::string opponentName) {
+    std::string titleBase = "Detailed Damage Dealt On " +
+                            opponentName + " By " + playerName;
+    createDamagePerTypeDetailed(titleBase, playerName, opponentName);
+}
+
+void DamageWriter::createDRPerTypeDetailed(std::string playerName,
+                                           std::string opponentName) {
+    std::string titleBase = "Detailed Damage Received By " +
+                            playerName + " From " + opponentName;
+    createDamagePerTypeDetailed(titleBase, opponentName, playerName);
+}
+
 void DamageWriter::createDamagePerTypeDetailed(
+    std::string titleBase,
     std::string playerName,
     std::string opponentName) {
 
-    std::string titleBase = "Detailed DD Per Damage Type On " +
-                            opponentName + " By " +
-                            playerName;
     std::vector<std::pair<std::string, Damage>> damageDealtPerType =
         playerVector.getDamageDealtPerType(playerName, opponentName);
     createDamagePerType(playerName,
@@ -960,7 +987,8 @@ bool DamageWriter::playerFound(
     std::string titleBase,
     std::string playerName,
     const std::vector<std::pair<std::string, Damage>>& v) {
-
+    /* PlayerVector returns an empty vector if the player can't
+    be found. */
     if (v.size() == 0) {
         createNotFoundMessage(titleBase, playerName + " not found.");
         return false;
@@ -973,8 +1001,9 @@ bool DamageWriter::opponentFound(
     std::string playerName,
     std::string opponentName,
     const std::vector<std::pair<std::string, Damage>>& v) {
-
-    // When the opponent is not found, a map with the key "empty" is returned.
+    /* When the opponent is not found, a map with the key "empty"
+    is returned from the Player that should contain the opponent.
+    Player vector passes this "empty" vector on. */
     bool notFound = v.size() == 1 &&
                    (v[0].first == "empty");
     if (notFound) {

@@ -202,18 +202,22 @@ std::string PlayerVector<C>::renameIfSelf(std::string name) const {
 
 template<class C>
 void PlayerVector<C>::stopLogging() {
-    log = false;
-    for (const auto& player : this->players) {
-        player->stopTimer();
+    if (log) { // Only stop if logging is ongoing
+        log = false;
+        for (const auto& player : this->players) {
+            player->stopTimer();
+        }
     }
 }
 
 template<class C>
 void PlayerVector<C>::startLogging() {
-    log = true;
-    for (const auto& player : this->players) {
-        if (player->getStartTime() != 0) {
-            player->resumeTimer();
+    if (!log) { // Only start if logging has been stopped
+        log = true;
+        for (const auto& player : this->players) {
+            if (player->getStartTime() != 0) {
+                player->resumeTimer();
+            }
         }
     }
 }
@@ -224,6 +228,7 @@ void PlayerVector<C>::reset() {
         delete player;
     }
     this->players.clear();
+    log = true;
 }
 
 

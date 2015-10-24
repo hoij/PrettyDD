@@ -106,6 +106,9 @@ void CommandHandler::execute(const std::string& command) {
             else if (commandParts[2] == "types") {
                 statWriter.createDRPerType("You");
             }
+            else if (commandParts[2] == "dtypes") {
+                statWriter.createDRPerTypeDetailed("You");
+            }
             else {
                 statWriter.createDRPerOpponent(commandParts[2]);
             }
@@ -144,7 +147,7 @@ void CommandHandler::execute(const std::string& command) {
                 statWriter.createDDPerType(commandParts[2]);
         }
         else {
-            statWriter.createDamagePerType(commandParts[1], commandParts[2]);
+            statWriter.createDDPerType(commandParts[1], commandParts[2]);
         }
     }
     else if (nrOfOptions == 3) {
@@ -156,7 +159,7 @@ void CommandHandler::execute(const std::string& command) {
                 statWriter.createDRPerOpponent(commandParts[3]);
             }
             else {
-                statWriter.createDamagePerType(commandParts[3], commandParts[2]);
+                statWriter.createDRPerType(commandParts[2], commandParts[3]);
             }
         }
         else if (commandParts[1] == "np") {  // Nano Program
@@ -177,21 +180,21 @@ void CommandHandler::execute(const std::string& command) {
             }
         }
         else if (commandParts[1] == "types") {
-            statWriter.createDamagePerType(commandParts[2], commandParts[3]);
+            statWriter.createDDPerType(commandParts[2], commandParts[3]);
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDamagePerTypeDetailed(commandParts[2],
-                                                   commandParts[3]);
+            statWriter.createDDPerTypeDetailed(commandParts[2],
+                                               commandParts[3]);
         }
     }
-    else if (nrOfOptions == 3) {
+    else if (nrOfOptions == 4) {
         if (commandParts[1] == "dr") {
             if (commandParts[2] == "types") {
-                statWriter.createDamagePerType(commandParts[4], commandParts[3]);
+                statWriter.createDRPerType(commandParts[3], commandParts[4]);
             }
             else if (commandParts[2] == "dtypes") {
-                statWriter.createDamagePerTypeDetailed(commandParts[4],
-                                                       commandParts[3]);
+                statWriter.createDRPerTypeDetailed(commandParts[3],
+                                                   commandParts[4]);
             }
         }
     }
