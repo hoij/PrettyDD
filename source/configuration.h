@@ -35,7 +35,7 @@ public:
         }
     }
 
-    std::string& getplayerRunningProgram() {return playerRunningProgram;}
+    std::string& getPlayerRunningProgram() {return playerRunningProgram;}
     std::string& getLogFilePath() {return logFilePath;}
     std::string& getScriptsPath() {return scriptsPath;}
     bool shouldParseFromEnd() {return parseFromEnd;}

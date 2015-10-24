@@ -33,52 +33,52 @@ void StatWriter::createDDTopList() {
     damageWriter.createDDTopList();
 }
 
-void StatWriter::createDDDetailedTopList() {
-    damageWriter.createDDDetailedTopList();
-}
-
-void StatWriter::createDDPerDamageType(std::string playerName) {
-    damageWriter.createDDPerDamageType(playerName);
-}
-
-void StatWriter::createDDPerDamageTypeDetailed(std::string playerName) {
-    damageWriter.createDDPerDamageTypeDetailed(playerName);
-}
-
-void StatWriter::createDDPerOpponent(std::string playerName) {
-    damageWriter.createDDPerOpponent(playerName);
-}
-
-void StatWriter::createDDPerTypeOnSpecificOpponent(std::string playerName,
-                                            std::string opponentName) {
-    damageWriter.createDDPerTypeOnSpecificOpponent(playerName, opponentName);
-}
-
-void StatWriter::createDDPerTypeDetailedOnSpecificOpponent(
-    std::string playerName,
-    std::string opponentName) {
-
-    damageWriter.createDDPerTypeDetailedOnSpecificOpponent(playerName, opponentName);
-}
-
-/******/
-/* DR */
-/******/
-
 void StatWriter::createDRTopList() {
     damageWriter.createDRTopList();
+}
+
+void StatWriter::createDDDetailedTopList() {
+    damageWriter.createDDDetailedTopList();
 }
 
 void StatWriter::createDRDetailedTopList() {
     damageWriter.createDRDetailedTopList();
 }
 
-void StatWriter::createDRPerDamageType(std::string playerName) {
-    damageWriter.createDRPerDamageType(playerName);
+void StatWriter::createDDPerType(std::string playerName) {
+    damageWriter.createDDPerType(playerName);
+}
+
+void StatWriter::createDRPerType(std::string playerName) {
+    damageWriter.createDRPerType(playerName);
+}
+
+void StatWriter::createDDPerTypeDetailed(std::string playerName) {
+    damageWriter.createDDPerTypeDetailed(playerName);
+}
+
+void StatWriter::createDRPerTypeDetailed(std::string playerName) {
+    damageWriter.createDRPerTypeDetailed(playerName);
+}
+
+void StatWriter::createDDPerOpponent(std::string playerName) {
+    damageWriter.createDDPerOpponent(playerName);
 }
 
 void StatWriter::createDRPerOpponent(std::string playerName) {
     damageWriter.createDRPerOpponent(playerName);
+}
+
+void StatWriter::createDamagePerType(std::string playerName,
+                                     std::string opponentName) {
+    damageWriter.createDamagePerType(playerName, opponentName);
+}
+
+void StatWriter::createDamagePerTypeDetailed(
+    std::string playerName,
+    std::string opponentName) {
+
+    damageWriter.createDamagePerTypeDetailed(playerName, opponentName);
 }
 
 /*********************/
@@ -163,8 +163,7 @@ void StatWriter::createCommands1() {
     writeCommand("dtypes [player1]", "Detailed damage per type for player");
     writeCommand("dtypes [player1] [player2]",
                  "Detailed damage per type on player2 by player1");
-    file << "</font>";
-    file << "<br>" << nl;
+    file << "</font><br>" << nl;
 
     writeEndOfLink("PDD Commands 1(2)");
 }
@@ -175,30 +174,33 @@ void StatWriter::createCommands2() {
 
     file << "Damage Received:" << "<br>" << nl;
     file << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("dr top");
-    writeCommand("dr dtop");
-    writeCommand("dr opp [player]");
-    writeCommand("dr [player]");
-    writeCommand("dr types");
-    writeCommand("dr types [player]");
-    file << "</font>";
-    file << "<br>" << nl;
+    file << "All the damage dealt commands are available when showing "
+            "damage received. Put a \"dr\" behind \"pdd\" then follow "
+            "with a command from the damage dealt list. Example:<br>" << nl;
+    writeCommand("pdd dr dtypes [player1] [player2]", "Which btw is the "
+                 "same as \"pdd dtypes [player2] [player1]\"");
+    file << "</font><br>" << nl
 
-    file << "Nano Program:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">" << nl;
+         << "Nano Program:" << "<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl;
     writeCommand("np");
-    file << "</font>";
-    file << "<br>" << nl;
+    file << "</font><br>" << nl;
 
-    file << "Experience:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">" << nl;
+    file << "Experience:" << "<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl;
     writeCommand("xp");
-    file << "</font>";
-    file << "<br>" << nl;
+    file << "</font><br>" << nl;
 
-    file << "Help:" << "<br>" << nl;
-    file << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("help");
+    file << "PrettyDD commands:" << "<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl;
+    writeCommand("pause", "Or \"stop\" pauses the timer used to calc DPM");
+    writeCommand("resume", "Or \"start\" resumes the timer");
+    writeCommand("reset", "Clears everything logged and starts anew directly");
+    file << "</font><br>" << nl;
+
+    file << "Help:" << "<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl;
+    writeCommand("help", "Shows this help");
     file << "</font>";
 
     writeEndOfLink("PDD Commands 2(2)");

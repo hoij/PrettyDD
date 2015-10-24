@@ -30,8 +30,8 @@ int main(void) {
         return 1;
     }
 
-    Parser parser(config.getplayerRunningProgram());
-    PlayerVector<Player*> playerVector;
+    Parser parser(config.getPlayerRunningProgram());
+    PlayerVector<Player*> playerVector(config.getPlayerRunningProgram());
 
     std::ofstream file;
     NanoProgramWriter nanoProgramWriter(playerVector, config, file);

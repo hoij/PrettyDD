@@ -55,7 +55,6 @@ public:
     std::vector<std::pair<std::string, Damage>>
     getTotalDamageReceivedPerType() const;
 
-    // TODO: Rename these to Dealt/Received from the Players perspective.
     std::vector<std::pair<std::string, Damage>>
     getTotalDamageDealtPerAffectedPlayer() const;
 

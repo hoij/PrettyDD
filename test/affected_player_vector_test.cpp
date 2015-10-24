@@ -25,9 +25,12 @@ these classes pass. */
 class MockAffectedPlayer : public virtual AffectedPlayerInterface, public AffectedPlayer {
 public:
     MockAffectedPlayer(std::string name, MyTime* myTime) : AffectedPlayer(name, myTime) {}
-    MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
-    MOCK_CONST_METHOD1(getDamagePerDamageType, Damage(const std::string damageType));
-    MOCK_CONST_METHOD0(getAllDamage, std::vector<std::pair<std::string, Damage>>(void));
+    MOCK_CONST_METHOD0(getTotalDamageReceivedFromPlayer, Damage(void));
+    MOCK_CONST_METHOD0(getTotalDamageDealtOnPlayer, Damage(void));
+    MOCK_CONST_METHOD0(getDamageReceivedFromPlayer,
+                       std::vector<std::pair<std::string, Damage>>(void));
+    MOCK_CONST_METHOD0(getDamageDealtOnPlayer,
+                       std::vector<std::pair<std::string, Damage>>(void));
     MOCK_CONST_METHOD0(getHeal, Heal&(void));
     MOCK_CONST_METHOD0(getNano, Nano&(void));
 };
@@ -45,19 +48,11 @@ const MockAffectedPlayer* addPlayerToVector(std::string name,
     return p;
 }
 
-Damage createDealerDamage(int amount) {
+Damage createDamage(int amount) {
     LineInfo li;
     li.amount = amount;
     Damage d;
-    d.addDamageDealtOnPlayer(li);
-    return d;
-}
-
-Damage createReceiverDamage(int amount) {
-    LineInfo li;
-    li.amount = amount;
-    Damage d;
-    d.addDamageReceivedFromPlayer(li);
+    d.add(li);
     return d;
 }
 
@@ -87,8 +82,8 @@ protected:
         affectedPlayerVector = new AffectedPlayerVector<::testing::NiceMock<MockAffectedPlayer>*>;
 
         // Set up the return values.
-        d1 = createDealerDamage(10);
-        d2 = createDealerDamage(30);
+        d1 = createDamage(10);
+        d2 = createDamage(30);
 
         // Add players to the vector.
         p1 = addPlayerToVector("dealer1", affectedPlayerVector);
@@ -107,7 +102,7 @@ protected:
 
 /* Test cases */
 
-TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage) {
+TEST_F(AffectedPlayerVectorDamageTest, getTotalDamageDealtOnPlayer) {
     /*
     Adds the a player with the same name as the caller to the vector.
     Calls getTotalDamage().
@@ -118,43 +113,16 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamage) {
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
-    EXPECT_CALL(*p1, getTotalDamage())
+    EXPECT_CALL(*p1, getDamageDealtOnPlayer())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage())
+    EXPECT_CALL(*p2, getDamageDealtOnPlayer())
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getTotalDamage())
+    EXPECT_CALL(*caller, getDamageDealtOnPlayer())
         .Times(0);
 
-    Damage totalDamage = affectedPlayerVector->getTotalDamage("Caller");
+    Damage totalDamage = affectedPlayerVector->getTotalDamageDealtOnPlayer("Caller");
 
-    EXPECT_EQ((d1 + d2).getTotalDealtOnPlayer(), totalDamage.getTotalDealtOnPlayer());
-}
-
-TEST_F(AffectedPlayerVectorDamageTest, getTotalDamagePerDamageType) {
-    /*
-    Adds the a player with the same name as the caller to the vector and
-    calls getTotalRegularDamagePerDamageType().
-    Verifies that each players, except for the callers,
-    getTotalDamagePerDamageType is called and that the summed damage is
-    correct.
-    */
-
-    const MockAffectedPlayer* caller = addPlayerToVector("Caller",
-                                                         affectedPlayerVector);
-
-    std::string damageType = "poison";
-    EXPECT_CALL(*p1, getDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getDamagePerDamageType(damageType))
-        .Times(0);
-
-    Damage totalDamage =
-        affectedPlayerVector->getTotalDamagePerDamageType("Caller",
-                                                          damageType);
-
-    EXPECT_EQ((d1 + d2).getTotalDealtOnPlayer(), totalDamage.getTotalDealtOnPlayer());
+    EXPECT_EQ((d1 + d2).getTotal(), totalDamage.getTotal());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getAllDamageFromAffectedPlayer) {

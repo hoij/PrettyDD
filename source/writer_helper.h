@@ -22,7 +22,6 @@ public:
     void writeEndOfLink(std::string title);
     void writePlace(int place);
     void writeName(std::string name);
-    std::string renameIfSelf(std::string name);
     std::string appendInterval(std::string titleBase,
                                int startOffset,
                                int stopOffset);

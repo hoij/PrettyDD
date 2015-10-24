@@ -5,46 +5,14 @@
 
 
 void CommandHandler::execute(const std::string& command) {
-    /* Available commands:
-    pdd top
-        dtop
-        "playerName"
-        types
-        dtypes
-        types "playerName"
-        "playerName1" "playerName2"
 
-        dr top
-        dr dtop
-        dr types "playerName"
-        dr "playerName"
-
-        h top
-        h dtop
-        h dealt
-
-        n top
-        n dtop
-        n dealt
-
-        np casted
-        np casted t
-        np casted "playerName"
-        np received
-        np received t
-        np received "playerName"
-
-        xp
-
-        help
-    */
-
-
-    std::vector<std::string> commandParts = mergeQuotedText(
-                                                splitCommand(command));
+    std::vector<std::string> commandParts =
+        mergeQuotedText(splitCommand(command));
 
     int nrOfOptions = (int)commandParts.size() - 1;
 
+    // TODO: Split into several methods and eventually switch to
+    // some other way of handling this.
     if (nrOfOptions == 0) {
         // Write the detailed top list by defualt:
 //         statWriter.createDDDetailedTopList();
@@ -55,30 +23,30 @@ void CommandHandler::execute(const std::string& command) {
 //        statWriter.createDDTopList();
 //        statWriter.createDDDetailedTopList();
 
-//        statWriter.createDDPerDamageType("You");
-//        statWriter.createDDPerDamageType("Predator Rogue");
-//        statWriter.createDDPerDamageType("Ass");
+//        statWriter.createDDPerType("You");
+//        statWriter.createDDPerType("Predator Rogue");
+//        statWriter.createDDPerType("Ass");
 
-//        statWriter.createDDPerDamageTypeDetailed("You");
-//        statWriter.createDDPerDamageTypeDetailed("Predator Rogue");
-//        statWriter.createDDPerDamageTypeDetailed("Sgtcuddle");
+//        statWriter.createDDPerTypeDetailed("You");
+//        statWriter.createDDPerTypeDetailed("Predator Rogue");
+//        statWriter.createDDPerTypeDetailed("Sgtcuddle");
 
 //        statWriter.createHelp();
 
 //        statWriter.createDDPerOpponent("You");
 //        statWriter.createDDPerOpponent("Predator Rogue");
 //        statWriter.createDDPerOpponent("Nonexisting");
-//        statWriter.createDDPerTypeOnSpecificOpponent("You", "Predator Rogue");
+//        statWriter.createDRPerType("You", "Predator Rogue");
 
-//        statWriter.createDDPerTypeDetailedOnSpecificOpponent("You", "Predator Rogue");
+//        statWriter.createDDPerTypeDetailed("You", "Predator Rogue");
 
-//        statWriter.createDDPerTypeOnSpecificOpponent("Predator Rogue", "You");
-//        statWriter.createDDPerTypeOnSpecificOpponent("You", "asshole");
+//        statWriter.createDRPerType("Predator Rogue", "You");
+//        statWriter.createDRPerType("You", "asshole");
 
 //        statWriter.createDRTopList();
 //        statWriter.createDRDetailedTopList();
 
-//        statWriter.createDRPerDamageType("You");
+//        statWriter.createDRPerType("You");
 
 //        statWriter.createDRPerOpponent("You");
     }
@@ -92,10 +60,10 @@ void CommandHandler::execute(const std::string& command) {
             statWriter.createDDDetailedTopList();
         }
         else if (commandParts[1] == "types") {
-            statWriter.createDDPerDamageType("You");
+            statWriter.createDDPerType("You");
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDPerDamageTypeDetailed("You");
+            statWriter.createDDPerTypeDetailed("You");
         }
         else if (commandParts[1] == "np") {
             statWriter.createNanoProgramsCastedDetailedList();
@@ -118,7 +86,6 @@ void CommandHandler::execute(const std::string& command) {
              playerVector.reset();  // Removes all players from playerVector.
         }
         else {
-            // Assume the string is the name of a player/monster in AO
             statWriter.createDDPerOpponent(commandParts[1]);
         }
     }
@@ -127,7 +94,7 @@ void CommandHandler::execute(const std::string& command) {
             statWriter.createDDPerOpponent(commandParts[2]);
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDPerDamageTypeDetailed(commandParts[2]);
+            statWriter.createDDPerTypeDetailed(commandParts[2]);
         }
         else if (commandParts[1] == "dr") {
             if (commandParts[2] == "top") {
@@ -137,7 +104,7 @@ void CommandHandler::execute(const std::string& command) {
                 statWriter.createDRDetailedTopList();
             }
             else if (commandParts[2] == "types") {
-                statWriter.createDRPerDamageType("You");
+                statWriter.createDRPerType("You");
             }
             else {
                 statWriter.createDRPerOpponent(commandParts[2]);
@@ -174,20 +141,22 @@ void CommandHandler::execute(const std::string& command) {
             }
         }
         else if (commandParts[1] == "types") {
-                statWriter.createDDPerDamageType(commandParts[2]);
+                statWriter.createDDPerType(commandParts[2]);
         }
         else {
-            statWriter.createDDPerTypeOnSpecificOpponent(commandParts[1],
-                                                         commandParts[2]);
+            statWriter.createDamagePerType(commandParts[1], commandParts[2]);
         }
     }
     else if (nrOfOptions == 3) {
         if (commandParts[1] == "dr") {
             if (commandParts[2] == "types") {
-                statWriter.createDRPerDamageType(commandParts[3]);
+                statWriter.createDRPerType(commandParts[3]);
             }
             else if (commandParts[2] == "opp") {
                 statWriter.createDRPerOpponent(commandParts[3]);
+            }
+            else {
+                statWriter.createDamagePerType(commandParts[3], commandParts[2]);
             }
         }
         else if (commandParts[1] == "np") {  // Nano Program
@@ -208,16 +177,22 @@ void CommandHandler::execute(const std::string& command) {
             }
         }
         else if (commandParts[1] == "types") {
-            statWriter.createDDPerTypeOnSpecificOpponent(commandParts[2],
-                                                         commandParts[3]);
+            statWriter.createDamagePerType(commandParts[2], commandParts[3]);
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDPerTypeDetailedOnSpecificOpponent(commandParts[2],
-                                                                 commandParts[3]);
+            statWriter.createDamagePerTypeDetailed(commandParts[2],
+                                                   commandParts[3]);
         }
-        else {
-            statWriter.createDDPerTypeDetailedOnSpecificOpponent(commandParts[2],
-                                                                 commandParts[3]);
+    }
+    else if (nrOfOptions == 3) {
+        if (commandParts[1] == "dr") {
+            if (commandParts[2] == "types") {
+                statWriter.createDamagePerType(commandParts[4], commandParts[3]);
+            }
+            else if (commandParts[2] == "dtypes") {
+                statWriter.createDamagePerTypeDetailed(commandParts[4],
+                                                       commandParts[3]);
+            }
         }
     }
     else {
@@ -235,7 +210,8 @@ std::vector<std::string> CommandHandler::splitCommand(std::string command) {
     return commandParts;
 }
 
-std::vector<std::string> CommandHandler::mergeQuotedText(std::vector<std::string> commandParts) {
+std::vector<std::string> CommandHandler::mergeQuotedText(
+    std::vector<std::string> commandParts) {
     /* Merges text within the same quotation marks.
     Can not handle names beginning with a space. */
     // TODO: Fix this backwards implementation. Maybe do it C-style.
@@ -283,7 +259,7 @@ std::vector<std::string> CommandHandler::mergeQuotedText(std::vector<std::string
     return result;
 }
 
-//
+// TODO: Move to test.
 //void CommandHandler::testMerge() {
 //    std::vector<std::string> text1 = {"pdd", "\"Player1\"", "\"Player", "2\"", "s"};
 //    std::vector<std::string> text2 = {"pdd", "\"Player1\"", "\"", "Player", "2\"", "s"};

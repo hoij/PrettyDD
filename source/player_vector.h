@@ -3,6 +3,7 @@
 
 
 #include "base_vector.h"
+#include "configuration.h"
 #include "logger.h"
 #include "my_time.h"
 #include "player.h"
@@ -20,14 +21,38 @@ class LineInfo;
 template<class C>
 class PlayerVector : public BaseVector<C> {
 public:
-    PlayerVector() {}
+    PlayerVector(std::string playerRunningProgram) :
+        playerRunningProgram(playerRunningProgram) {}
     virtual ~PlayerVector() {};
     PlayerVector(const PlayerVector<C>& other) : BaseVector<C>(other) {}
 
     virtual void addToPlayers(LineInfo& lineInfo);
 
-    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageDealtForEachPlayer() const;
-    virtual std::vector<std::pair<std::string, Damage>> getTotalDamageReceivedForEachPlayer() const;
+    virtual std::vector<std::pair<std::string, Damage>>
+    getTotalDamageDealtPerPlayer() const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getTotalDamageReceivedPerPlayer() const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageDealtPerType(std::string playerName) const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageReceivedPerType(std::string playerName) const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageDealtPerType(std::string playerName,
+                          std::string opponentName) const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageDealtPerOpponent(std::string playerName) const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageReceivedPerOpponent(std::string playerName) const;
+
+
+    std::string renameIfSelf(std::string name) const;
+
 
     virtual void startLogging();
     virtual void stopLogging();
@@ -35,6 +60,7 @@ public:
 
 private:
     bool log = false;
+    std::string playerRunningProgram;
 };
 
 
@@ -69,7 +95,8 @@ void PlayerVector<C>::addToPlayers(LineInfo& lineInfo) {
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageDealtForEachPlayer() const {
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getTotalDamageDealtPerPlayer() const {
     /* Returns a vector of pairs containing the players name and their
     total damage dealt (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
@@ -81,7 +108,8 @@ std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageDealt
 }
 
 template<class C>
-std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageReceivedForEachPlayer() const {
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getTotalDamageReceivedPerPlayer() const {
     /* Returns a vector of pairs containing the players name and their
     total damage received (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
@@ -90,6 +118,86 @@ std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageRecei
                                           p->getTotalDamageReceived());
     }
     return totalDamagePerPlayer;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getDamageDealtPerType(std::string playerName) const {
+    std::string pName = renameIfSelf(playerName);
+    for (const C p : this->players) {
+        if (p->getName() == pName) {
+            return p->getTotalDamageDealtPerType();
+        }
+    }
+    // Return an empty vector if the player was not found.
+    std::vector<std::pair<std::string, Damage>> v;
+    return v;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getDamageReceivedPerType(std::string playerName) const {
+    std::string pName = renameIfSelf(playerName);
+    for (const C p : this->players) {
+        if (p->getName() == pName) {
+            return p->getTotalDamageReceivedPerType();
+        }
+    }
+    // Return an empty vector if the player was not found.
+    std::vector<std::pair<std::string, Damage>> v;
+    return v;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getDamageDealtPerType(std::string playerName,
+                                       std::string opponentName) const {
+    /* There is no DR version of this method as the same result
+    can be achieved by swapping player and opponent when calling
+    this method. */
+    std::string pName = renameIfSelf(playerName);
+    std::string oppName = renameIfSelf(opponentName);
+    for (const C p : this->players) {
+        if (p->getName() == pName) {
+            return p->getDamageDealtPerType(oppName);
+        }
+    }
+    // Return an empty vector if the player was not found.
+    std::vector<std::pair<std::string, Damage>> v;
+    return v;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getDamageDealtPerOpponent(std::string playerName) const {
+    std::string pName = renameIfSelf(playerName);
+    for (const C p : this->players) {
+        if (p->getName() == pName) {
+            return p->getTotalDamageDealtPerAffectedPlayer();
+        }
+    }
+    // Return an empty vector if the player was not found.
+    std::vector<std::pair<std::string, Damage>> v;
+    return v;
+}
+
+template<class C>
+std::vector<std::pair<std::string, Damage>>
+PlayerVector<C>::getDamageReceivedPerOpponent(std::string playerName) const {
+    std::string pName = renameIfSelf(playerName);
+    for (const C p : this->players) {
+        if (p->getName() == pName) {
+            return p->getTotalDamageReceivedPerAffectedPlayer();
+        }
+    }
+    // Return an empty vector if the player was not found.
+    std::vector<std::pair<std::string, Damage>> v;
+    return v;
+}
+
+template<class C>
+std::string PlayerVector<C>::renameIfSelf(std::string name) const {
+    return (name == playerRunningProgram ? "You" : name);
 }
 
 template<class C>

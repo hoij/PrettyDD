@@ -46,11 +46,6 @@ void WriterHelper::writeName(std::string name) {
     file << ((name == "You") ? " %m" : " " + name);
 }
 
-std::string WriterHelper::renameIfSelf(std::string name) {
-    std::string playerRunningProgram = config.getplayerRunningProgram();
-    return (name == playerRunningProgram ? "You" : name);
-}
-
 std::string WriterHelper::appendInterval(std::string titleBase,
                                          int startOffset,
                                          int stopOffset) {

@@ -28,19 +28,19 @@ public:
     StatWriter& operator=(StatWriter rhs) = delete;
 
     void createDDTopList();
-    void createDDDetailedTopList();
-    void createDDPerDamageType(std::string playerName);
-    void createDDPerDamageTypeDetailed(std::string playerName);
-    void createDDPerOpponent(std::string playerName);  // Lists all opponents for playerName
-    void createDDPerTypeOnSpecificOpponent(std::string playerName,
-                                           std::string opponentName);
-    void createDDPerTypeDetailedOnSpecificOpponent(std::string playerName,
-                                                   std::string opponentName);
-
     void createDRTopList();
+    void createDDDetailedTopList();
     void createDRDetailedTopList();
-    void createDRPerDamageType(std::string playerName);
-    void createDRPerOpponent(std::string playerName);  // Lists all opponents for playerName
+    void createDDPerType(std::string playerName);
+    void createDRPerType(std::string playerName);
+    void createDDPerTypeDetailed(std::string playerName);
+    void createDRPerTypeDetailed(std::string playerName);
+    void createDDPerOpponent(std::string playerName);
+    void createDRPerOpponent(std::string playerName);
+    void createDamagePerType(std::string playerName,
+                             std::string opponentName);
+    void createDamagePerTypeDetailed(std::string playerName,
+                                     std::string opponentName);
 
     void createHealReceivedTopList();
     void createHealReceivedDetailedTopList();
