@@ -45,30 +45,51 @@ public:
 
     void add(LineInfo& lineInfo);
 
-    Damage getTotalDamage() const;
-    Damage getTotalDamagePerDamageType(std::string damageType) const;
+    /* Damage */
+    Damage getTotalDamageDealt() const;
+    Damage getTotalDamageReceived() const;
 
-    std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageType() const;
-    std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageTypeReceivedFromPlayer() const;
-    std::vector<std::pair<std::string, Damage>> getTotalDamageForEveryDamageTypeDealtOnPlayer() const;
-    std::vector<std::pair<std::string, Damage>> getTotalDamageForAllAffectedPlayers() const;
+    std::vector<std::pair<std::string, Damage>>
+    getTotalDamageDealtPerType() const;
+
+    std::vector<std::pair<std::string, Damage>>
+    getTotalDamageReceivedPerType() const;
+
     // TODO: Rename these to Dealt/Received from the Players perspective.
-    std::vector<std::pair<std::string, Damage>> getTotalDamageReceivedFromPlayerForAllAffectedPlayers() const;
-    std::vector<std::pair<std::string, Damage>> getTotalDamageDealtOnPlayerForAllAffectedPlayers() const;
-    std::vector<std::pair<std::string, Damage>> getAllDamageFromAffectedPlayer(std::string name) const;
-    std::vector<std::pair<std::string, Damage>> getAllDamageTakenFromAffectedPlayer(std::string name) const;
-    std::vector<std::pair<std::string, Damage>> getAllDamageDealtOnAffectedPlayer(std::string name) const;
+    std::vector<std::pair<std::string, Damage>>
+    getTotalDamageDealtPerAffectedPlayer() const;
 
+    std::vector<std::pair<std::string, Damage>>
+    getTotalDamageReceivedPerAffectedPlayer() const;
+
+    std::vector<std::pair<std::string, Damage>>
+    getDamageReceivedPerType(std::string affectedPlayerName) const;
+
+    std::vector<std::pair<std::string, Damage>>
+    getDamageDealtPerType(std::string affectedPlayerName) const;
+
+    /* Heal */
     Heal getTotalHeals() const;
-    std::vector<std::pair<std::string, Heal>> getHealsForAllAffectedPlayers() const;
-    const Heal& getHealFromAffectedPlayer(std::string name) const;
 
+    std::vector<std::pair<std::string, Heal>>
+    getHealsPerAffectedPlayer() const;
+
+    Heal getHeal(std::string affectedPlayerName) const;
+
+    /* Nano */
     Nano getTotalNano() const;
-    std::vector<std::pair<std::string, Nano>> getNanoForAllAffectedPlayers() const;
-    const Nano& getNanoFromAffectedPlayer(std::string name) const;
 
+    std::vector<std::pair<std::string, Nano>>
+    getNanoPerAffectedPlayer() const;
+
+    Nano getNano(std::string affectedPlayerName) const;
+
+    /* Nano Program */
     const NanoPrograms& getNanoPrograms() const;
+
+    /* XP */
     const XP& getXp();
+
 
     std::time_t getTimeActive() const;
     std::time_t getPauseDuration() const;

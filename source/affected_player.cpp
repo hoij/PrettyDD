@@ -21,13 +21,16 @@ void AffectedPlayer::add(LineInfo& lineInfo) {
 
 void AffectedPlayer::addDamage(LineInfo& li) {
     if (li.dealer_name == getName()) {
-        damage[li.subtype].addDamageDealtOnPlayer(li);
+        damageDealtOnPlayer[li.subtype].add(li);
     }
     else if (li.receiver_name == getName()) {
-        damage[li.subtype].addDamageReceivedFromPlayer(li);
+        damageReceivedFromPlayer[li.subtype].add(li);
     }
     else {
-        // TODO: Exception?
+        errorLog.write("Error: Neither dealer nor receiver matches"
+                       "AffectedPlayers name. Names were:");
+        errorLog.write("\t Dealer: " + li.dealer_name + " Receiver: " +
+                       li.receiver_name + " AffectedPlayer: " + getName());
     }
 }
 
@@ -78,75 +81,20 @@ void AffectedPlayer::addNano(LineInfo& li) {
     }
 }
 
-Damage AffectedPlayer::getTotalDamage() const {
+Damage AffectedPlayer::getTotalDamageReceivedFromPlayer() const {
     Damage d;
-    for (const auto& type : damage) {
+    for (const auto& type : damageReceivedFromPlayer) {
         d += type.second;
     }
     return d;
 }
 
-Damage AffectedPlayer::getDamagePerDamageType(const std::string damageType) const {
-    auto it = damage.find(damageType);
-    if (it != damage.end()) {
-        return it->second;
+Damage AffectedPlayer::getTotalDamageDealtOnPlayer() const {
+    Damage d;
+    for (const auto& type : damageDealtOnPlayer) {
+        d += type.second;
     }
-    else {
-        Damage d;
-        return d;  // Empty Damage
-    }
-}
-
-std::vector<std::pair<std::string, Damage>> AffectedPlayer::getAllDamage() const {
-    // Copy the data to a sortable container
-    std::vector<std::pair<std::string, Damage>> sortableDamage;
-    for (const auto& damagePair : damage) {
-        sortableDamage.push_back(damagePair);
-    }
-    return sortableDamage;
-}
-
-std::vector<std::pair<std::string, Damage>>
-AffectedPlayer::getAllDamageReceivedFromPlayer() const {
-    // Gets all damage types that the affected player has received
-    // from the owning Player. Stores it in a sortable container.
-    std::vector<std::pair<std::string, Damage>> sortableDamage;
-    for (const auto& damagePair : damage) {
-        if (damagePair.second.getCountReceivedFromPlayer() > 0) {
-            sortableDamage.push_back(damagePair);
-        }
-        // TODO: Remove when done:
-        // Using this opportunity to check that a Damage in the map
-        // always has a positive count on either or both of
-        // dealt or received.
-        else if (damagePair.second.getCountDealtOnPlayer() <= 0 &&
-                 damagePair.second.getCountReceivedFromPlayer() <= 0) {
-            errorLog.write("Damage of type \"" + damagePair.first +
-                           "\" has 0 count when it should have at least 1.");
-        }
-    }
-    return sortableDamage;
-}
-
-std::vector<std::pair<std::string, Damage>>
-AffectedPlayer::getAllDamageDealtOnPlayer() const {
-    // Gets all damage types that the affected player has dealt
-    // on the owning Player. Stores it in a sortable container.
-    std::vector<std::pair<std::string, Damage>> sortableDamage;
-    for (const auto& damagePair : damage) {
-        if (damagePair.second.getCountDealtOnPlayer() > 0) {
-            sortableDamage.push_back(damagePair);
-        }
-        // Using this opportunity to check that a Damage in the map
-        // always has a positive count on either or both of
-        // dealt or received.
-        else if (damagePair.second.getCountDealtOnPlayer() <= 0 &&
-                 damagePair.second.getCountReceivedFromPlayer() <= 0) {
-            errorLog.write("Damage of type \"" + damagePair.first +
-                           "\" has 0 count when it should have at least 1.");
-        }
-    }
-    return sortableDamage;
+    return d;
 }
 
 const Heal& AffectedPlayer::getHeal() const {
@@ -155,4 +103,26 @@ const Heal& AffectedPlayer::getHeal() const {
 
 const Nano& AffectedPlayer::getNano() const {
     return nano;
+}
+
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayer::getDamageReceivedFromPlayer() const {
+    /* Gets all damage types that the affected player has received
+    from the owning Player. Returns it as a sortable container. */
+    std::vector<std::pair<std::string, Damage>> sortableDamage;
+    for (const auto& damagePair : damageReceivedFromPlayer) {
+        sortableDamage.push_back(damagePair);
+    }
+    return sortableDamage;
+}
+
+std::vector<std::pair<std::string, Damage>>
+AffectedPlayer::getDamageDealtOnPlayer() const {
+    /* Gets all damage types that the affected player has received
+    from the owning Player. Returns it as a sortable container. */
+    std::vector<std::pair<std::string, Damage>> sortableDamage;
+    for (const auto& damagePair : damageDealtOnPlayer) {
+        sortableDamage.push_back(damagePair);
+    }
+    return sortableDamage;
 }

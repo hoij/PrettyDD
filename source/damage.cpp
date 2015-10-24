@@ -79,7 +79,7 @@ Damage& Damage::operator+=(const Damage& rhs) {
     return *this;
 }
 
-void Damage::addDamage(LineInfo& li) {
+void Damage::add(LineInfo& li) {
     total += li.amount;
     count++;
 

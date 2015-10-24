@@ -26,11 +26,9 @@ public:
 
     virtual void addToPlayers(LineInfo& lineInfo);
 
-    virtual Damage getTotalDamage() const;
-    virtual Damage getTotalDamagePerDamageType(std::string damageType) const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageDealtForEachPlayer() const;
     virtual std::vector<std::pair<std::string, Damage>> getTotalDamageReceivedForEachPlayer() const;
-    virtual Heal getTotalHeals() const;
+
     virtual void startLogging();
     virtual void stopLogging();
     virtual void reset();
@@ -71,33 +69,13 @@ void PlayerVector<C>::addToPlayers(LineInfo& lineInfo) {
 }
 
 template<class C>
-Damage PlayerVector<C>::getTotalDamage() const {
-    Damage d;
-    for (const C p : this->players) {
-        d += p->getTotalDamage();
-    }
-    return d;
-}
-
-template<class C>
-Damage PlayerVector<C>::getTotalDamagePerDamageType(std::string damageType) const {
-    Damage d;
-    for (const C p : this->players) {
-        d += p->getTotalDamagePerDamageType(damageType);
-    }
-    return d;
-}
-
-template<class C>
 std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageDealtForEachPlayer() const {
     /* Returns a vector of pairs containing the players name and their
-    total damage (in the form of the Damage class). */
+    total damage dealt (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
-        Damage d = p->getTotalDamage();
-        if (d.getCountReceivedFromPlayer() != 0) {
-            totalDamagePerPlayer.emplace_back(p->getName(), d);
-        }
+        totalDamagePerPlayer.emplace_back(p->getName(),
+                                          p->getTotalDamageDealt());
     }
     return totalDamagePerPlayer;
 }
@@ -105,24 +83,13 @@ std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageDealt
 template<class C>
 std::vector<std::pair<std::string, Damage>> PlayerVector<C>::getTotalDamageReceivedForEachPlayer() const {
     /* Returns a vector of pairs containing the players name and their
-    total damage (in the form of the Damage class). */
+    total damage received (in the form of the Damage class). */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
-        Damage d = p->getTotalDamage();
-        if (d.getCountDealtOnPlayer() != 0) {
-            totalDamagePerPlayer.emplace_back(p->getName(), d);
-        }
+        totalDamagePerPlayer.emplace_back(p->getName(),
+                                          p->getTotalDamageReceived());
     }
     return totalDamagePerPlayer;
-}
-
-template<class C>
-Heal PlayerVector<C>::getTotalHeals() const {
-    Heal h;
-    for (const C p : this->players) {
-        h += p->getTotalHeals();
-    }
-    return h;
 }
 
 template<class C>

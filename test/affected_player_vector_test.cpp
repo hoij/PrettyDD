@@ -208,12 +208,12 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalHeals) {
     EXPECT_EQ((h1 + h2).getPotentialDealtOnPlayer(), totalHeal.getPotentialDealtOnPlayer());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getHealsForAllAffectedPlayers) {
+TEST_F(AffectedPlayerVectorDamageTest, getHealsPerAffectedPlayer) {
     /*
     This test case depends on the implementation of Heal.
     If it fails, make sure that Heals's tests can pass.
 
-    Calls getHealsForAllAffectedPlayers().
+    Calls getHealsPerAffectedPlayer().
     Verifies that each players getHeal is in turn called and that
     the returned vector is sorted on potential heal dealt.
     */
@@ -240,7 +240,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getHealsForAllAffectedPlayers) {
         .WillOnce(::testing::ReturnRef(h4));
 
     std::vector<std::pair<std::string, Heal>> result =
-        affectedPlayerVector->getHealsForAllAffectedPlayers();
+        affectedPlayerVector->getHealsPerAffectedPlayer();
 
     // Assuming the order is the same as when added which could be untrue.
     EXPECT_EQ(h1.getPotentialDealtOnPlayer(), result[0].second.getPotentialDealtOnPlayer());
@@ -271,7 +271,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalNano) {
     EXPECT_EQ((n1 + n2).getTotalDealtOnPlayer(), totalNano.getTotalDealtOnPlayer());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getNanoForAllAffectedPlayers) {
+TEST_F(AffectedPlayerVectorDamageTest, getNanoPerAffectedPlayer) {
     /* Verifies that the nanos are returned in a sorted list */
     // Add more players to the vector. "dealer1" and "dealer2" have already
     // been added in the SetUp();
@@ -293,7 +293,7 @@ TEST_F(AffectedPlayerVectorDamageTest, getNanoForAllAffectedPlayers) {
         .WillOnce(::testing::ReturnRef(n4));
 
     std::vector<std::pair<std::string, Nano>> result =
-        affectedPlayerVector->getNanoForAllAffectedPlayers();
+        affectedPlayerVector->getNanoPerAffectedPlayer();
 
     EXPECT_EQ(n3.getTotalDealtOnPlayer(), result[0].second.getTotalDealtOnPlayer());
     EXPECT_EQ(n4.getTotalDealtOnPlayer(), result[1].second.getTotalDealtOnPlayer());

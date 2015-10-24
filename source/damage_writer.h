@@ -115,29 +115,20 @@ private:
                                   writeDamagePointer& wdp,
                                   bool detailed);
 
-    void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
+    void sortByTotal(std::vector<std::pair<std::string, Damage>>& v);
     void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
 
-    std::string calcCritHitPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcMissPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcRegularMissPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcSpecialMissPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcDeflectHitPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcSpecialDeflectHitPercentageReceivedFromPlayer(const Damage&d);
-    int calcRegularAndSpecialHitsReceivedFromPlayer(const Damage&d);
-    std::string calcRegularDmgPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcSpecialDmgPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcNanobotDmgPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcShieldDmgPercentageReceivedFromPlayer(const Damage&d);
-
-    std::string calcCritHitPercentageDealtOnPlayer(const Damage&d);
-    std::string calcMissPercentageDealtOnPlayer(const Damage&d);
-    std::string calcDeflectHitPercentageDealtOnPlayer(const Damage&d);
-    int calcRegularAndSpecialHitsDealtOnPlayer(const Damage&d);
-    std::string calcRegularDmgPercentageDealtOnPlayer(const Damage&d);
-    std::string calcSpecialDmgPercentageDealtOnPlayer(const Damage&d);
-    std::string calcNanobotDmgPercentageDealtOnPlayer(const Damage&d);
-    std::string calcShieldDmgPercentageDealtOnPlayer(const Damage&d);
+    std::string calcCritHitPercentage(const Damage&d);
+    std::string calcMissPercentage(const Damage&d);
+    std::string calcRegularMissPercentage(const Damage&d);
+    std::string calcSpecialMissPercentage(const Damage&d);
+    std::string calcDeflectHitPercentage(const Damage&d);
+    std::string calcSpecialDeflectHitPercentage(const Damage&d);
+    int calcRegularAndSpecialHits(const Damage&d);
+    std::string calcRegularDmgPercentage(const Damage&d);
+    std::string calcSpecialDmgPercentage(const Damage&d);
+    std::string calcNanobotDmgPercentage(const Damage&d);
+    std::string calcShieldDmgPercentage(const Damage&d);
 
 
     PlayerVector<Player*>& playerVector;

@@ -12,7 +12,7 @@ class Damage {
 public:
     Damage& operator+=(const Damage& rhs);
 
-    void addDamage(LineInfo& li);
+    void add(LineInfo& li);
 
     void setDPM(int damagePerMinute);
 
