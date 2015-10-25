@@ -26,63 +26,55 @@ public:
     MockPlayer(std::string name, MyTime* myTime) : Player(name, myTime) {}
     MOCK_METHOD1(add, void(LineInfo& li));
 
-    MOCK_CONST_METHOD0(getTotalDamage, Damage(void));
+    MOCK_CONST_METHOD0(getTotalDamageDealt, Damage(void));
+    MOCK_CONST_METHOD0(getTotalDamageReceived, Damage(void));
 
-    MOCK_CONST_METHOD1(getTotalDamagePerDamageType,
-                       Damage(std::string damageType));
-
-    MOCK_CONST_METHOD0(getTotalDamageForAllAffectedPlayers,
+    MOCK_CONST_METHOD0(getTotalDamageDealtPerType,
                        std::vector<std::pair<std::string, Damage>>(void));
-    MOCK_CONST_METHOD0(getTotalHeals, Heal(void));
+    MOCK_CONST_METHOD0(getTotalDamageReceivedPerType,
+                       std::vector<std::pair<std::string, Damage>>(void));
+
+    MOCK_CONST_METHOD0(getTotalDamageDealtPerAffectedPlayer,
+                       std::vector<std::pair<std::string, Damage>>(void));
+    MOCK_CONST_METHOD0(getTotalDamageReceivedPerAffectedPlayer,
+                       std::vector<std::pair<std::string, Damage>>(void));
+
+    MOCK_CONST_METHOD0(stopTimer, void(void));
+    MOCK_CONST_METHOD0(resumeTimer, void(void));
+    MOCK_CONST_METHOD0(getStartTime, std::time_t(void));
 };
 
 /* Helper functions */
 
-const MockPlayer* addPlayerToVector(std::string name,
-    PlayerVector<::testing::NiceMock<MockPlayer>*>* playerVector) {
-
-    LineInfo li;
-    li.dealer_name = name;
-    playerVector->addToPlayers(li);
-    const MockPlayer* p = playerVector->getPlayer(name);
-    EXPECT_FALSE(p == nullptr);
-    return p;
-}
-
-Damage createDealerDamage(int amount) {
+Damage createDamage(int amount) {
     LineInfo li;
     li.amount = amount;
     Damage d;
-    d.addDamageDealtOnPlayer(li);
+    d.add(li);
     return d;
 }
 
-Damage createReceiverDamage(int amount) {
-    LineInfo li;
-    li.amount = amount;
-    Damage d;
-    d.addDamageReceivedFromPlayer(li);
-    return d;
-}
-
-class PlayerVectorDamageTest : public ::testing::Test {
+class PlayerVectorTest : public ::testing::Test {
 /* NiceMock suppresses warnings about function calls not expected via an
 EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
-        playerVector = new PlayerVector<::testing::NiceMock<MockPlayer>*>;
+        playerVector = new PlayerVector<::testing::NiceMock<MockPlayer>*>(
+            "PlayerRunningProgram");
         playerVector->startLogging();
-        // Set up the return values.
-        d1 = createDealerDamage(10);
-        d1 = createDealerDamage(30);
+        // Set up the return values
+        d1 = createDamage(10);
+        d1 = createDamage(30);
 
         // Add players to the vector.
-        p1 = addPlayerToVector("dealer1", playerVector);
-        p2 = addPlayerToVector("dealer2", playerVector);
+        p1 = addPlayerToVector("dealer1");
+        p2 = addPlayerToVector("dealer2");
     }
     virtual void TearDown() {
         delete playerVector;
     }
+
+    const MockPlayer* addPlayerToVector(std::string name);
 
     PlayerVector<::testing::NiceMock<MockPlayer>*>* playerVector;
     const MockPlayer* p1;
@@ -91,9 +83,18 @@ protected:
     Damage d2;
 };
 
+const MockPlayer* PlayerVectorTest::addPlayerToVector(std::string name) {
+    LineInfo li;
+    li.dealer_name = name;
+    playerVector->addToPlayers(li);
+    const MockPlayer* p = playerVector->getPlayer(name);
+    EXPECT_FALSE(p == nullptr);
+    return p;
+}
+
 /* Test cases */
 
-TEST_F(PlayerVectorDamageTest, reset) {
+TEST_F(PlayerVectorTest, reset) {
     // Reset to remove the two players added in the SetUp.
     playerVector->reset();
     EXPECT_EQ(0, playerVector->size());
@@ -105,111 +106,142 @@ TEST_F(PlayerVectorDamageTest, reset) {
     // Add two players
     std::string p1Name = "dealerAfterReset1";
     std::string p2Name = "dealerAfterReset2";
-    p1 = addPlayerToVector(p1Name, playerVector);
-    p2 = addPlayerToVector(p2Name, playerVector);
+    p1 = addPlayerToVector(p1Name);
+    p2 = addPlayerToVector(p2Name);
     EXPECT_EQ(2, playerVector->size());
     EXPECT_EQ(p1Name, p1->getName());
     EXPECT_EQ(p2Name, p2->getName());
 }
 
-TEST_F(PlayerVectorDamageTest, getTotalDamage) {
-    /* Calls getTotalDamage().
-    Verifies that each players getTotalDamage is in turn called and
-    that the summed damage is correct. */
+TEST_F(PlayerVectorTest, getDamageDealtPerType) {
+    /* Get damage per type from one existing player.
+    Verify that it gets called.
+    Get damage per type from nonexisting player.
+    Verify that none of the players in the vector are called
+    and that an empty vector is instead returned. */
 
-    EXPECT_CALL(*p1, getTotalDamage())
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage())
-        .WillOnce(::testing::Return(d2));
+    std::vector<std::pair<std::string, Damage>> v;
+    Damage d;
+    v.emplace_back("type", d);
+    EXPECT_CALL(*p1, getTotalDamageDealtPerType())
+        .WillOnce(::testing::Return(v));
 
-    Damage totalDamage = playerVector->getTotalDamage();
+    std::vector<std::pair<std::string, Damage>> result;
+    result = playerVector->getDamageDealtPerType(p1->getName());
+    EXPECT_EQ(result[0].first, "type");
 
-    EXPECT_EQ((d1 + d2).getTotalDealtOnPlayer(), totalDamage.getTotalDealtOnPlayer());
+
+    result = playerVector->getDamageDealtPerType("nonexistingPlayer");
+    EXPECT_CALL(*p1, getTotalDamageDealtPerType())
+        .Times(0);
+    EXPECT_CALL(*p1, getTotalDamageDealtPerType())
+        .Times(0);
+    EXPECT_EQ(0, result.size());
 }
 
-TEST_F(PlayerVectorDamageTest, getTotalDamagePerDamageType) {
-    /* Calls getTotalDamagePerDamageType("poison").
-    Verifies that each players getTotalDamagePerDamageType is in turn
-    called and that the summed damage is correct. */
-
-    std::string damageType = "poison";
-    EXPECT_CALL(*p1, getTotalDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamagePerDamageType(damageType))
-        .WillOnce(::testing::Return(d2));
-
-    Damage totalDamage = playerVector->getTotalDamagePerDamageType(damageType);
-
-    EXPECT_EQ((d1 + d2).getTotalDealtOnPlayer(), totalDamage.getTotalDealtOnPlayer());
-}
-
-TEST_F(PlayerVectorDamageTest, getTotalHeals) {
-    /* Calls getTotalHeals().
-    Verifies that each players getTotalHeal is in turn called and that
-    the summed heal is correct. */
-
-    LineInfo li1;
-    LineInfo li2;
-    li1.amount = 10;
-    li2.amount = 30;
-    Heal h1;
-    Heal h2;
-    h1.addHealDealtOnPlayer(li1);
-    h2.addHealDealtOnPlayer(li2);
-
-    EXPECT_CALL(*p1, getTotalHeals())
-        .WillOnce(::testing::Return(h1));
-    EXPECT_CALL(*p2, getTotalHeals())
-        .WillOnce(::testing::Return(h2));
-
-    Heal resultHeal = playerVector->getTotalHeals();
-
-    EXPECT_EQ((h1 + h2).getPotentialDealtOnPlayer(), resultHeal.getPotentialDealtOnPlayer());
-}
-
-TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
+TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
     /*
     Adds several players with different damage.
-    Calls getTotalDamageForEachPlayer().
-    Verifies that each players getTotalDamage() is called and that the
-    returned vector is sorted on total received damage.
+    Gets total damage received per player.
+    Verifies that each player is called and that the
+    returned vector contains them all.
     */
 
-    PlayerVector<::testing::NiceMock<MockPlayer>*> playerVector;
-    playerVector.startLogging();
     // Add players to the vector.
-    const MockPlayer* p1 = addPlayerToVector("Receiver1", &playerVector);
-    const MockPlayer* p2 = addPlayerToVector("Receiver2", &playerVector);
-    const MockPlayer* p3 = addPlayerToVector("Receiver3", &playerVector);
-    const MockPlayer* p4 = addPlayerToVector("Receiver4", &playerVector);
+    const MockPlayer* p3 = addPlayerToVector("Receiver1");
+    const MockPlayer* p4 = addPlayerToVector("Receiver2");
+    const MockPlayer* p5 = addPlayerToVector("Receiver3");
+    const MockPlayer* p6 = addPlayerToVector("Receiver4");
 
     // Set up the return values.
 
-    Damage d1 = createReceiverDamage(7000);
-    Damage d2 = createReceiverDamage(0);
-    Damage d3 = createReceiverDamage(500000);
-    Damage d4 = createReceiverDamage(1500);
+    Damage d3 = createDamage(7000);
+    Damage d4 = createDamage(0);
+    Damage d5 = createDamage(500000);
+    Damage d6 = createDamage(1500);
 
-    EXPECT_CALL(*p1, getTotalDamage())
+    EXPECT_CALL(*p1, getTotalDamageReceived())
+        .WillOnce(::testing::Return(d4));
+    EXPECT_CALL(*p2, getTotalDamageReceived())
+        .WillOnce(::testing::Return(d4));
+    EXPECT_CALL(*p3, getTotalDamageReceived())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage())
+    EXPECT_CALL(*p4, getTotalDamageReceived())
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*p3, getTotalDamage())
+    EXPECT_CALL(*p5, getTotalDamageReceived())
         .WillOnce(::testing::Return(d3));
-    EXPECT_CALL(*p4, getTotalDamage())
+    EXPECT_CALL(*p6, getTotalDamageReceived())
         .WillOnce(::testing::Return(d4));
 
     std::vector<std::pair<std::string, Damage>> result;
-    result = playerVector.getTotalDamageDealtPerPlayer();
+    result = playerVector->getTotalDamageReceivedPerPlayer();
 
-    // Assuming the order is the same as when added which could be untrue.
-    EXPECT_EQ(d1.getTotalReceivedFromPlayer(),
-              result[0].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d2.getTotalReceivedFromPlayer(),
-              result[1].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d3.getTotalReceivedFromPlayer(),
-              result[2].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d4.getTotalReceivedFromPlayer(),
-              result[3].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(4, result.size());
+    Damage d;
+    for (const auto& p : result) {
+        d += p.second;
+    }
+    EXPECT_EQ(6, result.size());
+    EXPECT_EQ((d1 + d2 + d3 + d4).getTotal(), d.getTotal());
+}
+
+TEST_F(PlayerVectorTest, stopAndStartLogging) {
+    /* Stop logging
+    Verify that each players stopTimer() gets called
+    Add new player
+    Verify that it wasn't added
+    Stop logging
+    Verify that each players stopTimer() is NOT called
+    Add new player
+    Verify that it wasn't added
+
+    Start logging
+    Verify that each players getStartTime() gets called
+    Add new player
+    Verify it gets added
+    Start Logging
+    Verify that each players getStartTime() is NOT called
+    Add new player
+    Verify that it gets added
+    */
+
+    LineInfo li1;
+    li1.dealer_name = "dealer3";
+    LineInfo li2;
+    li2.dealer_name = "dealer4";
+
+    EXPECT_CALL(*p1, stopTimer());
+    EXPECT_CALL(*p2, stopTimer());
+    playerVector->stopLogging();
+
+    playerVector->addToPlayers(li1);
+    EXPECT_EQ(2, playerVector->size());
+
+    EXPECT_CALL(*p1, stopTimer())
+        .Times(0);
+    EXPECT_CALL(*p2, stopTimer())
+        .Times(0);
+    playerVector->stopLogging();
+
+    playerVector->addToPlayers(li1);
+    EXPECT_EQ(2, playerVector->size());
+
+    // Have to expect call to getStartTime instead
+    // of resumeTimer() as getStartTime is checked for 0
+    // before allowing a call to resumeTimer. And
+    // startTime is 0 in this case as no stats have been added.
+    EXPECT_CALL(*p1, getStartTime());
+    EXPECT_CALL(*p2, getStartTime());
+    playerVector->startLogging();
+
+    playerVector->addToPlayers(li1);
+    EXPECT_EQ(3, playerVector->size());
+
+    EXPECT_CALL(*p1, getStartTime())
+        .Times(0);
+    EXPECT_CALL(*p2, getStartTime())
+        .Times(0);
+    playerVector->startLogging();
+
+    playerVector->addToPlayers(li2);
+    EXPECT_EQ(4, playerVector->size());
 }

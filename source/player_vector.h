@@ -71,8 +71,7 @@ void PlayerVector<C>::addToPlayers(LineInfo& lineInfo) {
     bool dealerFound = false;
     bool receiverFound = false;
 
-    if (!log) {
-        // Don't log when stopped.
+    if (!log) {  // Don't log when stopped.
         return;
     }
 

@@ -107,7 +107,7 @@ bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
     lhs.nanoProgramName == rhs.nanoProgramName;
 }
 
-TEST_F(PlayerTest, timerTest) {
+TEST_F(PlayerTest, timerTest_normalUsage) {
     /* Add LineInfo.
     "Stop" time.
     Resume time.
@@ -169,7 +169,7 @@ TEST_F(PlayerTest, timerTest) {
     EXPECT_EQ(expected, player->getTimeActive());
 }
 
-TEST_F(PlayerTest, instantStopResume) {
+TEST_F(PlayerTest, timerTest_instantStopResume) {
     /* Stop and resume time on the same second */
     LineInfo li;
     li.type = "damage";

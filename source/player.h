@@ -92,7 +92,7 @@ public:
 
     std::time_t getTimeActive() const;
     std::time_t getPauseDuration() const;
-    time_t getStartTime() {return startTime;}
+    std::time_t getStartTime() {return startTime;}
     void stopTimer();
     void resumeTimer();
 
