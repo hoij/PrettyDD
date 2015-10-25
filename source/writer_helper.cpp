@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <limits>
+#include <sstream>
 
 
 WriterHelper::WriterHelper(Configuration& config,
