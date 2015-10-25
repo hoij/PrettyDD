@@ -637,13 +637,8 @@ void DamageWriter::writePerPlayer(const std::string& name,
             std::setw(pcWidth) << " " + critHitPercentage << '%' << " " <<
             std::setw(pcWidth) << " " + deflectHitPercentage << '%' << " ";
     if (self) {
-        if (d.hasSpecial()) {
             std::string missPercentage = calcMissPercentage(d);
             file << std::setw(pcWidth) << " " + missPercentage << '%' << " ";
-        }
-        else {
-            file << std::setw(pcWidth) << na << "% ";
-        }
     }
     file << std::setfill(' ');
 

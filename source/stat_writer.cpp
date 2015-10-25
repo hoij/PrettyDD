@@ -229,7 +229,7 @@ void StatWriter::createInfo1() {
         << "<font color = " + lightBlue + ">" << nl
         << "* Category hit rate is calculated in the following way:<br>" << nl
         << "   nr of x / "
-        "(normal hits + crits (if existing) + deflects + misses)<br><br>"
+           "(normal hits + crits (if existing) + deflects + misses)<br><br>"
         << nl << nl
         << "</font>"
 

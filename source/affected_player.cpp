@@ -64,11 +64,11 @@ void AffectedPlayer::addHeal(LineInfo& li) {
             heal.addHealReceivedFromPlayer(li);
         }
         else {
-            // TODO: Throw exception?
+            // TODO: Log error.
         }
     }
     else {
-        // TODO: Throw exception?
+        // TODO: Log error.
     }
 }
 

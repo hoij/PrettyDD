@@ -74,7 +74,7 @@ public:
 private:
     void addToVector(
         std::vector<std::pair<std::string, Damage>>& allDamageTypes,
-        std::vector<std::pair<std::string, Damage>>& apsDamageTypes) const;
+        std::vector<std::pair<std::string, Damage>> apsDamageTypes) const;
 
     static bool compareNanoDealt(const std::pair<std::string, Nano>& p1,
                                  const std::pair<std::string, Nano>& p2);
@@ -126,11 +126,13 @@ std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector<C>::getTotalDamageReceivedFromPlayerPerAffectedPlayer(
     std::string callerName) const {
     /* Returns a vector of pairs containing the Affected players name and their
-    total damage (in the form of the Damage class). */
+    total damage (in the form of the Damage class). AffectedPlayers with
+    an empty Damage are not included. */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C ap : this->players) {
         Damage d = ap->getTotalDamageReceivedFromPlayer();
-        if (ap->getName() != callerName) {  // If not owner of the vector
+        if (ap->getName() != callerName &&  // If not owner of the vector
+            d.getCount() != 0) {  // If the Damage isn't empty
             totalDamagePerPlayer.emplace_back(ap->getName(), d);
         }
     }
@@ -142,11 +144,13 @@ std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector<C>::getTotalDamageDealtOnPlayerPerAffectedPlayer(
     std::string callerName) const {
     /* Returns a vector of pairs containing the Affected players name and their
-    total damage (in the form of the Damage class). */
+    total damage (in the form of the Damage class). AffectedPlayers with
+    an empty Damage are not included. */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C ap : this->players) {
         Damage d = ap->getTotalDamageDealtOnPlayer();
-        if (ap->getName() != callerName) {  // If not owner of the vector
+        if (ap->getName() != callerName &&  // If not owner of the vector
+            d.getCount() != 0) {  // If the Damage isn't empty
             totalDamagePerPlayer.emplace_back(ap->getName(), d);
         }
     }
@@ -165,9 +169,7 @@ AffectedPlayerVector<C>::getTotalDamageReceivedFromPlayerPerDamageType(
     std::vector<std::pair<std::string, Damage>> allDamageTypes;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
-            std::vector<std::pair<std::string, Damage>> apsDamageTypes =
-                ap->getDamageReceivedFromPlayer();
-            addToVector(allDamageTypes, apsDamageTypes);
+            addToVector(allDamageTypes, ap->getDamageReceivedFromPlayer());
         }
     }
     return allDamageTypes;
@@ -185,9 +187,7 @@ AffectedPlayerVector<C>::getTotalDamageDealtOnPlayerPerDamageType(
     std::vector<std::pair<std::string, Damage>> allDamageTypes;
     for (const C ap : this->players) {
         if (ap->getName() != callerName) {  // If not owner of the vector
-            std::vector<std::pair<std::string, Damage>> apsDamageTypes =
-                ap->getDamageDealtOnPlayer();
-            addToVector(allDamageTypes, apsDamageTypes);
+            addToVector(allDamageTypes, ap->getDamageDealtOnPlayer());
         }
     }
     return allDamageTypes;
@@ -199,7 +199,8 @@ AffectedPlayerVector<C>::getDamageReceivedFromPlayer(
     std::string affectedPlayerName) const {
 
     for (const C ap : this->players) {
-        if (ap->getName() == affectedPlayerName) {
+        if (ap->getName() == affectedPlayerName &&
+            ap->getDamageReceivedFromPlayer().size() != 0) {
             return ap->getDamageReceivedFromPlayer();
         }
     }
@@ -219,7 +220,8 @@ AffectedPlayerVector<C>::getDamageDealtOnPlayer(
     std::string affectedPlayerName) const {
 
     for (const C ap : this->players) {
-        if (ap->getName() == affectedPlayerName) {
+        if (ap->getName() == affectedPlayerName &&
+            ap->getDamageDealtOnPlayer().size() != 0) {
             return ap->getDamageDealtOnPlayer();
         }
     }
@@ -320,7 +322,7 @@ template<class C>
 void
 AffectedPlayerVector<C>::addToVector(
     std::vector<std::pair<std::string, Damage>>& allDamageTypes,
-    std::vector<std::pair<std::string, Damage>>& apsDamageTypes) const {
+    std::vector<std::pair<std::string, Damage>> apsDamageTypes) const {
     /* Adds a string/Damage pair in apsDamageTypes to allDamageTypes */
 
     for (const auto& damagePair : apsDamageTypes) {

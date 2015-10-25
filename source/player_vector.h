@@ -97,11 +97,14 @@ template<class C>
 std::vector<std::pair<std::string, Damage>>
 PlayerVector<C>::getTotalDamageDealtPerPlayer() const {
     /* Returns a vector of pairs containing the players name and their
-    total damage dealt (in the form of the Damage class). */
+    total damage dealt (in the form of the Damage class). Players
+    with an empty Damage are not included. */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
-        totalDamagePerPlayer.emplace_back(p->getName(),
-                                          p->getTotalDamageDealt());
+        Damage d = p->getTotalDamageDealt();
+        if (d.getCount() != 0) {
+            totalDamagePerPlayer.emplace_back(p->getName(), d);
+        }
     }
     return totalDamagePerPlayer;
 }
@@ -110,11 +113,14 @@ template<class C>
 std::vector<std::pair<std::string, Damage>>
 PlayerVector<C>::getTotalDamageReceivedPerPlayer() const {
     /* Returns a vector of pairs containing the players name and their
-    total damage received (in the form of the Damage class). */
+    total damage received (in the form of the Damage class). Players
+    with an empty Damage are not included. */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
     for (const C p : this->players) {
-        totalDamagePerPlayer.emplace_back(p->getName(),
-                                          p->getTotalDamageReceived());
+        Damage d = p->getTotalDamageReceived();
+        if (d.getCount() != 0) {
+            totalDamagePerPlayer.emplace_back(p->getName(), d);
+        }
     }
     return totalDamagePerPlayer;
 }
