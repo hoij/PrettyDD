@@ -1,11 +1,23 @@
 #include "command_handler.h"
+#include "line_info.h"
+#include "my_time_interface.h"
 
+#include <ostream>
 #include <sstream>
 #include <vector>
 
 
-void CommandHandler::execute(const std::string& command) {
+bool CommandHandler::execute(const LineInfo& li) {
 
+
+    bool shouldContinue = true;
+
+    // Avoid executing old commands
+    if (wasCommandTypedLongAgo(li.time)) {
+        return shouldContinue;
+    }
+
+    std::string command = li.command;
     std::vector<std::string> commandParts =
         mergeQuotedText(splitCommand(command));
 
@@ -83,7 +95,10 @@ void CommandHandler::execute(const std::string& command) {
             playerVector.stopLogging();
         }
         else if (commandParts[1] == "reset") {
-             playerVector.reset();  // Removes all players from playerVector.
+                playerVector.reset();
+        }
+        else if (commandParts[1] == "quit") {
+            shouldContinue = false;
         }
         else {
             statWriter.createDDPerOpponent(commandParts[1]);
@@ -201,6 +216,8 @@ void CommandHandler::execute(const std::string& command) {
     else {
         errorLog.write("Too many commands: " + command);
     }
+    
+    return shouldContinue;
 }
 
 std::vector<std::string> CommandHandler::splitCommand(std::string command) {
@@ -260,6 +277,13 @@ std::vector<std::string> CommandHandler::mergeQuotedText(
         }
     }
     return result;
+}
+
+bool CommandHandler::wasCommandTypedLongAgo(const std::time_t& t) {
+    // Return true if the command happened in the last 30 s.
+    // This method is needed to avoid executing old commands
+    // when reparsing a log.
+    return t < myTime.currentTime() - 30;
 }
 
 // TODO: Move to test.

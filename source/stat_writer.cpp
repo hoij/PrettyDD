@@ -207,6 +207,7 @@ void StatWriter::createCommands2() {
     writeCommand("pause", "Or \\\"stop\\\" pauses the timer used to calc DPM");
     writeCommand("resume", "Or \\\"start\\\" resumes the timer");
     writeCommand("reset", "Clears everything logged and starts anew directly");
+    writeCommand("quit");
     file << "</font><br>" << nl;
 
     file << "Help" << "<br>" << nl

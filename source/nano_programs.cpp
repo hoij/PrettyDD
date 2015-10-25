@@ -11,6 +11,10 @@ void NanoPrograms::add(LineInfo& li) {
     }
     else if (!nameOfLastNanoProgramCasted.empty() &&
              !li.subtype.empty()) {
+        // If the message is "clear" the last nano program name is cleared.
+        if (li.subtype == "clear") {
+            nameOfLastNanoProgramCasted.clear();
+        }
         // If nano casted successfully/resisted/countered/aborted/fumble,
         // the message won't contain a name. The previously saved name
         // is added with the new subtype info (the success info).
@@ -23,8 +27,10 @@ void NanoPrograms::add(LineInfo& li) {
         // Note that if a proc fires before the nano status message arrives
         // the subtype set for the nano program may be wrong. I don't know
         // if this can actually happen.
-        addNanoProgram(li.subtype);
-        nameOfLastNanoProgramCasted.clear();
+        else {
+            addNanoProgram(li.subtype);
+            nameOfLastNanoProgramCasted.clear();
+        }
     }
 }
 

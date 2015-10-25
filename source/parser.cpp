@@ -64,7 +64,8 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
 
     if (formattedLine.getDescription() == "Vicinity" ||
         formattedLine.getDescription() == "Team" ||
-        formattedLine.getDescriptionCode() == "00000003000011fc") {
+        formattedLine.getDescriptionCode() == "00000003000011fc" ||
+        formattedLine.getDescription() == "Raid") {
             // Vicinity, team or org chat messages
             lineInfo = chat(formattedLine.getMessage(), formattedLine.getSender());
         }
@@ -89,7 +90,7 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             // Might want to remove this error message as it could print a lot
             // if the user choses to log many other messages not found in the map
 
-            // Temporarily ignoring Tell Messages:
+            // TODO: Remove: Temporarily ignoring Tell Messages:
             if (formattedLine.getDescription() == "Tell Messages") {
                 ;
             }
@@ -160,6 +161,9 @@ std::string Parser::findSubtype(const std::string& message, const std::string ty
     else if (type == "nano") {
         return ""; // No subtype for nano.
     }
+    else if (type == "na") {
+        return "";
+    }
     else {
         errorLog.write("Error: Could not find a type in:");
         errorLog.write("Error: Message: " + message);
@@ -187,7 +191,7 @@ std::string Parser::findDamageSubtype(const std::string& message) {
         return renameSpecial(m[1]);  // Some specials in misses have a different name
     }
     else if (regex_search(message, m, regex(" tried to hit "))) {
-        return "regular miss";
+        return "Regular Miss";
     }
     else if (regex_search(message, m, regex("(?: damaged by )(.*?)( for )"))) {
         return m[1];
@@ -234,13 +238,66 @@ std::string Parser::findNanoCastSubtype(const std::string& message) {
     else if (message == "Your target countered the nano program.") {
         return "counter";
     }
-    else if (message.find("You fumbled.") != std::string::npos) {  // TODO: Find one of these log messages
+    // TODO: Find one of these log messages
+    else if (message.find("You fumbled.") != std::string::npos) {
         return "fumble";
     }
     // "Target does not have enough nano controlling units(NCU) left."
     else if (message.find("Target does not") != std::string::npos) {
         return "fullncu";
     }
+
+    /* Once the nano has executed a message about the status of the
+    execution will arrive. These message should therefore not be saved */
+    // "Wait for current nano program execution to finish."
+    else if (message.find("Wait") != std::string::npos) {
+        return "";
+    }
+    // "Nano program failed. Already executing nanoprogram."
+    else if (message.find("Nano program failed") != std::string::npos) {
+        return "";
+    }
+
+    /* The messages below can be ignored (not added to stats) as they
+    are not preceded by an "Executing Nano Program:" message. */
+    // "NCU error: Better nano program already running."
+    // "NCU error: This nano program can't automatically replace other program."
+    else if (message.find("NCU error") != std::string::npos) {
+        return "";
+    }
+    // "Unable to execute nano program. You can't execute this nano on the target."
+    else if (message.find("Unable") != std::string::npos) {
+        return "";
+    }
+    // "Executing programs is currently unavailable."
+    else if (message.find("Executing") != std::string::npos) {
+        return "";
+    }
+    // "You need at least 1983 remaining nano energy to execute this program."
+    else if (message.find("You need") != std::string::npos) {
+        return "";
+    }
+    // "Target is outside range."
+    else if (message.find("Target is") != std::string::npos) {
+        return "";
+    }
+    // "Target out of range for nano program."
+    else if (message.find("Target out") != std::string::npos) {
+        return "";
+    }
+    // "Not allowed to execute friendly nanoprogram on anyone on the opposite side of your team in the conflict."
+    else if (message.find("Not") != std::string::npos) {
+        return "";
+    }
+
+    // "You can't execute nano programs on items."
+    // This message is preceeded by "Executing Nano Program:"
+    // so a "clear" subtype is passed on so that NanoPrograms
+    // can clear the previous message.
+    else if (message.find("You can't") != std::string::npos) {
+        return "clear";
+    }
+
     else {
         errorLog.write("Error: Could not find a nano cast subtype in:");
         errorLog.write("Error: " + message);
@@ -315,10 +372,7 @@ std::string Parser::renameSpecial(std::string subtype) {
     // Misses writes specials to the log different so they have to be renamed.
     // I can either rename these here, or when I get the data from a player,
     // I can get both "Brawl" and "Brawling" for example.
-    if (subtype == "regular miss") {
-        return subtype;
-    }
-    else if (subtype == "FastAttack") {
+    if (subtype == "FastAttack") {
         return "Fast Attack";
     }
     else if (subtype == "FlingShot") {
@@ -331,8 +385,6 @@ std::string Parser::renameSpecial(std::string subtype) {
         return "Full Auto";
     }
     else {
-        errorLog.write("Tried to rename special called \"" + subtype, false);
-        errorLog.write("\", but no match was found.");
         return subtype;
     }
 }
@@ -350,7 +402,7 @@ bool Parser::isSpecial(std::string& subtype) {
 }
 
 void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine) {
-    // TODO: Remove at some point.
+    // TODO: Remove before releasing.
     // For development purposes only.
     // Just to capture anything I might have missed.
     if (formattedLine.getDescription() == "System" ||
@@ -358,6 +410,14 @@ void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterfa
         formattedLine.getDescription() == "Team" ||
         formattedLine.getDescription() == "Tell Messages" ||
         formattedLine.getDescription() == "Me got health" ||
+        formattedLine.getDescription() == "Me got XP" ||
+        formattedLine.getDescription() == "Me Cast Nano" ||
+        formattedLine.getDescription() == "Research" ||
+        formattedLine.getDescription() == "Other hit by nano" ||
+        formattedLine.getMessage().find("Wait for current nano program execution to finish.") ||
+        formattedLine.getMessage().find("Unable to execute nano program.") ||
+        formattedLine.getMessage().find("NCU error:") ||
+        formattedLine.getMessage().find("Executing programs is currently unavailable.") ||
         formattedLine.getDescriptionCode() == "00000003000011fc") {
         return;
     }
@@ -437,32 +497,25 @@ LineInfo Parser::otherHitByNano(const std::string& message) {
     ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
     ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
     ["#0000000042000004#","Other hit by nano","",1444750507]Xan Spirit of Redemption was attacked with nanobots for 2162 points of unknown damage.
+    Sometimes there is no dealer:
+    ["#0000000042000004#","Other hit by nano","",1444741138]Blackbullet0 was attacked with nanobots for 715 points of poison damage.
     */
     LineInfo li;
     li.type = "damage";
     std::smatch m;
+    // Find dealer
     if (regex_search(message, m, regex("(?:from )(.*?)(?= for)"))) {
         li.dealer_name = m[1];
     }
-    else if (regex_search(message, m, regex("(?:of )(unknown)(?= damage)"))) {
-        if (m[1] == "unknown") {
-            li.dealer_name = "Unknown";
-        }
-        else {
-            errorLog.write("Message should have matched \"unknown\" dealer "
-                           "but matched something else:");
-            errorLog.write("\t" + message);
-        }
-    }
     else {
-        errorLog.write("Could not find a dealer in: ");
-        errorLog.write("\t" + message);
+        li.dealer_name = "Unknown";
     }
+    // Find receiver
     if (regex_search(message, m, regex("(.*?)(?= was attacked)"))) {
         li.receiver_name = m[0];
     }
     else {
-        errorLog.write("Could not find a receiver in: ");
+        errorLog.write("Warning: Could not find a receiver in: ");
         errorLog.write("\t" + message);
     }
     li.amount = findAmount(message);
@@ -584,8 +637,8 @@ LineInfo Parser::meHitByMonster(const std::string& message) {
         }
     }
     else {
-        errorLog.write("Could not find a dealer in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Warning: Could not find a dealer in: ");
+        errorLog.write("Warning:\t" + message);
     }
     li.amount = findAmount(message);
     li.crit = isCrit(message);
@@ -596,6 +649,9 @@ LineInfo Parser::meHitByMonster(const std::string& message) {
 LineInfo Parser::meHitByNano(const std::string& message) {
     /*
     ["#0000000042000002#","Me hit by nano","",1425326283]You were attacked with nanobots from Predator Rogue for 875 points of poison damage.
+    Sometimes there is no dealer:
+    ["#0000000042000002#","Me hit by nano","",1444742987]You were attacked with nanobots for 9 points of unknown damage.
+    ["#0000000042000002#","Me hit by nano","",1444855910]You were attacked with nanobots for 56 points of energy damage.
     */
     LineInfo li;
     li.type = "damage";
@@ -605,8 +661,7 @@ LineInfo Parser::meHitByNano(const std::string& message) {
         li.dealer_name = m[1];
     }
     else {
-        errorLog.write("Could not find a dealer in: ");
-        errorLog.write("\t" + message);
+        li.dealer_name = "Unknown";
     }
     li.amount = findAmount(message);
     li.nanobots = true;
@@ -656,6 +711,7 @@ LineInfo Parser::otherMisses(const std::string& message) {
 LineInfo Parser::yourMisses(const std::string& message) {
     /*
     ["#0000000042000012#","Your misses","",1425666157]You try to attack Peal Thunder with Brawl, but you miss!
+    ["#0000000042000012#","Your misses","",1444856536]You try to attack Majicninja with Burst, but you miss!
     ["#0000000042000012#","Your misses","",1426199923]You tried to hit Stim Fiend, but missed!
     */
     LineInfo li;
@@ -811,6 +867,9 @@ LineInfo Parser::research(const std::string& message) {
         li.receiver_name = "You";
         li.amount = findAmount(message);
     }
+    else {
+        li.type = "na";
+    }
     return li;
 }
 
@@ -845,8 +904,8 @@ LineInfo Parser::meGotNano(const std::string& message) {
         li.dealer_name = m[1];
     }
     else {
-        errorLog.write("Could not find a dealer in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Warning: Could not find a dealer in: ");
+        errorLog.write("Warning:\t" + message);
     }
     li.amount = findAmount(message);
     return li;
@@ -877,8 +936,8 @@ LineInfo Parser::system(const std::string& message) {
         li.dealer_name = m[1];
         li.nanoProgramName = m[2];
     }
-//    else if (regex_search(message, m, regex("Victory Points"))) {
-    // This is ignored for now.
+    /* TODO: Log victory points
+    else if (regex_search(message, m, regex("Victory Points"))) {
     // TODO: Find out why these messages are different. Maybe it's
     // todo with quest reward, double clicking pvp vp item to pick it up,
     // pressing E to pick it up, killing notum miner or looting VP rewards
@@ -888,24 +947,24 @@ LineInfo Parser::system(const std::string& message) {
     Other variants:
     ["#0000000040000001#","System","",1444744688]New Victory Points gained: 95.
     ["#0000000040000001#","System","",1444856587]New Victory Points gained.
+
+        li.receiver_name = "You";
+        li.type = "vp";
+        li.subtype = "gained";
+        li.amount = findAmount(message);
+        li.hasStats = true;
+    }
     */
-//        li.receiver_name = "You";
-//        li.type = "vp";
-//        li.subtype = "gained";
-//        li.amount = findAmount(message);
-//        li.hasStats = true;
-//    }
     li.hasStats = false;
     return li;
 }
 
 LineInfo Parser::chat(const std::string& message, const std::string& sender) {
-    // Reads chat for commands made by the player running the program
-    /* Add raid chat?
-
+    /* Reads chat for commands made by the player running the program.
     ["#0000000040000002#","Vicinity","Sgtcuddle",1436181663]test
     ["Team","Team","Sgtcuddle",1436182391]test
     ["#00000003000011fc#","Pantheon","Sgtcuddle",1436182488]test
+    ["Raid","Raid","Sgtcuddle",1445781089]yolo
     */
     LineInfo li;
     li.hasStats = false;

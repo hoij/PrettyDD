@@ -24,6 +24,5 @@ TEST_F(RenameSpecialTest, renameSpecials) {
     ASSERT_EQ("Brawling", parser->renameSpecial("Brawl"));
     ASSERT_EQ("Full Auto", parser->renameSpecial("FullAuto"));
     ASSERT_EQ("", parser->renameSpecial(""));
-    ASSERT_EQ("regular miss", parser->renameSpecial("regular miss"));
     ASSERT_EQ("something random", parser->renameSpecial("something random"));
 }
