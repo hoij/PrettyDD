@@ -868,7 +868,7 @@ LineInfo Parser::research(const std::string& message) {
         li.amount = findAmount(message);
     }
     else {
-        li.type = "na";
+        li.type = "na";  // Not available
     }
     return li;
 }
@@ -942,7 +942,7 @@ LineInfo Parser::system(const std::string& message) {
     // todo with quest reward, double clicking pvp vp item to pick it up,
     // pressing E to pick it up, killing notum miner or looting VP rewards
     // from AI missions.
-    /* When clicking a VP reward, this is the message (really? with a space?):
+    When clicking a VP reward, this is the message (really? with a space?):
     ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
     Other variants:
     ["#0000000040000001#","System","",1444744688]New Victory Points gained: 95.

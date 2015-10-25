@@ -25,14 +25,17 @@ public:
     AffectedPlayerVector(const AffectedPlayerVector<C>& other) : BaseVector<C>(other) {}
 
     /* Damage */
-    virtual Damage getTotalDamageReceivedFromPlayer(std::string callerName) const;
-    virtual Damage getTotalDamageDealtOnPlayer(std::string callerName) const;
+    virtual Damage
+    getTotalDamageReceivedFromPlayer(std::string callerName) const;
 
-    std::vector<std::pair<std::string, Damage>>
+    virtual Damage
+    getTotalDamageDealtOnPlayer(std::string callerName) const;
+
+    virtual std::vector<std::pair<std::string, Damage>>
     getTotalDamageReceivedFromPlayerPerDamageType(
         std::string callerName) const;
 
-    std::vector<std::pair<std::string, Damage>>
+    virtual std::vector<std::pair<std::string, Damage>>
     getTotalDamageDealtOnPlayerPerDamageType(
         std::string callerName) const;
 
@@ -44,10 +47,10 @@ public:
     getTotalDamageDealtOnPlayerPerAffectedPlayer(
         std::string callerName) const;
 
-    std::vector<std::pair<std::string, Damage>>
+    virtual std::vector<std::pair<std::string, Damage>>
     getDamageReceivedFromPlayer(std::string affectedPlayerName) const;
 
-    std::vector<std::pair<std::string, Damage>>
+    virtual std::vector<std::pair<std::string, Damage>>
     getDamageDealtOnPlayer(std::string affectedPlayerName) const;
 
     /* Heal */
