@@ -17,17 +17,29 @@ public:
 
     MOCK_CONST_METHOD0(getLongestNameLength, size_t());
 
-    MOCK_CONST_METHOD1(getTotalDamage, Damage(std::string callerName));
+    MOCK_CONST_METHOD1(getTotalDamageReceivedFromPlayer, Damage(std::string callerName));
+    MOCK_CONST_METHOD1(getTotalDamageDealtOnPlayer, Damage(std::string callerName));
 
-    MOCK_CONST_METHOD2(getTotalDamagePerDamageType,
+    MOCK_CONST_METHOD2(getTotalReceivedFromPlayerPerDamageType,
+                       Damage(std::string callerName,
+                              const std::string damageType));
+    MOCK_CONST_METHOD2(getTotalDealtOnPlayerPerDamageType,
                        Damage(std::string callerName,
                               const std::string damageType));
 
-    MOCK_CONST_METHOD1(getTotalDamageForAllAffectedPlayers,
+    MOCK_CONST_METHOD1(getTotalDamageReceivedFromPlayerPerAffectedPlayer,
                        std::vector<std::pair<std::string, Damage>>(
                            std::string callerName));
 
-    MOCK_CONST_METHOD1(getAllDamageFromAffectedPlayer,
+    MOCK_CONST_METHOD1(getTotalDamageDealtOnPlayerPerAffectedPlayer,
+                       std::vector<std::pair<std::string, Damage>>(
+                           std::string callerName));
+
+    MOCK_CONST_METHOD1(getDamageReceivedFromPlayer,
+                       std::vector<std::pair<std::string, Damage>>(
+                           std::string name));
+
+    MOCK_CONST_METHOD1(getDamageDealtOnPlayer,
                        std::vector<std::pair<std::string, Damage>>(
                            std::string name));
 
@@ -62,8 +74,8 @@ protected:
         LineInfo li2;
         li1.amount = 1000;
         li2.amount = 3000;
-        d1.addDamageDealtOnPlayer(li1);
-        d2.addDamageDealtOnPlayer(li2);
+        d1.add(li1);
+        d2.add(li2);
     }
     virtual void TearDown() {
         delete player;
@@ -254,66 +266,52 @@ TEST_F(PlayerTest, add_xp) {
     EXPECT_EQ(li.amount, player->getXp().getTotalGained("xp"));
 }
 
-TEST_F(PlayerTest, getTotalDamage) {
-    /* Verifies that getTotalDamage() calls AffectedPlayerVectors
-    getTotalDamage() */
+TEST_F(PlayerTest, getTotalDamageDealt) {
+    /* Verifies that getTotalDamageDealt() calls AffectedPlayerVectors
+    getTotalDamageReceivedFromPlayer() */
 
-    EXPECT_CALL(*mockAffectedPlayerVector, getTotalDamage(player->getName()))
-        .WillOnce(::testing::Return(d1));
-
-    Damage result = player->getTotalDamage();
-
-    EXPECT_EQ(d1.getTotalDealtOnPlayer(), result.getTotalDealtOnPlayer());
-}
-
-TEST_F(PlayerTest, getTotalDamagePerDamageType) {
-    /* Verifies that getTotalDamagePerDamageType() calls AffectedPlayerVectors
-    getTotalRegularDamagePerDamageType() and that the damage is summed.*/
-
-    std::string damageType = "chemical";
     EXPECT_CALL(*mockAffectedPlayerVector,
-                getTotalDamagePerDamageType(player->getName(), damageType))
+                getTotalDamageReceivedFromPlayer(player->getName()))
         .WillOnce(::testing::Return(d1));
 
-    Damage result = player->getTotalDamagePerDamageType(damageType);
+    Damage dealt = player->getTotalDamageDealt();
 
-    EXPECT_EQ(d1.getTotalDealtOnPlayer(), result.getTotalDealtOnPlayer());
+    EXPECT_EQ(d1.getTotal(), dealt.getTotal());
 }
 
-TEST_F(PlayerTest, getTotalDamageForAllAffectedPlayers) {
-    /* Verifies that getTotalDamageForAllAffectedPlayers() calls
-    PlayerVectors getTotalDamageForAllAffectedPlayers(std::string callerName)
-    */
+TEST_F(PlayerTest, getTotalDamageDealtPerAffectedPlayer) {
+    /* Verifies that correct method in AffectedPlayerVector
+    is called. */
 
     std::vector<std::pair<std::string, Damage>> totalDamageForAllAffectedPlayers;
     totalDamageForAllAffectedPlayers.emplace_back("AffectedPlayer1", d1);
 
-    EXPECT_CALL(*mockAffectedPlayerVector,
-        getTotalDamageForAllAffectedPlayers(player->getName()))
+    EXPECT_CALL(
+        *mockAffectedPlayerVector,
+        getTotalDamageReceivedFromPlayerPerAffectedPlayer(player->getName()))
         .WillOnce(::testing::Return(totalDamageForAllAffectedPlayers));
 
     std::vector<std::pair<std::string, Damage>> result =
-        player->getTotalDamageForAllAffectedPlayers();
+        player->getTotalDamageDealtPerAffectedPlayer();
 }
 
-TEST_F(PlayerTest, getAllDamageFromAffectedPlayer) {
-    /* Verifies that getAllDamageFromAffectedPlayer() calls
-    PlayerVectors getAllDamageFromAffectedPlayer(std::string callerName).
-    */
+TEST_F(PlayerTest, getDamageDealtPerType) {
+    /* Verifies that correct method in AffectedPlayerVector
+    is called. */
 
-    std::string name = "AffectedPlayer1";
+    std::string affectedPlayerName = "AffectedPlayer1";
     std::vector<std::pair<std::string, Damage>> damageFromAffectedPlayer;
-    damageFromAffectedPlayer.emplace_back(name, d1);
+    damageFromAffectedPlayer.emplace_back("type", d1);
 
     EXPECT_CALL(*mockAffectedPlayerVector,
-        getAllDamageFromAffectedPlayer(name))
+        getDamageReceivedFromPlayer(affectedPlayerName))
         .WillOnce(::testing::Return(damageFromAffectedPlayer));
 
     std::vector<std::pair<std::string, Damage>> result =
-        player->getAllDamageFromAffectedPlayer(name);
+        player->getDamageDealtPerType(affectedPlayerName);
 
-    EXPECT_EQ(damageFromAffectedPlayer[0].second.getTotalDealtOnPlayer(),
-              result[0].second.getTotalDealtOnPlayer());
+    EXPECT_EQ(damageFromAffectedPlayer[0].second.getTotal(),
+              result[0].second.getTotal());
 }
 
 TEST_F(PlayerTest, getTotalHeals) {

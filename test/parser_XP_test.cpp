@@ -80,6 +80,6 @@ INSTANTIATE_TEST_CASE_P(research, ParseTest,
                               "You have completed your research on \"Force Recon 9\"."),
             ExtendedLineInfo("",
                              "",
-                             "",
+                             "na",
                              "",
                              0))));

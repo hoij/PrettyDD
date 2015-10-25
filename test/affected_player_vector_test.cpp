@@ -3,7 +3,7 @@
 #pragma warning(disable : 4373)
 #endif
 
-#include "affected_player.h"
+#include "affected_player_interface.h"
 #include "affected_player_vector.h"
 #include "damage.h"
 #include "heal.h"
@@ -113,11 +113,11 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamageDealtOnPlayer) {
     const MockAffectedPlayer* caller = addPlayerToVector("Caller",
                                                          affectedPlayerVector);
 
-    EXPECT_CALL(*p1, getDamageDealtOnPlayer())
+    EXPECT_CALL(*p1, getTotalDamageDealtOnPlayer())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getDamageDealtOnPlayer())
+    EXPECT_CALL(*p2, getTotalDamageDealtOnPlayer())
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*caller, getDamageDealtOnPlayer())
+    EXPECT_CALL(*caller, getTotalDamageDealtOnPlayer())
         .Times(0);
 
     Damage totalDamage = affectedPlayerVector->getTotalDamageDealtOnPlayer("Caller");
@@ -125,34 +125,35 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamageDealtOnPlayer) {
     EXPECT_EQ((d1 + d2).getTotal(), totalDamage.getTotal());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getAllDamageFromAffectedPlayer) {
-    /* Verifies that getAllDamage is called on the the correct player */
+TEST_F(AffectedPlayerVectorDamageTest, getDamageDealtOnPlayer) {
+    /* Verifies that the correct method in the affected player
+    is called. */
 
     std::vector<std::pair<std::string, Damage>> expected;
     expected.emplace_back("type", d2);
 
-    EXPECT_CALL(*p2, getAllDamage())
+    EXPECT_CALL(*p2, getDamageDealtOnPlayer())
         .WillOnce(::testing::Return(expected));
 
     std::vector<std::pair<std::string, Damage>> result2 =
-        affectedPlayerVector->getAllDamageFromAffectedPlayer("dealer2");
+        affectedPlayerVector->getDamageDealtOnPlayer("dealer2");
 
     EXPECT_EQ(expected[0].first, result2[0].first);
-    EXPECT_EQ(expected[0].second.getTotalDealtOnPlayer(),
-              result2[0].second.getTotalDealtOnPlayer());
+    EXPECT_EQ(expected[0].second.getTotal(),
+              result2[0].second.getTotal());
 }
 
-TEST_F(AffectedPlayerVectorDamageTest, getAllDamageFromAffectedPlayer_notFound) {
+TEST_F(AffectedPlayerVectorDamageTest, getDamageDealtOnPlayer_notFound) {
     /* Verifies that a vector with the pair "empty" and an empty Damage
     is returned when the player is not found in the vector. */
 
     std::string name = "NotInTheVector";
 
-    auto result = affectedPlayerVector->getAllDamageFromAffectedPlayer(name);
+    auto result = affectedPlayerVector->getDamageDealtOnPlayer(name);
 
     EXPECT_EQ(1, result.size());
     EXPECT_EQ("empty", result[0].first);
-    EXPECT_EQ(0, result[0].second.getTotalDealtOnPlayer());
+    EXPECT_EQ(0, result[0].second.getTotal());
 }
 
 TEST_F(AffectedPlayerVectorDamageTest, getTotalHeals) {
@@ -276,10 +277,9 @@ TEST_F(AffectedPlayerVectorDamageTest, getNanoPerAffectedPlayer) {
 
 TEST(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     /*
-    Adds several players with different damage.
-    Calls getTotalDamageForAllAffectedPlayers().
-    Verifies that each players getTotalDamage() is called and that the
-    returned vector is sorted on total received damage.
+    Adds several players with different damage and retreives the damage
+    per player.
+    Verifies that each AffectedPlayers correct get method is called.
     */
 
     AffectedPlayerVector<::testing::NiceMock<MockAffectedPlayer>*> affectedPlayerVector;
@@ -290,27 +290,28 @@ TEST(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     const MockAffectedPlayer* p4 = addPlayerToVector("Receiver4", &affectedPlayerVector);
 
     // Set up the return values.
-    Damage d1 = createReceiverDamage(7000);
-    Damage d2 = createReceiverDamage(0);
-    Damage d3 = createReceiverDamage(500000);
-    Damage d4 = createReceiverDamage(1500);
+    Damage d1 = createDamage(7000);
+    Damage d2 = createDamage(0);
+    Damage d3 = createDamage(500000);
+    Damage d4 = createDamage(1500);
 
-    EXPECT_CALL(*p1, getTotalDamage())
+    EXPECT_CALL(*p1, getTotalDamageReceivedFromPlayer())
         .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamage())
+    EXPECT_CALL(*p2, getTotalDamageReceivedFromPlayer())
         .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*p3, getTotalDamage())
+    EXPECT_CALL(*p3, getTotalDamageReceivedFromPlayer())
         .WillOnce(::testing::Return(d3));
-    EXPECT_CALL(*p4, getTotalDamage())
+    EXPECT_CALL(*p4, getTotalDamageReceivedFromPlayer())
         .WillOnce(::testing::Return(d4));
 
-    std::vector<std::pair<std::string, Damage>> result;
-    result = affectedPlayerVector.getTotalDamageForAllAffectedPlayers("Caller");
+    std::vector<std::pair<std::string, Damage>> result =
+        affectedPlayerVector.
+            getTotalDamageReceivedFromPlayerPerAffectedPlayer("Caller");
 
     // Assuming the order is the same as when added which could be untrue.
-    EXPECT_EQ(d1.getTotalReceivedFromPlayer(), result[0].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d2.getTotalReceivedFromPlayer(), result[1].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d3.getTotalReceivedFromPlayer(), result[2].second.getTotalReceivedFromPlayer());
-    EXPECT_EQ(d4.getTotalReceivedFromPlayer(), result[3].second.getTotalReceivedFromPlayer());
+    EXPECT_EQ(d1.getTotal(), result[0].second.getTotal());
+    EXPECT_EQ(d2.getTotal(), result[1].second.getTotal());
+    EXPECT_EQ(d3.getTotal(), result[2].second.getTotal());
+    EXPECT_EQ(d4.getTotal(), result[3].second.getTotal());
     EXPECT_EQ(4, result.size());
 }
