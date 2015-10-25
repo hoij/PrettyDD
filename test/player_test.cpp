@@ -33,12 +33,12 @@ public:
 
     MOCK_METHOD1(getTotalHeals, Heal(std::string callerName));
 
-    MOCK_CONST_METHOD0(getHealsForAllAffectedPlayers,
+    MOCK_CONST_METHOD0(getHealsPerAffectedPlayer,
                        std::vector<std::pair<std::string, Heal>>(void));
 
     MOCK_CONST_METHOD1(getTotalNano, Nano(std::string callerName));
 
-    MOCK_CONST_METHOD1(getNanoForAllAffectedPlayers,
+    MOCK_CONST_METHOD1(getNanoPerAffectedPlayer,
                        std::vector<std::pair<std::string, Nano>>(
                            std::string callerName));
 };

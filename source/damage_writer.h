@@ -11,7 +11,6 @@
 
 
 class Damage;
-class Player;
 
 class DamageWriter : public WriterHelper {
 
@@ -21,19 +20,29 @@ public:
                  std::ofstream& file);
 
     void createDDTopList();
-    void createDDDetailedTopList();
-    void createDDPerDamageType(std::string playerName);
-    void createDDPerDamageTypeDetailed(std::string playerName);
-    void createDDPerOpponent(std::string playerName);  // Lists all opponents for playerName
-    void createDDOnSpecificOpponent(std::string playerName,
-                                    std::string opponentName);
-    void createDDOnSpecificOpponentDetailed(std::string playerName,
-                                            std::string opponentName);
-
     void createDRTopList();
+
+    void createDDDetailedTopList();
     void createDRDetailedTopList();
-    void createDRPerDamageType(std::string playerName);
-    void createDRPerOpponent(std::string playerName);  // Lists all opponents for playerName
+
+    void createDDPerType(std::string playerName);
+    void createDRPerType(std::string playerName);
+
+    void createDDPerType(std::string playerName,
+                         std::string opponentName);
+    void createDRPerType(std::string playerName,
+                         std::string opponentName);
+
+    void createDDPerTypeDetailed(std::string playerName);
+    void createDRPerTypeDetailed(std::string playerName);
+
+    void createDDPerTypeDetailed(std::string playerName,
+        std::string opponentName);
+    void createDRPerTypeDetailed(std::string playerName,
+        std::string opponentName);
+
+    void createDDPerOpponent(std::string playerName);
+    void createDRPerOpponent(std::string playerName);
 
 private:
     typedef void (DamageWriter::*writeHeadingsPointer)(bool self);
@@ -43,20 +52,43 @@ private:
                                                      bool self);
 
     // Common writes
-    void createDamagePerDamageType(std::string playerName,
-                                   std::string titleBase,
-                                   int typesPerWindow,
-                                   bool dealt,
-                                   bool detailed);
-    void createDamagePerOpponent(std::string playerName,
-                                 std::string titleBase,
-                                 bool dealt,
-                                 bool detailed);
-    void createDamageOnSpecificOpponent(std::string playerName,
-                                        std::string opponentName,
-                                        std::string titleBase,
-                                        int typesPerWindow,
-                                        bool detailed);
+    void createTopList(
+        std::string titleBase,
+        std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer);
+
+    void createDetailedTopList(
+        std::string titleBase,
+        std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer);
+
+    void createDamagePerType(
+        std::string playerName,
+        std::string titleBase,
+        std::vector<std::pair<std::string, Damage>> damagePerType,
+        int typesPerWindow,
+        bool detailed);
+
+    void createDamagePerOpponent(
+        std::string playerName,
+        std::string titleBase,
+        std::vector<std::pair<std::string, Damage>> damagePerOpponent,
+        bool detailed);
+
+    void createDamagePerType(
+        std::string playerName,
+        std::string opponentName,
+        std::string titleBase,
+        std::vector<std::pair<std::string, Damage>> damagePerOpponent,
+        int typesPerWindow,
+        bool detailed);
+
+    void createDamagePerType(std::string titleBase,
+                             std::string playerName,
+                             std::string opponentName);
+
+    void createDamagePerTypeDetailed(std::string titleBase,
+                                     std::string playerName,
+                                     std::string opponentName);
+
     void writeToFile(
         std::string titleBase,
         std::vector<std::pair<std::string, Damage>>& v,
@@ -65,6 +97,9 @@ private:
         bool self,
         writeHeadingsPointer,
         writeDamagePointer);
+
+    std::string nameFile(int fileNr);
+    void writeExecutionOfNextScript(int fileNr, int nrOfFiles);
 
     void writeStats(
         std::vector<std::pair<std::string, Damage>>::iterator start,
@@ -77,30 +112,23 @@ private:
 
     // Headings
     void writeTopListHeadings(bool self);
-    void writeOverviewHeadings(bool self);
-    void writeOverviewHeadingsDetailed(bool self);
-    void writePerTypeOverviewHeadings(bool self);
+    void writePerPlayerHeadings(bool self);
+    void writePerTypeHeadings(bool self);
+    void writePerTypeDetailedHeadings(bool self);
 
     // Writes
-    void writeDDTopList(const std::string& name, const Damage& d, int place, bool self);
-    void writeDDOverviewDetailed(const std::string& name, const Damage& d, int place, bool self);
-    void writeDDOverview(const std::string& name, const Damage& d, int place, bool self);
+    void writeTopList(const std::string& name, const Damage& d, int place, bool self);
+    void writePerPlayer(const std::string& name, const Damage& d, int place, bool self);
+    void writePerType(const std::string& name, const Damage& d, int place, bool self);
+    void writePerTypeDetailed(const std::string& name, const Damage& d, int place, bool self);
 
-    void writeDDPerTypeOverview(const std::string& name, const Damage& d, int place, bool self);
-
-    void writeDRPerTypeOverview(const std::string& name, const Damage& d, int place, bool self);
-
-
-    void writeDRTopList(const std::string& name, const Damage& d, int place, bool self);
-    void writeDROverview(const std::string& name, const Damage& d, int place, bool self);
-
-    // Detailed type write helper functions
+    // WriteDDPerTypeDetailed helper methods
+    void writeTotalInfo(int total, int count, std::string category);
     void writeDetailedRegularInfo(const Damage& d);
     void writeDetailedNanobotInfo(const Damage& d);
     void writeDetailedSpecialInfo(const Damage& d, bool self);
     void writeDetailedShieldInfo(const Damage& d);
     void writeDetailedMissInfo(const Damage& d, bool self);
-    void writeTotalInfo(int total, int count, std::string category);
     void writeDetailedInfoForType(std::string type,
                                   int total,
                                   int nrOfhits,
@@ -110,41 +138,39 @@ private:
                                   std::string hitPercentOfType = "",
                                   std::string hitPercentOfCategory = "");
 
-    // Helper functions
-    void setDDWriteMethods(writeHeadingsPointer& whp,
-                           writeDamagePointer& wdp,
-                           bool detailed);
-    void setDDPerTypeWriteMethods(writeHeadingsPointer& whp,
+    // Helper methods
+    void setPerPlayerWriteMethods(writeHeadingsPointer& whp,
                                   writeDamagePointer& wdp,
                                   bool detailed);
-    void setDRWriteMethods(writeHeadingsPointer& whp,
-                           writeDamagePointer& wdp);
-    void setDRPerTypeWriteMethods(writeHeadingsPointer& whp,
-                                  writeDamagePointer& wdp);
+    void setPerTypeWriteMethods(writeHeadingsPointer& whp,
+                                writeDamagePointer& wdp,
+                                bool detailed);
 
-    void sortByDealt(std::vector<std::pair<std::string, Damage>>& v);
-    void sortByReceived(std::vector<std::pair<std::string, Damage>>& v);
+    void sortByTotal(std::vector<std::pair<std::string, Damage>>& v);
 
-    std::string calcCritHitPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcMissPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcRegularMissPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcSpecialMissPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcDeflectHitPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcSpecialDeflectHitPercentageReceivedFromPlayer(const Damage&d);
-    int calcRegularAndSpecialHitsReceivedFromPlayer(const Damage&d);
-    std::string calcRegularDmgPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcSpecialDmgPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcNanobotDmgPercentageReceivedFromPlayer(const Damage&d);
-    std::string calcShieldDmgPercentageReceivedFromPlayer(const Damage&d);
+    bool playerFound(std::string titleBase,
+                     std::string playerName,
+                     const std::vector<std::pair<std::string, Damage>>& v);
 
-    std::string calcCritHitPercentageDealtOnPlayer(const Damage&d);
-    std::string calcMissPercentageDealtOnPlayer(const Damage&d);
-    std::string calcDeflectHitPercentageDealtOnPlayer(const Damage&d);
-    int calcRegularAndSpecialHitsDealtOnPlayer(const Damage&d);
-    std::string calcRegularDmgPercentageDealtOnPlayer(const Damage&d);
-    std::string calcSpecialDmgPercentageDealtOnPlayer(const Damage&d);
-    std::string calcNanobotDmgPercentageDealtOnPlayer(const Damage&d);
-    std::string calcShieldDmgPercentageDealtOnPlayer(const Damage&d);
+    bool opponentFound(std::string titleBase,
+                       std::string playerName,
+                       std::string opponentName,
+                       const std::vector<std::pair<std::string, Damage>>& v);
+
+    bool isSelf(std::string playerName, std::string opponentName = "");
+
+    // TODO: Move to separate class or into Damage.
+    std::string calcCritHitPercentage(const Damage&d);
+    std::string calcMissPercentage(const Damage&d);
+    std::string calcRegularMissPercentage(const Damage&d);
+    std::string calcSpecialMissPercentage(const Damage&d);
+    std::string calcDeflectHitPercentage(const Damage&d);
+    std::string calcSpecialDeflectHitPercentage(const Damage&d);
+    int calcRegularAndSpecialHits(const Damage&d);
+    std::string calcRegularDmgPercentage(const Damage&d);
+    std::string calcSpecialDmgPercentage(const Damage&d);
+    std::string calcNanobotDmgPercentage(const Damage&d);
+    std::string calcShieldDmgPercentage(const Damage&d);
 
 
     PlayerVector<Player*>& playerVector;

@@ -200,7 +200,7 @@ TEST(PlayerVectorTest, getTotalDamageForEachPlayer) {
         .WillOnce(::testing::Return(d4));
 
     std::vector<std::pair<std::string, Damage>> result;
-    result = playerVector.getTotalDamageDealtForEachPlayer();
+    result = playerVector.getTotalDamageDealtPerPlayer();
 
     // Assuming the order is the same as when added which could be untrue.
     EXPECT_EQ(d1.getTotalReceivedFromPlayer(),

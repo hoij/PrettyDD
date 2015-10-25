@@ -24,15 +24,14 @@ public:
 
     std::string getName() const {return name;}
 
-    Damage getTotalDamage() const;
-    Damage getDamagePerDamageType(const std::string damageType) const;
-    std::vector<std::pair<std::string, Damage>> getAllDamage() const;
+    Damage getTotalDamageReceivedFromPlayer() const;
+    Damage getTotalDamageDealtOnPlayer() const;
 
     std::vector<std::pair<std::string, Damage>>
-    getAllDamageReceivedFromPlayer() const;
+    getDamageReceivedFromPlayer() const;
 
     std::vector<std::pair<std::string, Damage>>
-    getAllDamageDealtOnPlayer() const;
+    getDamageDealtOnPlayer() const;
 
     const Heal& getHeal() const;
     const Nano& getNano() const;
@@ -44,8 +43,9 @@ private:
     void addHeal(LineInfo& li);
     void addNano(LineInfo& li);
 
-    // Name of the type and it's Damage.
-    std::map<std::string, Damage> damage;
+    // Map contains ame of the type and it's Damage.
+    std::map<std::string, Damage> damageReceivedFromPlayer;
+    std::map<std::string, Damage> damageDealtOnPlayer;
 
     Heal heal;
     Nano nano;

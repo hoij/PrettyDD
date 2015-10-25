@@ -18,9 +18,14 @@ public:
 
     virtual void add(LineInfo& lineInfo) = 0;
 
-    virtual Damage getTotalDamage() const = 0;
-    virtual Damage getDamagePerDamageType(const std::string damageType) const = 0;
-    virtual std::vector<std::pair<std::string, Damage>> getAllDamage() const = 0;
+    virtual Damage getTotalDamageReceivedFromPlayer() const = 0;
+    virtual Damage getTotalDamageDealtOnPlayer() const = 0;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageReceivedFromPlayer() const = 0;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+    getDamageDealtOnPlayer() const = 0;
 
     virtual const Heal& getHeal() const = 0;
     virtual const Nano& getNano() const = 0;

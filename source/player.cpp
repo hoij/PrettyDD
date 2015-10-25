@@ -79,69 +79,48 @@ void Player::addXp(LineInfo& lineInfo) {
     xp.add(lineInfo);
 }
 
-Damage Player::getTotalDamage() const {
-    Damage total = affectedPlayers->getTotalDamage(getName());
-    int dpmR = amountPerMinute(total.getTotalReceivedFromPlayer());
-    total.setReceivedFromPlayerDPM(dpmR);
-    int dpmD = amountPerMinute(total.getTotalDealtOnPlayer());
-    total.setDealtOnPlayerDPM(dpmD);
+Damage Player::getTotalDamageDealt() const {
+    Damage total = affectedPlayers->getTotalDamageReceivedFromPlayer(getName());
+    int dpm = amountPerMinute(total.getTotal());
+    total.setDPM(dpm);
     return total;
 }
 
-Damage Player::getTotalDamagePerDamageType(std::string damageType) const {
-    Damage total = affectedPlayers->getTotalDamagePerDamageType(getName(),
-                                                                damageType);
-    int dpmR = amountPerMinute(total.getTotalReceivedFromPlayer());
-    total.setReceivedFromPlayerDPM(dpmR);
-    int dpmD = amountPerMinute(total.getTotalDealtOnPlayer());
-    total.setDealtOnPlayerDPM(dpmD);
+Damage Player::getTotalDamageReceived() const {
+    Damage total = affectedPlayers->getTotalDamageDealtOnPlayer(getName());
+    int dpm = amountPerMinute(total.getTotal());
+    total.setDPM(dpm);
     return total;
 }
 
 std::vector<std::pair<std::string, Damage>>
-Player::getTotalDamageForEveryDamageType() const {
+Player::getTotalDamageDealtPerType() const {
     std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getTotalDamageForEveryDamageType(getName());
+        affectedPlayers->getTotalDamageReceivedFromPlayerPerDamageType(getName());
     addDPM(total);
     return total;
 }
 
 std::vector<std::pair<std::string, Damage>>
-Player::getTotalDamageForEveryDamageTypeReceivedFromPlayer() const {
+Player::getTotalDamageReceivedPerType() const {
     std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getTotalDamageForEveryDamageTypeReceivedFromPlayer(getName());
+        affectedPlayers->getTotalDamageDealtOnPlayerPerDamageType(getName());
     addDPM(total);
     return total;
 }
 
 std::vector<std::pair<std::string, Damage>>
-Player::getTotalDamageForEveryDamageTypeDealtOnPlayer() const {
+Player::getTotalDamageDealtPerAffectedPlayer() const {
     std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getTotalDamageForEveryDamageTypeDealtOnPlayer(getName());
+        affectedPlayers->getTotalDamageReceivedFromPlayerPerAffectedPlayer(getName());
     addDPM(total);
     return total;
 }
 
 std::vector<std::pair<std::string, Damage>>
-Player::getTotalDamageForAllAffectedPlayers() const {
+Player::getTotalDamageReceivedPerAffectedPlayer() const {
     std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getTotalDamageForAllAffectedPlayers(getName());
-    addDPM(total);
-    return total;
-}
-
-std::vector<std::pair<std::string, Damage>>
-Player::getTotalDamageReceivedFromPlayerForAllAffectedPlayers() const {
-    std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getTotalDamageReceivedFromPlayerForAllAffectedPlayers(getName());
-    addDPM(total);
-    return total;
-}
-
-std::vector<std::pair<std::string, Damage>>
-Player::getTotalDamageDealtOnPlayerForAllAffectedPlayers() const {
-    std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getTotalDamageDealtOnPlayerForAllAffectedPlayers(getName());
+        affectedPlayers->getTotalDamageDealtOnPlayerPerAffectedPlayer(getName());
     addDPM(total);
     return total;
 }
@@ -150,63 +129,59 @@ size_t Player::getLongestAffectedPlayerNameLength() const {
     return affectedPlayers->getLongestNameLength();
 }
 
+std::vector<std::pair<std::string, Damage>>
+Player::getDamageReceivedPerType(std::string affectedPlayerName) const {
+    std::vector<std::pair<std::string, Damage>> total =
+        affectedPlayers->getDamageDealtOnPlayer(affectedPlayerName);
+    addDPM(total);
+    return total;
+}
+
+std::vector<std::pair<std::string, Damage>>
+Player::getDamageDealtPerType(std::string affectedPlayerName) const {
+    std::vector<std::pair<std::string, Damage>> total =
+        affectedPlayers->getDamageReceivedFromPlayer(affectedPlayerName);
+    addDPM(total);
+    return total;
+}
+
+/* Heal */
 Heal Player::getTotalHeals() const {
     return affectedPlayers->getTotalHeals(getName());
 }
 
-std::vector<std::pair<std::string, Damage>>
-Player::getAllDamageFromAffectedPlayer(std::string name) const {
-    std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getAllDamageFromAffectedPlayer(name);
-    addDPM(total);
-    return total;
-}
-
-std::vector<std::pair<std::string, Damage>>
-Player::getAllDamageTakenFromAffectedPlayer(std::string name) const {
-    std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getAllDamageDealtOnPlayerForAffectedPlayer(name);
-    addDPM(total);
-    return total;
-}
-
-std::vector<std::pair<std::string, Damage>>
-Player::getAllDamageDealtOnAffectedPlayer(std::string name) const {
-    std::vector<std::pair<std::string, Damage>> total =
-        affectedPlayers->getAllDamageReceivedFromPlayerForAffectedPlayer(name);
-    addDPM(total);
-    return total;
-}
-
 std::vector<std::pair<std::string, Heal>>
-Player::getHealsForAllAffectedPlayers() const {
-    return affectedPlayers->getHealsForAllAffectedPlayers();
+Player::getHealsPerAffectedPlayer() const {
+    return affectedPlayers->getHealsPerAffectedPlayer();
 }
 
-const Heal& Player::getHealFromAffectedPlayer(std::string name) const {
-    return affectedPlayers->getHealFromAffectedPlayer(name);
+Heal Player::getHeal(std::string affectedPlayerName) const {
+    return affectedPlayers->getHeal(affectedPlayerName);
 }
 
+/* Nano */
+Nano Player::getTotalNano() const {
+    return affectedPlayers->getTotalNano(getName());
+}
+
+std::vector<std::pair<std::string, Nano>>
+Player::getNanoPerAffectedPlayer() const {
+    return affectedPlayers->getNanoPerAffectedPlayer();
+}
+
+Nano Player::getNano(std::string affectedPlayerName) const {
+    return affectedPlayers->getNano(affectedPlayerName);
+}
+
+/* Nano Program*/
 const NanoPrograms& Player::getNanoPrograms() const {
     return nanoPrograms;
 }
 
-std::vector<std::pair<std::string, Nano>>
-Player::getNanoForAllAffectedPlayers() const {
-    return affectedPlayers->getNanoForAllAffectedPlayers();
-}
-
-const Nano& Player::getNanoFromAffectedPlayer(std::string name) const {
-    return affectedPlayers->getNanoFromAffectedPlayer(name);
-}
-
+/* XP */
 const XP& Player::getXp() {
     xp.calcXPH(getTimeActive());
     return xp;
-}
-
-Nano Player::getTotalNano() const {
-    return affectedPlayers->getTotalNano(getName());
 }
 
 std::time_t Player::getTimeActive() const {
@@ -247,11 +222,7 @@ int Player::amountPerMinute(int amount) const {
 
 void Player::addDPM(std::vector<std::pair<std::string, Damage>>& v) const {
     for (auto& damagePair : v) {
-        int DPMReceivedFromPlayer =
-            amountPerMinute(damagePair.second.getTotalReceivedFromPlayer());
-        int DPMDealtOnPlayer =
-            amountPerMinute(damagePair.second.getTotalDealtOnPlayer());
-        damagePair.second.setReceivedFromPlayerDPM(DPMReceivedFromPlayer);
-        damagePair.second.setDealtOnPlayerDPM(DPMDealtOnPlayer);
+        int dpm = amountPerMinute(damagePair.second.getTotal());
+        damagePair.second.setDPM(dpm);
     }
 }

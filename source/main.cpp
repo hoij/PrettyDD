@@ -22,16 +22,16 @@
 int main(void) {
     MyTime myTime;
     errorLog.write("");
-    errorLog.write("Info: Program started at: ", false);
-    errorLog.write(myTime.currentTimeString());
+    errorLog.write("Info: Program started at: " + myTime.currentTimeString());
 
     Configuration config;
     if(!config.read()) {
         return 1;
     }
 
-    Parser parser(config.getplayerRunningProgram());
-    PlayerVector<Player*> playerVector;
+    Parser parser(config.getPlayerRunningProgram());
+    PlayerVector<Player*> playerVector(config.getPlayerRunningProgram());
+    playerVector.startLogging();
 
     std::ofstream file;
     NanoProgramWriter nanoProgramWriter(playerVector, config, file);
@@ -44,10 +44,7 @@ int main(void) {
                           xpWriter,
                           file);
 
-    CommandHandler commandHandler(statWriter, playerVector);
-
-    // TODO: Remove when done:
-    playerVector.startLogging();
+    CommandHandler commandHandler(statWriter, playerVector, myTime);
 
     // TODO: Move into parser or new class.
     std::ifstream logstream(config.getLogFilePath());
@@ -56,6 +53,7 @@ int main(void) {
         errorLog.write("Error: " + config.getLogFilePath());
     }
     logstream.clear();
+
     // Read from the end of the file if true,
     // otherwise read from the start.
     if (config.shouldParseFromEnd()) {
@@ -65,8 +63,8 @@ int main(void) {
     std::ios::streampos endpos = logstream.tellg();
 
     std::string line;
-    bool is_running = true;
-    while (is_running) {
+    bool isRunning = true;
+    while (isRunning) {
         if(!std::getline(logstream, line) || logstream.eof()) {
             // Check the end to see if the file has shrunk.
             // If it has, then move back to the new end.
@@ -75,30 +73,29 @@ int main(void) {
             endpos = logstream.tellg();
             logstream.clear();
             logstream.seekg((endpos < lastpos) ? endpos : lastpos);
-            //sleep to get less CPU intensive
+
+            // Sleep to get less CPU intensive
             std::this_thread::sleep_for(std::chrono::milliseconds(250));
             continue;
         }
 
+        // Format and parse the log line
         FormattedLine formattedLine(line);
-        // TODO: Figure out some way to handling this check nicer.
         if (formattedLine.isFormatted()) {
             LineInfo lineInfo = parser.parse(formattedLine);
             if(lineInfo.hasStats) {
                 playerVector.addToPlayers(lineInfo);
             }
-            else if (!lineInfo.command.empty()) {
-                commandHandler.execute(lineInfo.command);
+            else if (!lineInfo.command.empty()) { // Command exists
+                isRunning = commandHandler.execute(lineInfo);
             }
         }
 
         lastpos = logstream.tellg();
-        //std::cout << "The log line: " << line << std::endl;
     }
 
     errorLog.write("");
-    errorLog.write("Info: Program ended at: ", false);
-    errorLog.write(myTime.currentTimeString());
+    errorLog.write("Info: Program ended at: " + myTime.currentTimeString());
 
     std::getchar();
     return 0;

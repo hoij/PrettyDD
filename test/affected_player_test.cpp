@@ -36,8 +36,14 @@ TEST_F(AffectedPlayerTest, addDamage_dealer) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(li.amount, affectedPlayer->getDamagePerDamageType("projectile").
-                                             getTotalDealtOnPlayer());
+    std::vector<std::pair<std::string, Damage>> dealt =
+        affectedPlayer->getDamageDealtOnPlayer();
+    std::vector<std::pair<std::string, Damage>> received =
+        affectedPlayer->getDamageReceivedFromPlayer();
+
+    EXPECT_EQ(1, dealt.size());
+    EXPECT_EQ(li.amount, dealt[0].second.getTotal());
+    EXPECT_EQ(0, received.size());
 }
 
 TEST_F(AffectedPlayerTest, addDamage_receiver) {
@@ -51,8 +57,14 @@ TEST_F(AffectedPlayerTest, addDamage_receiver) {
 
     affectedPlayer->add(li);
 
-    EXPECT_EQ(li.amount, affectedPlayer->getDamagePerDamageType("projectile").
-                                             getTotalReceivedFromPlayer());
+    std::vector<std::pair<std::string, Damage>> dealt =
+        affectedPlayer->getDamageDealtOnPlayer();
+    std::vector<std::pair<std::string, Damage>> received =
+        affectedPlayer->getDamageReceivedFromPlayer();
+
+    EXPECT_EQ(0, dealt.size());
+    EXPECT_EQ(li.amount, received[0].second.getTotal());
+    EXPECT_EQ(1, received.size());
 }
 
 TEST_F(AffectedPlayerTest, addHeal_actual) {
@@ -153,63 +165,5 @@ TEST_F(AffectedPlayerTest, getTotalDamage) {
     affectedPlayer->add(li2);
 
     EXPECT_EQ(li1.amount + li2.amount,
-              affectedPlayer->getTotalDamage().getTotalDealtOnPlayer());
-}
-
-TEST_F(AffectedPlayerTest, getDamagePerDamageType) {
-    /* Adds two damages with the same subtype and one with a different.
-    Verifies that the sum of the nanobots and regular damage with the same
-    subtype is returned for the specified damageType */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-
-    LineInfo li2 = li1;
-    LineInfo li3 = li1;
-    li1.subtype = "melee";
-    li2.subtype = "melee";
-    li3.subtype = "projectile";
-    li1.amount = 100;
-    li2.amount = 300;
-    li3.amount = 900;
-    li2.nanobots = true;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-
-    EXPECT_EQ(li1.amount + li2.amount,
-              affectedPlayer->getDamagePerDamageType("melee").
-                  getTotalDealtOnPlayer());
-}
-
-TEST_F(AffectedPlayerTest, getDamagePerDamageType_nonexistent) {
-    /* Adds two damages of the same subtype. One with nanobots and the other
-    without. Then calls getTotalDamagePerDamageType with a non-existing type.
-    Verifies that an empty instance of Damage is returned when the
-    damageType is not found among the nanobots damage types */
-    LineInfo li1;
-    li1.dealer_name = affectedPlayer->getName();
-    li1.type = "damage";
-
-    LineInfo li2 = li1;
-
-    li1.subtype = "melee";
-    li2.subtype = "melee";
-    li1.amount = 100;
-    li2.amount = 300;
-    li1.nanobots = true;
-    li2.nanobots = false;
-
-    affectedPlayer->add(li1);
-    affectedPlayer->add(li2);
-
-    Damage result1 = affectedPlayer->getDamagePerDamageType(
-                         "nonexistingType");
-    Damage result2 = affectedPlayer->getDamagePerDamageType(
-                         "nonexistingType");
-
-    EXPECT_EQ(0, result1.getTotalDealtOnPlayer());
-    EXPECT_EQ(0, result2.getTotalDealtOnPlayer());
-    EXPECT_EQ(0, result1.getTotalReceivedFromPlayer());
-    EXPECT_EQ(0, result2.getTotalReceivedFromPlayer());
+              affectedPlayer->getTotalDamageDealtOnPlayer().getTotal());
 }
