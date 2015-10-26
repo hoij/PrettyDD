@@ -2,13 +2,11 @@
 #include "line_info.h"
 #include "my_time_interface.h"
 
-#include <ostream>
 #include <sstream>
 #include <vector>
 
 
 bool CommandHandler::execute(const LineInfo& li) {
-
 
     bool shouldContinue = true;
 
@@ -27,40 +25,7 @@ bool CommandHandler::execute(const LineInfo& li) {
     // some other way of handling this.
     if (nrOfOptions == 0) {
         // Write the detailed top list by defualt:
-//         statWriter.createDDDetailedTopList();
-
-//        statWriter.createNanoProgramsCastedDetailedList();
-        // For testing purposes:
-        statWriter.createXPInfo();
-//        statWriter.createDDTopList();
-//        statWriter.createDDDetailedTopList();
-
-//        statWriter.createDDPerType("You");
-//        statWriter.createDDPerType("Predator Rogue");
-//        statWriter.createDDPerType("Ass");
-
-//        statWriter.createDDPerTypeDetailed("You");
-//        statWriter.createDDPerTypeDetailed("Predator Rogue");
-//        statWriter.createDDPerTypeDetailed("Sgtcuddle");
-
-//        statWriter.createHelp();
-
-//        statWriter.createDDPerOpponent("You");
-//        statWriter.createDDPerOpponent("Predator Rogue");
-//        statWriter.createDDPerOpponent("Nonexisting");
-//        statWriter.createDRPerType("You", "Predator Rogue");
-
-//        statWriter.createDDPerTypeDetailed("You", "Predator Rogue");
-
-//        statWriter.createDRPerType("Predator Rogue", "You");
-//        statWriter.createDRPerType("You", "asshole");
-
-//        statWriter.createDRTopList();
-//        statWriter.createDRDetailedTopList();
-
-//        statWriter.createDRPerType("You");
-
-//        statWriter.createDRPerOpponent("You");
+        statWriter.createDDDetailedTopList();
     }
     else if (nrOfOptions == 1) {
         // No extra options on top/dtop/types will print damage dealt
@@ -216,7 +181,7 @@ bool CommandHandler::execute(const LineInfo& li) {
     else {
         errorLog.write("Too many commands: " + command);
     }
-    
+
     return shouldContinue;
 }
 
@@ -285,46 +250,3 @@ bool CommandHandler::wasCommandTypedLongAgo(const std::time_t& t) {
     // when reparsing a log.
     return t < myTime.currentTime() - 30;
 }
-
-// TODO: Move to test.
-//void CommandHandler::testMerge() {
-//    std::vector<std::string> text1 = {"pdd", "\"Player1\"", "\"Player", "2\"", "s"};
-//    std::vector<std::string> text2 = {"pdd", "\"Player1\"", "\"", "Player", "2\"", "s"};
-//    std::vector<std::string> text3 = {"hello", "\"quote1\"", "\"quote2\""};
-//
-//    std::vector<std::string> text4 = {"hello", "\"this", "is", "some", "quoted",
-//                                     "text\"", "and", "this", "is", "not"};
-//    std::vector<std::string> text5 = {"hello", "\"this", "is", "some", "quotedtext",
-//                                      "\"", "and", "this", "is", "not"};
-//    std::vector<std::string> text6 = {"hello", "\"quote\"", "\"quote\""};
-//    std::vector<std::string> result1 = mergeQuotedText(text1);
-//    std::vector<std::string> result2 = mergeQuotedText(text2);
-//    std::vector<std::string> result3 = mergeQuotedText(text3);
-//    std::vector<std::string> result4 = mergeQuotedText(text4);
-//    std::vector<std::string> result5 = mergeQuotedText(text5);
-//    std::vector<std::string> result6 = mergeQuotedText(text6);
-//
-//    for (const auto& e : result1) {
-//        std::cout << e << std::endl;
-//    }
-//    std::cout << std::endl;
-//    for (const auto& e : result2) {
-//        std::cout << e << std::endl;
-//    }
-//    std::cout << std::endl;
-//    for (const auto& e : result3) {
-//        std::cout << e << std::endl;
-//    }
-//    std::cout << std::endl;
-//    for (const auto& e : result4) {
-//        std::cout << e << std::endl;
-//    }
-//    std::cout << std::endl;
-//    for (const auto& e : result5) {
-//        std::cout << e << std::endl;
-//    }
-//    std::cout << std::endl;
-//    for (const auto& e : result6) {
-//        std::cout << e << std::endl;
-//    }
-//}

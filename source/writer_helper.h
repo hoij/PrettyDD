@@ -2,14 +2,14 @@
 #define WRITER_HELPER_H
 
 
-#include "configuration.h"
 #include "newline.h"
 
 #include <fstream>
-#include <memory>
 #include <ostream>
 #include <string>
 
+
+class Configuration;
 
 class WriterHelper {
 public:

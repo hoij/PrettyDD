@@ -2,13 +2,15 @@
 #define XP_WRITER_H
 
 
-#include "configuration.h"
 #include "player_vector.h"
 #include "writer_helper.h"
 #include "xp.h"
 
 #include <ostream>
+#include <string>
 
+
+class Configuration;
 
 class XPWriter : public WriterHelper {
 public:

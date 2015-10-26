@@ -3,15 +3,9 @@
 
 
 #include "base_vector.h"
-#include "configuration.h"
-#include "logger.h"
-#include "my_time.h"
 #include "player.h"
 
-#include <algorithm>
-#include <iterator>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 class Damage;
@@ -23,40 +17,38 @@ class PlayerVector : public BaseVector<C> {
 public:
     PlayerVector(std::string playerRunningProgram) :
         playerRunningProgram(playerRunningProgram) {}
-    virtual ~PlayerVector() {};
+    ~PlayerVector() {};
     PlayerVector(const PlayerVector<C>& other) : BaseVector<C>(other) {}
 
-    virtual void addToPlayers(LineInfo& lineInfo);
+    void addToPlayers(LineInfo& lineInfo);
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getTotalDamageDealtPerPlayer() const;
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getTotalDamageReceivedPerPlayer() const;
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getDamageDealtPerType(std::string playerName) const;
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getDamageReceivedPerType(std::string playerName) const;
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getDamageDealtPerType(std::string playerName,
                           std::string opponentName) const;
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getDamageDealtPerOpponent(std::string playerName) const;
 
-    virtual std::vector<std::pair<std::string, Damage>>
+    std::vector<std::pair<std::string, Damage>>
     getDamageReceivedPerOpponent(std::string playerName) const;
 
 
     std::string renameIfSelf(std::string name) const;
-
-
-    virtual void startLogging();
-    virtual void stopLogging();
-    virtual void reset();
+    void startLogging();
+    void stopLogging();
+    void reset();
 
 private:
     bool log = false;

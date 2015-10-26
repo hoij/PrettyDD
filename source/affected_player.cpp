@@ -1,10 +1,10 @@
 #include "affected_player.h"
 #include "logger.h"
 #include "line_info.h"
-#include "my_time.h"
+#include "my_time_interface.h"
 
 
-AffectedPlayer::AffectedPlayer(std::string name, MyTime* myTime) :
+AffectedPlayer::AffectedPlayer(std::string name, MyTimeInterface* myTime) :
     name(name), myTime(myTime) {}
 
 void AffectedPlayer::add(LineInfo& lineInfo) {

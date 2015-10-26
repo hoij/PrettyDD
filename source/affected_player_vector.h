@@ -6,12 +6,8 @@
 #include "base_vector.h"
 #include "damage.h"
 #include "heal.h"
-#include "line_info.h"
-#include "logger.h"
-#include "my_time.h"
 
 #include <algorithm>
-#include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
@@ -337,8 +333,7 @@ AffectedPlayerVector<C>::addToVector(
             // If it exists, add it to the existing one
             it->second += damagePair.second;
         }
-        else {
-            // Otherwise create a new one.
+        else {  // Otherwise create a new one.
             allDamageTypes.push_back(damagePair);
         }
     }

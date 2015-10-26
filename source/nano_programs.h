@@ -2,12 +2,12 @@
 #define NANO_PROGRAMS_H
 
 
-#include "line_info.h"
-
 #include <map>
 #include <string>
 #include <vector>
 
+
+class LineInfo;
 
 class NanoPrograms {
 public:

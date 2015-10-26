@@ -8,7 +8,6 @@
 #include <string>
 
 
-
 class Configuration {
 public:
     bool read();

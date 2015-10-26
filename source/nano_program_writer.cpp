@@ -1,9 +1,12 @@
+#include "configuration.h"
+#include "nano_programs.h"
 #include "nano_program_writer.h"
 
 #include <algorithm>
 #include <iomanip>
 #include <fstream>
 #include <string>
+
 
 NanoProgramWriter::NanoProgramWriter(PlayerVector<Player*>& playerVector,
                                      Configuration& config,

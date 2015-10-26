@@ -1,10 +1,6 @@
 #include "damage.h"
 #include "line_info.h"
 
-#include <iomanip>
-#include <ostream>
-#include <string>
-
 
 Damage& Damage::operator+=(const Damage& rhs) {
     total += rhs.total;

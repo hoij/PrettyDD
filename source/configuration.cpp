@@ -15,8 +15,7 @@ bool Configuration::read() {
         getline(settings, scriptsPath);
         getline(settings, key, '=');
 
-        // Decide wether to read the log form the start or not
-        // (read from the end).
+        // Decide wether to read the log form the start or from the end
         // Read the text "true" or "false and store it as a bool.
         parseFromEnd = getAndConvertToBool(settings);
         // Decide wether to write the stats to a file that's

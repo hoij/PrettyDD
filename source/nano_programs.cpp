@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "line_info.h"
 #include "nano_programs.h"
 
 
@@ -18,7 +18,7 @@ void NanoPrograms::add(LineInfo& li) {
         // If nano casted successfully/resisted/countered/aborted/fumble,
         // the message won't contain a name. The previously saved name
         // is added with the new subtype info (the success info).
-        
+
         // When a proc fires or when certain nanos execute two programs on
         // one cast, the nano program status message (executed/countered etc.)
         // will appear twice or more after the "Executing Nano Program:"

@@ -1,3 +1,4 @@
+#include "configuration.h"
 #include "writer_helper.h"
 
 #include <iomanip>

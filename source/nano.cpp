@@ -1,3 +1,4 @@
+#include "line_info.h"
 #include "nano.h"
 
 #include <string>

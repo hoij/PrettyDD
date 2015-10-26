@@ -7,18 +7,17 @@
 #include "heal.h"
 #include "nano.h"
 
-#include <ctime>
 #include <map>
 #include <string>
 #include <vector>
 
 
 class LineInfo;
-class MyTime;
+class MyTimeInterface;
 
 class AffectedPlayer : public virtual AffectedPlayerInterface {
 public:
-	AffectedPlayer(std::string name, MyTime* myTime);
+	AffectedPlayer(std::string name, MyTimeInterface* myTime);
 
     void add(LineInfo& lineInfo);
 
@@ -50,7 +49,7 @@ private:
     Heal heal;
     Nano nano;
 
-    MyTime* myTime = nullptr;
+    MyTimeInterface* myTime = nullptr;
 };
 
 

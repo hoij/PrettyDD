@@ -1,7 +1,7 @@
+#include "configuration.h"
 #include "xp_writer.h"
 
 #include <iomanip>
-#include <string>
 #include <vector>
 
 

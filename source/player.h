@@ -3,15 +3,14 @@
 
 
 #include "affected_player_vector.h"
-#include "damage.h"
-#include "heal.h"
-#include "nano.h"
-#include "nano_programs.h"
 #include "player_interface.h"
-#include "my_time.h"
+#include "my_time_interface.h"
+#include "nano_programs.h"
+
 #include "xp.h"
 
 #include <gtest/gtest_prod.h>
+#include <ctime>
 #include <map>
 #include <string>
 #include <vector>
@@ -25,7 +24,10 @@
 #endif
 
 
+class Damage;
+class Heal;
 class LineInfo;
+class Nano;
 
 class Player : public virtual PlayerInterface {
 // TODO: Se if Player can be split into smaller classes.

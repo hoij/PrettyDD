@@ -1,16 +1,8 @@
-#include "affected_player.h"
-#include "damage.h"
-#include "logger.h"
-#include "player.h"
 #include "stat_writer.h"
 
-#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <string>
-#include <sstream>
-#include <vector>
-#include <utility>
 
 
 StatWriter::StatWriter(PlayerVector<Player*>& playerVector,

@@ -4,12 +4,12 @@
 
 #include "damage.h"
 #include "line_info.h"
-#include "logger.h"
 #include "my_time.h"
 
 #include <algorithm>
 #include <iterator>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 

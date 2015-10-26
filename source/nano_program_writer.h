@@ -2,12 +2,13 @@
 #define NANO_PROGRAM_WRITER_H
 
 
-#include "configuration.h"
-#include "nano_programs.h"
 #include "player_vector.h"
 #include "writer_helper.h"
 
 #include <fstream>
+
+class Configuration;
+class NanoPrograms;
 
 
 class NanoProgramWriter : public WriterHelper {

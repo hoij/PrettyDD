@@ -1,6 +1,9 @@
 #include "affected_player.h"
 #include "affected_player_vector.h"
+#include "damage.h"
+#include "heal.h"
 #include "line_info.h"
+#include "nano.h"
 #include "player.h"
 
 #include <algorithm>

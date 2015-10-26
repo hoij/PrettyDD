@@ -2,6 +2,7 @@
 #include "heal.h"
 #include "line_info.h"
 
+#include <string>
 
 Heal& Heal::operator+=(const Heal& rhs) {
     dealtOnPlayer += rhs.dealtOnPlayer;

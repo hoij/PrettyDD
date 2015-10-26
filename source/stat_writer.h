@@ -2,7 +2,6 @@
 #define STAT_WRITER_H
 
 
-#include "configuration.h"
 #include "damage_writer.h"
 #include "nano_program_writer.h"
 #include "player_vector.h"
@@ -10,9 +9,9 @@
 #include "xp_writer.h"
 
 #include <ostream>
-#include <string>
 
 
+class Configuration;
 class Damage;
 class Player;
 
