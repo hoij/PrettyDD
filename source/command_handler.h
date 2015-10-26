@@ -6,6 +6,8 @@
 #include "player_vector.h"
 #include "stat_writer.h"
 
+#include "gtest/gtest_prod.h"
+
 #include <string>
 
 class LineInfo;
@@ -22,13 +24,12 @@ public:
     bool execute(const LineInfo& li);
 
 private:
+    FRIEND_TEST(CommandHandlerTest, splitAndMergeQuotedText);
     std::vector<std::string> splitCommand(std::string command);
     std::vector<std::string> mergeQuotedText(
         std::vector<std::string> commandParts);
 
     bool wasCommandTypedLongAgo(const std::time_t& t);
-
-    //void testMerge();
 
     StatWriter& statWriter;
     PlayerVector<Player*>& playerVector;

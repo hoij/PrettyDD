@@ -90,3 +90,14 @@ add_gmock_test(nano_test nanolib nano_test.cpp)
 add_gmock_test(xp_test xplib xp_test.cpp)
 add_gmock_test_2_libs(nano_programs_test nano_programslib loggerlib nano_programs_test.cpp)
 #add_gmock_test(command_handler_test command_handlerlib command_handler_test.cpp)
+
+add_executable(command_handler_test command_handler_test.cpp)
+target_link_libraries(command_handler_test gmock_main command_handlerlib stat_writerlib nano_program_writerlib
+  damage_writerlib xp_writerlib my_timelib playerlib)
+add_test(command_handler_test command_handler_test)
+
+add_custom_command(TARGET command_handler_test
+		   POST_BUILD
+		   COMMAND command_handler_test
+		   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		   COMMENT "Running command_handler_test" VERBATIM)

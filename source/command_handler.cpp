@@ -178,9 +178,6 @@ bool CommandHandler::execute(const LineInfo& li) {
             }
         }
     }
-    else {
-        errorLog.write("Too many commands: " + command);
-    }
 
     return shouldContinue;
 }
@@ -221,6 +218,14 @@ std::vector<std::string> CommandHandler::mergeQuotedText(
         else if (part.front() == '"' && part.size() == 1 && !insideQuote) {
             insideQuote = !insideQuote;
             quotedString += part + " ";
+        }
+        else if (part.front() == '"' &&
+                 part.back() == '"' &&
+                 part.size() == 1 &&
+                 insideQuote) {
+            quotedString += part;
+            result.push_back(quotedString);
+            insideQuote = !insideQuote;
         }
         else if (part.front() == '"' && part.size() == 1 && insideQuote) {
             quotedString += part + " ";
