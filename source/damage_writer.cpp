@@ -544,6 +544,12 @@ void DamageWriter::writePerType(const std::string& name,
     Misses are not logged by AO for players other than yourself.
     (Unless they are hitting you) */
 
+    // Don't write stats about the type "Regular Miss" for
+    // players other than you.
+    if (!self && name == "Regular Miss") {
+        return;
+    }
+
     std::string deflectHitPercentage =
         calcDeflectHitPercentage(d);
 
@@ -654,6 +660,12 @@ void DamageWriter::writePerTypeDetailed(const std::string& name,
     /* If the bool self is set then the details will contain misses.
     Misses are not not logged by AO for players other than yourself.
     (Unless they are hitting you) */
+
+    // Don't write stats about the type "Regular Miss" for
+    // players other than you.
+    if (!self && name == "Regular Miss") {
+        return;
+    }
 
     file << "<font color = " + lightBlue + ">" << nl <<
             place << ". " << name << "</font><br>" << nl;

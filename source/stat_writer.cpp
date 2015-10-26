@@ -194,7 +194,7 @@ void StatWriter::createCommands2() {
     writeCommand("xp");
     file << "</font><br>" << nl;
 
-    file << "Time" << "<br>" << nl
+    file << "General" << "<br>" << nl
          << "<font color = " + lightBlue + ">" << nl;
     writeCommand("pause", "Or \\\"stop\\\" pauses the timer used to calc DPM");
     writeCommand("resume", "Or \\\"start\\\" resumes the timer");
@@ -272,7 +272,7 @@ void StatWriter::createInfo2() {
          << "* CatHit% - See info 1<br>" << nl
          << "</font>"
 
-         << "XP Info<br>" << nl
+         << "XP<br>" << nl
          << "<font color = " + lightBlue + ">" << nl
          << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
          << "</font>";
