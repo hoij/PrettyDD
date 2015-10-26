@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "logger.h"
 #include "writer_helper.h"
 
 #include <iomanip>

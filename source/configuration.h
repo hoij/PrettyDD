@@ -2,8 +2,6 @@
 #define CONFIGURATION_H
 
 
-#include "logger.h"
-
 #include <fstream>
 #include <string>
 

@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "logger.h"
 
 #include <sstream>
 
@@ -13,8 +14,6 @@ bool Configuration::read() {
         getline(settings, logFilePath);
         getline(settings, key, '=');
         getline(settings, scriptsPath);
-        getline(settings, key, '=');
-
         // Decide wether to read the log form the start or from the end
         // Read the text "true" or "false and store it as a bool.
         parseFromEnd = getAndConvertToBool(settings);
@@ -32,10 +31,15 @@ bool Configuration::read() {
 }
 
 bool Configuration::getAndConvertToBool(std::ifstream& settings) {
+    std::string key;
     std::string s;
     bool b;
-    getline(settings, s, '=');
-    getline(settings, s);
+    getline(settings, key, '=');  // Read the key value
+    getline(settings, s);  // read what should be a bool string
+    if (s != "true" && s != "false") {
+        errorLog.write("Error: Expected \"true\" or \"false\" when reading "
+                       "the settings key \"" + key + "\". Instead got: " + s);
+    }
     std::istringstream(s) >> std::boolalpha >> b;
     return b;
 }
