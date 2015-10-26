@@ -64,7 +64,7 @@ protected:
         playerVector->startLogging();
         // Set up the return values
         d1 = createDamage(10);
-        d1 = createDamage(30);
+        d2 = createDamage(30);
 
         // Add players to the vector.
         p1 = addPlayerToVector("dealer1");
@@ -126,8 +126,8 @@ TEST_F(PlayerVectorTest, getDamageDealtPerType) {
     EXPECT_CALL(*p1, getTotalDamageDealtPerType())
         .WillOnce(::testing::Return(v));
 
-    std::vector<std::pair<std::string, Damage>> result;
-    result = playerVector->getDamageDealtPerType(p1->getName());
+    std::vector<std::pair<std::string, Damage>> result
+        = playerVector->getDamageDealtPerType(p1->getName());
     EXPECT_EQ(result[0].first, "type");
 
 
@@ -141,10 +141,13 @@ TEST_F(PlayerVectorTest, getDamageDealtPerType) {
 
 TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
     /*
-    Adds several players with different damage.
+    Adds several players.
+    Make p1 and p2 return empty damages (meaning
+    they should not be included in the vector).
     Gets total damage received per player.
-    Verifies that each player is called and that the
-    returned vector contains them all.
+    Verifie that each player is called and that the
+    returned vector contains players that have returned non-empty
+    damages.
     */
 
     // Add players to the vector.
@@ -157,13 +160,12 @@ TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
 
     Damage d3 = createDamage(7000);
     Damage d4 = createDamage(0);
-    Damage d5 = createDamage(500000);
-    Damage d6 = createDamage(1500);
+    Damage emptyDamage;
 
     EXPECT_CALL(*p1, getTotalDamageReceived())
-        .WillOnce(::testing::Return(d4));
+        .WillOnce(::testing::Return(emptyDamage));
     EXPECT_CALL(*p2, getTotalDamageReceived())
-        .WillOnce(::testing::Return(d4));
+        .WillOnce(::testing::Return(emptyDamage));
     EXPECT_CALL(*p3, getTotalDamageReceived())
         .WillOnce(::testing::Return(d1));
     EXPECT_CALL(*p4, getTotalDamageReceived())
@@ -180,7 +182,7 @@ TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
     for (const auto& p : result) {
         d += p.second;
     }
-    EXPECT_EQ(6, result.size());
+    EXPECT_EQ(4, result.size());
     EXPECT_EQ((d1 + d2 + d3 + d4).getTotal(), d.getTotal());
 }
 

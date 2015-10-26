@@ -132,8 +132,11 @@ TEST_F(AffectedPlayerVectorDamageTest, getDamageDealtOnPlayer) {
     std::vector<std::pair<std::string, Damage>> expected;
     expected.emplace_back("type", d2);
 
+    // It gets called twice (once to get size and
+    // once to return.
     EXPECT_CALL(*p2, getDamageDealtOnPlayer())
-        .WillOnce(::testing::Return(expected));
+        .WillOnce(::testing::Return(expected))
+        .WillOnce(::testing::Return(expected));;
 
     std::vector<std::pair<std::string, Damage>> result2 =
         affectedPlayerVector->getDamageDealtOnPlayer("dealer2");
