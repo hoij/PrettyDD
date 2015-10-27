@@ -46,4 +46,4 @@ Chose to parse the log form the beginning or the end by changing a setting param
 Damage per minute is individual per player and calculated form the time that a player first performs any action (e.g. hit or cast a nano) which adds it to the program.
 
 ## Install Instructions
-See the readme in the program package.
+See [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md)
