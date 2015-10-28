@@ -997,7 +997,9 @@ bool DamageWriter::playerFound(
     /* PlayerVector returns an empty vector if the player can't
     be found. */
     if (v.size() == 0) {
-        createNotFoundMessage(titleBase, playerName + " not found.");
+        createNotFoundMessage("No data logged for " + playerName,
+                              "Tried to display " + titleBase + " but " +
+                              playerName + " was not found.");
         return false;
     }
     return true;
@@ -1014,8 +1016,10 @@ bool DamageWriter::opponentFound(
     bool notFound = v.size() == 1 &&
                    (v[0].first == "empty");
     if (notFound) {
-        createNotFoundMessage(titleBase,
-                              opponentName + " not found among " +
+        createNotFoundMessage(opponentName + " not found among " +
+                              playerName + "'s opponents",
+                              "Tried to display " + titleBase + " but " +
+                              opponentName + " was not found among " +
                               playerName + "'s opponents.");
         return false;
     }

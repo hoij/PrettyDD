@@ -1,6 +1,7 @@
 #include "configuration.h"
 #include "nano_programs.h"
 #include "nano_program_writer.h"
+#include "player.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -20,11 +21,20 @@ void NanoProgramWriter::createCastedDetailedList() {
 
     Player* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
-        createNotFoundMessage(titleBase, "You not found.");
+        createNotFoundMessage("No data logged for \"You\"",
+                              "Tried to display " + titleBase + " but " +
+                              "could not find \\\"You\\\".");
         return;
     }
 
     const NanoPrograms& nanoPrograms = pp->getNanoPrograms();
+    if (nanoPrograms.empty()) {
+        createNotFoundMessage("No nano programs logged",
+            "Tried to display " + titleBase + " but " +
+            "could not find any nano programs for "
+            "\\\"You\\\".");
+        return;
+    }
     std::vector<std::string> v =
         nanoPrograms.getNanoProgramNames();
     sortByExecutes(v, nanoPrograms);

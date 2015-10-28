@@ -68,8 +68,8 @@ void WriterHelper::createNotFoundMessage(std::string title,
     if (!openFile("pdd")) {
         return;
     }
-    file << "<a href=\"text://" + message + "<br>" <<
-            "\">" + title + "</a>";
+    writeStartOfLink(message);
+    writeEndOfLink(title);
     closeFile();
 }
 

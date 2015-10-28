@@ -18,6 +18,8 @@ public:
     // called before retreiving the XP per Hour stats.
     void calcXPH(std::time_t timeActive);
 
+    bool empty() const;
+
     std::vector<std::string> getTypes() const;
 
     int getTotal(std::string type) const;

@@ -51,6 +51,10 @@ void XP::calcXPH(time_t timeActive) {
     }
 }
 
+bool XP::empty() const {
+    return stats.empty();
+}
+
 std::vector<std::string> XP::getTypes() const {
     std::vector<std::string> types;
     for (const auto& xp : stats) {

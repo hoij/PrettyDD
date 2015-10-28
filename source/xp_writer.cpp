@@ -13,19 +13,28 @@ XPWriter::XPWriter(PlayerVector<Player*>& playerVector,
 
 void XPWriter::createXPInfo() {
 
-    if (!openFile("pdd")) {
-        return;
-    }
-
     std::string title = "XP Info";
 
     Player* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
-        createNotFoundMessage(title, "You not found.");
+        createNotFoundMessage("No data logged for \"You\"",
+                              "Tried to display " + title + " but " +
+                              "could not find \\\"You\\\".");
         return;
     }
 
     const XP& xp = pp->getXp();
+
+    if (xp.empty()) {
+        createNotFoundMessage("No XP logged",
+                              "Tried to display " + title + " but " +
+                              "you have neither gained nor lost any XP.");
+        return;
+    }
+    
+    if (!openFile("pdd")) {
+        return;
+    }
 
     writeStartOfLink(title);
 
@@ -61,7 +70,7 @@ void XPWriter::writeXPHeadingsOverall() {
         "<font color = " + lightBlue + ">" << nl;
 
     file << std::setw(width+4) << " Total " <<
-            std::setw(width) << " XPH " <<
+            std::setw(width+1) << " XPH " <<
             "</font><br>" << std::setfill(' ') << nl;
 }
 

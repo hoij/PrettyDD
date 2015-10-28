@@ -13,6 +13,8 @@ class NanoPrograms {
 public:
     void add(LineInfo& li);
 
+    bool empty() const;
+
     std::vector<std::string> getNanoProgramNames() const;
 
     int getExecutes(std::string& name) const;

@@ -58,6 +58,10 @@ void NanoPrograms::addNanoProgram(std::string& subtype) {
     }
 }
 
+bool NanoPrograms::empty() const {
+    return nanoPrograms.empty();
+}
+
 std::vector<std::string> NanoPrograms::getNanoProgramNames() const {
     std::vector<std::string> nanoProgramNames;
     for (const auto& nanoProgram : nanoPrograms) {
