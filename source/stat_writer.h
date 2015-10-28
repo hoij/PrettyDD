@@ -16,7 +16,7 @@ class Damage;
 class Player;
 
 class StatWriter : public WriterHelper {
-// TODO: Split into smaller classes
+// TODO: Remove this class and move createHelp into it's own class.
 public:
     StatWriter(PlayerVector<Player*>& playerVector,
                Configuration& config,

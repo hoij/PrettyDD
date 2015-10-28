@@ -61,6 +61,7 @@ bool CommandHandler::execute(const LineInfo& li) {
         }
         else if (commandParts[1] == "reset") {
                 playerVector.reset();
+                statWriter.clearFile("pdd");
         }
         else if (commandParts[1] == "quit") {
             shouldContinue = false;

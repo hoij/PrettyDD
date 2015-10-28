@@ -28,6 +28,12 @@ void WriterHelper::closeFile() {
     file.close();
 }
 
+void WriterHelper::clearFile(std::string fileName) {
+    openFile(fileName);
+    file << "";
+    closeFile();
+}
+
 void WriterHelper::writeStartOfLink(std::string title) {
     file << "<a href=\"text://<font color = " + yellow + ">" <<
             title << "</font><br>" << nl;

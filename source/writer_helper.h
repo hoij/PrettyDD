@@ -18,6 +18,7 @@ public:
 
     bool openFile(std::string fileName);
     void closeFile();
+    void clearFile(std::string fileName);
     void writeStartOfLink(std::string title);
     void writeEndOfLink(std::string title);
     void writePlace(int place);
