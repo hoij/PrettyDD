@@ -73,6 +73,18 @@ INSTANTIATE_TEST_CASE_P(meHitByNano, ParseTest,
                              false,
                              false,
                              false,
+                             true)),
+        std::make_tuple(
+            FormattedLineStub("Me hit by nano",
+                             "You were attacked with nanobots for 9 points of unknown damage."),
+            ExtendedLineInfo("Unknown",
+                             "You",
+                             "damage",
+                             "unknown",
+                             9,
+                             false,
+                             false,
+                             false,
                              true))));
 
 INSTANTIATE_TEST_CASE_P(meHitByPlayer, ParseTest,
