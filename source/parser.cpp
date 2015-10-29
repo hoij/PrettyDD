@@ -457,6 +457,7 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     LineInfo li;
     li.type = "damage";
     std::smatch m;
+    // Find receiver
     if (regex_search(message, m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
                                         "(.*?)"			// match everything following, non-greedy
                                                         // i.e. until first occurrence, of
@@ -466,6 +467,11 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     else if (regex_search(message, m, regex("(.*?)(?= absorbed )"))) {
         li.receiver_name = m[1];
     }
+    else {
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
+    }
+    // Find dealer
     if (regex_search(message, m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
         if (m[0] == "Something") {
             li.dealer_name = "Unknown";
@@ -474,9 +480,14 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
             li.dealer_name = m[0];
         }
     }
-    else if (li.receiver_name == "Someone") {
-        li.dealer_name = "Unknown";  // There will be no dealer in this case.
+    else if (li.receiver_name == "Someone") {  // There will be no dealer in this message
+        li.dealer_name = "Unknown"; 
     }
+    else {
+        errorLog.write("Error: No dealer found in: ");
+        errorLog.write("Error:\t" + message);
+    }
+
     li.amount = findAmount(message);
     li.crit = isCrit(message);
     li.deflect = isDeflect(message);
@@ -498,16 +509,20 @@ LineInfo Parser::otherHitByNano(const std::string& message) {
     if (regex_search(message, m, regex("(?:from )(.*?)(?= for)"))) {
         li.dealer_name = m[1];
     }
-    else {
+    else if (regex_search(message, m, regex("was attacked with nanobots"))) {
         li.dealer_name = "Unknown";
+    }
+    else {
+        errorLog.write("Error: No dealer found in: ");
+        errorLog.write("Error:\t" + message);
     }
     // Find receiver
     if (regex_search(message, m, regex("(.*?)(?= was attacked)"))) {
         li.receiver_name = m[0];
     }
     else {
-        errorLog.write("Warning: Could not find a receiver in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     li.nanobots = true;
@@ -533,8 +548,8 @@ LineInfo Parser::youHitOther(const std::string& message) {
         li.receiver_name = m[1];
     }
     else {
-        errorLog.write("Could not find a receiver in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     li.crit = isCrit(message);
@@ -554,11 +569,10 @@ LineInfo Parser::youHitOtherWithNano(const std::string& message) {
         li.receiver_name = m[1];
     }
     else {
-        errorLog.write("Could not find a receiver in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
-    // TODO: Can this deflect?
     li.nanobots = true;
     return li;
 }
@@ -602,8 +616,8 @@ LineInfo Parser::youGaveHealth(const std::string& message) {
         li.receiver_name = m[1];
     }
     else {
-        errorLog.write("Could not find a receiver in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     return li;
@@ -628,8 +642,8 @@ LineInfo Parser::meHitByMonster(const std::string& message) {
         }
     }
     else {
-        errorLog.write("Warning: Could not find a dealer in: ");
-        errorLog.write("Warning:\t" + message);
+        errorLog.write("Error: No dealer found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     li.crit = isCrit(message);
@@ -651,8 +665,12 @@ LineInfo Parser::meHitByNano(const std::string& message) {
     if (regex_search(message, m, regex("(?:from )(.*?)(?= for)"))) {
         li.dealer_name = m[1];
     }
-    else {
+    else if (regex_search(message, m, regex("nanobots for"))) {
         li.dealer_name = "Unknown";
+    }
+    else {
+        errorLog.write("Error: No dealer found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     li.nanobots = true;
@@ -671,6 +689,10 @@ LineInfo Parser::meHitByPlayer(const std::string& message) {
     if (regex_search(message, m, regex("(?:Player )(.*?)(?= hit you for )")) ||
         regex_search(message, m, regex("(.*?)(?= hit you for )"))) {
         li.dealer_name = m[1];
+    }
+    else {
+        errorLog.write("Error: No dealer found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     li.crit = isCrit(message);
@@ -695,6 +717,10 @@ LineInfo Parser::otherMisses(const std::string& message) {
             li.receiver_name = "You";
         }
     }
+    else {
+        errorLog.write("Error: Neither dealer nor receiver found in: ");
+        errorLog.write("Error:\t" + message);
+    }
     li.miss = true;
     return li;
 }
@@ -712,6 +738,10 @@ LineInfo Parser::yourMisses(const std::string& message) {
     if (regex_search(message, m, regex("(?:attack )(.*?)(?= with )")) ||
         regex_search(message, m, regex("(?:hit )(.*)(?:, but missed!)"))) {
         li.receiver_name = m[1];
+    }
+    else {
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.miss = true;
     return li;
@@ -749,17 +779,13 @@ LineInfo Parser::meCastNano(const std::string& message) {
     ["#0000000042000018#","Me Cast Nano","",1434561648]Executing Nano Program: Uncontrollable Body Tremors.
     ["#0000000042000018#","Me Cast Nano","",1434561650]Your target countered the nano program.
 
-    TODO:
     This nano will execute twice. It will cast the HP buff, then heal.
-    When the last nano has received a status (land/resist etc.) I could clear the pointer.
-    If then another status message arrives, I can ignore it.
     ["#0000000042000018#","Me Cast Nano","",1434562392]Executing Nano Program: Team Improved Life Channeler.
     ["#0000000042000018#","Me Cast Nano","",1434562393]Nano program executed successfully.
     ["#0000000042000015#","Me got health","",1434562393]You were healed for 3025 points.
     ["#0000000042000018#","Me Cast Nano","",1434562393]Nano program executed successfully.
 
-    TODO:
-    Randomly this message can appear. Possibly when a proc fires. Need to handle it.
+    Randomly this message can appear. Possibly when a proc fires.
     ["#0000000042000018#","Me Cast Nano","",1442506417]Nano program executed successfully.
     */
     LineInfo li;
@@ -773,7 +799,7 @@ LineInfo Parser::meCastNano(const std::string& message) {
 }
 
 LineInfo Parser::yourPetHitByNano(const std::string& message) {
-    // Find example
+    // TODO: Find example
     LineInfo li;
     li.type = "damage";
     li.amount = findAmount(message);
@@ -785,7 +811,7 @@ LineInfo Parser::yourPetHitByMonster(const std::string& message) {
     /* Find my own log line, also find one of these when it this "you" and "other".
     ["#0000000042000011#","Your pet hit by monster","",1191516331]Your pet Vios was damaged by a toxic substance for 25 points of damage.
 
-    There must be other variations of this type too. Find them.
+    TODO: There must be other variations of this type too. Find them.
     */
     LineInfo li;
     li.type = "damage";
@@ -795,8 +821,8 @@ LineInfo Parser::yourPetHitByMonster(const std::string& message) {
         li.receiver_name = m[1];
     }
     else {
-        errorLog.write("Could not find a receiver in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     li.crit = isCrit(message);
@@ -876,8 +902,8 @@ LineInfo Parser::youGaveNano(const std::string& message) {
         li.receiver_name = m[1];
     }
     else {
-        errorLog.write("Could not find a receiver in: ");
-        errorLog.write("\t" + message);
+        errorLog.write("Error: No receiver found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     return li;
@@ -895,8 +921,8 @@ LineInfo Parser::meGotNano(const std::string& message) {
         li.dealer_name = m[1];
     }
     else {
-        errorLog.write("Warning: Could not find a dealer in: ");
-        errorLog.write("Warning:\t" + message);
+        errorLog.write("Error: No dealer found in: ");
+        errorLog.write("Error:\t" + message);
     }
     li.amount = findAmount(message);
     return li;
