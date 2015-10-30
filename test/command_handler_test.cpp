@@ -1,10 +1,12 @@
 #include "command_handler.h"
 #include "configuration.h"
 #include "damage_writer.h"
+#include "help_writer.h"
 #include "my_time.h"
 #include "nano_program_writer.h"
+#include "player.h"
 #include "player_vector.h"
-#include "stat_writer.h"
+#include "writer_helper.h"
 #include "xp_writer.h"
 
 #include <gtest/gtest.h>
@@ -15,17 +17,20 @@ TEST(CommandHandlerTest, splitAndMergeQuotedText) {
     std::ofstream file;
     PlayerVector<Player*> playerVector("playerRunningProgram");
     Configuration config;
-    NanoProgramWriter nanoProgramWriter(playerVector, config, file);
     DamageWriter damageWriter(playerVector, config, file);
-    XPWriter xpWriter(playerVector, config, file);
-    StatWriter statWriter(playerVector,
-                          config,
-                          nanoProgramWriter,
-                          damageWriter,
-                          xpWriter,
-                          file);
+    HelpWriter helpWriter(config, file);
     MyTime myTime;
-    CommandHandler commandHandler(statWriter, playerVector, myTime);
+    NanoProgramWriter nanoProgramWriter(playerVector, config, file);
+    WriterHelper writerHelper(config, file);
+    XPWriter xpWriter(playerVector, config, file);
+    CommandHandler commandHandler(playerVector,
+                                  file,
+                                  damageWriter,
+                                  helpWriter,
+                                  myTime,
+                                  nanoProgramWriter,
+                                  writerHelper,
+                                  xpWriter);
 
     std::string text1 = "pdd \"Player1\" \"Player 2\" s";
     std::vector<std::string> expected1 = {"pdd", "Player1", "Player 2", "s"};

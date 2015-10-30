@@ -5,6 +5,22 @@
 #include <sstream>
 #include <vector>
 
+CommandHandler::CommandHandler(PlayerVector<Player*>& playerVector,
+                               std::ofstream& file,
+                               DamageWriter& damageWriter,
+                               HelpWriter& helpWriter,
+                               MyTimeInterface& myTime,
+                               NanoProgramWriter& nanoProgramWriter,
+                               WriterHelper& writerHelper,
+                               XPWriter& xpWriter) :
+    playerVector(playerVector),
+    damageWriter(damageWriter),
+    myTime(myTime),
+    nanoProgramWriter(nanoProgramWriter),
+    helpWriter(helpWriter),
+    writerHelper(writerHelper),
+    xpWriter(xpWriter) {}
+
 
 bool CommandHandler::execute(const LineInfo& li) {
 
@@ -25,31 +41,31 @@ bool CommandHandler::execute(const LineInfo& li) {
     // some other way of handling this.
     if (nrOfOptions == 0) {
         // Write the detailed top list by defualt:
-        statWriter.createDDDetailedTopList();
+        damageWriter.createDDDetailedTopList();
     }
     else if (nrOfOptions == 1) {
         // No extra options on top/dtop/types will print damage dealt
         // as it's the most common thing to want.
         if (commandParts[1] == "top") {
-            statWriter.createDDTopList();
+            damageWriter.createDDTopList();
         }
         else if (commandParts[1] == "dtop") {
-            statWriter.createDDDetailedTopList();
+            damageWriter.createDDDetailedTopList();
         }
         else if (commandParts[1] == "types") {
-            statWriter.createDDPerType("You");
+            damageWriter.createDDPerType("You");
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDPerTypeDetailed("You");
+            damageWriter.createDDPerTypeDetailed("You");
         }
         else if (commandParts[1] == "np") {
-            statWriter.createNanoProgramsCastedDetailedList();
+            nanoProgramWriter.createCastedDetailedList();
         }
         else if (commandParts[1] == "xp") {
-            statWriter.createXPInfo();
+            xpWriter.createXPInfo();
         }
         else if (commandParts[1] == "help") {
-            statWriter.createHelp();
+            helpWriter.createHelp();
         }
         else if (commandParts[1] == "start" ||
                  commandParts[1] == "resume") {
@@ -61,120 +77,123 @@ bool CommandHandler::execute(const LineInfo& li) {
         }
         else if (commandParts[1] == "reset") {
                 playerVector.reset();
-                statWriter.clearFile("pdd");
+                writerHelper.clearFile("pdd");
         }
         else if (commandParts[1] == "quit") {
             shouldContinue = false;
         }
         else {
-            statWriter.createDDPerOpponent(commandParts[1]);
+            damageWriter.createDDPerOpponent(commandParts[1]);
         }
     }
     else if (nrOfOptions == 2) {
         if (commandParts[1] == "opp") {
-            statWriter.createDDPerOpponent(commandParts[2]);
+            damageWriter.createDDPerOpponent(commandParts[2]);
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDPerTypeDetailed(commandParts[2]);
+            damageWriter.createDDPerTypeDetailed(commandParts[2]);
         }
         else if (commandParts[1] == "dr") {
             if (commandParts[2] == "top") {
-                statWriter.createDRTopList();
+                damageWriter.createDRTopList();
             }
             else if (commandParts[2] == "dtop") {
-                statWriter.createDRDetailedTopList();
+                damageWriter.createDRDetailedTopList();
             }
             else if (commandParts[2] == "types") {
-                statWriter.createDRPerType("You");
+                damageWriter.createDRPerType("You");
             }
             else if (commandParts[2] == "dtypes") {
-                statWriter.createDRPerTypeDetailed("You");
+                damageWriter.createDRPerTypeDetailed("You");
             }
             else {
-                statWriter.createDRPerOpponent(commandParts[2]);
+                damageWriter.createDRPerOpponent(commandParts[2]);
             }
         }
         else if (commandParts[1] == "h") {  // Heal
             if (commandParts[2] == "top") {
-                //statWriter.createHealReceivedTopList();
+                //healWriter.createHealReceivedTopList();
             }
             else if (commandParts[2] == "dtop") {
-                //statWriter.createHealReceivedDetailedTopList();
+                //healWriter.createHealReceivedDetailedTopList();
             }
             else if (commandParts[2] == "dealt") {
-                //statWriter.createHealDealtPerReceiver();
+                //healWriter.createHealDealtPerReceiver();
             }
         }
         else if (commandParts[1] == "n") {  // Nano
             if (commandParts[2] == "top") {
-                //statWriter.createNanoReceivedTopList();
+                //nanoWriter.createNanoReceivedTopList();
             }
             else if (commandParts[2] == "dtop") {
-                //statWriter.createNanoReceivedDetailedTopList();
+                //nanoWriter.createNanoReceivedDetailedTopList();
             }
             else if (commandParts[2] == "dealt") {
-                //statWriter.createNanoDealtPerReceiver();
+                //nanoWriter.createNanoDealtPerReceiver();
             }
         }
         else if (commandParts[1] == "np") {  // Nano Program
             if (commandParts[2] == "casted") {
-                statWriter.createNanoProgramsCastedDetailedList();
+                nanoProgramWriter.createCastedDetailedList();
             }
             else if (commandParts[2] == "received") {
-                //statWriter.createNanoProgramsReceived();
+                //nanoProgramWriter.createNanoProgramsReceived();
             }
         }
         else if (commandParts[1] == "types") {
-                statWriter.createDDPerType(commandParts[2]);
+                damageWriter.createDDPerType(commandParts[2]);
         }
         else {
-            statWriter.createDDPerType(commandParts[1], commandParts[2]);
+            damageWriter.createDDPerType(commandParts[1], commandParts[2]);
         }
     }
     else if (nrOfOptions == 3) {
         if (commandParts[1] == "dr") {
             if (commandParts[2] == "types") {
-                statWriter.createDRPerType(commandParts[3]);
+                damageWriter.createDRPerType(commandParts[3]);
+            }
+            else if (commandParts[2] == "dtypes") {
+                damageWriter.createDRPerTypeDetailed(commandParts[3]);
             }
             else if (commandParts[2] == "opp") {
-                statWriter.createDRPerOpponent(commandParts[3]);
+                damageWriter.createDRPerOpponent(commandParts[3]);
             }
             else {
-                statWriter.createDRPerType(commandParts[2], commandParts[3]);
+                damageWriter.createDRPerType(commandParts[2], commandParts[3]);
             }
         }
         else if (commandParts[1] == "np") {  // Nano Program
             if (commandParts[2] == "casted" &&
                 commandParts[3] == "t") {
-                //statWriter.createNanoProgramsCastedPerTarget();
+                //nanoProgramWriter.createNanoProgramsCastedPerTarget();
             }
             else if (commandParts[2] == "received" &&
                      commandParts[3] == "t") {
-                //statWriter.createNanoProgramsReceivedPerTarget();
+                //nanoProgramWriter.createNanoProgramsReceivedPerTarget();
             }
             else if (commandParts[2] == "casted") {
-                //statWriter.createNanoProgramsCastedOnTarget(commandParts[3]);
+                //nanoProgramWriter.createNanoProgramsCastedOnTarget(commandParts[3]);
             }
             else if (commandParts[2] == "received") {
-                //statWriter.createNanoProgramsReceivedFromTarget(
+                //nanoProgramWriter.createNanoProgramsReceivedFromTarget(
                 //    commandParts[3]);
             }
         }
         else if (commandParts[1] == "types") {
-            statWriter.createDDPerType(commandParts[2], commandParts[3]);
+            damageWriter.createDDPerType(commandParts[2], commandParts[3]);
         }
         else if (commandParts[1] == "dtypes") {
-            statWriter.createDDPerTypeDetailed(commandParts[2],
+            damageWriter.createDDPerTypeDetailed(commandParts[2],
                                                commandParts[3]);
         }
     }
     else if (nrOfOptions == 4) {
         if (commandParts[1] == "dr") {
             if (commandParts[2] == "types") {
-                statWriter.createDRPerType(commandParts[3], commandParts[4]);
+                damageWriter.createDRPerType(commandParts[3], commandParts[4]);
             }
             else if (commandParts[2] == "dtypes") {
-                statWriter.createDRPerTypeDetailed(commandParts[3],
+                damageWriter.createDRPerTypeDetailed(commandParts[3],
                                                    commandParts[4]);
             }
         }

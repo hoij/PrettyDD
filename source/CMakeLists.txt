@@ -39,9 +39,11 @@ add_library(nano_program_writerlib nano_program_writer.cpp)
 target_link_libraries(nano_program_writerlib nano_programslib configurationlib writer_helperlib)
 add_library(xp_writerlib xp_writer.cpp)
 target_link_libraries(xp_writerlib xplib configurationlib writer_helperlib)
-add_library(stat_writerlib stat_writer.cpp)
-target_link_libraries(stat_writerlib configurationlib nano_program_writerlib damage_writerlib writer_helperlib)
+add_library(help_writerlib help_writer.cpp)
+target_link_libraries(help_writerlib configurationlib writer_helperlib)
 add_library(command_handlerlib command_handler.cpp)
+target_link_libraries(command_handlerlib damage_writerlib help_writerlib
+	my_timelib nano_program_writerlib playerlib writer_helperlib xp_writerlib)
 
 target_link_libraries(PrettyDD
   damagelib
@@ -57,8 +59,8 @@ target_link_libraries(PrettyDD
   damage_writerlib
   nano_program_writerlib
   xp_writerlib
-  stat_writerlib
   configurationlib
   command_handlerlib
   my_timelib
+  help_writerlib
   )

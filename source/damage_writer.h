@@ -5,6 +5,7 @@
 #include "player_vector.h"
 #include "writer_helper.h"
 
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>

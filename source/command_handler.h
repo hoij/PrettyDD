@@ -2,11 +2,15 @@
 #define COMMAND_HANDLER_H
 
 
-#include "my_time_interface.h"
-#include "player_vector.h"
-#include "stat_writer.h"
-
+#include "damage_writer.h"
 #include "gtest/gtest_prod.h"
+#include "help_writer.h"
+#include "my_time_interface.h"
+#include "nano_program_writer.h"
+#include "player.h"
+#include "player_vector.h"
+#include "writer_helper.h"
+#include "xp_writer.h"
 
 #include <string>
 
@@ -14,12 +18,15 @@ class LineInfo;
 
 class CommandHandler {
 public:
-    CommandHandler(StatWriter& statWriter,
-                   PlayerVector<Player*>& playerVector,
-                   MyTimeInterface& myTime) :
-        statWriter(statWriter),
-        playerVector(playerVector),
-        myTime(myTime) {}
+    CommandHandler(PlayerVector<Player*>& playerVector,
+                   std::ofstream& file,
+                   DamageWriter& damageWriter,
+                   HelpWriter& helpWriter,
+                   MyTimeInterface& myTime,
+                   NanoProgramWriter& nanoProgramWriter,
+                   WriterHelper& writerHelper,
+                   XPWriter& xpWriter);
+
     CommandHandler& operator=(CommandHandler rhs) = delete;
     bool execute(const LineInfo& li);
 
@@ -31,9 +38,13 @@ private:
 
     bool wasCommandTypedLongAgo(const std::time_t& t);
 
-    StatWriter& statWriter;
-    PlayerVector<Player*>& playerVector;
+    DamageWriter& damageWriter;
+    HelpWriter& helpWriter;
     MyTimeInterface& myTime;
+    NanoProgramWriter& nanoProgramWriter;
+    PlayerVector<Player*>& playerVector;
+    WriterHelper& writerHelper;
+    XPWriter& xpWriter;
 };
 
 
