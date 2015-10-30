@@ -24,11 +24,13 @@ int main(void) {
     errorLog.write("");
     errorLog.write("Info: Program started at: " + myTime.currentTimeString());
 
+    // Read config
     Configuration config;
     if(!config.read()) {
         return 1;
     }
 
+    // Instantiate classes
     Parser parser(config.getPlayerRunningProgram());
     PlayerVector<Player*> playerVector(config.getPlayerRunningProgram());
     playerVector.startLogging();
@@ -48,6 +50,7 @@ int main(void) {
                                   writerHelper,
                                   xpWriter);
 
+    // Open the AO log
     // TODO: Move into parser or new class.
     std::ifstream logstream(config.getLogFilePath());
     if (!logstream.is_open()) {
@@ -66,14 +69,21 @@ int main(void) {
 
     std::string line;
     bool isRunning = true;
+    // Parse loop
     while (isRunning) {
+        // If there are no more lines to read
         if(!std::getline(logstream, line) || logstream.eof()) {
-            // Check the end to see if the file has shrunk.
-            // If it has, then move back to the new end.
+
+            /* Handle the case when the log file shrinks (for example
+            when it's deleted). */
             logstream.clear();
+            // Seek to the end and save that position
             logstream.seekg(0, logstream.end);
             endpos = logstream.tellg();
             logstream.clear();
+            // Compare the end with the position of the last char read
+            // to see if the file has shrunk. If it has, then move back
+            // to the new end.
             logstream.seekg((endpos < lastpos) ? endpos : lastpos);
 
             // Sleep to get less CPU intensive
@@ -83,8 +93,8 @@ int main(void) {
 
         // Format and parse the log line
         FormattedLine formattedLine(line);
-        if (formattedLine.isFormatted()) {
-            LineInfo lineInfo = parser.parse(formattedLine);
+        if (formattedLine.isFormatted()) {  // If successfully formatted
+            LineInfo lineInfo = parser.parse(formattedLine);  // Parse it
             if(lineInfo.hasStats) {
                 playerVector.addToPlayers(lineInfo);
             }
@@ -93,6 +103,7 @@ int main(void) {
             }
         }
 
+        // Save position of the last char read.
         lastpos = logstream.tellg();
     }
 
