@@ -281,6 +281,10 @@ std::string Parser::findNanoCastSubtype(const std::string& message) {
     else if (message.find("Not") != std::string::npos) {
         return "";
     }
+    // "You must be standing up to execute a nano program."
+    else if (message.find("You must") != std::string::npos) {
+        return "";
+    }
 
     // "You can't execute nano programs on items."
     // This message is preceeded by "Executing Nano Program:"
