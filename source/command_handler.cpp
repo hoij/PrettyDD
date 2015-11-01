@@ -65,7 +65,8 @@ bool CommandHandler::execute(const LineInfo& li) {
             xpWriter.createXPInfo();
         }
         else if (commandParts[1] == "help") {
-            helpWriter.createHelp();
+            std::string fileName = "pdd";
+            helpWriter.createHelp(fileName);
         }
         else if (commandParts[1] == "start" ||
                  commandParts[1] == "resume") {

@@ -59,6 +59,9 @@ int main(void) {
     }
     logstream.clear();
 
+    // Create the help script on startup
+    helpWriter.createHelp("pddhelp");
+
     // Read from the end of the file if true,
     // otherwise read from the start.
     if (config.shouldParseFromEnd()) {

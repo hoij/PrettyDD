@@ -5,8 +5,8 @@ HelpWriter::HelpWriter(Configuration& config,
                        std::ofstream& file) :
                        WriterHelper(config, file) {}
 
-void HelpWriter::createHelp() {
-    if (!openFile("pdd")) {
+void HelpWriter::createHelp(std::string fileName) {
+    if (!openFile(fileName)) {
         return;
     }
 
