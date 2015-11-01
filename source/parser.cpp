@@ -21,6 +21,7 @@ Parser::Parser(std::string playerRunningProgram) :
 
     specials.emplace("Aimed Shot");
     specials.emplace("Brawling");
+    specials.emplace("Backstab");
     specials.emplace("Burst");
     specials.emplace("Dimach");
     specials.emplace("Fast Attack");
