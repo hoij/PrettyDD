@@ -88,10 +88,7 @@ bool CommandHandler::execute(const LineInfo& li) {
         }
     }
     else if (nrOfOptions == 2) {
-        if (commandParts[1] == "opp") {
-            damageWriter.createDDPerOpponent(commandParts[2]);
-        }
-        else if (commandParts[1] == "dtypes") {
+        if (commandParts[1] == "dtypes") {
             damageWriter.createDDPerTypeDetailed(commandParts[2]);
         }
         else if (commandParts[1] == "dr") {
@@ -155,9 +152,6 @@ bool CommandHandler::execute(const LineInfo& li) {
             }
             else if (commandParts[2] == "dtypes") {
                 damageWriter.createDRPerTypeDetailed(commandParts[3]);
-            }
-            else if (commandParts[2] == "opp") {
-                damageWriter.createDRPerOpponent(commandParts[3]);
             }
             else {
                 damageWriter.createDRPerType(commandParts[2], commandParts[3]);

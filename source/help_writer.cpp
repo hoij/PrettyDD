@@ -10,164 +10,101 @@ void HelpWriter::createHelp(std::string fileName) {
         return;
     }
 
+    createInfo();
     createCommands1();
     createCommands2();
-    createInfo1();
-    createInfo2();
+
 
     closeFile();
 }
 
+void HelpWriter::createInfo() {
+
+    writeStartOfLink("Welcome to PrettyDD!");
+    file << "PrettyDD generates script files based on commands spoken into chat channels.<br>" << nl
+         << "<br>" << nl
+         << "<font color = " + yellow + ">" << nl
+         << "Usage"
+         << "</font><br>" << nl
+         << "Begin a command with:<br>" << nl;
+    writeCommand("pdd");
+    file << "<br>" << nl
+
+         << "Then add one of the options from the command list.<br>" << nl
+         << "Examples:<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "  pdd top<br>" << nl
+         << "  pdd dtop<br>" << nl
+         << "  pdd types" << nl
+         << "</font><br><br>" << nl << nl
+
+         << "Show the result by typing:<br>" << nl;
+    writeCommand("/pdd");
+    file << "<br>" << nl
+         << "<font color = " + yellow + ">" << nl
+         << "----------------------------------" << nl
+         << "</font><br><br>" << nl << nl
+
+         << "You can show this help by typing:<br>" << nl;
+    writeCommand("/pddhelp");
+    file << "<br>" << nl
+         << "For a complete list of commands, see the \\\"commands\\\" section.<br>" << nl
+         << "For detailed information, see the README.";
+
+    writeEndOfLink("Info");
+}
+
 void HelpWriter::createCommands1() {
 
-    writeStartOfLink("PDD Commands 1(2)");
+    writeStartOfLink("Commands 1(2)");
 
-    file << "<br>" << nl <<
-        "PrettyDD generates script files based on commands spoken into "
-        "chat channels.<br>" << nl <<
-        "Each command begins with \\\"pdd\\\" and is followed with options "
-        "from the command list.<br>" << nl <<
-        "Example:<br>" << nl <<
-        "<font color = " + lightBlue + ">" << nl;
-    writeCommand("pdd dr Sgtcuddle");
-    file << "</font>" << nl <<
-        "To show the generated script, type:<br>" << nl <<
-        "<font color = " + lightBlue + ">" << nl;
-    writeCommand("/pdd<br>");
-    file << "</font>" << nl << nl <<
-        "Damage Dealt:" << "<br>" << nl <<
-        "<font color = " + lightBlue + ">" << nl;
-    writeCommand("top");
+    file << "<br>" << nl;
+    writeCommand("top","Simple list of damage dealers");
     writeCommand("dtop", "Detailed top list");
-    writeCommand("opp [player]", "Damage per opponent for player");
-    writeCommand("[player]", "As above");
-    writeCommand("types", "Damage per type for you");
-    writeCommand("types [player]", "Damage per type for player");
-    writeCommand("types [player1] [player2]", "Damage per type on player2 by player1");
-    writeCommand("[player1] [player2]", "As above");
-    writeCommand("dtypes", "Detailed damage per type for you");
-    writeCommand("dtypes [player1]", "Detailed damage per type for player");
-    writeCommand("dtypes [player1] [player2]",
-        "Detailed damage per type on player2 by player1");
-    file << "</font><br>" << nl;
+    writeCommand("[Player]", "Damage per opponent by the specified player");
+    writeCommand("types", "Damage per type by you");
+    writeCommand("types [Player1] [Player2]", "Damage per type by specified player(s)");
+    writeCommand("dtypes", "Detailed damage per type by you");
+    writeCommand("dtypes [Player1] [Player2]", "Detailed damage per type by specified player(s)");
+    file << "<br>" << nl
+         << "<font color = " + yellow + ">" << nl
+         << "----------------------------------" << nl
+         << "</font><br><br>" << nl << nl
 
-    writeEndOfLink("PDD Commands 1(2)");
+         << "You can also show damage received by adding <font color = #3399FF>dr</font> after pdd.<br>" << nl
+         << "Examples:<br>" << nl
+         << "<font color = " + lightBlue + ">" << nl
+         << "  pdd dr top<br>" << nl
+         << "  pdd dr Player<br>" << nl
+         << "  pdd dr types Player1 \\\"The Beast\\\"" << nl
+         << "</font><br><br>" << nl << nl
+    
+         << "Note that player names are case sensitive.";
+
+    writeEndOfLink("Commands 1(2)");
 }
 
 void HelpWriter::createCommands2() {
 
-    writeStartOfLink("PDD Commands 2(2)");
+    writeStartOfLink("Commands 2(2)");
 
-    file << "<br>" <<
-        "Damage Received" << "<br>" << nl;
-    file << "All the damage dealt commands are available when showing "
-        "damage received.<br>" << nl <<
-        "Put a \\\"dr\\\" behind \\\"pdd\\\" then follow "
-        "with a command from the damage dealt list. Example:<br>" << nl;
-    file << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("pdd dr dtypes [player1] [player2]", "Which btw is the "
-        "same as \\\"pdd dtypes [player2] [player1]\\\"");
-    file << "</font><br>" << nl
-
-        << "Nano Program" << "<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("np");
-    file << "</font><br>" << nl;
-
-    file << "Experience" << "<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("xp");
-    file << "</font><br>" << nl;
-
-    file << "General" << "<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl;
-    writeCommand("pause", "Or \\\"stop\\\" pauses the timer used to calc DPM");
+    file << "<br>" << nl;
+    writeCommand("np", "Shows a detailed list of casted nanoprograms");
+    file << "<br>" << nl;
+    writeCommand("xp", "Shows information on XP/SK/PVP Score gained<br>");
+    writeCommand("pause", "Or \\\"stop\\\" pauses the timer used to calculate DPM");
     writeCommand("resume", "Or \\\"start\\\" resumes the timer");
-    writeCommand("reset", "Clears everything logged and starts anew directly");
-    writeCommand("quit");
-    file << "</font><br>" << nl;
-
-    file << "Help" << "<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl;
+    writeCommand("reset", "Resets current session");
+    writeCommand("quit", "Closes PrettyDD");
+    file << "<br>" << nl;
     writeCommand("help", "Shows this help");
-    file << "</font>";
 
-    writeEndOfLink("PDD Commands 2(2)");
-}
-
-void HelpWriter::createInfo1() {
-
-    writeStartOfLink("PDD Info 1(2)");
-
-    file << "<br>" << nl
-        << "Stats Info<br><br>" << nl << nl
-
-        << "CatHit% (Category Hit %) for Normal, Crit, Deflect and Miss<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* Category hit rate is calculated in the following way:<br>" << nl
-        << "   nr of x / "
-           "(normal hits + crits (if existing) + deflects + misses)<br><br>"
-        << nl << nl
-        << "</font>"
-
-        << "TotHit% (Total Hit %)<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* Total hit rate is calculated in the following way:<br>" << nl
-        << "   nr of x / all attacks for that type<br><br>" << nl << nl
-        << "</font>"
-
-        << "DPM<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* DPM is calculated individually from the first action "
-           "(attack, heal, nano cast, etc.) to the last action."
-           "<br><br>" << nl << nl
-        << "</font>";
-
-    writeEndOfLink("PDD Info 1(2)");
-}
-
-void HelpWriter::createInfo2() {
-
-    writeStartOfLink("PDD Info 2(2)");
-
-    file << "<br>" << nl
-        << "Damage per Player, Opponent and Detailed Top List<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* Regular, special, nanobot and shield % is % of total damage<br>" << nl
-        << "* Crit, deflect and miss % is % of hits that can "
-        "crit, deflect or miss (CatHit%)<br><br>" << nl << nl
-        << "</font>"
-
-        << "Damage per Type (types)<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* Regular and nanobot % is % of total damage<br>" << nl
-        << "* Crit, deflect and miss % is % of hits that can "
-        "crit, deflect or miss (CatHit%)<br>" << nl
-        << "* A blank line means that the stat isn't possible to log "
-        "or doesn't exist<br>"
-        << "* Misses from regular attacks have no type info and can't "
-        "be logged per type. Regular misses are instead "
-        "shown as a separate type<br><br>" << nl << nl
-        << "</font>"
-
-        << "Detailed Damage per Type (dtypes)<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* Regular Total is the sum of normal, crit and deflect<br>" << nl
-        << "* Damage % is % of total damage<br>" << nl
-        << "* TotHit% - See info 1<br>" << nl
-        << "* CatHit% - See info 1<br><br>" << nl
-        << "</font>"
-
-        << "XP<br>" << nl
-        << "<font color = " + lightBlue + ">" << nl
-        << "* Min xp gained ignores xp of value 1.<br><br>" << nl << nl
-        << "</font>";
-
-    writeEndOfLink("PDD Info 2(2)");
+    writeEndOfLink("Commands 2(2)");
 }
 
 void HelpWriter::writeCommand(std::string command, std::string description) {
-    file << "  " << command;
+    file << "<font color = " + lightBlue + ">" << nl
+         << "  " << command << "</font>";
     if (!description.empty()) {
         file << " --> " << description;
     }
