@@ -57,7 +57,7 @@ Chose to parse the log form the beginning or the end by changing a paramater in 
 * A stat that isn't possible to log or doesn't exist is shown as a blank line
 * Misses from regular attacks have no type info and can't be logged per type. Regular misses are instead shown as a separate type.
 
-####Detailed Damage per Type (dtypes)
+####Detailed Damage per Type (dtypes [Player1] [Player2])
 * "Regular Total" is the sum of normal, crit and deflect damage
 * "Dmg%" is calculated as percentage of total damage
 * "TotHit%" (Total hit percentage) is calculated as percentage of all hits for that type
