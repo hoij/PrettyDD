@@ -23,12 +23,11 @@ TEST(CommandHandlerTest, splitAndMergeQuotedText) {
     NanoProgramWriter nanoProgramWriter(playerVector, config, file);
     WriterHelper writerHelper(config, file);
     XPWriter xpWriter(playerVector, config, file);
-    CommandHandler commandHandler(playerVector,
-                                  file,
-                                  damageWriter,
+    CommandHandler commandHandler(damageWriter,
                                   helpWriter,
                                   myTime,
                                   nanoProgramWriter,
+				  playerVector,
                                   writerHelper,
                                   xpWriter);
 

@@ -5,19 +5,18 @@
 #include <sstream>
 #include <vector>
 
-CommandHandler::CommandHandler(PlayerVector<Player*>& playerVector,
-                               std::ofstream& file,
-                               DamageWriter& damageWriter,
+CommandHandler::CommandHandler(DamageWriter& damageWriter,
                                HelpWriter& helpWriter,
                                MyTimeInterface& myTime,
                                NanoProgramWriter& nanoProgramWriter,
+                               PlayerVector<Player*>& playerVector,
                                WriterHelper& writerHelper,
                                XPWriter& xpWriter) :
-    playerVector(playerVector),
     damageWriter(damageWriter),
+    helpWriter(helpWriter),
     myTime(myTime),
     nanoProgramWriter(nanoProgramWriter),
-    helpWriter(helpWriter),
+    playerVector(playerVector),
     writerHelper(writerHelper),
     xpWriter(xpWriter) {}
 

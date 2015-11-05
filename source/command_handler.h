@@ -18,12 +18,11 @@ class LineInfo;
 
 class CommandHandler {
 public:
-    CommandHandler(PlayerVector<Player*>& playerVector,
-                   std::ofstream& file,
-                   DamageWriter& damageWriter,
+    CommandHandler(DamageWriter& damageWriter,
                    HelpWriter& helpWriter,
                    MyTimeInterface& myTime,
                    NanoProgramWriter& nanoProgramWriter,
+                   PlayerVector<Player*>& playerVector,
                    WriterHelper& writerHelper,
                    XPWriter& xpWriter);
 

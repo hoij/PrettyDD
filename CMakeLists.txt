@@ -14,7 +14,7 @@ endif()
 if (NOT CONFIGURED_ONCE)
 	set(CMAKE_CXX_FLAGS "${flags}"
 	    CACHE STRING "Flags used by the compiler during all build types." FORCE)
-	set(CMAKE_C_FLAGS   "${flags}"
+	set(CMAKE_C_FLAGS  "${flags}"
 	    CACHE STRING "Flags used by the compiler during all build types." FORCE)
 endif()
 
