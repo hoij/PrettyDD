@@ -21,6 +21,6 @@ Character ID can be seen in-game by doing SHIFT + F9.
 Example: "character id: 50000:123456789"
 The number you want is the one after the colon (123456789).
 
-6. Run the program!
+6. Run the program and execute /pddhelp in-game for more information.
 
 7. In case of problems, check the log file pddlog.txt which should have been generated on program start.
