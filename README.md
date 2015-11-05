@@ -71,4 +71,4 @@ Chose to parse the log form the beginning or the end by changing a paramater in 
 
 
 ## Install Instructions
-See [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md)
+See [INSTALL.md](INSTALL.md)
