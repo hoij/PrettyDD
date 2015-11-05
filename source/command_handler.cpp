@@ -5,19 +5,18 @@
 #include <sstream>
 #include <vector>
 
-CommandHandler::CommandHandler(PlayerVector<Player*>& playerVector,
-                               std::ofstream& file,
-                               DamageWriter& damageWriter,
+CommandHandler::CommandHandler(DamageWriter& damageWriter,
                                HelpWriter& helpWriter,
                                MyTimeInterface& myTime,
                                NanoProgramWriter& nanoProgramWriter,
+                               PlayerVector<Player*>& playerVector,
                                WriterHelper& writerHelper,
                                XPWriter& xpWriter) :
-    playerVector(playerVector),
     damageWriter(damageWriter),
+    helpWriter(helpWriter),
     myTime(myTime),
     nanoProgramWriter(nanoProgramWriter),
-    helpWriter(helpWriter),
+    playerVector(playerVector),
     writerHelper(writerHelper),
     xpWriter(xpWriter) {}
 
@@ -65,7 +64,8 @@ bool CommandHandler::execute(const LineInfo& li) {
             xpWriter.createXPInfo();
         }
         else if (commandParts[1] == "help") {
-            helpWriter.createHelp();
+            std::string fileName = "pdd";
+            helpWriter.createHelp(fileName);
         }
         else if (commandParts[1] == "start" ||
                  commandParts[1] == "resume") {
@@ -87,10 +87,7 @@ bool CommandHandler::execute(const LineInfo& li) {
         }
     }
     else if (nrOfOptions == 2) {
-        if (commandParts[1] == "opp") {
-            damageWriter.createDDPerOpponent(commandParts[2]);
-        }
-        else if (commandParts[1] == "dtypes") {
+        if (commandParts[1] == "dtypes") {
             damageWriter.createDDPerTypeDetailed(commandParts[2]);
         }
         else if (commandParts[1] == "dr") {
@@ -154,9 +151,6 @@ bool CommandHandler::execute(const LineInfo& li) {
             }
             else if (commandParts[2] == "dtypes") {
                 damageWriter.createDRPerTypeDetailed(commandParts[3]);
-            }
-            else if (commandParts[2] == "opp") {
-                damageWriter.createDRPerOpponent(commandParts[3]);
             }
             else {
                 damageWriter.createDRPerType(commandParts[2], commandParts[3]);

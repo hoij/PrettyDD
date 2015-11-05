@@ -13,13 +13,12 @@ class HelpWriter : public WriterHelper {
 public:
     HelpWriter(Configuration& config, std::ofstream& file);
 
-    void createHelp();
+    void createHelp(std::string fileName);
 
 private:
+    void createInfo();
     void createCommands1();
     void createCommands2();
-    void createInfo1();
-    void createInfo2();
     void writeCommand(std::string command, std::string description = "");
 };
 

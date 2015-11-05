@@ -41,12 +41,11 @@ int main(void) {
     NanoProgramWriter nanoProgramWriter(playerVector, config, file);
     WriterHelper writerHelper(config, file);
     XPWriter xpWriter(playerVector, config, file);
-    CommandHandler commandHandler(playerVector,
-                                  file,
-                                  damageWriter,
+    CommandHandler commandHandler(damageWriter,
                                   helpWriter,
                                   myTime,
                                   nanoProgramWriter,
+                                  playerVector,
                                   writerHelper,
                                   xpWriter);
 
@@ -58,6 +57,9 @@ int main(void) {
         errorLog.write("Error: " + config.getLogFilePath());
     }
     logstream.clear();
+
+    // Create the help script on startup
+    helpWriter.createHelp("pddhelp");
 
     // Read from the end of the file if true,
     // otherwise read from the start.
