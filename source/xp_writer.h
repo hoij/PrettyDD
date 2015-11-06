@@ -14,7 +14,7 @@ class Configuration;
 
 class XPWriter : public WriterHelper {
 public:
-    XPWriter(PlayerVector<Player*>& playerVector,
+    XPWriter(PlayerVector& playerVector,
              Configuration& config,
              std::ofstream& file);
 
@@ -28,7 +28,7 @@ private:
     void writeXPStatsOverview(const XP& xp, std::string type);
     void writeXPStatsDetailed(const XP& xp, std::string type);
 
-    PlayerVector<Player*>& playerVector;
+    PlayerVector& playerVector;
 };
 
 

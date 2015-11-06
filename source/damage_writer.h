@@ -16,7 +16,7 @@ class Damage;
 class DamageWriter : public WriterHelper {
 
 public:
-    DamageWriter(PlayerVector<Player*>& playerVector,
+    DamageWriter(PlayerVector& playerVector,
                  Configuration& config,
                  std::ofstream& file);
 
@@ -174,7 +174,7 @@ private:
     std::string calcShieldDmgPercentage(const Damage&d);
 
 
-    PlayerVector<Player*>& playerVector;
+    PlayerVector& playerVector;
 };
 
 

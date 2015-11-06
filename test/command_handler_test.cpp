@@ -5,6 +5,7 @@
 #include "my_time.h"
 #include "nano_program_writer.h"
 #include "player.h"
+#include "player_factory.h"
 #include "player_vector.h"
 #include "writer_helper.h"
 #include "xp_writer.h"
@@ -15,7 +16,8 @@
 
 TEST(CommandHandlerTest, splitAndMergeQuotedText) {
     std::ofstream file;
-    PlayerVector<Player*> playerVector("playerRunningProgram");
+    PlayerFactoryInterface* playerFactory = new PlayerFactory();
+    PlayerVector playerVector("playerRunningProgram", playerFactory);
     Configuration config;
     DamageWriter damageWriter(playerVector, config, file);
     HelpWriter helpWriter(config, file);
@@ -27,7 +29,7 @@ TEST(CommandHandlerTest, splitAndMergeQuotedText) {
                                   helpWriter,
                                   myTime,
                                   nanoProgramWriter,
-				  playerVector,
+				                  playerVector,
                                   writerHelper,
                                   xpWriter);
 

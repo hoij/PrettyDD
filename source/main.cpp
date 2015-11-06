@@ -7,6 +7,7 @@
 #include "my_time.h"
 #include "nano_program_writer.h"
 #include "parser.h"
+#include "player_factory.h"
 #include "player_interface.h"
 #include "player_vector.h"
 #include "xp_writer.h"
@@ -32,7 +33,8 @@ int main(void) {
 
     // Instantiate classes
     Parser parser(config.getPlayerRunningProgram());
-    PlayerVector<Player*> playerVector(config.getPlayerRunningProgram());
+    PlayerFactoryInterface* playerFactory = new PlayerFactory();
+    PlayerVector playerVector(config.getPlayerRunningProgram(), playerFactory);
     playerVector.startLogging();
 
     std::ofstream file;

@@ -9,7 +9,7 @@ CommandHandler::CommandHandler(DamageWriter& damageWriter,
                                HelpWriter& helpWriter,
                                MyTimeInterface& myTime,
                                NanoProgramWriter& nanoProgramWriter,
-                               PlayerVector<Player*>& playerVector,
+                               PlayerVector& playerVector,
                                WriterHelper& writerHelper,
                                XPWriter& xpWriter) :
     damageWriter(damageWriter),

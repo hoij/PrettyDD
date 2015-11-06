@@ -42,9 +42,8 @@ public:
     Player& operator=(Player rhs);
     friend void swap(Player& first, Player& second);
 
-    std::string getName() const {return name;}
-
     void add(LineInfo& lineInfo);
+    std::string getName() const {return name;}
 
     /* Damage */
     Damage getTotalDamageDealt() const;
@@ -90,10 +89,10 @@ public:
     /* XP */
     const XP& getXp();
 
-
+    /* Time. TODO: Move into its own class */
     std::time_t getTimeActive() const;
     std::time_t getPauseDuration() const;
-    std::time_t getStartTime() {return startTime;}
+    std::time_t getStartTime() const {return startTime;}
     void stopTimer();
     void resumeTimer();
 

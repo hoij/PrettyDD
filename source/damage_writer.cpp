@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iomanip>
 
-DamageWriter::DamageWriter(PlayerVector<Player*>& playerVector,
+DamageWriter::DamageWriter(PlayerVector& playerVector,
                            Configuration& config,
                            std::ofstream& file) :
                            WriterHelper(config, file),

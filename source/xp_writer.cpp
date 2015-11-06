@@ -5,7 +5,7 @@
 #include <vector>
 
 
-XPWriter::XPWriter(PlayerVector<Player*>& playerVector,
+XPWriter::XPWriter(PlayerVector& playerVector,
                    Configuration& config,
                    std::ofstream& file) :
                    WriterHelper(config, file),
@@ -15,7 +15,7 @@ void XPWriter::createXPInfo() {
 
     std::string title = "XP Info";
 
-    Player* pp = playerVector.getPlayer("You");
+    PlayerInterface* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
         createNotFoundMessage("No data logged for \"You\"",
                               "Tried to display " + title + " but " +

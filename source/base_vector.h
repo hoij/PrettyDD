@@ -27,7 +27,7 @@ public:
     template<class T>
     friend void swap(BaseVector<T>& first, BaseVector<T>& second);
 
-    typename std::vector<C>::size_type size() {return this->players.size();}
+    typename std::vector<C>::size_type size() {return players.size();}
 
     virtual void addToPlayers(LineInfo& lineInfo);
     virtual size_t getLongestNameLength() const;
