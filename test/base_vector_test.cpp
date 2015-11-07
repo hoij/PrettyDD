@@ -11,7 +11,7 @@
 
 class StubPlayer : public Player {
 public:
-    StubPlayer(std::string name, MyTime* myTime) : Player(name, myTime) {}
+    StubPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) : Player(name, myTime) {}
     void add(LineInfo& li) {
         (void)li;
         callsToAdd++;

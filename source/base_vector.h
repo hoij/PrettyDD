@@ -109,8 +109,7 @@ void BaseVector<C>::createPlayer(std::string name, LineInfo& lineInfo) {
 
     // Get the type pointed to by C
     typedef typename std::remove_pointer<C>::type CNoPointer;
-    MyTime* pTime = new MyTime();
-    C player = new CNoPointer(name, pTime);
+    C player = new CNoPointer(name, std::make_shared<MyTime>());
     player->add(lineInfo);
     players.push_back(player);
 }

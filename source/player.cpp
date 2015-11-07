@@ -13,10 +13,10 @@
 
 Player::Player(std::string name) : name(name) {
     affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
-    myTime = new MyTime();
+    myTime = std::make_shared<MyTime>();
 }
 
-Player::Player(std::string name, MyTimeInterface* myTime) : name(name), myTime(myTime) {
+Player::Player(std::string name, std::shared_ptr<MyTimeInterface> myTime) : name(name), myTime(myTime) {
     affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
 }
 
@@ -29,7 +29,6 @@ Player::Player(std::string name,
 
 Player::~Player() {
     delete affectedPlayers;
-    delete myTime;
 }
 
 Player::Player(const Player& other) {

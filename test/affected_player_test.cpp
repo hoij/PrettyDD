@@ -16,8 +16,7 @@ Issue arises it might be a good idea to check that their tests pass.
 class AffectedPlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        MyTime* myTime = new MyTime();
-        affectedPlayer = new AffectedPlayer("Player1", myTime);
+        affectedPlayer = new AffectedPlayer("Player1", std::make_shared<MyTime>());
     }
     virtual void TearDown() {
         delete affectedPlayer;

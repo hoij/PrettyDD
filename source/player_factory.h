@@ -12,8 +12,7 @@
 class PlayerFactory : public PlayerFactoryInterface {
 public:
     virtual PlayerInterface* createPlayer(std::string name) {
-        MyTime* myTime = new MyTime();
-        return new Player(name, myTime);
+        return new Player(name, std::make_shared<MyTime>());
     }
 };
 

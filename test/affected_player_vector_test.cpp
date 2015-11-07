@@ -24,7 +24,7 @@ these classes pass. */
 
 class MockAffectedPlayer : public virtual AffectedPlayerInterface, public AffectedPlayer {
 public:
-    MockAffectedPlayer(std::string name, MyTime* myTime) : AffectedPlayer(name, myTime) {}
+    MockAffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) : AffectedPlayer(name, myTime) {}
     MOCK_CONST_METHOD0(getTotalDamageReceivedFromPlayer, Damage(void));
     MOCK_CONST_METHOD0(getTotalDamageDealtOnPlayer, Damage(void));
     MOCK_CONST_METHOD0(getDamageReceivedFromPlayer,

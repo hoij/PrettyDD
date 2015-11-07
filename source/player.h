@@ -11,6 +11,7 @@
 #include <ctime>
 #include <gtest/gtest_prod.h>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -32,7 +33,7 @@ class Player : public virtual PlayerInterface {
 // TODO: Se if Player can be split into smaller classes.
 public:
     Player(std::string name);
-    Player(std::string name, MyTimeInterface* myTime);
+    Player(std::string name, std::shared_ptr<MyTimeInterface> myTime);
     Player(std::string name,
            AffectedPlayerVector<AffectedPlayer*>* pv,
            MyTimeInterface* myTime);
@@ -122,7 +123,7 @@ private:
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
     AffectedPlayerVector<AffectedPlayer*>* affectedPlayers = nullptr;
-    MyTimeInterface* myTime = nullptr;
+    std::shared_ptr<MyTimeInterface> myTime = nullptr;
 	NanoPrograms nanoPrograms;
     XP xp;
 };
