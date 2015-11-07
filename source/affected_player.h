@@ -19,6 +19,7 @@ class MyTimeInterface;
 class AffectedPlayer : public virtual AffectedPlayerInterface {
 public:
     AffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime);
+    AffectedPlayerInterface* clone() const;
 
     void add(LineInfo& lineInfo);
 

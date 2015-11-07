@@ -15,8 +15,11 @@ class LineInfo;
 class AffectedPlayerInterface {
 public:
     virtual ~AffectedPlayerInterface() {};
+    virtual AffectedPlayerInterface* clone() const = 0;
 
     virtual void add(LineInfo& lineInfo) = 0;
+
+    virtual std::string getName() const = 0;
 
     virtual Damage getTotalDamageReceivedFromPlayer() const = 0;
     virtual Damage getTotalDamageDealtOnPlayer() const = 0;
@@ -29,8 +32,6 @@ public:
 
     virtual const Heal& getHeal() const = 0;
     virtual const Nano& getNano() const = 0;
-
-    virtual std::string getName() const = 0;
 };
 
 

@@ -3,6 +3,7 @@
 #include "damage.h"
 #include "heal.h"
 #include "line_info.h"
+#include "my_time.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

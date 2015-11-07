@@ -1,4 +1,5 @@
 #include "affected_player.h"
+#include "affected_player_factory.h"
 #include "affected_player_vector.h"
 #include "damage.h"
 #include "heal.h"
@@ -8,11 +9,15 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
 
-class MockAffectedPlayerVector : public AffectedPlayerVector<AffectedPlayer*> {
+class MockAffectedPlayerVector : public AffectedPlayerVector {
 public:
+    MockAffectedPlayerVector(AffectedPlayerFactoryInterface* affectedPlayerFactory) :
+        AffectedPlayerVector(affectedPlayerFactory) {}
+
     MOCK_METHOD1(addToPlayers, void(LineInfo& li));
 
     MOCK_CONST_METHOD0(getLongestNameLength, size_t());
@@ -65,9 +70,13 @@ class PlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
         // mockAffectedPlayerVector and mockMyTime will be deleted in Player
-        mockAffectedPlayerVector = new MockAffectedPlayerVector();
-        mockMyTime = new ::testing::NiceMock<MockMyTime>;
-        player = new Player("You", mockAffectedPlayerVector, mockMyTime);
+        AffectedPlayerFactoryInterface* affectedPlayerFactory =
+            new AffectedPlayerFactory();
+        mockAffectedPlayerVector =
+            new MockAffectedPlayerVector(affectedPlayerFactory);
+        player = new Player("You",
+            mockAffectedPlayerVector,
+            std::make_shared<::testing::NiceMock<MockMyTime>>());
 
         // Set up the return values.
         LineInfo li1;

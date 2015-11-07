@@ -3,15 +3,19 @@
 #pragma warning(disable : 4373)
 #endif
 
+#include "affected_player_factory_interface.h"
+#include "affected_player_factory.h"
 #include "affected_player_interface.h"
 #include "affected_player_vector.h"
 #include "damage.h"
 #include "heal.h"
 #include "line_info.h"
+#include "my_time.h"
 #include "nano.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
 
@@ -22,9 +26,13 @@ these classes pass. */
 
 /* Test Player */
 
-class MockAffectedPlayer : public virtual AffectedPlayerInterface, public AffectedPlayer {
+class MockAffectedPlayer : public AffectedPlayerInterface {
 public:
-    MockAffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) : AffectedPlayer(name, myTime) {}
+    MockAffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
+        name(name), myTime(myTime) {}
+    MOCK_CONST_METHOD0(clone, AffectedPlayerInterface*(void));
+    MOCK_METHOD1(add, void(LineInfo& lineInfo));
+    std::string getName() const {return name;}
     MOCK_CONST_METHOD0(getTotalDamageReceivedFromPlayer, Damage(void));
     MOCK_CONST_METHOD0(getTotalDamageDealtOnPlayer, Damage(void));
     MOCK_CONST_METHOD0(getDamageReceivedFromPlayer,
@@ -33,19 +41,30 @@ public:
                        std::vector<std::pair<std::string, Damage>>(void));
     MOCK_CONST_METHOD0(getHeal, Heal&(void));
     MOCK_CONST_METHOD0(getNano, Nano&(void));
+
+private:
+    std::shared_ptr<MyTimeInterface> myTime;
+    std::string name;
+};
+
+class MockAffectedPlayerFactory : public AffectedPlayerFactoryInterface {
+public:
+    virtual AffectedPlayerInterface* createPlayer(std::string name) {
+        return new ::testing::NiceMock<MockAffectedPlayer>(name, std::make_shared<MyTime>());
+    }
 };
 
 /* Helper functions */
 
-const MockAffectedPlayer* addPlayerToVector(std::string name,
-    AffectedPlayerVector<::testing::NiceMock<MockAffectedPlayer>*>* affectedPlayerVector) {
+MockAffectedPlayer* addPlayerToVector(std::string name,
+    AffectedPlayerVector* affectedPlayerVector) {
 
     LineInfo li;
     li.dealer_name = name;
     affectedPlayerVector->addToPlayers(li);
-    const MockAffectedPlayer* p = affectedPlayerVector->getPlayer(name);
+    AffectedPlayerInterface* p = affectedPlayerVector->getPlayer(name);
     EXPECT_FALSE(p == nullptr);
-    return p;
+    return dynamic_cast<MockAffectedPlayer*>(p);
 }
 
 Damage createDamage(int amount) {
@@ -79,7 +98,8 @@ class AffectedPlayerVectorDamageTest : public ::testing::Test {
 EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
-        affectedPlayerVector = new AffectedPlayerVector<::testing::NiceMock<MockAffectedPlayer>*>;
+        AffectedPlayerFactoryInterface* mockAffectedPlayerFactory = new MockAffectedPlayerFactory();
+        affectedPlayerVector = new AffectedPlayerVector(mockAffectedPlayerFactory);
 
         // Set up the return values.
         d1 = createDamage(10);
@@ -93,9 +113,9 @@ protected:
         delete affectedPlayerVector;
     }
 
-    AffectedPlayerVector<::testing::NiceMock<MockAffectedPlayer>*>* affectedPlayerVector;
-    const MockAffectedPlayer* p1;
-    const MockAffectedPlayer* p2;
+    AffectedPlayerVector* affectedPlayerVector;
+    MockAffectedPlayer* p1;
+    MockAffectedPlayer* p2;
     Damage d1;
     Damage d2;
 };
@@ -110,8 +130,8 @@ TEST_F(AffectedPlayerVectorDamageTest, getTotalDamageDealtOnPlayer) {
     is in turn called and that the summed damage is correct.
     */
 
-    const MockAffectedPlayer* caller = addPlayerToVector("Caller",
-                                                         affectedPlayerVector);
+    MockAffectedPlayer* caller = addPlayerToVector("Caller",
+                                                   affectedPlayerVector);
 
     EXPECT_CALL(*p1, getTotalDamageDealtOnPlayer())
         .WillOnce(::testing::Return(d1));
@@ -285,12 +305,13 @@ TEST(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     Verifies that each AffectedPlayers correct get method is called.
     */
 
-    AffectedPlayerVector<::testing::NiceMock<MockAffectedPlayer>*> affectedPlayerVector;
+    AffectedPlayerFactoryInterface* affectedPlayerFactory = new AffectedPlayerFactory();
+    AffectedPlayerVector affectedPlayerVector(affectedPlayerFactory);
     // Add players to the vector.
-    const MockAffectedPlayer* p1 = addPlayerToVector("Receiver1", &affectedPlayerVector);
-    const MockAffectedPlayer* p2 = addPlayerToVector("Receiver2", &affectedPlayerVector);
-    const MockAffectedPlayer* p3 = addPlayerToVector("Receiver3", &affectedPlayerVector);
-    const MockAffectedPlayer* p4 = addPlayerToVector("Receiver4", &affectedPlayerVector);
+    MockAffectedPlayer* p1 = addPlayerToVector("Receiver1", &affectedPlayerVector);
+    MockAffectedPlayer* p2 = addPlayerToVector("Receiver2", &affectedPlayerVector);
+    MockAffectedPlayer* p3 = addPlayerToVector("Receiver3", &affectedPlayerVector);
+    MockAffectedPlayer* p4 = addPlayerToVector("Receiver4", &affectedPlayerVector);
 
     // Set up the return values.
     Damage d1 = createDamage(7000);

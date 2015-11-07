@@ -2,7 +2,10 @@
 #define PLAYER_FACTORY_H
 
 
-#include "my_time_interface.h"
+#include "affected_player_factory.h"
+#include "affected_player_vector.h"
+#include "my_time.h"
+#include "player.h"
 #include "player_factory_interface.h"
 
 #include <ctime>
@@ -12,7 +15,10 @@
 class PlayerFactory : public PlayerFactoryInterface {
 public:
     virtual PlayerInterface* createPlayer(std::string name) {
-        return new Player(name, std::make_shared<MyTime>());
+        AffectedPlayerFactoryInterface* affectedPlayerFactory = new AffectedPlayerFactory();
+        AffectedPlayerVector* affectedPlayers =
+            new AffectedPlayerVector(affectedPlayerFactory);
+        return new Player(name, affectedPlayers, std::make_shared<MyTime>());
     }
 };
 

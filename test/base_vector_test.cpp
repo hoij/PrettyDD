@@ -11,7 +11,10 @@
 
 class StubPlayer : public Player {
 public:
-    StubPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) : Player(name, myTime) {}
+    StubPlayer(std::string name,
+               AffectedPlayerVector* affectedPlayerVector,
+               std::shared_ptr<MyTimeInterface> myTime) :
+               Player(name, affectedPlayerVector, myTime) {}
     void add(LineInfo& li) {
         (void)li;
         callsToAdd++;

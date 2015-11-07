@@ -2,9 +2,11 @@
 #pragma warning(disable : 4250)
 #endif
 
-#include "heal.h"
+#include "affected_player_factory.h"
 #include "damage.h"
+#include "heal.h"
 #include "line_info.h"
+#include "nano.h"
 #include "player.h"
 #include "player_factory_interface.h"
 #include "player_interface.h"
@@ -12,6 +14,7 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
 
@@ -24,10 +27,11 @@ these classes pass. */
 
 class MockPlayer : public virtual PlayerInterface {
 public:
-    MockPlayer(std::string name, MyTimeInterface* myTime) :
-    name(name) {
-        affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
-        myTime = new MyTime();
+    MockPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
+    name(name), myTime(myTime) {
+        AffectedPlayerFactoryInterface* affectedPlayerFactory =
+            new AffectedPlayerFactory();
+        affectedPlayers = new AffectedPlayerVector(affectedPlayerFactory);
     }
 
     MOCK_METHOD1(add, void(LineInfo& li));
@@ -75,16 +79,15 @@ public:
     MOCK_METHOD0(nrOfAffectedPlayers,
         std::vector<AffectedPlayer*>::size_type(void));
 private:
-    AffectedPlayerVector<AffectedPlayer*>* affectedPlayers;
-    MyTimeInterface* myTime;
+    AffectedPlayerVector* affectedPlayers;
+    std::shared_ptr<MyTimeInterface> myTime;
     std::string name;
 };
 
 class MockPlayerFactory : public PlayerFactoryInterface {
 public:
     virtual PlayerInterface* createPlayer(std::string name) {
-        MyTime* myTime = new MyTime();
-        return new ::testing::NiceMock<MockPlayer>(name, myTime);
+        return new ::testing::NiceMock<MockPlayer>(name, std::make_shared<MyTime>());
     }
 };
 
@@ -131,7 +134,6 @@ protected:
 PlayerInterface* PlayerVectorTest::addPlayerToVector(std::string name) {
     LineInfo li;
     li.dealer_name = name;
-
     playerVector->addToPlayers(li);
     PlayerInterface* p = playerVector->getPlayer(name);
     EXPECT_FALSE(p == nullptr);

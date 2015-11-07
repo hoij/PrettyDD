@@ -8,10 +8,10 @@
 #include <string>
 #include <vector>
 
+
 class Damage;
 class Heal;
 class LineInfo;
-
 
 class PlayerVector {
 public:
@@ -67,7 +67,7 @@ private:
 
     bool log = false;
     std::string playerRunningProgram;
-    PlayerFactoryInterface* playerFactory;
+    PlayerFactoryInterface* playerFactory = nullptr;
     std::vector<PlayerInterface*> players;
 };
 
