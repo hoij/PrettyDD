@@ -9,6 +9,7 @@
 #include "player_factory_interface.h"
 
 #include <ctime>
+#include <memory>
 #include <string>
 
 
@@ -16,9 +17,10 @@ class PlayerFactory : public PlayerFactoryInterface {
 public:
     virtual PlayerInterface* createPlayer(std::string name) {
         AffectedPlayerFactoryInterface* affectedPlayerFactory = new AffectedPlayerFactory();
-        AffectedPlayerVector* affectedPlayers =
-            new AffectedPlayerVector(affectedPlayerFactory);
-        return new Player(name, affectedPlayers, std::make_shared<MyTime>());
+        return new Player(
+            name,
+            std::make_shared<AffectedPlayerVector>(affectedPlayerFactory),
+            std::make_shared<MyTime>());
     }
 };
 

@@ -7,10 +7,6 @@
 AffectedPlayer::AffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
     name(name), myTime(myTime) {}
 
-AffectedPlayerInterface* AffectedPlayer::clone() const {
-    return new AffectedPlayer(*this);
-}
-
 void AffectedPlayer::add(LineInfo& lineInfo) {
     if (lineInfo.type == "damage") {
         addDamage(lineInfo);

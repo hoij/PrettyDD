@@ -32,12 +32,9 @@ class Nano;
 class Player : public virtual PlayerInterface {
 // TODO: Se if Player can be split into smaller classes.
 public:
-    //Player(std::string name);
-    //Player(std::string name, std::shared_ptr<MyTimeInterface> myTime);
     Player(std::string name,
-           AffectedPlayerVector* pv,
+           std::shared_ptr<AffectedPlayerVector> affectedPlayers,
            std::shared_ptr<MyTimeInterface> myTime);
-    ~Player();
     Player(const Player& other);
     Player(Player&& other) NOEXCEPT;
     Player& operator=(Player rhs);
@@ -122,7 +119,7 @@ private:
     Damage sumDamage(bool nanobots);
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
-    AffectedPlayerVector* affectedPlayers = nullptr;
+    std::shared_ptr<AffectedPlayerVector> affectedPlayers = nullptr;
     std::shared_ptr<MyTimeInterface> myTime = nullptr;
 	NanoPrograms nanoPrograms;
     XP xp;

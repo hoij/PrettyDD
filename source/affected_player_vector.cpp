@@ -7,34 +7,6 @@
 #include <algorithm>
 
 
-AffectedPlayerVector::~AffectedPlayerVector() {
-    for (auto& player : players) {
-        delete player;
-    }
-}
-
-AffectedPlayerVector::AffectedPlayerVector(
-    const AffectedPlayerVector& other) {
-    for (auto player : other.players) {
-        AffectedPlayerInterface* p = player->clone();
-        players.push_back(p);
-    }
-}
-
-AffectedPlayerVector::AffectedPlayerVector(AffectedPlayerVector&& other) {
-    swap(*this, other);
-}
-
-AffectedPlayerVector& AffectedPlayerVector::operator=(
-    AffectedPlayerVector rhs) {
-    swap(*this, rhs);
-    return *this;
-}
-
-void swap(AffectedPlayerVector& first, AffectedPlayerVector& second) {
-    std::swap(first.players, second.players);
-}
-
 void AffectedPlayerVector::addToPlayers(LineInfo& lineInfo) {
     // Adds the info found in a log line to dealer and receiver.
     // If a player with the same name is not found, a new one is created.
@@ -61,7 +33,7 @@ void AffectedPlayerVector::addToPlayers(LineInfo& lineInfo) {
 
 void AffectedPlayerVector::createPlayer(std::string name,
                                         LineInfo& lineInfo) {
-    AffectedPlayerInterface* affectedPlayer =
+    std::shared_ptr<AffectedPlayerInterface> affectedPlayer =
         affectedPlayerFactory->createPlayer(name);
     affectedPlayer->add(lineInfo);
     players.push_back(affectedPlayer);
@@ -77,7 +49,7 @@ size_t AffectedPlayerVector::getLongestNameLength() const {
     return longestNameLength;
 }
 
-AffectedPlayerInterface* AffectedPlayerVector::getPlayer(std::string name) {
+std::shared_ptr<AffectedPlayerInterface> AffectedPlayerVector::getPlayer(std::string name) {
     for (const auto player : players) {
         if (player->getName() == name) {
             return player;

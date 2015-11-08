@@ -12,8 +12,8 @@
 
 class AffectedPlayerFactory : public AffectedPlayerFactoryInterface {
 public:
-    virtual AffectedPlayerInterface* createPlayer(std::string name) {
-        return new AffectedPlayer(name, std::make_shared<MyTime>());
+    virtual std::shared_ptr<AffectedPlayerInterface> createPlayer(std::string name) {
+        return std::make_shared<AffectedPlayer>(name, std::make_shared<MyTime>());
     }
 };
 

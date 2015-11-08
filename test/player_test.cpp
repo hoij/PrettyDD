@@ -74,8 +74,8 @@ protected:
         AffectedPlayerFactoryInterface* affectedPlayerFactory =
             new AffectedPlayerFactory();
         mockAffectedPlayerVector =
-            new MockAffectedPlayerVector(affectedPlayerFactory);
-        player = new Player("You",
+            std::make_shared<MockAffectedPlayerVector>(affectedPlayerFactory);
+        player = std::make_shared<Player>("You",
                             mockAffectedPlayerVector,
                             mockMyTime);
 
@@ -87,11 +87,10 @@ protected:
         d1.add(li1);
         d2.add(li2);
     }
-    virtual void TearDown() {
-        delete player;
-    }
-    Player* player;
-    MockAffectedPlayerVector* mockAffectedPlayerVector;
+    virtual void TearDown() {}
+
+    std::shared_ptr<Player> player;
+    std::shared_ptr<MockAffectedPlayerVector> mockAffectedPlayerVector;
     std::shared_ptr<::testing::NiceMock<MockMyTime>> mockMyTime;
 
     Damage d1;

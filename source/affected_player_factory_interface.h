@@ -10,7 +10,7 @@
 class AffectedPlayerFactoryInterface {
 public:
     virtual ~AffectedPlayerFactoryInterface() {}
-    virtual AffectedPlayerInterface* createPlayer(std::string name) = 0;
+    virtual std::shared_ptr<AffectedPlayerInterface> createPlayer(std::string name) = 0;
 };
 
 

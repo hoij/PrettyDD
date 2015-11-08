@@ -3,6 +3,7 @@
 
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,7 +16,6 @@ class LineInfo;
 class AffectedPlayerInterface {
 public:
     virtual ~AffectedPlayerInterface() {};
-    virtual AffectedPlayerInterface* clone() const = 0;
 
     virtual void add(LineInfo& lineInfo) = 0;
 

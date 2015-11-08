@@ -5,6 +5,7 @@
 #include "affected_player_factory_interface.h"
 #include "affected_player_interface.h"
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -18,7 +19,7 @@ class AffectedPlayerVector {
 public:
     AffectedPlayerVector(AffectedPlayerFactoryInterface* affectedPlayerFactory) :
         affectedPlayerFactory(affectedPlayerFactory) {}
-    virtual ~AffectedPlayerVector();
+    virtual ~AffectedPlayerVector() {}
     AffectedPlayerVector(const AffectedPlayerVector& other);
     AffectedPlayerVector(AffectedPlayerVector&& other);
     AffectedPlayerVector& operator=(AffectedPlayerVector rhs);
@@ -28,7 +29,7 @@ public:
 
     virtual void addToPlayers(LineInfo& lineInfo);
     virtual size_t getLongestNameLength() const;
-    virtual AffectedPlayerInterface* getPlayer(std::string name);
+    virtual std::shared_ptr<AffectedPlayerInterface> getPlayer(std::string name);
 
     /* Damage */
     virtual Damage
@@ -77,10 +78,10 @@ public:
     virtual Nano
     getNano(std::string affectedPlayerName) const;
 
-    typedef std::vector<AffectedPlayerInterface*>::iterator PlayerVectorIterator;
+    typedef std::vector<std::shared_ptr<AffectedPlayerInterface>>::iterator PlayerVectorIterator;
     virtual PlayerVectorIterator begin() { return players.begin(); }
     virtual PlayerVectorIterator end() { return players.end(); }
-    typedef std::vector<AffectedPlayerInterface*>::const_iterator const_PlayerVectorIterator;
+    typedef std::vector<std::shared_ptr<AffectedPlayerInterface>>::const_iterator const_PlayerVectorIterator;
     virtual const_PlayerVectorIterator begin() const { return players.begin(); }
     virtual const_PlayerVectorIterator end() const { return players.end(); }
 
@@ -97,7 +98,7 @@ private:
                                      const std::pair<std::string, Heal>& p2);
 
     AffectedPlayerFactoryInterface* affectedPlayerFactory = nullptr;
-    std::vector<AffectedPlayerInterface*> players;
+    std::vector<std::shared_ptr<AffectedPlayerInterface>> players;
 };
 
 

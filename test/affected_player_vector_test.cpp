@@ -30,7 +30,6 @@ class MockAffectedPlayer : public AffectedPlayerInterface {
 public:
     MockAffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
         name(name), myTime(myTime) {}
-    MOCK_CONST_METHOD0(clone, AffectedPlayerInterface*(void));
     MOCK_METHOD1(add, void(LineInfo& lineInfo));
     std::string getName() const {return name;}
     MOCK_CONST_METHOD0(getTotalDamageReceivedFromPlayer, Damage(void));
@@ -49,8 +48,10 @@ private:
 
 class MockAffectedPlayerFactory : public AffectedPlayerFactoryInterface {
 public:
-    virtual AffectedPlayerInterface* createPlayer(std::string name) {
-        return new ::testing::NiceMock<MockAffectedPlayer>(name, std::make_shared<MyTime>());
+    virtual std::shared_ptr<AffectedPlayerInterface> createPlayer(std::string name) {
+        return std::make_shared<::testing::NiceMock<MockAffectedPlayer>>(
+            name,
+            std::make_shared<MyTime>());
     }
 };
 
@@ -100,8 +101,8 @@ protected:
         delete affectedPlayerVector;
     }
 
-    MockAffectedPlayer* addDealerToVector(std::string name);
-    MockAffectedPlayer* addReceiverToVector(std::string name);
+    std::shared_ptr<MockAffectedPlayer> addDealerToVector(std::string name);
+    std::shared_ptr<MockAffectedPlayer> addReceiverToVector(std::string name);
     void AffectedPlayerVectorTest::addPlayersToVector(std::string dealer,
                                                       std::string receiver);
 
@@ -110,26 +111,26 @@ protected:
     Damage d2;
 };
 
-MockAffectedPlayer* AffectedPlayerVectorTest::addDealerToVector(
+std::shared_ptr<MockAffectedPlayer> AffectedPlayerVectorTest::addDealerToVector(
     std::string name) {
 
     LineInfo li;
     li.dealer_name = name;
     affectedPlayerVector->addToPlayers(li);
-    AffectedPlayerInterface* p = affectedPlayerVector->getPlayer(name);
+    std::shared_ptr<AffectedPlayerInterface> p = affectedPlayerVector->getPlayer(name);
     EXPECT_FALSE(p == nullptr);
-    return dynamic_cast<MockAffectedPlayer*>(p);
+    return std::dynamic_pointer_cast<MockAffectedPlayer>(p);
 }
 
-MockAffectedPlayer* AffectedPlayerVectorTest::addReceiverToVector(
+std::shared_ptr<MockAffectedPlayer> AffectedPlayerVectorTest::addReceiverToVector(
     std::string name) {
 
     LineInfo li;
     li.receiver_name = name;
     affectedPlayerVector->addToPlayers(li);
-    AffectedPlayerInterface* p = affectedPlayerVector->getPlayer(name);
+    std::shared_ptr<AffectedPlayerInterface> p = affectedPlayerVector->getPlayer(name);
     EXPECT_FALSE(p == nullptr);
-    return dynamic_cast<MockAffectedPlayer*>(p);
+    return std::dynamic_pointer_cast<MockAffectedPlayer> (p);
 }
 
 void AffectedPlayerVectorTest::addPlayersToVector(std::string dealer,
@@ -140,11 +141,11 @@ void AffectedPlayerVectorTest::addPlayersToVector(std::string dealer,
     affectedPlayerVector->addToPlayers(li);
     // Verify that they've been added to the vector
     if (dealer != "") {
-        AffectedPlayerInterface* p = affectedPlayerVector->getPlayer(dealer);
+        std::shared_ptr<AffectedPlayerInterface> p = affectedPlayerVector->getPlayer(dealer);
         EXPECT_FALSE(p == nullptr);
     }
     if (receiver != "") {
-        AffectedPlayerInterface* p = affectedPlayerVector->getPlayer(receiver);
+        std::shared_ptr<AffectedPlayerInterface> p = affectedPlayerVector->getPlayer(receiver);
         EXPECT_FALSE(p == nullptr);
     }
 }
@@ -200,12 +201,12 @@ TEST_F(AffectedPlayerVectorTest, addToPlayers_existingDealer) {
     Also verifies that the added players add method gets called twice. */
 
     // The first time a new player will be created.
-    MockAffectedPlayer* dealer1 = addDealerToVector("Dealer");
+    std::shared_ptr<MockAffectedPlayer> dealer1 = addDealerToVector("Dealer");
     // The second time the add method of the previously
     // created player will be called.
     EXPECT_CALL(*dealer1, add(::testing::_))
         .Times(1);
-    MockAffectedPlayer* dealer2 = addDealerToVector("Dealer");
+    std::shared_ptr<MockAffectedPlayer> dealer2 = addDealerToVector("Dealer");
 
     EXPECT_EQ(dealer1, dealer2);
     EXPECT_EQ(1, affectedPlayerVector->size());
@@ -220,10 +221,10 @@ TEST_F(AffectedPlayerVectorTest, getTotalDamageDealtOnPlayer) {
     */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addDealerToVector("dealer1");
-    MockAffectedPlayer* p2 = addDealerToVector("dealer2");
+    std::shared_ptr<MockAffectedPlayer> p1 = addDealerToVector("dealer1");
+    std::shared_ptr<MockAffectedPlayer> p2 = addDealerToVector("dealer2");
 
-    MockAffectedPlayer* caller = addDealerToVector("Caller");
+    std::shared_ptr<MockAffectedPlayer> caller = addDealerToVector("Caller");
 
     EXPECT_CALL(*p1, getTotalDamageDealtOnPlayer())
         .WillOnce(::testing::Return(d1));
@@ -242,7 +243,7 @@ TEST_F(AffectedPlayerVectorTest, getDamageDealtOnPlayer) {
     is called. */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addDealerToVector("dealer1");
+    std::shared_ptr<MockAffectedPlayer> p1 = addDealerToVector("dealer1");
 
     std::vector<std::pair<std::string, Damage>> expected;
     expected.emplace_back("type", d2);
@@ -279,12 +280,12 @@ TEST_F(AffectedPlayerVectorTest, getTotalHeals) {
     that the returned sum is correct. */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addDealerToVector("dealer1");
-    MockAffectedPlayer* p2 = addDealerToVector("dealer2");
+    std::shared_ptr<MockAffectedPlayer> p1 = addDealerToVector("dealer1");
+    std::shared_ptr<MockAffectedPlayer> p2 = addDealerToVector("dealer2");
 
     Heal h1 = createHeal(10);
     Heal h2 = createHeal(30);
-    const MockAffectedPlayer* caller = addDealerToVector("Caller");
+    const std::shared_ptr<MockAffectedPlayer> caller = addDealerToVector("Caller");
 
     EXPECT_CALL(*p1, getHeal())
         .WillOnce(::testing::ReturnRef(h1));
@@ -309,10 +310,10 @@ TEST_F(AffectedPlayerVectorTest, getHealsPerAffectedPlayer) {
     */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addDealerToVector("dealer1");
-    MockAffectedPlayer* p2 = addDealerToVector("dealer2");
-    MockAffectedPlayer* p3 = addDealerToVector("dealer3");
-    MockAffectedPlayer* p4 = addDealerToVector("dealer4");
+    std::shared_ptr<MockAffectedPlayer> p1 = addDealerToVector("dealer1");
+    std::shared_ptr<MockAffectedPlayer> p2 = addDealerToVector("dealer2");
+    std::shared_ptr<MockAffectedPlayer> p3 = addDealerToVector("dealer3");
+    std::shared_ptr<MockAffectedPlayer> p4 = addDealerToVector("dealer4");
 
     Heal h1 = createHeal(10);
     Heal h2 = createHeal(0);
@@ -344,12 +345,12 @@ TEST_F(AffectedPlayerVectorTest, getTotalNano) {
     that the returned sum is correct. */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addDealerToVector("dealer1");
-    MockAffectedPlayer* p2 = addDealerToVector("dealer2");
+    std::shared_ptr<MockAffectedPlayer> p1 = addDealerToVector("dealer1");
+    std::shared_ptr<MockAffectedPlayer> p2 = addDealerToVector("dealer2");
 
     Nano n1 = createNano(10);
     Nano n2 = createNano(30);
-    const MockAffectedPlayer* caller = addDealerToVector("Caller");
+    const std::shared_ptr<MockAffectedPlayer> caller = addDealerToVector("Caller");
 
     EXPECT_CALL(*p1, getNano())
         .WillOnce(::testing::ReturnRef(n1));
@@ -367,10 +368,10 @@ TEST_F(AffectedPlayerVectorTest, getNanoPerAffectedPlayer) {
     /* Verifies that the nanos are returned in a sorted list */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addDealerToVector("dealer1");
-    MockAffectedPlayer* p2 = addDealerToVector("dealer2");
-    MockAffectedPlayer* p3 = addDealerToVector("dealer3");
-    MockAffectedPlayer* p4 = addDealerToVector("dealer4");
+    std::shared_ptr<MockAffectedPlayer> p1 = addDealerToVector("dealer1");
+    std::shared_ptr<MockAffectedPlayer> p2 = addDealerToVector("dealer2");
+    std::shared_ptr<MockAffectedPlayer> p3 = addDealerToVector("dealer3");
+    std::shared_ptr<MockAffectedPlayer> p4 = addDealerToVector("dealer4");
 
     Nano n1 = createNano(10);
     Nano n2 = createNano(0);
@@ -408,10 +409,10 @@ TEST_F(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     */
 
     // Add players to the vector
-    MockAffectedPlayer* p1 = addReceiverToVector("Receiver1");
-    MockAffectedPlayer* p2 = addReceiverToVector("Receiver2");
-    MockAffectedPlayer* p3 = addReceiverToVector("Receiver3");
-    MockAffectedPlayer* p4 = addReceiverToVector("Receiver4");
+    std::shared_ptr<MockAffectedPlayer> p1 = addReceiverToVector("Receiver1");
+    std::shared_ptr<MockAffectedPlayer> p2 = addReceiverToVector("Receiver2");
+    std::shared_ptr<MockAffectedPlayer> p3 = addReceiverToVector("Receiver3");
+    std::shared_ptr<MockAffectedPlayer> p4 = addReceiverToVector("Receiver4");
 
     // Set up the return values.
     Damage d1 = createDamage(7000);
@@ -439,3 +440,29 @@ TEST_F(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     EXPECT_EQ(d4.getTotal(), result[3].second.getTotal());
     EXPECT_EQ(4, result.size());
 }
+
+//TEST_F(AffectedPlayerVectorTest, copyConstructor) {
+//    /* Verifies that all affected players are copied
+//    when the copy constructor is used. */
+//
+//    // Add players to the vector
+//    std::shared_ptr<MockAffectedPlayer> p1 = addReceiverToVector("Receiver1");
+//    std::shared_ptr<MockAffectedPlayer> p2 = addReceiverToVector("Receiver2");
+//    std::shared_ptr<MockAffectedPlayer> p3 = addDealerToVector("Dealer1");
+//    std::shared_ptr<MockAffectedPlayer> p4 = addDealerToVector("Dealer2");
+//
+//    EXPECT_CALL(*p1, clone());
+//    EXPECT_CALL(*p2, clone());
+//    EXPECT_CALL(*p3, clone());
+//    EXPECT_CALL(*p4, clone());
+//
+//    AffectedPlayerVector copyOfVector(*affectedPlayerVector);
+//
+//    EXPECT_EQ(4, copyOfVector.size());
+//
+//    std::cout << (copyOfVector.getPlayer("Receiver1")) << std::endl;
+//    std::cout << "here" << std::endl;
+//    EXPECT_TRUE(copyOfVector.getPlayer("Receiver2") != nullptr);
+//    EXPECT_TRUE(copyOfVector.getPlayer("Dealer1") != nullptr);
+//    EXPECT_TRUE(copyOfVector.getPlayer("Dealer2") != nullptr);
+//}

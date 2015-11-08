@@ -26,41 +26,11 @@
 //}
 
 Player::Player(std::string name,
-               AffectedPlayerVector* affectedPlayers,
+               std::shared_ptr<AffectedPlayerVector> affectedPlayers,
                std::shared_ptr<MyTimeInterface> myTime) :
     name(name),
     affectedPlayers(affectedPlayers),
     myTime(myTime) {}
-
-Player::~Player() {
-    delete affectedPlayers;
-}
-
-Player::Player(const Player& other) {
-    name = other.name;
-    AffectedPlayerFactoryInterface* affectedPlayerFactory =
-        new AffectedPlayerFactory();
-    affectedPlayers = new AffectedPlayerVector(affectedPlayerFactory);
-    *affectedPlayers = *other.affectedPlayers;
-	nanoPrograms = other.nanoPrograms;
-    xp = other.xp;
-}
-
-Player::Player(Player&& other) NOEXCEPT {
-    swap(*this, other);
-}
-
-Player& Player::operator=(Player rhs) {
-    swap(*this, rhs);
-    return *this;
-}
-
-void swap(Player& first, Player& second) {
-    std::swap(first.name, second.name);
-    std::swap(first.affectedPlayers, second.affectedPlayers);
-    std::swap(first.xp, second.xp);
-    std::swap(first.nanoPrograms, second.nanoPrograms);
-}
 
 void Player::add(LineInfo& lineInfo) {
     timeOfLastAction = lineInfo.time;
