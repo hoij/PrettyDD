@@ -70,13 +70,14 @@ class PlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
         // mockAffectedPlayerVector and mockMyTime will be deleted in Player
+        mockMyTime = std::make_shared<::testing::NiceMock<MockMyTime>>();
         AffectedPlayerFactoryInterface* affectedPlayerFactory =
             new AffectedPlayerFactory();
         mockAffectedPlayerVector =
             new MockAffectedPlayerVector(affectedPlayerFactory);
         player = new Player("You",
-            mockAffectedPlayerVector,
-            std::make_shared<::testing::NiceMock<MockMyTime>>());
+                            mockAffectedPlayerVector,
+                            mockMyTime);
 
         // Set up the return values.
         LineInfo li1;
@@ -91,7 +92,7 @@ protected:
     }
     Player* player;
     MockAffectedPlayerVector* mockAffectedPlayerVector;
-    ::testing::NiceMock<MockMyTime>* mockMyTime;
+    std::shared_ptr<::testing::NiceMock<MockMyTime>> mockMyTime;
 
     Damage d1;
     Damage d2;

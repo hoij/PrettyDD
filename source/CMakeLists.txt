@@ -7,7 +7,6 @@ add_executable(PrettyDD main.cpp
 	affected_player_factory_interface.h
         affected_player_interface.h
         affected_player_vector.h
-	base_vector.h
 	line_info.h
 	formatted_line_interface.h
 	player_interface.h

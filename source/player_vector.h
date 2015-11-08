@@ -26,6 +26,7 @@ public:
     void addToPlayers(LineInfo& lineInfo);
     PlayerInterface* getPlayer(std::string name);
     std::vector<PlayerInterface*>::size_type size() { return players.size(); }
+    size_t getLongestNameLength() const;
 
     std::vector<std::pair<std::string, Damage>>
     getTotalDamageDealtPerPlayer() const;
@@ -56,11 +57,11 @@ public:
     void reset();
 
     typedef std::vector<PlayerInterface*>::iterator PlayerVectorIterator;
-    virtual PlayerVectorIterator begin() {return players.begin();}
-    virtual PlayerVectorIterator end() {return players.end();}
+    PlayerVectorIterator begin() {return players.begin();}
+    PlayerVectorIterator end() {return players.end();}
     typedef std::vector<PlayerInterface*>::const_iterator const_PlayerVectorIterator;
-    virtual const_PlayerVectorIterator begin() const {return players.begin();}
-    virtual const_PlayerVectorIterator end() const {return players.end();}
+    const_PlayerVectorIterator begin() const {return players.begin();}
+    const_PlayerVectorIterator end() const {return players.end();}
 
 private:
     void createPlayer(std::string name, LineInfo& lineInfo);

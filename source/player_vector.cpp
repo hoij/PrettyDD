@@ -52,6 +52,16 @@ PlayerInterface* PlayerVector::getPlayer(std::string name) {
     return nullptr;
 }
 
+size_t PlayerVector::getLongestNameLength() const {
+    size_t longestNameLength = 0;
+    for (const auto& player : players) {
+        if (player->getName().length() > longestNameLength) {
+            longestNameLength = player->getName().length();
+        }
+    }
+    return longestNameLength;
+}
+
 std::vector<std::pair<std::string, Damage>>
 PlayerVector::getTotalDamageDealtPerPlayer() const {
     /* Returns a vector of pairs containing the players name and their
