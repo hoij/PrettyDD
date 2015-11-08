@@ -43,8 +43,8 @@ public:
     MOCK_CONST_METHOD0(getNano, Nano&(void));
 
 private:
-    std::shared_ptr<MyTimeInterface> myTime;
     std::string name;
+    std::shared_ptr<MyTimeInterface> myTime;
 };
 
 class MockAffectedPlayerFactory : public AffectedPlayerFactoryInterface {
