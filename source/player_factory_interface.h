@@ -4,13 +4,14 @@
 
 #include "player_interface.h"
 
+#include <memory>
 #include <string>
 
 
 class PlayerFactoryInterface {
 public:
     virtual ~PlayerFactoryInterface() {}
-    virtual PlayerInterface* createPlayer(std::string name) = 0;
+    virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) = 0;
 };
 
 

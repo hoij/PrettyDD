@@ -19,7 +19,7 @@ class XP;
 
 class PlayerInterface {
 public:
-    virtual ~PlayerInterface() {};
+    virtual ~PlayerInterface() {}
 
     virtual void add(LineInfo& lineInfo) = 0;
 

@@ -87,10 +87,11 @@ private:
 
 class MockPlayerFactory : public PlayerFactoryInterface {
 public:
-    virtual PlayerInterface* createPlayer(std::string name) {
-        return new ::testing::NiceMock<MockPlayer>(
+    virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
+        return std::unique_ptr<::testing::NiceMock<MockPlayer>>(
+            new ::testing::NiceMock<MockPlayer>(
             name,
-            std::make_shared<MyTime>());
+            std::make_shared<MyTime>()));
     }
 };
 
@@ -111,9 +112,9 @@ class PlayerVectorTest : public ::testing::Test {
 EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
-        PlayerFactoryInterface* mockPlayerFactory = new MockPlayerFactory();
         playerVector = new PlayerVector(
-            "PlayerRunningProgram", mockPlayerFactory);
+            "PlayerRunningProgram",
+            std::unique_ptr<MockPlayerFactory>(new MockPlayerFactory()));
         playerVector->startLogging();
         // Set up standard return values
         d1 = createDamage(10);

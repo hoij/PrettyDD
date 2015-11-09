@@ -16,8 +16,9 @@
 
 TEST(CommandHandlerTest, splitAndMergeQuotedText) {
     std::ofstream file;
-    PlayerFactoryInterface* playerFactory = new PlayerFactory();
-    PlayerVector playerVector("playerRunningProgram", playerFactory);
+    PlayerVector playerVector(
+        "playerRunningProgram",
+        std::unique_ptr<PlayerFactory>(new PlayerFactory()));
     Configuration config;
     DamageWriter damageWriter(playerVector, config, file);
     HelpWriter helpWriter(config, file);

@@ -29,12 +29,14 @@ class Heal;
 class LineInfo;
 class Nano;
 
-class Player : public virtual PlayerInterface {
+class Player : public PlayerInterface {
 // TODO: Se if Player can be split into smaller classes.
 public:
     Player(std::string name,
            std::shared_ptr<AffectedPlayerVector> affectedPlayers,
            std::shared_ptr<MyTimeInterface> myTime);
+    ~Player() {}
+
     Player(const Player& other);
     Player(Player&& other) NOEXCEPT;
     Player& operator=(Player rhs);
