@@ -35,8 +35,9 @@ int main(void) {
 
     // Instantiate classes
     Parser parser(config.getPlayerRunningProgram());
-    PlayerFactoryInterface* playerFactory = new PlayerFactory();
-    PlayerVector playerVector(config.getPlayerRunningProgram(), playerFactory);
+    PlayerVector playerVector(
+        config.getPlayerRunningProgram(),
+        std::make_unique<PlayerFactory>());
     playerVector.startLogging();
 
     std::ofstream file;

@@ -5,6 +5,7 @@
 #include "player_interface.h"
 #include "player_factory_interface.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,9 +17,9 @@ class LineInfo;
 class PlayerVector {
 public:
     PlayerVector(std::string playerRunningProgram,
-                 PlayerFactoryInterface* playerFactory) :
+                 std::unique_ptr<PlayerFactoryInterface> playerFactory) :
         playerRunningProgram(playerRunningProgram),
-        playerFactory(playerFactory)
+        playerFactory(std::move(playerFactory))
         {}
     ~PlayerVector();
     PlayerVector(const PlayerVector& other) = delete;
@@ -68,7 +69,7 @@ private:
 
     bool log = false;
     std::string playerRunningProgram;
-    PlayerFactoryInterface* playerFactory = nullptr;
+    std::unique_ptr<PlayerFactoryInterface> playerFactory = nullptr;
     std::vector<PlayerInterface*> players;
 };
 

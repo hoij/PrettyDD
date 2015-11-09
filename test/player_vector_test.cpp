@@ -111,9 +111,9 @@ class PlayerVectorTest : public ::testing::Test {
 EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
-        PlayerFactoryInterface* mockPlayerFactory = new MockPlayerFactory();
         playerVector = new PlayerVector(
-            "PlayerRunningProgram", mockPlayerFactory);
+            "PlayerRunningProgram",
+            std::make_unique<MockPlayerFactory>());
         playerVector->startLogging();
         // Set up standard return values
         d1 = createDamage(10);

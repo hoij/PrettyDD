@@ -10,8 +10,8 @@ PlayerVector::~PlayerVector() {
 };
 
 void PlayerVector::addToPlayers(LineInfo& lineInfo) {
-    // Adds the info found in a log line to dealer and receiver.
-    // If a player with the same name is not found, a new one is created.
+    /* Adds the info found in a log line to dealer and receiver.
+    If a player with the same name is not found, a new one is created. */
     bool dealerFound = false;
     bool receiverFound = false;
 
