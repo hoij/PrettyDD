@@ -22,7 +22,7 @@ public:
                    HelpWriter& helpWriter,
                    MyTimeInterface& myTime,
                    NanoProgramWriter& nanoProgramWriter,
-                   PlayerVector<Player*>& playerVector,
+                   PlayerVector& playerVector,
                    WriterHelper& writerHelper,
                    XPWriter& xpWriter);
 
@@ -41,7 +41,7 @@ private:
     HelpWriter& helpWriter;
     MyTimeInterface& myTime;
     NanoProgramWriter& nanoProgramWriter;
-    PlayerVector<Player*>& playerVector;
+    PlayerVector& playerVector;
     WriterHelper& writerHelper;
     XPWriter& xpWriter;
 };

@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "nano_programs.h"
 #include "nano_program_writer.h"
-#include "player.h"
+#include "player_interface.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -9,7 +9,7 @@
 #include <string>
 
 
-NanoProgramWriter::NanoProgramWriter(PlayerVector<Player*>& playerVector,
+NanoProgramWriter::NanoProgramWriter(PlayerVector& playerVector,
                                      Configuration& config,
                                      std::ofstream& file) :
                                      WriterHelper(config, file),
@@ -19,7 +19,7 @@ void NanoProgramWriter::createCastedDetailedList() {
 
     std::string titleBase = "Casted Nano Program Info";
 
-    Player* pp = playerVector.getPlayer("You");
+    const PlayerInterface* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
         createNotFoundMessage("No data logged for \"You\"",
                               "Tried to display " + titleBase + " but " +

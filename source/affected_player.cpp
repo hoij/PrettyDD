@@ -4,7 +4,7 @@
 #include "my_time_interface.h"
 
 
-AffectedPlayer::AffectedPlayer(std::string name, MyTimeInterface* myTime) :
+AffectedPlayer::AffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
     name(name), myTime(myTime) {}
 
 void AffectedPlayer::add(LineInfo& lineInfo) {

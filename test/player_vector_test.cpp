@@ -2,15 +2,19 @@
 #pragma warning(disable : 4250)
 #endif
 
-#include "heal.h"
+#include "affected_player_factory.h"
 #include "damage.h"
+#include "heal.h"
 #include "line_info.h"
+#include "nano.h"
 #include "player.h"
+#include "player_factory_interface.h"
 #include "player_interface.h"
 #include "player_vector.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
 
@@ -21,10 +25,18 @@ these classes pass. */
 
 /* Test Player */
 
-class MockPlayer : public virtual PlayerInterface, public Player {
+class MockPlayer : public virtual PlayerInterface {
 public:
-    MockPlayer(std::string name, MyTime* myTime) : Player(name, myTime) {}
+    MockPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
+    name(name), myTime(myTime) {
+        std::unique_ptr<AffectedPlayerFactoryInterface>
+            affectedPlayerFactory(new AffectedPlayerFactory());
+        affectedPlayers = std::make_shared<AffectedPlayerVector>(std::move(affectedPlayerFactory));
+    }
+
     MOCK_METHOD1(add, void(LineInfo& li));
+
+    std::string getName() const { return name; }
 
     MOCK_CONST_METHOD0(getTotalDamageDealt, Damage(void));
     MOCK_CONST_METHOD0(getTotalDamageReceived, Damage(void));
@@ -39,9 +51,48 @@ public:
     MOCK_CONST_METHOD0(getTotalDamageReceivedPerAffectedPlayer,
                        std::vector<std::pair<std::string, Damage>>(void));
 
-    MOCK_CONST_METHOD0(stopTimer, void(void));
-    MOCK_CONST_METHOD0(resumeTimer, void(void));
+    MOCK_CONST_METHOD1(getDamageReceivedPerType,
+        std::vector<std::pair<std::string, Damage>>(std::string));
+    MOCK_CONST_METHOD1(getDamageDealtPerType,
+        std::vector<std::pair<std::string, Damage>>(std::string));
+
+    MOCK_CONST_METHOD0(getTotalHeals, Heal(void));
+    MOCK_CONST_METHOD0(getHealsPerAffectedPlayer,
+        std::vector<std::pair<std::string, Heal>>(void));
+    MOCK_CONST_METHOD1(getHeal, Heal(std::string name));
+
+    MOCK_CONST_METHOD0(getTotalNano, Nano(void));
+    MOCK_CONST_METHOD0(getNanoPerAffectedPlayer,
+        std::vector<std::pair<std::string, Nano>>(void));
+    MOCK_CONST_METHOD1(getNano, Nano(std::string name));
+
+    MOCK_CONST_METHOD0(getNanoPrograms, NanoPrograms&(void));
+
+    MOCK_METHOD0(getXp, XP&(void));
+
+    MOCK_CONST_METHOD0(getTimeActive, std::time_t(void));
+    MOCK_CONST_METHOD0(getPauseDuration, std::time_t(void));
     MOCK_CONST_METHOD0(getStartTime, std::time_t(void));
+    MOCK_METHOD0(stopTimer, void(void));
+    MOCK_METHOD0(resumeTimer, void(void));
+
+    MOCK_CONST_METHOD0(getLongestAffectedPlayerNameLength, size_t(void));
+    MOCK_METHOD0(nrOfAffectedPlayers,
+        std::vector<AffectedPlayer*>::size_type(void));
+private:
+    std::string name;
+    std::shared_ptr<AffectedPlayerVector> affectedPlayers;
+    std::shared_ptr<MyTimeInterface> myTime;
+};
+
+class MockPlayerFactory : public PlayerFactoryInterface {
+public:
+    virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
+        return std::unique_ptr<PlayerInterface>(
+            new ::testing::NiceMock<MockPlayer>(
+            name,
+            std::make_shared<MyTime>()));
+    }
 };
 
 /* Helper functions */
@@ -54,48 +105,137 @@ Damage createDamage(int amount) {
     return d;
 }
 
+/* Test fixture */
+
 class PlayerVectorTest : public ::testing::Test {
 /* NiceMock suppresses warnings about function calls not expected via an
 EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
-        playerVector = new PlayerVector<::testing::NiceMock<MockPlayer>*>(
-            "PlayerRunningProgram");
+        playerVector = new PlayerVector(
+            "PlayerRunningProgram",
+            std::unique_ptr<PlayerFactoryInterface>(new MockPlayerFactory()));
         playerVector->startLogging();
-        // Set up the return values
+        // Set up standard return values
         d1 = createDamage(10);
         d2 = createDamage(30);
-
-        // Add players to the vector.
-        p1 = addPlayerToVector("dealer1");
-        p2 = addPlayerToVector("dealer2");
     }
     virtual void TearDown() {
         delete playerVector;
     }
 
-    const MockPlayer* addPlayerToVector(std::string name);
+    MockPlayer* addDealerToVector(std::string name);
+    MockPlayer* addReceiverToVector(std::string name);
+    void addPlayersToVector(std::string dealer,
+                            std::string receiver);
 
-    PlayerVector<::testing::NiceMock<MockPlayer>*>* playerVector;
-    const MockPlayer* p1;
-    const MockPlayer* p2;
+    PlayerVector* playerVector;
     Damage d1;
     Damage d2;
 };
 
-const MockPlayer* PlayerVectorTest::addPlayerToVector(std::string name) {
+MockPlayer* PlayerVectorTest::addDealerToVector(std::string name) {
     LineInfo li;
     li.dealer_name = name;
     playerVector->addToPlayers(li);
-    const MockPlayer* p = playerVector->getPlayer(name);
+    PlayerInterface* p = playerVector->getPlayer(name);
     EXPECT_FALSE(p == nullptr);
-    return p;
+    return dynamic_cast<MockPlayer*>(p);
+}
+
+MockPlayer* PlayerVectorTest::addReceiverToVector(std::string name) {
+    LineInfo li;
+    li.receiver_name = name;
+    playerVector->addToPlayers(li);
+    PlayerInterface* p = playerVector->getPlayer(name);
+    EXPECT_FALSE(p == nullptr);
+    return dynamic_cast<MockPlayer*>(p);
+}
+
+void PlayerVectorTest::addPlayersToVector(std::string dealer,
+                                          std::string receiver) {
+    LineInfo li;
+    li.dealer_name = dealer;
+    li.receiver_name = receiver;
+    playerVector->addToPlayers(li);
+    // Verify that they've been added to the vector
+    if (dealer != "") {
+        PlayerInterface* p = playerVector->getPlayer(dealer);
+        EXPECT_FALSE(p == nullptr);
+    }
+    if (receiver != "") {
+        PlayerInterface* p = playerVector->getPlayer(receiver);
+        EXPECT_FALSE(p == nullptr);
+    }
 }
 
 /* Test cases */
 
+TEST_F(PlayerVectorTest, addToPlayers_noDealerNorReceiver) {
+    /* Adds a line info object with no dealer and no receiver.
+    Verifies that the total nr of players has not increased. */
+    addPlayersToVector("", "");
+    EXPECT_EQ(0, playerVector->size());
+}
+
+TEST_F(PlayerVectorTest, addToPlayers_newDealerOnly) {
+    /* Adds a line info object with only the dealer name defined.
+    Verifies that only the dealer is added. */
+    std::string dealerName = "Dealer";
+    addPlayersToVector(dealerName, "");
+    EXPECT_EQ(1, playerVector->size());
+}
+
+TEST_F(PlayerVectorTest, addToPlayers_newReceiverOnly) {
+    /* Adds a line info object with only the receiver name defined.
+    Verifies that only the receiver is added. */
+    std::string receiverName = "Receiver";
+    addPlayersToVector(receiverName, "");
+    EXPECT_EQ(1, playerVector->size());
+}
+
+TEST_F(PlayerVectorTest, addToPlayers_newDealerAndReceiver) {
+    /* Adds a line info object with both dealer and receiver names defined.
+    Verifies that they are unique and that the total nr of players is 2. */
+    std::string dealerName = "Dealer";
+    std::string receiverName = "Receiver";
+    addPlayersToVector(dealerName, receiverName);
+    EXPECT_EQ(2, playerVector->size());
+}
+
+TEST_F(PlayerVectorTest, addToPlayers_existingDealer) {
+    /* Adds an identical line info object, with dealer name defined, twice.
+    Verifies that the dealer info is added to the existing dealer.
+    Also verifies that the added players add method gets called twice. */
+
+    // The first time a new player will be created.
+    MockPlayer* dealer1 = addDealerToVector("Dealer");
+    // The second time the add method of the previously
+    // created player will be called.
+    EXPECT_CALL(*dealer1, add(::testing::_))
+        .Times(1);
+    MockPlayer* dealer2 = addDealerToVector("Dealer");
+
+    EXPECT_EQ(dealer1, dealer2);
+    EXPECT_EQ(1, playerVector->size());
+}
+
+TEST_F(PlayerVectorTest, getLongestNameLength) {
+    /* Adds eigth players and gets the longest name length. */
+    std::string theLongestName = "AReallyReallyLongName OfSomeone";
+    addPlayersToVector("Name", "Name2");
+    addPlayersToVector("AName2", "AName");
+    addPlayersToVector("A Really Long Name Of Someone", theLongestName);
+    addPlayersToVector("ALongName", "AReallyReallyLongNameOfSomeone");
+
+    EXPECT_EQ(theLongestName.length(), playerVector->getLongestNameLength());
+}
+
 TEST_F(PlayerVectorTest, reset) {
-    // Reset to remove the two players added in the SetUp.
+    // Add players to the vector.
+    PlayerInterface* p1 = addDealerToVector("dealer1");
+    PlayerInterface* p2 = addDealerToVector("dealer2");
+    // Reset to remove them
     playerVector->reset();
     EXPECT_EQ(0, playerVector->size());
 
@@ -103,11 +243,12 @@ TEST_F(PlayerVectorTest, reset) {
     playerVector->reset();
     EXPECT_EQ(0, playerVector->size());
 
-    // Add two players
+    // Add two players to make sure it still
+    // can be done.
     std::string p1Name = "dealerAfterReset1";
     std::string p2Name = "dealerAfterReset2";
-    p1 = addPlayerToVector(p1Name);
-    p2 = addPlayerToVector(p2Name);
+    p1 = addDealerToVector(p1Name);
+    p2 = addDealerToVector(p2Name);
     EXPECT_EQ(2, playerVector->size());
     EXPECT_EQ(p1Name, p1->getName());
     EXPECT_EQ(p2Name, p2->getName());
@@ -119,6 +260,9 @@ TEST_F(PlayerVectorTest, getDamageDealtPerType) {
     Get damage per type from nonexisting player.
     Verify that none of the players in the vector are called
     and that an empty vector is instead returned. */
+
+    // Add a player to the vector.
+    MockPlayer* p1 = dynamic_cast<MockPlayer*>(addDealerToVector("dealer1"));
 
     std::vector<std::pair<std::string, Damage>> v;
     Damage d;
@@ -151,13 +295,16 @@ TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
     */
 
     // Add players to the vector.
-    const MockPlayer* p3 = addPlayerToVector("Receiver1");
-    const MockPlayer* p4 = addPlayerToVector("Receiver2");
-    const MockPlayer* p5 = addPlayerToVector("Receiver3");
-    const MockPlayer* p6 = addPlayerToVector("Receiver4");
+    // These players being delaer or receivers has no real effect
+    // on the test.
+    MockPlayer* p1 = dynamic_cast<MockPlayer*>(addDealerToVector("Dealer1"));
+    MockPlayer* p2 = dynamic_cast<MockPlayer*>(addDealerToVector("Dealer2"));
+    MockPlayer* p3 = dynamic_cast<MockPlayer*>(addReceiverToVector("Receiver1"));
+    MockPlayer* p4 = dynamic_cast<MockPlayer*>(addReceiverToVector("Receiver2"));
+    MockPlayer* p5 = dynamic_cast<MockPlayer*>(addReceiverToVector("Receiver3"));
+    MockPlayer* p6 = dynamic_cast<MockPlayer*>(addReceiverToVector("Receiver4"));
 
     // Set up the return values.
-
     Damage d3 = createDamage(7000);
     Damage d4 = createDamage(0);
     Damage emptyDamage;
@@ -205,6 +352,10 @@ TEST_F(PlayerVectorTest, stopAndStartLogging) {
     Add new player
     Verify that it gets added
     */
+
+    // Add players to the vector.
+    MockPlayer* p1 = dynamic_cast<MockPlayer*>(addDealerToVector("dealer1"));
+    MockPlayer* p2 = dynamic_cast<MockPlayer*>(addDealerToVector("dealer2"));
 
     LineInfo li1;
     li1.dealer_name = "dealer3";

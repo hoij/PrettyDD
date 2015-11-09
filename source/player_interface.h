@@ -2,11 +2,13 @@
 #define PLAYER_INTERFACE_H
 
 
+#include <ctime>
 #include <map>
 #include <string>
 #include <vector>
 
 
+class AffectedPlayer;
 class Damage;
 class Heal;
 class Nano;
@@ -17,25 +19,33 @@ class XP;
 
 class PlayerInterface {
 public:
-    virtual ~PlayerInterface() {};
+    virtual ~PlayerInterface() {}
 
     virtual void add(LineInfo& lineInfo) = 0;
+
+    virtual std::string getName() const = 0;
 
     /* Damage */
     virtual Damage getTotalDamageDealt() const = 0;
     virtual Damage getTotalDamageReceived() const = 0;
 
     virtual std::vector<std::pair<std::string, Damage>>
-    getTotalDamageDealtPerType() const = 0;
+        getTotalDamageDealtPerType() const = 0;
 
     virtual std::vector<std::pair<std::string, Damage>>
-    getTotalDamageReceivedPerType() const = 0;
+        getTotalDamageReceivedPerType() const = 0;
 
     virtual std::vector<std::pair<std::string, Damage>>
-    getTotalDamageDealtPerAffectedPlayer() const = 0;
+        getTotalDamageDealtPerAffectedPlayer() const = 0;
 
     virtual std::vector<std::pair<std::string, Damage>>
-    getTotalDamageReceivedPerAffectedPlayer() const = 0;
+        getTotalDamageReceivedPerAffectedPlayer() const = 0;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+        getDamageReceivedPerType(std::string affectedPlayerName) const = 0;
+
+    virtual std::vector<std::pair<std::string, Damage>>
+        getDamageDealtPerType(std::string affectedPlayerName) const = 0;
 
     /* Heal */
     virtual Heal getTotalHeals() const = 0;
@@ -60,7 +70,15 @@ public:
     virtual const XP& getXp() = 0;
 
 
+    /* Time. TODO: Move into its own class */
+    virtual std::time_t getTimeActive() const = 0;
+    virtual std::time_t getPauseDuration() const = 0;
+    virtual std::time_t getStartTime() const = 0;
+    virtual void stopTimer() = 0;
+    virtual void resumeTimer() = 0;
+
     virtual size_t getLongestAffectedPlayerNameLength() const = 0;
+    virtual std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers() = 0;
 };
 
 

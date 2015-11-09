@@ -1,8 +1,11 @@
 #include "affected_player.h"
+#include "affected_player_factory.h"
+#include "affected_player_factory_interface.h"
 #include "affected_player_vector.h"
 #include "damage.h"
 #include "heal.h"
 #include "line_info.h"
+#include "my_time.h"
 #include "nano.h"
 #include "player.h"
 
@@ -11,50 +14,16 @@
 #include <utility>
 
 
-Player::Player(std::string name) : name(name) {
-    affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
-    myTime = new MyTime();
-}
-
-Player::Player(std::string name, MyTimeInterface* myTime) : name(name), myTime(myTime) {
-    affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>();
-}
-
+// Takes shared pointers for the only reason that the test cases must
+// be able to use them at the same time. Unique pointers would
+// have been better as Player is the only one owning them but they
+// would've been moved and unreachable.
 Player::Player(std::string name,
-               AffectedPlayerVector<AffectedPlayer*>* pv,
-               MyTimeInterface* myTime) :
+               std::shared_ptr<AffectedPlayerVector> affectedPlayers,
+               std::shared_ptr<MyTimeInterface> myTime) :
     name(name),
-    affectedPlayers(pv),
+    affectedPlayers(affectedPlayers),
     myTime(myTime) {}
-
-Player::~Player() {
-    delete affectedPlayers;
-    delete myTime;
-}
-
-Player::Player(const Player& other) {
-    name = other.name;
-    affectedPlayers = new AffectedPlayerVector<AffectedPlayer*>;
-    *affectedPlayers = *other.affectedPlayers;
-	nanoPrograms = other.nanoPrograms;
-    xp = other.xp;
-}
-
-Player::Player(Player&& other) NOEXCEPT : Player(other.getName()) {
-    swap(*this, other);
-}
-
-Player& Player::operator=(Player rhs) {
-    swap(*this, rhs);
-    return *this;
-}
-
-void swap(Player& first, Player& second) {
-    std::swap(first.name, second.name);
-    std::swap(first.affectedPlayers, second.affectedPlayers);
-    std::swap(first.xp, second.xp);
-    std::swap(first.nanoPrograms, second.nanoPrograms);
-}
 
 void Player::add(LineInfo& lineInfo) {
     timeOfLastAction = lineInfo.time;

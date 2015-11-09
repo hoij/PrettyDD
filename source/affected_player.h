@@ -8,6 +8,7 @@
 #include "nano.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -17,7 +18,7 @@ class MyTimeInterface;
 
 class AffectedPlayer : public virtual AffectedPlayerInterface {
 public:
-	AffectedPlayer(std::string name, MyTimeInterface* myTime);
+    AffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime);
 
     void add(LineInfo& lineInfo);
 
@@ -49,7 +50,7 @@ private:
     Heal heal;
     Nano nano;
 
-    MyTimeInterface* myTime = nullptr;
+    std::shared_ptr<MyTimeInterface> myTime = nullptr;
 };
 
 

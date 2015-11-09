@@ -13,7 +13,7 @@ class NanoPrograms;
 
 class NanoProgramWriter : public WriterHelper {
 public:
-    NanoProgramWriter(PlayerVector<Player*>& playerVector,
+    NanoProgramWriter(PlayerVector& playerVector,
                       Configuration& config,
                       std::ofstream& file);
 
@@ -33,7 +33,7 @@ private:
     void sortByExecutes(std::vector<std::string>& v,
                         const NanoPrograms& nanoPrograms);
 
-    PlayerVector<Player*>& playerVector;
+    PlayerVector& playerVector;
 };
 
 

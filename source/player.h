@@ -11,6 +11,7 @@
 #include <ctime>
 #include <gtest/gtest_prod.h>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -28,23 +29,16 @@ class Heal;
 class LineInfo;
 class Nano;
 
-class Player : public virtual PlayerInterface {
+class Player : public PlayerInterface {
 // TODO: Se if Player can be split into smaller classes.
 public:
-    Player(std::string name);
-    Player(std::string name, MyTimeInterface* myTime);
     Player(std::string name,
-           AffectedPlayerVector<AffectedPlayer*>* pv,
-           MyTimeInterface* myTime);
-    ~Player();
-    Player(const Player& other);
-    Player(Player&& other) NOEXCEPT;
-    Player& operator=(Player rhs);
-    friend void swap(Player& first, Player& second);
-
-    std::string getName() const {return name;}
+           std::shared_ptr<AffectedPlayerVector> affectedPlayers,
+           std::shared_ptr<MyTimeInterface> myTime);
+    ~Player() {}
 
     void add(LineInfo& lineInfo);
+    std::string getName() const {return name;}
 
     /* Damage */
     Damage getTotalDamageDealt() const;
@@ -90,10 +84,10 @@ public:
     /* XP */
     const XP& getXp();
 
-
+    /* Time. TODO: Move into its own class */
     std::time_t getTimeActive() const;
     std::time_t getPauseDuration() const;
-    std::time_t getStartTime() {return startTime;}
+    std::time_t getStartTime() const {return startTime;}
     void stopTimer();
     void resumeTimer();
 
@@ -122,8 +116,8 @@ private:
     Damage sumDamage(bool nanobots);
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
-    AffectedPlayerVector<AffectedPlayer*>* affectedPlayers = nullptr;
-    MyTimeInterface* myTime = nullptr;
+    std::shared_ptr<AffectedPlayerVector> affectedPlayers = nullptr;
+    std::shared_ptr<MyTimeInterface> myTime = nullptr;
 	NanoPrograms nanoPrograms;
     XP xp;
 };

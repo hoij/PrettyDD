@@ -1,4 +1,5 @@
 #include "affected_player.h"
+#include "affected_player_factory.h"
 #include "affected_player_vector.h"
 #include "damage.h"
 #include "heal.h"
@@ -8,11 +9,15 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
 
-class MockAffectedPlayerVector : public AffectedPlayerVector<AffectedPlayer*> {
+class MockAffectedPlayerVector : public AffectedPlayerVector {
 public:
+    MockAffectedPlayerVector(std::unique_ptr<AffectedPlayerFactoryInterface> affectedPlayerFactory) :
+        AffectedPlayerVector(std::move(affectedPlayerFactory)) {}
+
     MOCK_METHOD1(addToPlayers, void(LineInfo& li));
 
     MOCK_CONST_METHOD0(getLongestNameLength, size_t());
@@ -65,9 +70,14 @@ class PlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
         // mockAffectedPlayerVector and mockMyTime will be deleted in Player
-        mockAffectedPlayerVector = new MockAffectedPlayerVector();
-        mockMyTime = new ::testing::NiceMock<MockMyTime>;
-        player = new Player("You", mockAffectedPlayerVector, mockMyTime);
+        mockMyTime = std::make_shared<::testing::NiceMock<MockMyTime>>();
+        std::unique_ptr<AffectedPlayerFactoryInterface>
+            affectedPlayerFactory(new AffectedPlayerFactory());
+        mockAffectedPlayerVector =
+            std::make_shared<MockAffectedPlayerVector>(std::move(affectedPlayerFactory));
+        player = std::unique_ptr<Player>(new Player("You",
+                            mockAffectedPlayerVector,
+                            mockMyTime));
 
         // Set up the return values.
         LineInfo li1;
@@ -77,12 +87,11 @@ protected:
         d1.add(li1);
         d2.add(li2);
     }
-    virtual void TearDown() {
-        delete player;
-    }
-    Player* player;
-    MockAffectedPlayerVector* mockAffectedPlayerVector;
-    ::testing::NiceMock<MockMyTime>* mockMyTime;
+    virtual void TearDown() {}
+
+    std::unique_ptr<Player> player;
+    std::shared_ptr<MockAffectedPlayerVector> mockAffectedPlayerVector;
+    std::shared_ptr<::testing::NiceMock<MockMyTime>> mockMyTime;
 
     Damage d1;
     Damage d2;
