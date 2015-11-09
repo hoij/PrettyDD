@@ -17,7 +17,7 @@ NanoProgramWriter::NanoProgramWriter(PlayerVector& playerVector,
 
 void NanoProgramWriter::createCastedDetailedList() {
 
-    std::string titleBase = "Casted Nano Program Info";
+    std::string titleBase = "Casted Nano Programs";
 
     const PlayerInterface* pp = playerVector.getPlayer("You");
     if (pp == nullptr) {
