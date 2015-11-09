@@ -18,10 +18,10 @@ public:
     virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
         AffectedPlayerFactoryInterface* affectedPlayerFactory =
             new AffectedPlayerFactory();
-        return std::make_unique<Player>(
+        return std::unique_ptr<Player>(new Player(
             name,
             std::make_shared<AffectedPlayerVector>(affectedPlayerFactory),
-            std::make_shared<MyTime>());
+            std::make_shared<MyTime>()));
     }
 };
 

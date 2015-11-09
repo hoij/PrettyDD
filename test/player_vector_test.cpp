@@ -88,9 +88,10 @@ private:
 class MockPlayerFactory : public PlayerFactoryInterface {
 public:
     virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
-        return std::make_unique<::testing::NiceMock<MockPlayer>>(
+        return std::unique_ptr<::testing::NiceMock<MockPlayer>>(
+            new ::testing::NiceMock<MockPlayer>(
             name,
-            std::make_shared<MyTime>());
+            std::make_shared<MyTime>()));
     }
 };
 
@@ -113,7 +114,7 @@ protected:
     virtual void SetUp() {
         playerVector = new PlayerVector(
             "PlayerRunningProgram",
-            std::make_unique<MockPlayerFactory>());
+            std::unique_ptr<MockPlayerFactory>(new MockPlayerFactory()));
         playerVector->startLogging();
         // Set up standard return values
         d1 = createDamage(10);

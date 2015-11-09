@@ -18,7 +18,7 @@ TEST(CommandHandlerTest, splitAndMergeQuotedText) {
     std::ofstream file;
     PlayerVector playerVector(
         "playerRunningProgram",
-        std::make_unique<PlayerFactory>());
+        std::unique_ptr<PlayerFactory>(new PlayerFactory()));
     Configuration config;
     DamageWriter damageWriter(playerVector, config, file);
     HelpWriter helpWriter(config, file);

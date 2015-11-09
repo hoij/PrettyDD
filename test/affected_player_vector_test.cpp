@@ -103,8 +103,7 @@ protected:
 
     std::shared_ptr<MockAffectedPlayer> addDealerToVector(std::string name);
     std::shared_ptr<MockAffectedPlayer> addReceiverToVector(std::string name);
-    void AffectedPlayerVectorTest::addPlayersToVector(std::string dealer,
-                                                      std::string receiver);
+    void addPlayersToVector(std::string dealer, std::string receiver);
 
     AffectedPlayerVector* affectedPlayerVector;
     Damage d1;

@@ -37,7 +37,7 @@ int main(void) {
     Parser parser(config.getPlayerRunningProgram());
     PlayerVector playerVector(
         config.getPlayerRunningProgram(),
-        std::make_unique<PlayerFactory>());
+        std::unique_ptr<PlayerFactory>(new PlayerFactory()));
     playerVector.startLogging();
 
     std::ofstream file;

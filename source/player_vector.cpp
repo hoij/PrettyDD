@@ -34,7 +34,7 @@ void PlayerVector::addToPlayers(LineInfo& lineInfo) {
 void PlayerVector::createPlayer(std::string name, LineInfo& lineInfo) {
     std::unique_ptr<PlayerInterface> player = playerFactory->createPlayer(name);
     player->add(lineInfo);
-    players.push_back(player);
+    players.push_back(std::move(player));
 }
 
 PlayerInterface* PlayerVector::getPlayer(std::string name) {
