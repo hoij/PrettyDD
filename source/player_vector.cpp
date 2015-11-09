@@ -3,12 +3,6 @@
 #include "player_vector.h"
 
 
-PlayerVector::~PlayerVector() {
-    for (auto player : players) {
-        delete player;
-    }
-};
-
 void PlayerVector::addToPlayers(LineInfo& lineInfo) {
     /* Adds the info found in a log line to dealer and receiver.
     If a player with the same name is not found, a new one is created. */
@@ -19,7 +13,7 @@ void PlayerVector::addToPlayers(LineInfo& lineInfo) {
         return;
     }
 
-    for (PlayerInterface* player : players) {
+    for (const auto& player : players) {
         if (player->getName() == lineInfo.dealer_name) {
             player->add(lineInfo);
             dealerFound = true;
@@ -38,15 +32,18 @@ void PlayerVector::addToPlayers(LineInfo& lineInfo) {
 }
 
 void PlayerVector::createPlayer(std::string name, LineInfo& lineInfo) {
-    PlayerInterface* player = playerFactory->createPlayer(name);
+    std::unique_ptr<PlayerInterface> player = playerFactory->createPlayer(name);
     player->add(lineInfo);
     players.push_back(player);
 }
 
 PlayerInterface* PlayerVector::getPlayer(std::string name) {
-    for (PlayerInterface* player : players) {
+    // Finds the player and returns it as a raw pointer.
+    // Reason for using a raw pointer is that the receiving end
+    // should not take ownership.
+    for (const auto& player : players) {
         if (player->getName() == name) {
-            return player;
+            return player.get();
         }
     }
     return nullptr;
@@ -68,7 +65,7 @@ PlayerVector::getTotalDamageDealtPerPlayer() const {
     total damage dealt (in the form of the Damage class). Players
     with an empty Damage are not included. */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         Damage d = p->getTotalDamageDealt();
         if (d.getCount() != 0) {
             totalDamagePerPlayer.emplace_back(p->getName(), d);
@@ -83,7 +80,7 @@ PlayerVector::getTotalDamageReceivedPerPlayer() const {
     total damage received (in the form of the Damage class). Players
     with an empty Damage are not included. */
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer;
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         Damage d = p->getTotalDamageReceived();
         if (d.getCount() != 0) {
             totalDamagePerPlayer.emplace_back(p->getName(), d);
@@ -95,7 +92,7 @@ PlayerVector::getTotalDamageReceivedPerPlayer() const {
 std::vector<std::pair<std::string, Damage>>
 PlayerVector::getDamageDealtPerType(std::string playerName) const {
     std::string pName = renameIfSelf(playerName);
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         if (p->getName() == pName) {
             return p->getTotalDamageDealtPerType();
         }
@@ -108,7 +105,7 @@ PlayerVector::getDamageDealtPerType(std::string playerName) const {
 std::vector<std::pair<std::string, Damage>>
 PlayerVector::getDamageReceivedPerType(std::string playerName) const {
     std::string pName = renameIfSelf(playerName);
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         if (p->getName() == pName) {
             return p->getTotalDamageReceivedPerType();
         }
@@ -126,7 +123,7 @@ std::string opponentName) const {
     this method. */
     std::string pName = renameIfSelf(playerName);
     std::string oppName = renameIfSelf(opponentName);
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         if (p->getName() == pName) {
             return p->getDamageDealtPerType(oppName);
         }
@@ -139,7 +136,7 @@ std::string opponentName) const {
 std::vector<std::pair<std::string, Damage>>
 PlayerVector::getDamageDealtPerOpponent(std::string playerName) const {
     std::string pName = renameIfSelf(playerName);
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         if (p->getName() == pName) {
             return p->getTotalDamageDealtPerAffectedPlayer();
         }
@@ -152,7 +149,7 @@ PlayerVector::getDamageDealtPerOpponent(std::string playerName) const {
 std::vector<std::pair<std::string, Damage>>
 PlayerVector::getDamageReceivedPerOpponent(std::string playerName) const {
     std::string pName = renameIfSelf(playerName);
-    for (const PlayerInterface* p : players) {
+    for (const auto& p : players) {
         if (p->getName() == pName) {
             return p->getTotalDamageReceivedPerAffectedPlayer();
         }
@@ -187,9 +184,6 @@ void PlayerVector::startLogging() {
 }
 
 void PlayerVector::reset() {
-    for (PlayerInterface* player : players) {
-        delete player;
-    }
     players.clear();
     log = true;
 }

@@ -21,12 +21,12 @@ public:
         playerRunningProgram(playerRunningProgram),
         playerFactory(std::move(playerFactory))
         {}
-    ~PlayerVector();
+    ~PlayerVector() {}
     PlayerVector(const PlayerVector& other) = delete;
 
     void addToPlayers(LineInfo& lineInfo);
     PlayerInterface* getPlayer(std::string name);
-    std::vector<PlayerInterface*>::size_type size() { return players.size(); }
+    std::vector<std::unique_ptr<PlayerInterface>>::size_type size() {return players.size();}
     size_t getLongestNameLength() const;
 
     std::vector<std::pair<std::string, Damage>>
@@ -57,10 +57,10 @@ public:
     void stopLogging();
     void reset();
 
-    typedef std::vector<PlayerInterface*>::iterator PlayerVectorIterator;
+    typedef std::vector<std::unique_ptr<PlayerInterface>>::iterator PlayerVectorIterator;
     PlayerVectorIterator begin() {return players.begin();}
     PlayerVectorIterator end() {return players.end();}
-    typedef std::vector<PlayerInterface*>::const_iterator const_PlayerVectorIterator;
+    typedef std::vector<std::unique_ptr<PlayerInterface>>::const_iterator const_PlayerVectorIterator;
     const_PlayerVectorIterator begin() const {return players.begin();}
     const_PlayerVectorIterator end() const {return players.end();}
 
@@ -70,7 +70,7 @@ private:
     bool log = false;
     std::string playerRunningProgram;
     std::unique_ptr<PlayerFactoryInterface> playerFactory = nullptr;
-    std::vector<PlayerInterface*> players;
+    std::vector<std::unique_ptr<PlayerInterface>> players;
 };
 
 

@@ -87,8 +87,8 @@ private:
 
 class MockPlayerFactory : public PlayerFactoryInterface {
 public:
-    virtual PlayerInterface* createPlayer(std::string name) {
-        return new ::testing::NiceMock<MockPlayer>(
+    virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
+        return std::make_unique<::testing::NiceMock<MockPlayer>>(
             name,
             std::make_shared<MyTime>());
     }
