@@ -17,15 +17,14 @@ class LineInfo;
 class PlayerVector {
 public:
     PlayerVector(std::string playerRunningProgram,
-                 std::unique_ptr<PlayerFactoryInterface> playerFactory) :
-        playerRunningProgram(playerRunningProgram),
-        playerFactory(std::move(playerFactory))
-        {}
+                 std::unique_ptr<PlayerFactoryInterface> playerFactory);
     ~PlayerVector() {}
 
     void addToPlayers(LineInfo& lineInfo);
     PlayerInterface* getPlayer(std::string name);
-    std::vector<std::unique_ptr<PlayerInterface>>::size_type size() {return players.size();}
+    std::vector<std::unique_ptr<PlayerInterface>>::size_type size() {
+        return players.size();
+    }
     size_t getLongestNameLength() const;
 
     std::vector<std::pair<std::string, Damage>>

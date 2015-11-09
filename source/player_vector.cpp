@@ -3,6 +3,14 @@
 #include "player_vector.h"
 
 
+/* Could take a reference to the factory but needs pointer
+in order for tests to work */
+PlayerVector::PlayerVector(
+    std::string playerRunningProgram,
+    std::unique_ptr<PlayerFactoryInterface> playerFactory) :
+    playerRunningProgram(playerRunningProgram),
+    playerFactory(std::move(playerFactory)) {}
+
 void PlayerVector::addToPlayers(LineInfo& lineInfo) {
     /* Adds the info found in a log line to dealer and receiver.
     If a player with the same name is not found, a new one is created. */

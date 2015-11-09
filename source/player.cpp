@@ -14,20 +14,10 @@
 #include <utility>
 
 
-//Player::Player(std::string name) : name(name) {
-//    AffectedPlayerFactoryInterface* affectedPlayerFactory = new AffectedPlayerFactory();
-//    affectedPlayers = new AffectedPlayerVector(affectedPlayerFactory);
-//    myTime = std::make_shared<MyTime>();
-//}
-//
-//Player::Player(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
-//name(name), myTime(myTime) {
-//    affectedPlayers = new AffectedPlayerVector();
-//}
-
 // Takes shared pointers for the only reason that the test cases must
 // be able to use them at the same time. Unique pointers would
-// have been better but they would've been moved and unreachable.
+// have been better as Player is the only one owning them but they
+// would've been moved and unreachable.
 Player::Player(std::string name,
                std::shared_ptr<AffectedPlayerVector> affectedPlayers,
                std::shared_ptr<MyTimeInterface> myTime) :
