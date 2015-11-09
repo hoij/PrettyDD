@@ -16,11 +16,11 @@
 class PlayerFactory : public PlayerFactoryInterface {
 public:
     virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
-        AffectedPlayerFactoryInterface* affectedPlayerFactory =
-            new AffectedPlayerFactory();
-        return std::unique_ptr<Player>(new Player(
+        std::unique_ptr<AffectedPlayerFactoryInterface>
+            affectedPlayerFactory(new AffectedPlayerFactory());
+        return std::unique_ptr<PlayerInterface>(new Player(
             name,
-            std::make_shared<AffectedPlayerVector>(affectedPlayerFactory),
+            std::make_shared<AffectedPlayerVector>(std::move(affectedPlayerFactory)),
             std::make_shared<MyTime>()));
     }
 };

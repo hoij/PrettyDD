@@ -15,8 +15,8 @@
 
 class MockAffectedPlayerVector : public AffectedPlayerVector {
 public:
-    MockAffectedPlayerVector(AffectedPlayerFactoryInterface* affectedPlayerFactory) :
-        AffectedPlayerVector(affectedPlayerFactory) {}
+    MockAffectedPlayerVector(std::unique_ptr<AffectedPlayerFactoryInterface> affectedPlayerFactory) :
+        AffectedPlayerVector(std::move(affectedPlayerFactory)) {}
 
     MOCK_METHOD1(addToPlayers, void(LineInfo& li));
 
@@ -71,13 +71,13 @@ protected:
     virtual void SetUp() {
         // mockAffectedPlayerVector and mockMyTime will be deleted in Player
         mockMyTime = std::make_shared<::testing::NiceMock<MockMyTime>>();
-        AffectedPlayerFactoryInterface* affectedPlayerFactory =
-            new AffectedPlayerFactory();
+        std::unique_ptr<AffectedPlayerFactoryInterface>
+            affectedPlayerFactory(new AffectedPlayerFactory());
         mockAffectedPlayerVector =
-            std::make_shared<MockAffectedPlayerVector>(affectedPlayerFactory);
-        player = std::make_shared<Player>("You",
+            std::make_shared<MockAffectedPlayerVector>(std::move(affectedPlayerFactory));
+        player = std::unique_ptr<Player>(new Player("You",
                             mockAffectedPlayerVector,
-                            mockMyTime);
+                            mockMyTime));
 
         // Set up the return values.
         LineInfo li1;
@@ -89,7 +89,7 @@ protected:
     }
     virtual void TearDown() {}
 
-    std::shared_ptr<Player> player;
+    std::unique_ptr<Player> player;
     std::shared_ptr<MockAffectedPlayerVector> mockAffectedPlayerVector;
     std::shared_ptr<::testing::NiceMock<MockMyTime>> mockMyTime;
 

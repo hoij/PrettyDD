@@ -29,9 +29,9 @@ class MockPlayer : public virtual PlayerInterface {
 public:
     MockPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
     name(name), myTime(myTime) {
-        AffectedPlayerFactoryInterface* affectedPlayerFactory =
-            new AffectedPlayerFactory();
-        affectedPlayers = new AffectedPlayerVector(affectedPlayerFactory);
+        std::unique_ptr<AffectedPlayerFactoryInterface>
+            affectedPlayerFactory(new AffectedPlayerFactory());
+        affectedPlayers = std::make_shared<AffectedPlayerVector>(std::move(affectedPlayerFactory));
     }
 
     MOCK_METHOD1(add, void(LineInfo& li));
@@ -81,14 +81,14 @@ public:
         std::vector<AffectedPlayer*>::size_type(void));
 private:
     std::string name;
-    AffectedPlayerVector* affectedPlayers;
+    std::shared_ptr<AffectedPlayerVector> affectedPlayers;
     std::shared_ptr<MyTimeInterface> myTime;
 };
 
 class MockPlayerFactory : public PlayerFactoryInterface {
 public:
     virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
-        return std::unique_ptr<::testing::NiceMock<MockPlayer>>(
+        return std::unique_ptr<PlayerInterface>(
             new ::testing::NiceMock<MockPlayer>(
             name,
             std::make_shared<MyTime>()));
@@ -114,7 +114,7 @@ protected:
     virtual void SetUp() {
         playerVector = new PlayerVector(
             "PlayerRunningProgram",
-            std::unique_ptr<MockPlayerFactory>(new MockPlayerFactory()));
+            std::unique_ptr<PlayerFactoryInterface>(new MockPlayerFactory()));
         playerVector->startLogging();
         // Set up standard return values
         d1 = createDamage(10);

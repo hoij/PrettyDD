@@ -17,8 +17,8 @@ class Nano;
 
 class AffectedPlayerVector {
 public:
-    AffectedPlayerVector(AffectedPlayerFactoryInterface* affectedPlayerFactory) :
-        affectedPlayerFactory(affectedPlayerFactory) {}
+    AffectedPlayerVector(std::unique_ptr<AffectedPlayerFactoryInterface> affectedPlayerFactory) :
+        affectedPlayerFactory(std::move(affectedPlayerFactory)) {}
     virtual ~AffectedPlayerVector() {}
     AffectedPlayerVector(const AffectedPlayerVector& other);
     AffectedPlayerVector(AffectedPlayerVector&& other);
@@ -97,7 +97,7 @@ private:
     static bool comparePotentialHeal(const std::pair<std::string, Heal>& p1,
                                      const std::pair<std::string, Heal>& p2);
 
-    AffectedPlayerFactoryInterface* affectedPlayerFactory = nullptr;
+    std::unique_ptr<AffectedPlayerFactoryInterface> affectedPlayerFactory = nullptr;
     std::vector<std::shared_ptr<AffectedPlayerInterface>> players;
 };
 

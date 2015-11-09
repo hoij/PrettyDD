@@ -88,24 +88,23 @@ class AffectedPlayerVectorTest : public ::testing::Test {
 EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
-        AffectedPlayerFactoryInterface* mockAffectedPlayerFactory =
-            new MockAffectedPlayerFactory();
+        std::unique_ptr<AffectedPlayerFactoryInterface>
+            mockAffectedPlayerFactory(new MockAffectedPlayerFactory());
+        
         affectedPlayerVector =
-            new AffectedPlayerVector(mockAffectedPlayerFactory);
+            std::make_shared<AffectedPlayerVector>(std::move(mockAffectedPlayerFactory));
 
         // Set up standard return values.
         d1 = createDamage(10);
         d2 = createDamage(30);
     }
-    virtual void TearDown() {
-        delete affectedPlayerVector;
-    }
+    virtual void TearDown() {}
 
     std::shared_ptr<MockAffectedPlayer> addDealerToVector(std::string name);
     std::shared_ptr<MockAffectedPlayer> addReceiverToVector(std::string name);
     void addPlayersToVector(std::string dealer, std::string receiver);
 
-    AffectedPlayerVector* affectedPlayerVector;
+    std::shared_ptr<AffectedPlayerVector> affectedPlayerVector;
     Damage d1;
     Damage d2;
 };

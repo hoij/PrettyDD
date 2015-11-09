@@ -22,7 +22,6 @@ public:
         playerFactory(std::move(playerFactory))
         {}
     ~PlayerVector() {}
-    PlayerVector(const PlayerVector& other) = delete;
 
     void addToPlayers(LineInfo& lineInfo);
     PlayerInterface* getPlayer(std::string name);

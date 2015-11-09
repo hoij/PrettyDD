@@ -37,11 +37,6 @@ public:
            std::shared_ptr<MyTimeInterface> myTime);
     ~Player() {}
 
-    Player(const Player& other);
-    Player(Player&& other) NOEXCEPT;
-    Player& operator=(Player rhs);
-    friend void swap(Player& first, Player& second);
-
     void add(LineInfo& lineInfo);
     std::string getName() const {return name;}
 
