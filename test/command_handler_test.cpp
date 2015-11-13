@@ -30,7 +30,7 @@ TEST(CommandHandlerTest, splitAndMergeQuotedText) {
                                   helpWriter,
                                   myTime,
                                   nanoProgramWriter,
-				                  playerVector,
+                                  playerVector,
                                   writerHelper,
                                   xpWriter);
 
