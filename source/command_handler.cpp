@@ -38,7 +38,8 @@ bool CommandHandler::execute(const LineInfo& li) {
 
     // TODO: Split into several methods and eventually switch to
     // some other way of handling this.
-    if (nrOfOptions == 0) {
+    if (nrOfOptions == 0 &&
+        commandParts[0] == "pdd") {
         // Write the detailed top list by defualt:
         damageWriter.createDDDetailedTopList();
     }

@@ -1,5 +1,6 @@
 #include "command_handler.h"
 #include "configuration.h"
+#include "console_reader.h"
 #include "damage_writer.h"
 #include "formatted_line.h"
 #include "help_writer.h"
@@ -38,6 +39,7 @@ int main(void) {
     PlayerVector playerVector(
         config.getPlayerRunningProgram(),
         std::unique_ptr<PlayerFactoryInterface>(new PlayerFactory()));
+    ConsoleReader consoleReader(myTime);
     playerVector.startLogging();
 
     std::ofstream file;
@@ -80,7 +82,6 @@ int main(void) {
     while (isRunning) {
         // If there are no more lines to read
         if(!std::getline(logstream, line) || logstream.eof()) {
-
             /* Handle the case when the log file shrinks (for example
             when it's deleted). */
             logstream.clear();
@@ -93,8 +94,13 @@ int main(void) {
             // to the new end.
             logstream.seekg((endpos < lastpos) ? endpos : lastpos);
 
+            // Console input is read at this time to avoid doing it
+            // after every log line read.
+            LineInfo lineInfo = consoleReader.read(std::cin);
+            isRunning = commandHandler.execute(lineInfo);
+            
             // Sleep to get less CPU intensive
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
             continue;
         }
 
@@ -117,6 +123,5 @@ int main(void) {
     errorLog.write("");
     errorLog.write("Info: Program ended at: " + myTime.currentTimeString());
 
-    std::getchar();
     return 0;
 }

@@ -62,6 +62,7 @@ add_gmock_test_2_libs(parser_youHitOther_test parserlib parser_param_testlib par
 add_gmock_test(affected_player_test affected_playerlib affected_player_test.cpp)
 add_gmock_test(affected_player_vector_test affected_player_vectorlib affected_player_vector_test.cpp)
 add_gmock_test(command_handler_test command_handlerlib command_handler_test.cpp)
+add_gmock_test(console_reader_test console_readerlib console_reader_test.cpp)
 add_gmock_test(damage_test damagelib damage_test.cpp)
 add_gmock_test(formatted_line_test formatted_linelib formatted_line_test.cpp)
 add_gmock_test(heal_test heallib heal_test.cpp)
