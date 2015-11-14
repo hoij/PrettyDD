@@ -48,7 +48,7 @@ private:
 
     // Functions within the funcMap
     LineInfo otherAndYourPetHitByOther(const std::string& message);
-    LineInfo otherHitByNano(const std::string& message);
+    LineInfo otherAndYourPetHitByNano(const std::string& message);
     LineInfo youHitOther(const std::string& message);
     LineInfo youHitOtherWithNano(const std::string& message);
     LineInfo meGotHealth(const std::string& message);
@@ -60,7 +60,6 @@ private:
     LineInfo yourMisses(const std::string& message);
     LineInfo meHitByNano(const std::string& message);
     LineInfo meCastNano(const std::string& message);
-    LineInfo yourPetHitByNano(const std::string& message);
     LineInfo yourPetHitByMonster(const std::string& message);
     LineInfo meGotSK(const std::string& message);
     LineInfo meGotXP(const std::string& message);
