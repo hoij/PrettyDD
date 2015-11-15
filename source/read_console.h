@@ -6,15 +6,18 @@
 
 #include <atomic>
 #include <istream>
+#include <mutex>
 #include <string>
 
-class CommandHandler;
+class Configuration;
 class LineInfo;
 
 void readConsole(std::istream& input,
-                 CommandHandler commandHandler,
+                 Configuration config,
                  MyTime myTime,
-                 std::atomic<bool>& isRunning);
+                 LineInfo& lineInfo,
+                 std::mutex& lineInfoMutex,
+                 std::atomic<bool>& isInitialParsingDone);
 
 void prepend(std::string& command);
 

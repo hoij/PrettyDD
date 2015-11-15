@@ -1,27 +1,46 @@
+#ifdef WIN32
+// warning C4127: conditional expression is constant
+#pragma warning(disable : 4127)
+#endif
+
 #include "command_handler.h"
+#include "configuration.h"
 #include "read_console.h"
 #include "line_info.h"
 
+#include <chrono>
 #include <iostream>
+#include <limits>
+#include <thread>
 
 
 void readConsole(std::istream& input,
-                 CommandHandler commandHandler,
+                 Configuration config,
                  MyTime myTime,
-                 std::atomic<bool>& isRunning) {
+                 LineInfo& lineInfo,
+                 std::mutex& lineInfoMutex,
+                 std::atomic<bool>& isInitialParsingDone) {
 
-    LineInfo li;
-    while (isRunning) {
+    // Do not accept any commands while performing the
+    // initial parsing.
+    while (!isInitialParsingDone) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    // Print a done message if there was any initial parsing.
+    if (!config.shouldParseFromEnd()) {
+        std::cout << "Done." << std::endl;
+    }
 
+    std::string command;
+    while (true) {
         std::cout << ">>> ";
-        std::getline(input, li.command);
-
-        prepend(li.command);
-
+        std::getline(input, command);
+        std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
+        lineInfo.command = command;
+        // Add "pdd" to the command if needed.
+        prepend(lineInfo.command);
         // Set the time of the command
-        li.time = myTime.currentTime();
-
-        isRunning = commandHandler.execute(li);
+        lineInfo.time = myTime.currentTime();
     }
 }
 
