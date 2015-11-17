@@ -4,6 +4,7 @@
 #include "formatted_line.h"
 #include "help_writer.h"
 #include "line_info.h"
+#include "log_reading.h"
 #include "logger.h"
 #include "my_time.h"
 #include "nano_program_writer.h"
@@ -70,14 +71,6 @@ int main(void) {
     // Create the help script on startup
     helpWriter.createHelp("pddhelp");
 
-    // Read from the end of the file if true,
-    // otherwise read from the start.
-    if (config.shouldParseFromEnd()) {
-        logstream.seekg(0, logstream.end);
-    }
-    std::ios::streampos lastpos = logstream.tellg();
-    std::ios::streampos endpos = logstream.tellg();
-
     // Create a thread to handle console input.
     // This thread is the only one reading from cin.
     std::atomic<bool> isInitialParsingDone(false);
@@ -92,16 +85,20 @@ int main(void) {
         std::ref(isInitialParsingDone));
     cinThread.detach();
 
-
-    if (!config.shouldParseFromEnd()) {
-        std::cout << "Parsing the log from the start." << std::endl;
-    }
-    else {
+    // Read from the end of the file if true,
+    // otherwise read from the start.
+    if (config.shouldParseFromEnd()) {
+        logstream.seekg(0, logstream.end);
         std::cout << "Parsing the log from the end." << std::endl;
         isInitialParsingDone = true;
     }
+    else {
+        std::cout << "Parsing the log from the start." << std::endl;
+    }
 
     // Parse loop
+    std::streampos lastpos = logstream.tellg();
+    std::streampos endpos = logstream.tellg();
     bool isRunning = true;
     std::string line;
     while (isRunning) {
@@ -112,27 +109,12 @@ int main(void) {
             // console.
             isInitialParsingDone = true;
 
-            /* Handle the case when the log file shrinks (for example
-            when it's deleted). */
-            logstream.clear();
-            // Seek to the end and save that position
-            logstream.seekg(0, logstream.end);
-            endpos = logstream.tellg();
-            logstream.clear();
-            // Compare the end with the position of the last char read
-            // to see if the file has shrunk. If it has, then move back
-            // to the new end.
-            logstream.seekg((endpos < lastpos) ? endpos : lastpos);
+            adaptIfLogShrunk(logstream, lastpos, endpos);
 
-            // TODO: Move into commandHandler or somewhere else and
-            // simply call a method here.
-            {
-                // New scope to let lock expire on exit
+            // Check for command
+            {  // New scope to let lock expire on exit
                 std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
-                if (!lineInfo.command.empty()) {
-                    isRunning = commandHandler.execute(lineInfo);
-                    lineInfo.command.clear();
-                }
+                isRunning = commandHandler.process(lineInfo);
             }
 
             // Sleep to get less CPU intensive
@@ -142,23 +124,18 @@ int main(void) {
         else {  // Format and parse the log line
             FormattedLine formattedLine(line);
             if (formattedLine.isFormatted()) {  // If successfully formatted
+                std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
                 lineInfo = parser.parse(formattedLine);  // Parse it
                 if (lineInfo.hasStats) {
                     playerVector.addToPlayers(lineInfo);
                 }
             }
         }
-
-        // TODO: Move into commandHandler or somewhere else and
-        // simply call a method here.
-         {
-             // New scope to let lock expire on exit
-             std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
-             if (!lineInfo.command.empty()) {
-                 isRunning = commandHandler.execute(lineInfo);
-                 lineInfo.command.clear();
-             }
-         }
+        // Check for command
+        {  // New scope to let lock expire on exit
+            std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
+            isRunning = commandHandler.process(lineInfo);
+        }
 
         // Save position of the last char read.
         lastpos = logstream.tellg();

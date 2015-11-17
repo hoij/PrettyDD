@@ -27,7 +27,7 @@ public:
                    XPWriter& xpWriter);
 
     CommandHandler& operator=(CommandHandler rhs) = delete;
-    bool execute(const LineInfo& li);
+    bool process(LineInfo& li);
 
 private:
     FRIEND_TEST(CommandHandlerTest, splitAndMergeQuotedText);

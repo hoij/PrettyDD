@@ -21,12 +21,13 @@ CommandHandler::CommandHandler(DamageWriter& damageWriter,
     xpWriter(xpWriter) {}
 
 
-bool CommandHandler::execute(const LineInfo& li) {
+bool CommandHandler::process(LineInfo& li) {
 
     bool shouldContinue = true;
 
-    // Avoid executing old commands
-    if (wasCommandTypedLongAgo(li.time)) {
+    // Check for command and avoid executing old commands
+    if (li.command.empty() || wasCommandTypedLongAgo(li.time)) {
+        li.command.clear();
         return shouldContinue;
     }
 
@@ -194,6 +195,9 @@ bool CommandHandler::execute(const LineInfo& li) {
         }
     }
 
+    // The LineInfo object is reused in the parse loop so
+    // the commands needs to be cleared to avoid repeats.
+    li.command.clear();
     return shouldContinue;
 }
 
