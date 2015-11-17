@@ -34,11 +34,13 @@ Show XP per hour, max and min. Either gained or lost. Logs the following types:
 
 
 #### General
-Control the program via in-game chat:
+Control the program via in-game chat or a console window:
 * Determine which stat view to show
 * Pause and resume logging to stop logging damage and stop the DPM/XP timer
 * Reset all data parsed (this will not clear the log file)
-* Display the results of a command by executing a single script (/pdd). Too see all commands available say "pdd help" to a chat channel in game and execute "/pdd".
+* Display the results of a command by executing a single script (/pdd). Too see all commands available type /pddhelp.
+
+Commands entered into the console window can ommit the "pdd" part.
 
 Chose to parse the log form the beginning or the end by changing a paramater in the settings file.
 
