@@ -137,8 +137,8 @@ void DamageWriter::createDamagePerType(std::string titleBase,
 
 void DamageWriter::createDDPerTypeDetailed(std::string playerName,
                                            std::string opponentName) {
-    std::string titleBase = "Detailed Damage Dealt On " +
-                            opponentName + " By " + playerName;
+    std::string titleBase = "Detailed Damage Dealt By " +
+                            playerName + " On " + opponentName;
     createDamagePerTypeDetailed(titleBase, playerName, opponentName);
 }
 
@@ -171,6 +171,13 @@ void DamageWriter::createDamagePerTypeDetailed(
 void DamageWriter::createTopList(
     std::string titleBase,
     std::vector<std::pair<std::string, Damage>> totalDamagePerPlayer) {
+
+    if (totalDamagePerPlayer.size() == 0) {
+        createNotFoundMessage("No damage logged",
+            "Tried to display " + titleBase + " but " +
+            "no damage has been logged.");
+        return;
+    }
 
     sortByTotal(totalDamagePerPlayer);
 
@@ -214,6 +221,7 @@ void DamageWriter::createDamagePerType(
     std::vector<std::pair<std::string, Damage>> damagePerType,
     int typesPerWindow,
     bool detailed) {
+    /* For all damage done by playerName */
 
     if (!playerFound(titleBase, playerName,damagePerType)) {
         return;
@@ -247,6 +255,7 @@ void DamageWriter::createDamagePerType(
     std::vector<std::pair<std::string, Damage>> damagePerType,
     int typesPerWindow,
     bool detailed) {
+    /* For all damage done to opponentName by playerName */
 
     if (!playerFound(titleBase, playerName, damagePerType)) {
         return;
@@ -1017,10 +1026,11 @@ bool DamageWriter::opponentFound(
                    (v[0].first == "empty");
     if (notFound) {
         createNotFoundMessage(opponentName + " not found among " +
-                              playerName + "'s opponents",
+                              playerName + "'s opponents.",
                               "Tried to display " + titleBase + " but " +
-                              opponentName + " was not found among " +
-                              playerName + "'s opponents.");
+                              playerName +
+                              " has not dealt any damage to " +
+                              opponentName + ".");
         return false;
     }
     return true;
