@@ -11,7 +11,7 @@
 
 class FormattedLine : public FormattedLineInterface {
 public:
-    FormattedLine(std::string& line);
+    bool format(std::string line);
 
     const std::string& getDescription() const {return formattedLine[1];}
     const std::string& getDescriptionCode() const {return formattedLine[0];}
@@ -23,7 +23,6 @@ public:
     bool isFormatted() const {return formatted;}
 
 private:
-    bool format(std::string line);
     std::string findDescriptionCode(std::string& s);
     std::string findDescription(std::string& s);
     std::string findSender(std::string& s);

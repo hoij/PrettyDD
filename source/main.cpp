@@ -122,7 +122,8 @@ int main(void) {
             continue;
         }
         else {  // Format and parse the log line
-            FormattedLine formattedLine(line);
+            FormattedLine formattedLine;
+            formattedLine.format(line);
             if (formattedLine.isFormatted()) {  // If successfully formatted
                 std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
                 lineInfo = parser.parse(formattedLine);  // Parse it

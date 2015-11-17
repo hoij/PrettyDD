@@ -8,9 +8,6 @@
 using std::regex;
 using std::regex_search;
 
-FormattedLine::FormattedLine(std::string& line) {
-    format(line);
-}
 
 bool FormattedLine::format(std::string line) {
     // Splits the log line into five parts and stores the original line.
