@@ -190,4 +190,4 @@ ModelManifest.xml
 Thumbs.db
 
 #kdevelop
-.kdev*
+*.kdev*
