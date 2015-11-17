@@ -154,26 +154,36 @@ INSTANTIATE_TEST_CASE_P(yourPetHitByMonster, ParseTest,
     testing::Values(
         std::make_tuple(
             FormattedLineStub("Your pet hit by monster",
-                              "Your pet Vios was damaged by a toxic substance for 25 points of damage."),
+                              "Your pet Letter was damaged by a toxic substance for 3 points of damage."),
             ExtendedLineInfo("Environment",
-                             "Vios",
+                             "Letter",
                              "damage",
                              "a toxic substance",
-                             25))));
+                             3))));
 
-//TODO:
-//INSTANTIATE_TEST_CASE_P(yourPetHitByNano, ParseTest,
-//    testing::Values(
-//        std::make_tuple(
-//            FormattedLineStub("",
-//                              ""),
-//            ExtendedLineInfo("Need example line",
-//                             "",
-//                             "",
-//                             "",
-//                             "",
-//                             0,
-//                             false,
-//                             false,
-//                             false,
-//                             true))));
+INSTANTIATE_TEST_CASE_P(yourPetHitByNano, ParseTest,
+    testing::Values(
+        std::make_tuple(
+            FormattedLineStub("Your pet hit by nano",
+                              "Letter was attacked with nanobots from Tekory for 1339 points of chemical damage."),
+            ExtendedLineInfo("Tekory",
+                             "Letter",
+                             "damage",
+                             "chemical",
+                             1339,
+                             false,
+                             false,
+                             false,
+                             true)),
+        std::make_tuple(
+            FormattedLineStub("Your pet hit by nano",
+                             "Letter was attacked with nanobots from Tekory for 175 points of melee damage."),
+            ExtendedLineInfo("Tekory",
+                             "Letter",
+                             "damage",
+                             "melee",
+                             175,
+                             false,
+                             false,
+                             false,
+                             true))));

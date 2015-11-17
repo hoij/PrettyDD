@@ -61,6 +61,8 @@
 ["#0000000042000009#","Your pet hit by other","",1425996728]Letter hit Guard for 623 points of melee damage.
 ["#0000000042000009#","Your pet hit by other","",1425996758]Letter hit Guard for 1268 points of melee damage.Critical hit!
 ["#0000000042000009#","Your pet hit by other","",1425996734]Guard hit Letter for 1639 points of melee damage.Critical hit!
+["#0000000042000003#","Your pet hit by nano","",1447090410]Letter was attacked with nanobots from Tekory for 1339 points of chemical damage.
+["#0000000042000003#","Your pet hit by nano","",1447090411]Letter was attacked with nanobots from Tekory for 175 points of melee damage.
 
 ["#0000000042000018#","Me Cast Nano","",1425326300]Executing Nano Program: Improved Mongo Crush!.
 ["#0000000042000018#","Me Cast Nano","",1425326300]Nano program executed successfully.
@@ -110,7 +112,7 @@
 ["#0000000042000017#","You gave nano","",1425734907]You increased nano on Sayet for 2102 points.
 
 ["#0000000042000016#","Me got nano","",1180555427]You got nano from Jspe80 for 288 points.
-["#0000000042000011#","Your pet hit by monster","",1191516331]Your pet Vios was damaged by a toxic substance for 25 points of damage.
+["#0000000042000011#","Your pet hit by monster","",1447094231]Your pet Letter was damaged by a toxic substance for 3 points of damage.
 ["#0000000042000001#","Me hit by environment","",1160126071]You were damaged by a toxic substance for 123 points of damage.
 ["#000000004200000b#","Me got XP","",1426200654]You lost 9822 xp.
 ["#000000004200000c#","Me got SK","",1425994822]You lost 200 points of Shadowknowledge

@@ -36,7 +36,7 @@ void Parser::createFunctionMap() {
     // TODO: Fix so all cases can use find_amout()
     funcMap["Other hit by other"] = &Parser::otherAndYourPetHitByOther;
     funcMap["Your pet hit by other"] = &Parser::otherAndYourPetHitByOther;
-    funcMap["Other hit by nano"] = &Parser::otherHitByNano;
+    funcMap["Other hit by nano"] = &Parser::otherAndYourPetHitByNano;
     funcMap["You hit other"] = &Parser::youHitOther;
     funcMap["You hit other with nano"] = &Parser::youHitOtherWithNano;
     funcMap["Me got health"] = &Parser::meGotHealth;
@@ -48,7 +48,7 @@ void Parser::createFunctionMap() {
     funcMap["Your misses"] = &Parser::yourMisses;
     funcMap["Me hit by environment"] = &Parser::meHitByEnvironment;
     funcMap["Me Cast Nano"] = &Parser::meCastNano;
-    funcMap["Your pet hit by nano"] = &Parser::yourPetHitByNano;
+    funcMap["Your pet hit by nano"] = &Parser::otherAndYourPetHitByNano;
     funcMap["Your pet hit by monster"] = &Parser::yourPetHitByMonster;
     funcMap["Me got SK"] = &Parser::meGotSK;
     funcMap["Me got XP"] = &Parser::meGotXP;
@@ -499,11 +499,14 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     return li;
 }
 
-LineInfo Parser::otherHitByNano(const std::string& message) {
+LineInfo Parser::otherAndYourPetHitByNano(const std::string& message) {
     /*
     ["#0000000042000004#","Other hit by nano","",1425326284]Predator Rogue was attacked with nanobots from Sgtcuddle for 1293 points of energy damage.
     ["#0000000042000004#","Other hit by nano","",1425326326]Frozen Spinetooth was attacked with nanobots for 445 points of unknown damage.
     ["#0000000042000004#","Other hit by nano","",1444750507]Xan Spirit of Redemption was attacked with nanobots for 2162 points of unknown damage.
+
+    ["#0000000042000003#", "Your pet hit by nano", "", 1447090410]Letter was attacked with nanobots from Tekory for 1339 points of chemical damage.
+    ["#0000000042000003#", "Your pet hit by nano", "", 1447090411]Letter was attacked with nanobots from Tekory for 175 points of melee damage.
     Sometimes there is no dealer:
     ["#0000000042000004#","Other hit by nano","",1444741138]Blackbullet0 was attacked with nanobots for 715 points of poison damage.
     */
@@ -803,20 +806,10 @@ LineInfo Parser::meCastNano(const std::string& message) {
     return li;
 }
 
-LineInfo Parser::yourPetHitByNano(const std::string& message) {
-    // TODO: Find example
-    LineInfo li;
-    li.type = "damage";
-    li.amount = findAmount(message);
-    li.crit = isCrit(message);
-    return li;
-}
-
 LineInfo Parser::yourPetHitByMonster(const std::string& message) {
-    /* Find my own log line, also find one of these when it this "you" and "other".
-    ["#0000000042000011#","Your pet hit by monster","",1191516331]Your pet Vios was damaged by a toxic substance for 25 points of damage.
-
+    /* TODO: Find one of these when it's "other". Toxic damage on other does not show in log.
     TODO: There must be other variations of this type too. Find them.
+    ["#0000000042000011#","Your pet hit by monster","",1447094231]Your pet Letter was damaged by a toxic substance for 3 points of damage.
     */
     LineInfo li;
     li.type = "damage";
