@@ -80,7 +80,7 @@ int main(void) {
 
     // Create a thread to handle console input.
     // This thread is the only one reading from cin.
-    std::atomic<bool> isInitialParsingDone = false;
+    std::atomic<bool> isInitialParsingDone(false);
     LineInfo lineInfo;  // Shared between threads.
     std::mutex lineInfoMutex;
     std::thread cinThread(readConsole,
@@ -131,6 +131,7 @@ int main(void) {
                 std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
                 if (!lineInfo.command.empty()) {
                     isRunning = commandHandler.execute(lineInfo);
+                    lineInfo.command.clear();
                 }
             }
 
@@ -155,6 +156,7 @@ int main(void) {
              std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
              if (!lineInfo.command.empty()) {
                  isRunning = commandHandler.execute(lineInfo);
+                 lineInfo.command.clear();
              }
          }
 
