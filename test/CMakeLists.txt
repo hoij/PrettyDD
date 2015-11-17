@@ -69,4 +69,5 @@ add_gmock_test_2_libs(nano_programs_test nano_programslib loggerlib nano_program
 add_gmock_test(nano_test nanolib nano_test.cpp)
 add_gmock_test(player_test playerlib player_test.cpp)
 add_gmock_test(player_vector_test player_vectorlib player_vector_test.cpp)
+add_gmock_test(read_console_test read_consolelib read_console_test.cpp)
 add_gmock_test(xp_test xplib xp_test.cpp)

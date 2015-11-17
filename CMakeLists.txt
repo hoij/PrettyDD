@@ -9,7 +9,7 @@ if(WIN32)
 		set(flags "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc")
 	endif()
 else()
-	set(flags "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror")
+	set(flags "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -Wall -Wextra -Werror")
 endif()
 if (NOT CONFIGURED_ONCE)
 	set(CMAKE_CXX_FLAGS "${flags}"

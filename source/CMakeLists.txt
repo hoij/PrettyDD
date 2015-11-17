@@ -21,6 +21,8 @@ add_library(affected_player_vectorlib affected_player_vector.cpp)
 target_link_libraries(affected_player_vectorlib affected_playerlib damagelib
                       heallib nanolib loggerlib)
 add_library(configurationlib configuration.cpp)
+add_library(read_consolelib read_console.cpp)
+target_link_libraries(read_consolelib command_handlerlib my_timelib)
 add_library(damagelib damage.cpp)
 add_library(formatted_linelib formatted_line.cpp)
 target_link_libraries(formatted_linelib loggerlib)
@@ -60,6 +62,7 @@ target_link_libraries(xp_writerlib xplib configurationlib writer_helperlib)
 
 target_link_libraries(PrettyDD
                       damagelib
+                      read_consolelib
                       heallib
                       nanolib
                       xplib

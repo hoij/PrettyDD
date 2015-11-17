@@ -12,11 +12,15 @@
 #include "player_factory_interface.h"
 #include "player_interface.h"
 #include "player_vector.h"
+#include "read_console.h"
 #include "xp_writer.h"
 
+#include <atomic>
+#include <chrono>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -74,12 +78,39 @@ int main(void) {
     std::ios::streampos lastpos = logstream.tellg();
     std::ios::streampos endpos = logstream.tellg();
 
-    std::string line;
-    bool isRunning = true;
+    // Create a thread to handle console input.
+    // This thread is the only one reading from cin.
+    std::atomic<bool> isInitialParsingDone(false);
+    LineInfo lineInfo;  // Shared between threads.
+    std::mutex lineInfoMutex;
+    std::thread cinThread(readConsole,
+        std::ref(std::cin),
+        config,
+        myTime,
+        std::ref(lineInfo),
+        std::ref(lineInfoMutex),
+        std::ref(isInitialParsingDone));
+    cinThread.detach();
+
+
+    if (!config.shouldParseFromEnd()) {
+        std::cout << "Parsing the log from the start." << std::endl;
+    }
+    else {
+        std::cout << "Parsing the log from the end." << std::endl;
+        isInitialParsingDone = true;
+    }
+
     // Parse loop
+    bool isRunning = true;
+    std::string line;
     while (isRunning) {
         // If there are no more lines to read
-        if(!std::getline(logstream, line) || logstream.eof()) {
+        if (!std::getline(logstream, line) || logstream.eof()) {
+            // Set to true to signal to the console thread that parsing
+            // is done and that it can start reading commands from the
+            // console.
+            isInitialParsingDone = true;
 
             /* Handle the case when the log file shrinks (for example
             when it's deleted). */
@@ -93,22 +124,41 @@ int main(void) {
             // to the new end.
             logstream.seekg((endpos < lastpos) ? endpos : lastpos);
 
+            // TODO: Move into commandHandler or somewhere else and
+            // simply call a method here.
+            {
+                // New scope to let lock expire on exit
+                std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
+                if (!lineInfo.command.empty()) {
+                    isRunning = commandHandler.execute(lineInfo);
+                    lineInfo.command.clear();
+                }
+            }
+
             // Sleep to get less CPU intensive
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
         }
-
-        // Format and parse the log line
-        FormattedLine formattedLine(line);
-        if (formattedLine.isFormatted()) {  // If successfully formatted
-            LineInfo lineInfo = parser.parse(formattedLine);  // Parse it
-            if(lineInfo.hasStats) {
-                playerVector.addToPlayers(lineInfo);
-            }
-            else if (!lineInfo.command.empty()) { // Command exists
-                isRunning = commandHandler.execute(lineInfo);
+        else {  // Format and parse the log line
+            FormattedLine formattedLine(line);
+            if (formattedLine.isFormatted()) {  // If successfully formatted
+                lineInfo = parser.parse(formattedLine);  // Parse it
+                if (lineInfo.hasStats) {
+                    playerVector.addToPlayers(lineInfo);
+                }
             }
         }
+
+        // TODO: Move into commandHandler or somewhere else and
+        // simply call a method here.
+         {
+             // New scope to let lock expire on exit
+             std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
+             if (!lineInfo.command.empty()) {
+                 isRunning = commandHandler.execute(lineInfo);
+                 lineInfo.command.clear();
+             }
+         }
 
         // Save position of the last char read.
         lastpos = logstream.tellg();
@@ -117,6 +167,5 @@ int main(void) {
     errorLog.write("");
     errorLog.write("Info: Program ended at: " + myTime.currentTimeString());
 
-    std::getchar();
     return 0;
 }
