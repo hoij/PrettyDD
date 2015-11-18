@@ -14,20 +14,20 @@ void HelpWriter::createHelp(std::string fileName) {
     createCommands1();
     createCommands2();
 
-
     closeFile();
 }
 
 void HelpWriter::createInfo() {
 
     writeStartOfLink("Welcome to PrettyDD!");
-    file << "PrettyDD generates script files based on commands spoken into chat channels.<br>" << nl
+    file << "PrettyDD generates script files based on commands spoken into "
+            "chat channels or entered into the console window.<br>" << nl
          << "<br>" << nl
          << "<font color = " + yellow + ">" << nl
          << "Usage"
          << "</font><br>" << nl
          << "Begin a command with:<br>" << nl;
-    writeCommand("pdd");
+    writeCommand("pdd", "Optional when using the console window");
     file << "<br>" << nl
 
          << "Then add one of the options from the command list.<br>" << nl
