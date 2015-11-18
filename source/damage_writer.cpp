@@ -940,7 +940,7 @@ void DamageWriter::writeTotalInfo(int total, int count, std::string category) {
     const int width = 7;
     const int nrWidth = 4;
     file << std::right << std::setfill(fillChar) <<
-            std::setw(width+1) << " " + std::to_string(total)
+            std::setw(width+2) << " " + std::to_string(total)
                                << " (" <<
             std::setw(nrWidth) << std::to_string(count)
                                << ") " << category << " Total" << "<br>" << nl;
