@@ -63,16 +63,10 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
 
     if (formattedLine.getDescription() == "Vicinity" ||
         formattedLine.getDescription() == "Team" ||
-        formattedLine.getDescriptionCode() == "00000003000011fc" ||
+        formattedLine.getDescriptionCode() == "00000003000011fc" ||  // Org
         formattedLine.getDescription() == "Raid") {
-            // Vicinity, team or org chat messages
             lineInfo = chat(formattedLine.getMessage(), formattedLine.getSender());
         }
-    // TODO: Fix this case with system. It's both in the func map
-    // and also here as an else if.
-    else if (formattedLine.getDescription() == "System") {
-        lineInfo = system(formattedLine.getMessage());
-    }
     else {
         // Call a matching function from the map of parsing functions.
         auto funcMapIterator = funcMap.find(formattedLine.getDescription());
@@ -80,6 +74,7 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
             lineInfo = (this->*funcMapIterator->second)(formattedLine.getMessage());
             // findSubtype can be called on any line
             lineInfo.subtype = findSubtype(formattedLine.getMessage(), lineInfo.type);
+            // Set special or shield flag
             if (lineInfo.type == "damage") {
                 lineInfo.special = isSpecial(lineInfo.subtype);
                 lineInfo.shield = isShield(lineInfo.subtype);
@@ -95,8 +90,6 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
     }
 
     lineInfo.time = formattedLine.getTime();
-
-    logWhenPlayerNamesNotFound(lineInfo, formattedLine);
 
     return lineInfo;
 }
@@ -364,7 +357,7 @@ bool Parser::isDeflect(const std::string& message) {
 }
 
 std::string Parser::renameSpecial(std::string subtype) {
-    // TODO: Are there any more of these? Bow Special?
+    // TODO: Are there any more of these?
     // Misses writes specials to the log different so they have to be renamed.
     // I can either rename these here, or when I get the data from a player,
     // I can get both "Brawl" and "Brawling" for example.
@@ -395,40 +388,6 @@ bool Parser::isShield(std::string& subtype) {
 
 bool Parser::isSpecial(std::string& subtype) {
     return !(specials.find(subtype) == specials.end());
-}
-
-void Parser::logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine) {
-    // TODO: Remove before releasing.
-    // For development purposes only.
-    // Just to capture anything I might have missed.
-    if (formattedLine.getDescription() == "System" ||
-        formattedLine.getDescription() == "Vicinity" ||
-        formattedLine.getDescription() == "Team" ||
-        formattedLine.getDescription() == "Tell Messages" ||
-        formattedLine.getDescription() == "Me got health" ||
-        formattedLine.getDescription() == "Me got XP" ||
-        formattedLine.getDescription() == "Me Cast Nano" ||
-        formattedLine.getDescription() == "Research" ||
-        formattedLine.getDescription() == "Other hit by nano" ||
-        formattedLine.getMessage().find("Wait for current nano program execution to finish.") ||
-        formattedLine.getMessage().find("Unable to execute nano program.") ||
-        formattedLine.getMessage().find("NCU error:") ||
-        formattedLine.getMessage().find("Executing programs is currently unavailable.") ||
-        formattedLine.getDescriptionCode() == "00000003000011fc") {
-        return;
-    }
-    if (lineInfo.dealer_name == "" && lineInfo.receiver_name == "") {
-        errorLog.write("Warning: Could not find dealer and receiver name in the following line (Note: This may be normal): ");
-        errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
-    }
-    else if (lineInfo.dealer_name == "") {
-        errorLog.write("Warning: Could not find dealer name in the following line (Note: This may be normal): ");
-        errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
-    }
-    else if (lineInfo.receiver_name == "") {
-        errorLog.write("Warning: Could not find receiver name in the following line (Note: This may be normal): ");
-        errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
-    }
 }
 
 //////////////////////////////////////////
@@ -928,6 +887,8 @@ LineInfo Parser::meGotNano(const std::string& message) {
 
 LineInfo Parser::system(const std::string& message) {
     /*
+    TODO: Fix. This currently has no use.
+
     ["#0000000040000001#", "System", "", 1442506644]Muwe executes Bodily Invigoration within your NCU...
 
     ["#0000000040000001#","System","",1442506292]You hit with 29 bullets...
@@ -942,6 +903,7 @@ LineInfo Parser::system(const std::string& message) {
     ["#0000000040000001#", "System", "", 1443609378]New Victory Points gained : 95.
     */
     LineInfo li;
+    li.type = "na";
     std::smatch m;
     if (regex_search(message, m, regex("You hit |You Successfully "))) {
         li.dealer_name = "You";
@@ -951,6 +913,7 @@ LineInfo Parser::system(const std::string& message) {
         li.dealer_name = m[1];
         li.nanoProgramName = m[2];
     }
+
     /* TODO: Log victory points
     else if (regex_search(message, m, regex("Victory Points"))) {
     // TODO: Find out why these messages are different. Maybe it's
