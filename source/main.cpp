@@ -121,20 +121,19 @@ int main(void) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
         }
-        else {  // Format and parse the log line
-            FormattedLine formattedLine;
-            formattedLine.format(line);
+
+        // Format and parse the log line
+        FormattedLine formattedLine;
+        formattedLine.format(line);
+        {  // New scope to let lock expire on exit
+            std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
             if (formattedLine.isFormatted()) {  // If successfully formatted
-                std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
-                lineInfo = parser.parse(formattedLine);  // Parse it
+                lineInfo = parser.parse(formattedLine);
                 if (lineInfo.hasStats) {
                     playerVector.addToPlayers(lineInfo);
                 }
             }
-        }
-        // Check for command
-        {  // New scope to let lock expire on exit
-            std::lock_guard<std::mutex> lineInfoLock(lineInfoMutex);
+            // Check for command
             isRunning = commandHandler.process(lineInfo);
         }
 
