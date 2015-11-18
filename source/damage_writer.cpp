@@ -10,9 +10,6 @@ DamageWriter::DamageWriter(PlayerVector& playerVector,
                            WriterHelper(config, file),
                            playerVector(playerVector) {}
 
-/******/
-/* DD */
-/******/
 
 void DamageWriter::createDDTopList() {
     std::string titleBase = "Damage Dealt Top List";
@@ -109,8 +106,8 @@ void DamageWriter::createDRPerOpponent(std::string playerName) {
 
 void DamageWriter::createDDPerType(std::string playerName,
                                    std::string opponentName) {
-    std::string titleBase = "Damage Dealt On " + opponentName + " By " +
-                            playerName;
+    std::string titleBase = "Damage Dealt By " + playerName + " On " +
+                            opponentName;
     createDamagePerType(titleBase, playerName, opponentName);
 }
 
@@ -515,7 +512,7 @@ void DamageWriter::writePerTypeDetailedHeadings(bool self) {
     const int nrWidth = 4;
     file << "<font color = " + lightBlue + ">" << nl;
     file << std::setfill(fillChar) << std::right <<
-            std::setw(width+1) << " Dmg" << " (" <<
+            std::setw(width+2) << " Dmg" << " (" <<
             std::setw(nrWidth) << "_Cnt" << ") " <<
             std::setw(pcWidth-1) << " Dmg" << "%  " <<
             std::setw(width-1) << " Max" << "-" << std::left <<
@@ -970,9 +967,9 @@ void DamageWriter::writeDetailedInfoForType(std::string type,
     const int pcWidth = 6;
     const int nrWidth = 4;
     std::string tot = total == -1 ? "" : std::to_string(total);
-
     std::string hits = std::to_string(nrOfHits);
-    file << std::setw(width+1) << " " + tot << " (" <<
+
+    file << std::setw(width+2) << " " + tot << " (" <<
             std::setw(nrWidth) << hits << ") " <<
             std::setw(pcWidth) << " " + dmgPercent << "% " <<
             std::setw(width) << " " + maxHit << "-" << std::left <<
