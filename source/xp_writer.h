@@ -2,6 +2,7 @@
 #define XP_WRITER_H
 
 
+#include "definitions.h"
 #include "player_vector.h"
 #include "writer_helper.h"
 #include "xp.h"
@@ -24,9 +25,10 @@ public:
 private:
     void writeXPHeadingsOverall();
     void writeXPHeadingsDetailed();
+    void writeXPTypeName(LineType type);
 
-    void writeXPStatsOverview(const XP& xp, std::string type);
-    void writeXPStatsDetailed(const XP& xp, std::string type);
+    void writeXPStatsOverview(const XP& xp, LineType type);
+    void writeXPStatsDetailed(const XP& xp, LineType type);
 
     PlayerVector& playerVector;
 };

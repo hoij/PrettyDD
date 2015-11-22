@@ -31,18 +31,20 @@ void Player::add(LineInfo& lineInfo) {
         // Set the start time on the first action made.
         startTime = lineInfo.time;
     }
-    if (lineInfo.type == "damage" || lineInfo.type == "heal" || lineInfo.type == "nano") {
+    if (lineInfo.type == LineType::damage ||
+		lineInfo.type == LineType::heal ||
+		lineInfo.type == LineType::nano) {
         affectedPlayers->addToPlayers(lineInfo);
     }
-    else if (lineInfo.type == "nano cast") {
+    else if (lineInfo.type == LineType::nanoCast) {
         nanoPrograms.add(lineInfo);
     }
-    else if (lineInfo.type == "xp" ||
-             lineInfo.type == "sk" ||
-             lineInfo.type == "research" ||
-             lineInfo.type == "aixp" ||
-             lineInfo.type == "PVP Solo Score" ||
-             lineInfo.type == "PVP Team Score") {
+    else if (lineInfo.type == LineType::xp ||
+             lineInfo.type == LineType::sk ||
+             lineInfo.type == LineType::research ||
+             lineInfo.type == LineType::aixp ||
+             lineInfo.type == LineType::pvpSoloScore ||
+             lineInfo.type == LineType::pvpTeamScore) {
         addXp(lineInfo);
     }
 }

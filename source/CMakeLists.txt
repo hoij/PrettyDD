@@ -7,6 +7,7 @@ add_executable(PrettyDD main.cpp
                affected_player_factory_interface.h
                affected_player_interface.h
                affected_player_vector.h
+               definitions.h
                formatted_line_interface.h
                line_info.h
                log_reading.h
@@ -59,7 +60,8 @@ add_library(nano_program_writerlib nano_program_writer.cpp)
 target_link_libraries(nano_program_writerlib nano_programslib configurationlib
                       writer_helperlib)
 add_library(xp_writerlib xp_writer.cpp)
-target_link_libraries(xp_writerlib xplib configurationlib writer_helperlib)
+target_link_libraries(xp_writerlib xplib configurationlib loggerlib
+                      writer_helperlib)
 
 target_link_libraries(PrettyDD
                       damagelib

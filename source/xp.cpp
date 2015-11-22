@@ -31,7 +31,6 @@ void XP::add(LineInfo& li) {
     }
     else {
         errorLog.write("Error: Unknown XP subtype: " + li.subtype);
-        errorLog.write("Error: \t type was: " + li.type);
     }
 }
 
@@ -55,66 +54,66 @@ bool XP::empty() const {
     return stats.empty();
 }
 
-std::vector<std::string> XP::getTypes() const {
-    std::vector<std::string> types;
+std::vector<LineType> XP::getTypes() const {
+    std::vector<LineType> types;
     for (const auto& xp : stats) {
         types.push_back(xp.first);
     }
     return types;
 }
 
-int XP::getTotal(std::string type) const {
+int XP::getTotal(LineType type) const {
     auto it = stats.find(type);
     return (it != stats.end()) ? it->second.total : 0;
 }
 
-int XP::getXPH(std::string type) const {
+int XP::getXPH(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.xph;
 }
 
-int XP::getTotalGained(std::string type) const {
+int XP::getTotalGained(LineType type) const {
     auto it = stats.find(type);
     return (it != stats.end()) ? it->second.totalGained : 0;
 }
 
-int XP::getXPHGained(std::string type) const {
+int XP::getXPHGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.xphGained;
 }
 
-int XP::getCountGained(std::string type) const {
+int XP::getCountGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.countGained;
 }
 
-int XP::getMaxGained(std::string type) const {
+int XP::getMaxGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? -1 : it->second.maxGained;
 }
 
-int XP::getMinGained(std::string type) const {
+int XP::getMinGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ?
         std::numeric_limits<int>::max() : it->second.minGained;
 }
 
-int XP::getTotalLost(std::string type) const {
+int XP::getTotalLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.totalLost;
 }
 
-int XP::getCountLost(std::string type) const {
+int XP::getCountLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.countLost;
 }
 
-int XP::getMaxLost(std::string type) const {
+int XP::getMaxLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? -1 : it->second.maxLost;
 }
 
-int XP::getMinLost(std::string type) const {
+int XP::getMinLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ?
         std::numeric_limits<int>::max() : it->second.minLost;

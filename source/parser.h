@@ -2,6 +2,8 @@
 #define PARSER_H
 
 
+#include "definitions.h"
+
 #include <gtest/gtest_prod.h>
 #include <map>
 #include <string>
@@ -29,7 +31,7 @@ private:
     bool isShield(std::string& subtype);
     bool isSpecial(std::string& subtype);
     int findAmount(const std::string& message);
-    std::string findSubtype(const std::string& message, const std::string type);
+    std::string findSubtype(const std::string& message, LineType type);
     std::string findDamageSubtype(const std::string& message);
     std::string findHealSubtype(const std::string& message);
     std::string findNanoCastSubtype(const std::string& message);

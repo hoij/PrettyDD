@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "logger.h"
 #include "xp_writer.h"
 
 #include <iomanip>
@@ -41,7 +42,7 @@ void XPWriter::createXPInfo() {
     writeXPHeadingsOverall();
 
     file << "<font color = " + lime + ">" << nl;
-    std::vector<std::string> types = xp.getTypes();
+    std::vector<LineType> types = xp.getTypes();
     for (const auto& type : types) {
         writeXPStatsOverview(xp, type);
     }
@@ -90,18 +91,18 @@ void XPWriter::writeXPHeadingsDetailed() {
 /* Stat writes */
 /***************/
 
-void XPWriter::writeXPStatsOverview(const XP& xp, std::string type) {
+void XPWriter::writeXPStatsOverview(const XP& xp, LineType type) {
     const int width = 9;
     file << std::setfill(fillChar) <<
             std::setw(width + 2) << " " + std::to_string(xp.getTotal(type)) <<
                                     " " <<
             std::setw(width) << " " + std::to_string(xp.getXPH(type)) << " " <<
             std::setfill(' ');
-    writeName(type);
+    writeXPTypeName(type);
     file << "<br>" << nl;
 }
 
-void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
+void XPWriter::writeXPStatsDetailed(const XP& xp, LineType type) {
 
     int totalGained = xp.getTotalGained(type);
     std::string maxGained = determineMax(xp.getMaxGained(type));
@@ -116,8 +117,8 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
                 std::setw(width) << " " + maxGained << " " <<
                 std::setw(width) << " " + minGained << " " <<
                 std::setfill(' ');
-        writeName(type + " gained");
-        file << "<br>" << nl;
+        writeXPTypeName(type);
+        file << " gained<br>" << nl;
     }
 
     int totalLost = xp.getTotalLost(type);
@@ -131,7 +132,37 @@ void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
                 std::setw(width) << " " + maxLost << " " <<
                 std::setw(width) << " " + minLost << " " <<
                 std::setfill(' ');
-        writeName(type + " lost");
-        file << "<br>" << nl;
+        writeXPTypeName(type);
+        file << " lost<br>" << nl;
+    }
+}
+
+void XPWriter::writeXPTypeName(LineType type) {
+    switch(type) {
+        case LineType::research:
+            writeName("Research");
+            break;
+        case LineType::sk:
+            writeName("SK");
+            break;
+        case LineType::xp:
+            writeName("XP");
+            break;
+        case LineType::aixp:
+            writeName("AIXP");
+            break;
+        case LineType::vp:
+            writeName("VP");
+            break;
+        case LineType::pvpTeamScore:
+            writeName("PVP Team Score");
+            break;
+        case LineType::pvpSoloScore:
+            writeName("PVP Solo Score");
+            break;
+        default:
+            errorLog.write("Error: Tried to write an unknown experience "
+            "type.");
+            break;
     }
 }

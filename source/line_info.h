@@ -2,6 +2,8 @@
 #define LINE_INFO_H
 
 
+#include "definitions.h"
+
 #include <ctime>
 #include <string>
 
@@ -12,7 +14,7 @@ public:
 
     std::string dealer_name;
     std::string receiver_name;
-    std::string type;
+    LineType type;
     std::string subtype;
     std::string command;
     std::string nanoProgramName;

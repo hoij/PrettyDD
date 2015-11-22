@@ -2,6 +2,8 @@
 #define XP_H
 
 
+#include "definitions.h"
+
 #include <ctime>
 #include <limits>
 #include <map>
@@ -20,21 +22,21 @@ public:
 
     bool empty() const;
 
-    std::vector<std::string> getTypes() const;
+    std::vector<LineType> getTypes() const;
 
-    int getTotal(std::string type) const;
-    int getXPH(std::string type) const;
+    int getTotal(LineType type) const;
+    int getXPH(LineType type) const;
 
-    int getTotalGained(std::string type) const;
-    int getXPHGained(std::string type) const;
-    int getCountGained(std::string type) const;
-    int getMaxGained(std::string type) const;
-    int getMinGained(std::string type) const;
+    int getTotalGained(LineType type) const;
+    int getXPHGained(LineType type) const;
+    int getCountGained(LineType type) const;
+    int getMaxGained(LineType type) const;
+    int getMinGained(LineType type) const;
 
-    int getTotalLost(std::string type) const;
-    int getCountLost(std::string type) const;
-    int getMaxLost(std::string type) const;
-    int getMinLost(std::string type) const;
+    int getTotalLost(LineType type) const;
+    int getCountLost(LineType type) const;
+    int getMaxLost(LineType type) const;
+    int getMinLost(LineType type) const;
 
 private:
     struct XpInfo {
@@ -53,7 +55,7 @@ private:
         int minLost = std::numeric_limits<int>::max();
     };
 
-    std::map<std::string, XpInfo> stats;
+    std::map<LineType, XpInfo> stats;
 };
 
 
