@@ -31,7 +31,9 @@ void Player::add(LineInfo& lineInfo) {
         // Set the start time on the first action made.
         startTime = lineInfo.time;
     }
-    if (lineInfo.type == LineType::damage || lineInfo.type == LineType::heal || lineInfo.type == LineType::nano) {
+    if (lineInfo.type == LineType::damage ||
+		lineInfo.type == LineType::heal ||
+		lineInfo.type == LineType::nano) {
         affectedPlayers->addToPlayers(lineInfo);
     }
     else if (lineInfo.type == LineType::nanoCast) {
