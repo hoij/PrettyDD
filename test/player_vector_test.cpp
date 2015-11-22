@@ -68,7 +68,7 @@ public:
 
     MOCK_CONST_METHOD0(getNanoPrograms, NanoPrograms&(void));
 
-    MOCK_METHOD0(getXp, XP&(void));
+    MOCK_METHOD0(getXp, Experience&(void));
 
     MOCK_CONST_METHOD0(getTimeActive, std::time_t(void));
     MOCK_CONST_METHOD0(getPauseDuration, std::time_t(void));

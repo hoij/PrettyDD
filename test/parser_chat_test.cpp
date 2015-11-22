@@ -5,7 +5,6 @@
 #include <tuple>
 
 
-
 // TODO: Make this test case test through the public parser->parse
 
 class ParseChatTest : public ::testing::TestWithParam<std::tuple<std::string, std::string, std::string>> {

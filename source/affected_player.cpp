@@ -8,13 +8,13 @@ AffectedPlayer::AffectedPlayer(std::string name, std::shared_ptr<MyTimeInterface
     name(name), myTime(myTime) {}
 
 void AffectedPlayer::add(LineInfo& lineInfo) {
-    if (lineInfo.type == "damage") {
+    if (lineInfo.type == DAMAGE) {
         addDamage(lineInfo);
     }
-    else if (lineInfo.type == "heal") {
+    else if (lineInfo.type == HEAL) {
         addHeal(lineInfo);
     }
-    else if (lineInfo.type == "nano") {
+    else if (lineInfo.type == NANO) {
         addNano(lineInfo);
     }
 }

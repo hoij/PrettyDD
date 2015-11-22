@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "logger.h"
 #include "xp_writer.h"
 
 #include <iomanip>
@@ -23,7 +24,7 @@ void XPWriter::createXPInfo() {
         return;
     }
 
-    const XP& xp = pp->getXp();
+    const Experience& xp = pp->getXp();
 
     if (xp.empty()) {
         createNotFoundMessage("No XP logged",
@@ -41,7 +42,7 @@ void XPWriter::createXPInfo() {
     writeXPHeadingsOverall();
 
     file << "<font color = " + lime + ">" << nl;
-    std::vector<std::string> types = xp.getTypes();
+    std::vector<LineType> types = xp.getTypes();
     for (const auto& type : types) {
         writeXPStatsOverview(xp, type);
     }
@@ -90,18 +91,44 @@ void XPWriter::writeXPHeadingsDetailed() {
 /* Stat writes */
 /***************/
 
-void XPWriter::writeXPStatsOverview(const XP& xp, std::string type) {
+void XPWriter::writeXPStatsOverview(const Experience& xp, LineType type) {
     const int width = 9;
     file << std::setfill(fillChar) <<
             std::setw(width + 2) << " " + std::to_string(xp.getTotal(type)) <<
                                     " " <<
             std::setw(width) << " " + std::to_string(xp.getXPH(type)) << " " <<
             std::setfill(' ');
-    writeName(type);
+    switch(type) {
+        case RESEARCH:
+            writeName("Research");
+            break;
+        case SK:
+            writeName("SK");
+            break;
+        case XP:
+            writeName("XP");
+            break;
+        case AIXP:
+            writeName("AIXP");
+            break;
+        case VP:
+            writeName("VP");
+            break;
+        case PVP_TEAM_SCORE:
+            writeName("PVP Team Score");
+            break;
+        case PVP_SOLO_SCORE:
+            writeName("PVP Solo Score");
+            break;
+        default:
+            errorLog.write("Error: Tried to write an unknown experience "
+                           "type: " + type);
+            break;
+    }
     file << "<br>" << nl;
 }
 
-void XPWriter::writeXPStatsDetailed(const XP& xp, std::string type) {
+void XPWriter::writeXPStatsDetailed(const Experience& xp, LineType type) {
 
     int totalGained = xp.getTotalGained(type);
     std::string maxGained = determineMax(xp.getMaxGained(type));

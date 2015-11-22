@@ -1,12 +1,15 @@
 #ifndef PARSER_PARAM_TEST_H
 #define PARSER_PARAM_TEST_H
 
+
+#include "definitions.h"
+#include "formatted_line_stub.h"
+#include "line_info.h"
+#include "parser.h"
+
 #include <gtest/gtest.h>
 #include <string>
 #include <tuple>
-#include "parser.h"
-#include "line_info.h"
-#include "formatted_line_stub.h"
 
 
 class ExtendedLineInfo : public LineInfo {
@@ -15,7 +18,7 @@ public:
     ExtendedLineInfo() {}
     ExtendedLineInfo(std::string dealer_name,
                      std::string receiver_name,
-                     std::string type,
+                     LineType type,
                      std::string subtype,
                      int amount = 0,
                      bool crit = false,
