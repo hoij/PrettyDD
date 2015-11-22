@@ -413,29 +413,29 @@ TEST_F(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     std::shared_ptr<MockAffectedPlayer> p4 = addReceiverToVector("Receiver4");
 
     // Set up the return values.
-    Damage d1 = createDamage(7000);
-    Damage d2 = createDamage(0);
-    Damage d3 = createDamage(500000);
-    Damage d4 = createDamage(1500);
+    Damage d3 = createDamage(7000);
+    Damage d4 = createDamage(0);
+    Damage d5 = createDamage(500000);
+    Damage d6 = createDamage(1500);
 
     EXPECT_CALL(*p1, getTotalDamageReceivedFromPlayer())
-        .WillOnce(::testing::Return(d1));
-    EXPECT_CALL(*p2, getTotalDamageReceivedFromPlayer())
-        .WillOnce(::testing::Return(d2));
-    EXPECT_CALL(*p3, getTotalDamageReceivedFromPlayer())
         .WillOnce(::testing::Return(d3));
-    EXPECT_CALL(*p4, getTotalDamageReceivedFromPlayer())
+    EXPECT_CALL(*p2, getTotalDamageReceivedFromPlayer())
         .WillOnce(::testing::Return(d4));
+    EXPECT_CALL(*p3, getTotalDamageReceivedFromPlayer())
+        .WillOnce(::testing::Return(d5));
+    EXPECT_CALL(*p4, getTotalDamageReceivedFromPlayer())
+        .WillOnce(::testing::Return(d6));
 
     std::vector<std::pair<std::string, Damage>> result =
         affectedPlayerVector->
             getTotalDamageReceivedFromPlayerPerAffectedPlayer("Caller");
 
     // Assuming the order is the same as when added which could be untrue.
-    EXPECT_EQ(d1.getTotal(), result[0].second.getTotal());
-    EXPECT_EQ(d2.getTotal(), result[1].second.getTotal());
-    EXPECT_EQ(d3.getTotal(), result[2].second.getTotal());
-    EXPECT_EQ(d4.getTotal(), result[3].second.getTotal());
+    EXPECT_EQ(d3.getTotal(), result[0].second.getTotal());
+    EXPECT_EQ(d4.getTotal(), result[1].second.getTotal());
+    EXPECT_EQ(d5.getTotal(), result[2].second.getTotal());
+    EXPECT_EQ(d6.getTotal(), result[3].second.getTotal());
     EXPECT_EQ(4, result.size());
 }
 
