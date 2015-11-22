@@ -82,7 +82,7 @@ public:
     const NanoPrograms& getNanoPrograms() const;
 
     /* XP */
-    const Experience& getXp();
+    const XP& getXp();
 
     /* Time. TODO: Move into its own class */
     std::time_t getTimeActive() const;
@@ -119,7 +119,7 @@ private:
     std::shared_ptr<AffectedPlayerVector> affectedPlayers = nullptr;
     std::shared_ptr<MyTimeInterface> myTime = nullptr;
 	NanoPrograms nanoPrograms;
-    Experience xp;
+    XP xp;
 };
 
 

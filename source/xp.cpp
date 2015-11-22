@@ -3,9 +3,9 @@
 #include "xp.h"
 
 
-void Experience::add(LineInfo& li) {
+void XP::add(LineInfo& li) {
     if (li.subtype == "gained") {
-        Experience::XpInfo& xp = stats[li.type];
+        XP::XpInfo& xp = stats[li.type];
         xp.total += li.amount;
         xp.totalGained += li.amount;
         xp.countGained += 1;
@@ -18,7 +18,7 @@ void Experience::add(LineInfo& li) {
         }
     }
     else if (li.subtype == "lost") {
-        Experience::XpInfo& xp = stats[li.type];
+        XP::XpInfo& xp = stats[li.type];
         xp.total -= li.amount;
         xp.totalLost += li.amount;
         xp.countLost += 1;
@@ -31,11 +31,10 @@ void Experience::add(LineInfo& li) {
     }
     else {
         errorLog.write("Error: Unknown XP subtype: " + li.subtype);
-        errorLog.write("Error: \t type was: " + li.type);
     }
 }
 
-void Experience::calcXPH(time_t timeActive) {
+void XP::calcXPH(time_t timeActive) {
     /* Calculates and sets XP Per Minute */
     for (auto& xp : stats) {
         if (timeActive == 0) {
@@ -51,11 +50,11 @@ void Experience::calcXPH(time_t timeActive) {
     }
 }
 
-bool Experience::empty() const {
+bool XP::empty() const {
     return stats.empty();
 }
 
-std::vector<LineType> Experience::getTypes() const {
+std::vector<LineType> XP::getTypes() const {
     std::vector<LineType> types;
     for (const auto& xp : stats) {
         types.push_back(xp.first);
@@ -63,58 +62,58 @@ std::vector<LineType> Experience::getTypes() const {
     return types;
 }
 
-int Experience::getTotal(LineType type) const {
+int XP::getTotal(LineType type) const {
     auto it = stats.find(type);
     return (it != stats.end()) ? it->second.total : 0;
 }
 
-int Experience::getXPH(LineType type) const {
+int XP::getXPH(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.xph;
 }
 
-int Experience::getTotalGained(LineType type) const {
+int XP::getTotalGained(LineType type) const {
     auto it = stats.find(type);
     return (it != stats.end()) ? it->second.totalGained : 0;
 }
 
-int Experience::getXPHGained(LineType type) const {
+int XP::getXPHGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.xphGained;
 }
 
-int Experience::getCountGained(LineType type) const {
+int XP::getCountGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.countGained;
 }
 
-int Experience::getMaxGained(LineType type) const {
+int XP::getMaxGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? -1 : it->second.maxGained;
 }
 
-int Experience::getMinGained(LineType type) const {
+int XP::getMinGained(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ?
         std::numeric_limits<int>::max() : it->second.minGained;
 }
 
-int Experience::getTotalLost(LineType type) const {
+int XP::getTotalLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.totalLost;
 }
 
-int Experience::getCountLost(LineType type) const {
+int XP::getCountLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? 0 : it->second.countLost;
 }
 
-int Experience::getMaxLost(LineType type) const {
+int XP::getMaxLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ? -1 : it->second.maxLost;
 }
 
-int Experience::getMinLost(LineType type) const {
+int XP::getMinLost(LineType type) const {
     auto it = stats.find(type);
     return (it == stats.end()) ?
         std::numeric_limits<int>::max() : it->second.minLost;

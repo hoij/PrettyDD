@@ -3,19 +3,19 @@
 
 /* These are the main types that a log line is categorized
  * into. They are sorted roughly by (guessed) frequency of use. */
-enum LineType {
-    DAMAGE,
-    NA,  // Not available
-    HEAL,
-    NANO_CAST,
-    RESEARCH,
-    SK,
-    XP,
-    AIXP,
-    NANO,
-    VP,
-    PVP_TEAM_SCORE,
-    PVP_SOLO_SCORE
+enum class LineType {
+    damage,
+    notAvailable,
+    heal,
+    nanoCast,
+    sk,
+    research,
+    xp,
+    aixp,
+    nano,
+    vp,
+    pvpTeamScore,
+    pvpSoloScore
 };
 
 

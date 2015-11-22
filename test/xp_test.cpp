@@ -9,7 +9,7 @@
 class XPTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        xp = new Experience;
+        xp = new XP;
     }
     virtual void TearDown() {
         delete xp;
@@ -17,7 +17,7 @@ protected:
 
     void addXP(LineType type, std::string subtype, int amount);
 
-    Experience* xp;
+    XP* xp;
 };
 
 void XPTest::addXP(LineType type, std::string subtype, int amount) {
@@ -35,41 +35,41 @@ TEST_F(XPTest, add) {
     int midXP2 = 50000001;
     int minXP = 49999999;
     int maxXP = 50000002;
-    addXP(XP, "gained", midXP1);
-    addXP(XP, "gained", midXP2);
-    addXP(XP, "gained", minXP);
-    addXP(XP, "gained", maxXP);
+    addXP(LineType::xp, "gained", midXP1);
+    addXP(LineType::xp, "gained", midXP2);
+    addXP(LineType::xp, "gained", minXP);
+    addXP(LineType::xp, "gained", maxXP);
 
     int midAIXP1 = 3999;
     int midAIXP2 = 3998;
     int maxAIXP = 4000;
     int minAIXP = 1;
-    addXP(AIXP, "gained", midAIXP1);
-    addXP(AIXP, "gained", midAIXP2);
-    addXP(AIXP, "gained", maxAIXP);
-    addXP(AIXP, "gained", minAIXP);
+    addXP(LineType::aixp, "gained", midAIXP1);
+    addXP(LineType::aixp, "gained", midAIXP2);
+    addXP(LineType::aixp, "gained", maxAIXP);
+    addXP(LineType::aixp, "gained", minAIXP);
 
     int midXPLost = 500000000;
     int maxXPLost = 500000001;
     int minXPLost = 499999999;
-    addXP(XP, "lost", maxXPLost);
-    addXP(XP, "lost", midXPLost);
-    addXP(XP, "lost", minXPLost);
+    addXP(LineType::xp, "lost", maxXPLost);
+    addXP(LineType::xp, "lost", midXPLost);
+    addXP(LineType::xp, "lost", minXPLost);
 
-    EXPECT_EQ(midXP1 + midXP2 + minXP + maxXP, xp->getTotalGained(XP));
-    EXPECT_EQ(4, xp->getCountGained(XP));
-    EXPECT_EQ(maxXP, xp->getMaxGained(XP));
-    EXPECT_EQ(minXP, xp->getMinGained(XP));
+    EXPECT_EQ(midXP1 + midXP2 + minXP + maxXP, xp->getTotalGained(LineType::xp));
+    EXPECT_EQ(4, xp->getCountGained(LineType::xp));
+    EXPECT_EQ(maxXP, xp->getMaxGained(LineType::xp));
+    EXPECT_EQ(minXP, xp->getMinGained(LineType::xp));
 
-    EXPECT_EQ(midAIXP1 + midAIXP2 + maxAIXP + minAIXP, xp->getTotalGained(AIXP));
-    EXPECT_EQ(4, xp->getCountGained(AIXP));
-    EXPECT_EQ(maxAIXP, xp->getMaxGained(AIXP));
-    EXPECT_EQ(midAIXP2, xp->getMinGained(AIXP));
+    EXPECT_EQ(midAIXP1 + midAIXP2 + maxAIXP + minAIXP, xp->getTotalGained(LineType::aixp));
+    EXPECT_EQ(4, xp->getCountGained(LineType::aixp));
+    EXPECT_EQ(maxAIXP, xp->getMaxGained(LineType::aixp));
+    EXPECT_EQ(midAIXP2, xp->getMinGained(LineType::aixp));
 
-    EXPECT_EQ(midXPLost + maxXPLost + minXPLost, xp->getTotalLost(XP));
-    EXPECT_EQ(3, xp->getCountLost(XP));
-    EXPECT_EQ(maxXPLost, xp->getMaxLost(XP));
-    EXPECT_EQ(minXPLost, xp->getMinLost(XP));
+    EXPECT_EQ(midXPLost + maxXPLost + minXPLost, xp->getTotalLost(LineType::xp));
+    EXPECT_EQ(3, xp->getCountLost(LineType::xp));
+    EXPECT_EQ(maxXPLost, xp->getMaxLost(LineType::xp));
+    EXPECT_EQ(minXPLost, xp->getMinLost(LineType::xp));
 }
 
 TEST_F(XPTest, xpPerHour) {
@@ -77,46 +77,46 @@ TEST_F(XPTest, xpPerHour) {
     int midXP2 = 3998;
     int maxXP = 4000;
     int minXP = 1;
-    addXP(XP, "gained", midXP1);
-    addXP(XP, "gained", midXP2);
-    addXP(XP, "gained", maxXP);
-    addXP(XP, "gained", minXP);
+    addXP(LineType::xp, "gained", midXP1);
+    addXP(LineType::xp, "gained", midXP2);
+    addXP(LineType::xp, "gained", maxXP);
+    addXP(LineType::xp, "gained", minXP);
     xp->calcXPH(29);
     // Expected: (3999 + 3998 + 4000 + 1) / (29 / 3600)
-    EXPECT_EQ(1489406, xp->getXPH(XP));
-    EXPECT_EQ(1489406, xp->getXPHGained(XP));
+    EXPECT_EQ(1489406, xp->getXPH(LineType::xp));
+    EXPECT_EQ(1489406, xp->getXPHGained(LineType::xp));
 
     int xpLost = 200;
-    addXP(XP, "lost", xpLost);
+    addXP(LineType::xp, "lost", xpLost);
     xp->calcXPH(29);
     // Expected: (3999 + 3998 + 4000 + 1 - 200) / (29 / 3600)
-    EXPECT_EQ(1464579, xp->getXPH(XP));
-    EXPECT_EQ(1489406, xp->getXPHGained(XP));
+    EXPECT_EQ(1464579, xp->getXPH(LineType::xp));
+    EXPECT_EQ(1489406, xp->getXPHGained(LineType::xp));
 
     xp->calcXPH(0);
-    EXPECT_EQ(0, xp->getXPH(XP));
-    EXPECT_EQ(0, xp->getXPHGained(XP));
+    EXPECT_EQ(0, xp->getXPH(LineType::xp));
+    EXPECT_EQ(0, xp->getXPHGained(LineType::xp));
 
     /* Negative XPH */
     int xpLost2 = 1000000;
-    addXP(XP, "lost", xpLost2);
+    addXP(LineType::xp, "lost", xpLost2);
     xp->calcXPH(29);
     // Expected: (3999 + 3998 + 4000 + 1 - 200 - 1000000) / (29 / 3600)
-    EXPECT_EQ(-122673351, xp->getXPH(XP));
-    EXPECT_EQ(1489406, xp->getXPHGained(XP));
+    EXPECT_EQ(-122673351, xp->getXPH(LineType::xp));
+    EXPECT_EQ(1489406, xp->getXPHGained(LineType::xp));
 }
 
 TEST_F(XPTest, getNonexistingXPType) {
     /* No xp has been added so the getters should return a standard value */
-    EXPECT_EQ(0, xp->getTotal(XP));
-    EXPECT_EQ(0, xp->getXPH(XP));
-    EXPECT_EQ(0, xp->getTotalGained(XP));
-    EXPECT_EQ(0, xp->getXPHGained(XP));
-    EXPECT_EQ(0, xp->getCountGained(XP));
-    EXPECT_EQ(-1, xp->getMaxGained(XP));
-    EXPECT_EQ(std::numeric_limits<int>::max(), xp->getMinGained(XP));
-    EXPECT_EQ(0, xp->getTotalLost(XP));
-    EXPECT_EQ(0, xp->getCountLost(XP));
-    EXPECT_EQ(-1, xp->getMaxLost(XP));
-    EXPECT_EQ(std::numeric_limits<int>::max(), xp->getMinLost(XP));
+    EXPECT_EQ(0, xp->getTotal(LineType::xp));
+    EXPECT_EQ(0, xp->getXPH(LineType::xp));
+    EXPECT_EQ(0, xp->getTotalGained(LineType::xp));
+    EXPECT_EQ(0, xp->getXPHGained(LineType::xp));
+    EXPECT_EQ(0, xp->getCountGained(LineType::xp));
+    EXPECT_EQ(-1, xp->getMaxGained(LineType::xp));
+    EXPECT_EQ(std::numeric_limits<int>::max(), xp->getMinGained(LineType::xp));
+    EXPECT_EQ(0, xp->getTotalLost(LineType::xp));
+    EXPECT_EQ(0, xp->getCountLost(LineType::xp));
+    EXPECT_EQ(-1, xp->getMaxLost(LineType::xp));
+    EXPECT_EQ(std::numeric_limits<int>::max(), xp->getMinLost(LineType::xp));
 }

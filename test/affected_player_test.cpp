@@ -31,7 +31,7 @@ TEST_F(AffectedPlayerTest, addDamage_dealer) {
     LineInfo li;
     li.dealer_name = affectedPlayer->getName();
     li.amount = 100;
-    li.type = DAMAGE;
+    li.type = LineType::damage;
     li.subtype = "projectile";
     li.nanobots = true;
 
@@ -52,7 +52,7 @@ TEST_F(AffectedPlayerTest, addDamage_receiver) {
     LineInfo li;
     li.receiver_name = affectedPlayer->getName();
     li.amount = 100;
-    li.type = DAMAGE;
+    li.type = LineType::damage;
     li.subtype = "projectile";
     li.nanobots = true;
 
@@ -74,7 +74,7 @@ TEST_F(AffectedPlayerTest, addHeal_actual) {
     li.receiver_name = affectedPlayer->getName();
     li.dealer_name = "SomeoneElse";
     li.amount = 100;
-    li.type = HEAL;
+    li.type = LineType::heal;
     li.subtype = "actual";
 
     affectedPlayer->add(li);
@@ -91,7 +91,7 @@ TEST_F(AffectedPlayerTest, addHeal_potentialReceived) {
     li.receiver_name = affectedPlayer->getName();
     li.dealer_name = "SomeoneElse";
     li.amount = 100;
-    li.type = HEAL;
+    li.type = LineType::heal;
     li.subtype = "potential";
 
     affectedPlayer->add(li);
@@ -108,7 +108,7 @@ TEST_F(AffectedPlayerTest, addHeal_potentialDealt) {
     li.receiver_name = "SomeoneElse";
     li.dealer_name = affectedPlayer->getName();
     li.amount = 100;
-    li.type = HEAL;
+    li.type = LineType::heal;
     li.subtype = "potential";
 
     affectedPlayer->add(li);
@@ -125,7 +125,7 @@ TEST_F(AffectedPlayerTest, addNano_receiver) {
     li.receiver_name = affectedPlayer->getName();
     li.dealer_name = "SomeoneElse";
     li.amount = 100;
-    li.type = NANO;
+    li.type = LineType::nano;
 
     affectedPlayer->add(li);
 
@@ -139,7 +139,7 @@ TEST_F(AffectedPlayerTest, addNano_dealer) {
     li.receiver_name = "SomeoneElse";
     li.dealer_name = affectedPlayer->getName();
     li.amount = 100;
-    li.type = NANO;
+    li.type = LineType::nano;
 
     affectedPlayer->add(li);
 
@@ -152,7 +152,7 @@ TEST_F(AffectedPlayerTest, getTotalDamage) {
     returned */
     LineInfo li1;
     li1.dealer_name = affectedPlayer->getName();
-    li1.type = DAMAGE;
+    li1.type = LineType::damage;
 
     LineInfo li2 = li1;
 

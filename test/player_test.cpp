@@ -130,13 +130,13 @@ TEST_F(PlayerTest, timerTest_normalUsage) {
     Verify the active time.
     */
     LineInfo li1;
-    li1.type = DAMAGE;
+    li1.type = LineType::damage;
     li1.time = startTime;
     LineInfo li2;
-    li2.type = DAMAGE;
+    li2.type = LineType::damage;
     li2.time = resumeTime;
     LineInfo li3;
-    li3.type = DAMAGE;
+    li3.type = LineType::damage;
     li3.time = resumeTime2 + 70;
 
     // Before adding anything to the player the active time should be 0.
@@ -182,7 +182,7 @@ TEST_F(PlayerTest, timerTest_normalUsage) {
 TEST_F(PlayerTest, timerTest_instantStopResume) {
     /* Stop and resume time on the same second */
     LineInfo li;
-    li.type = DAMAGE;
+    li.type = LineType::damage;
     li.time = startTime;
 
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
@@ -218,7 +218,7 @@ TEST_F(PlayerTest, amountPerMinute) {
 
 TEST_F(PlayerTest, add_damage) {
     LineInfo li;
-    li.type = DAMAGE;
+    li.type = LineType::damage;
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
@@ -226,7 +226,7 @@ TEST_F(PlayerTest, add_damage) {
 
 TEST_F(PlayerTest, add_heal) {
     LineInfo li;
-    li.type = HEAL;
+    li.type = LineType::heal;
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
@@ -234,7 +234,7 @@ TEST_F(PlayerTest, add_heal) {
 
 TEST_F(PlayerTest, add_nano) {
     LineInfo li;
-    li.type = NANO;
+    li.type = LineType::nano;
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
     player->add(li);
@@ -249,13 +249,13 @@ TEST_F(PlayerTest, add_nanoCast) {
     Expect the nano program name list to contain one nano,
     the named nano added previously. */
     LineInfo li1;
-    li1.type = NANO_CAST;
+    li1.type = LineType::nanoCast;
     li1.nanoProgramName = "Test Program";
     player->add(li1);
     EXPECT_EQ(0, player->getNanoPrograms().getNanoProgramNames().size());
 
     LineInfo li2;
-    li2.type = NANO_CAST;
+    li2.type = LineType::nanoCast;
     li2.subtype = "execute";
     li2.nanoProgramName = "";
     player->add(li2);
@@ -269,11 +269,11 @@ TEST_F(PlayerTest, add_xp) {
     /* This test uses the real class XP.
     Test that a LineInfo object of type xp can be added successfully. */
     LineInfo li;
-    li.type = XP;
+    li.type = LineType::xp;
     li.subtype = "gained";
     li.amount = 123456;
     player->add(li);
-    EXPECT_EQ(li.amount, player->getXp().getTotalGained(XP));
+    EXPECT_EQ(li.amount, player->getXp().getTotalGained(LineType::xp));
 }
 
 TEST_F(PlayerTest, getTotalDamageDealt) {

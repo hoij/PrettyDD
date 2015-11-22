@@ -12,7 +12,7 @@
 
 class LineInfo;
 
-class Experience {
+class XP {
 public:
     void add(LineInfo& li);
 

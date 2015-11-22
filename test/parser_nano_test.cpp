@@ -10,7 +10,7 @@ INSTANTIATE_TEST_CASE_P(meGotNano, ParseTest,
                               "You got nano from Jspe80 for 288 points."),
             ExtendedLineInfo("Jspe80",
                              "You",
-                             NANO,
+                             LineType::nano,
                              "",
                              288))));
 
@@ -21,6 +21,6 @@ INSTANTIATE_TEST_CASE_P(youGaveNano, ParseTest,
                               "You increased nano on Sayet for 2102 points."),
             ExtendedLineInfo("You",
                              "Sayet",
-                             NANO,
+                             LineType::nano,
                              "",
                              2102))));

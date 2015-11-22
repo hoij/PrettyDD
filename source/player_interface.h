@@ -14,7 +14,7 @@ class Heal;
 class Nano;
 class NanoPrograms;
 class LineInfo;
-class Experience;
+class XP;
 
 
 class PlayerInterface {
@@ -67,7 +67,7 @@ public:
     virtual const NanoPrograms& getNanoPrograms() const = 0;
 
     /* XP */
-    virtual const Experience& getXp() = 0;
+    virtual const XP& getXp() = 0;
 
 
     /* Time. TODO: Move into its own class */

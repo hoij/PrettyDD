@@ -25,9 +25,10 @@ public:
 private:
     void writeXPHeadingsOverall();
     void writeXPHeadingsDetailed();
+    void writeXPTypeName(LineType type);
 
-    void writeXPStatsOverview(const Experience& xp, LineType type);
-    void writeXPStatsDetailed(const Experience& xp, LineType type);
+    void writeXPStatsOverview(const XP& xp, LineType type);
+    void writeXPStatsDetailed(const XP& xp, LineType type);
 
     PlayerVector& playerVector;
 };
