@@ -66,22 +66,23 @@ target_link_libraries(xp_writerlib xplib configurationlib loggerlib
                       writer_helperlib)
 
 target_link_libraries(PrettyDD
-                      damagelib
-                      read_consolelib
-                      heallib
-                      nanolib
-                      xplib
-                      playerlib
-                      player_vectorlib
                       affected_playerlib
-                      parserlib
-                      nano_programslib
-                      loggerlib
-                      formatted_linelib
-                      damage_writerlib
-                      nano_program_writerlib
-                      xp_writerlib
-                      configurationlib
                       command_handlerlib
+                      configurationlib
+                      damagelib
+                      damage_writerlib
+                      formatted_linelib
+                      heallib
+                      help_writerlib
+                      loggerlib
                       my_timelib
-                      help_writerlib)
+                      nanolib
+                      nano_programslib
+                      nano_program_writerlib
+                      parserlib
+                      playerlib
+                      player_timelib
+                      player_vectorlib
+                      read_consolelib
+                      xplib
+                      xp_writerlib)
