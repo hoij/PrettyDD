@@ -98,17 +98,6 @@ protected:
 
     Damage d1;
     Damage d2;
-
-    std::time_t startTime = 1442318667;
-    std::time_t stopTime = startTime + 180;
-    std::time_t resumeTime = startTime + 780;
-    std::time_t pauseDuration = resumeTime - stopTime; // 600
-    std::time_t DPMTime = startTime + 800;
-    std::time_t stopTime2 = startTime + 820;
-    std::time_t resumeTime2 = startTime + 886;
-    std::time_t pauseDuration2 = pauseDuration +
-                                 resumeTime2 -
-                                 stopTime2; // 666
 };
 
 bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
