@@ -69,11 +69,9 @@ public:
     /* XP */
     virtual const XP& getXp() = 0;
 
-
-    /* Time. TODO: Move into its own class */
-    virtual std::time_t getTimeActive() const = 0;
-    virtual std::time_t getPauseDuration() const = 0;
+    /* Time */
     virtual std::time_t getStartTime() const = 0;
+    virtual std::time_t getTimeActive() const = 0;
     virtual void stopTimer() = 0;
     virtual void resumeTimer() = 0;
 

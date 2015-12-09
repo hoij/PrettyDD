@@ -5,7 +5,6 @@
 #include "damage.h"
 #include "heal.h"
 #include "line_info.h"
-#include "my_time.h"
 #include "nano.h"
 #include "player.h"
 
@@ -20,20 +19,18 @@
 // would've been moved and unreachable.
 Player::Player(std::string name,
                std::shared_ptr<AffectedPlayerVector> affectedPlayers,
-               std::shared_ptr<MyTimeInterface> myTime) :
+               std::unique_ptr<PlayerTime> playerTime) :
     name(name),
     affectedPlayers(affectedPlayers),
-    myTime(myTime) {}
+    playerTime(std::move(playerTime)) {}
 
 void Player::add(LineInfo& lineInfo) {
-    timeOfLastAction = lineInfo.time;
-    if (startTime == 0) {
-        // Set the start time on the first action made.
-        startTime = lineInfo.time;
-    }
+
+    playerTime->setTimeOfLastAction(lineInfo.time);
+
     if (lineInfo.type == LineType::damage ||
-		lineInfo.type == LineType::heal ||
-		lineInfo.type == LineType::nano) {
+        lineInfo.type == LineType::heal ||
+        lineInfo.type == LineType::nano) {
         affectedPlayers->addToPlayers(lineInfo);
     }
     else if (lineInfo.type == LineType::nanoCast) {
@@ -55,14 +52,14 @@ void Player::addXp(LineInfo& lineInfo) {
 
 Damage Player::getTotalDamageDealt() const {
     Damage total = affectedPlayers->getTotalDamageReceivedFromPlayer(getName());
-    int dpm = amountPerMinute(total.getTotal());
+    int dpm = playerTime->amountPerMinute(total.getTotal());
     total.setDPM(dpm);
     return total;
 }
 
 Damage Player::getTotalDamageReceived() const {
     Damage total = affectedPlayers->getTotalDamageDealtOnPlayer(getName());
-    int dpm = amountPerMinute(total.getTotal());
+    int dpm = playerTime->amountPerMinute(total.getTotal());
     total.setDPM(dpm);
     return total;
 }
@@ -97,10 +94,6 @@ Player::getTotalDamageReceivedPerAffectedPlayer() const {
         affectedPlayers->getTotalDamageDealtOnPlayerPerAffectedPlayer(getName());
     addDPM(total);
     return total;
-}
-
-size_t Player::getLongestAffectedPlayerNameLength() const {
-    return affectedPlayers->getLongestNameLength();
 }
 
 std::vector<std::pair<std::string, Damage>>
@@ -154,49 +147,37 @@ const NanoPrograms& Player::getNanoPrograms() const {
 
 /* XP */
 const XP& Player::getXp() {
-    xp.calcXPH(getTimeActive());
+    xp.calcXPH(playerTime->getTimeActive());
     return xp;
 }
 
-std::time_t Player::getTimeActive() const {
-    // Start time is set the first time the add method of a new
-    // Player is called.
-    return timeOfLastAction - startTime - getPauseDuration();
+std::time_t Player::getStartTime() const {
+    return playerTime->getStartTime();
 }
 
-std::time_t Player::getPauseDuration() const {
-    std::time_t pauseDuration = 0;
-    for (const Pause& pause : pauses) {
-        if (timeOfLastAction >= pause.stop) {
-            pauseDuration += pause.stop - pause.start;
-        }
-    }
-    return pauseDuration;
+std::time_t Player::getTimeActive() const {
+    return playerTime->getTimeActive();
 }
 
 void Player::stopTimer() {
-    stopTime = myTime->currentTime();
+    playerTime->stopTimer();
 }
 
 void Player::resumeTimer() {
-    Pause p = {stopTime, myTime->currentTime()};
-    pauses.push_back(p);
-    stopTime = 0;
+    playerTime->resumeTimer();
 }
 
-int Player::amountPerMinute(int amount) const {
-    std::time_t t = getTimeActive();
-    if (t == 0) {
-        return 0;
-    }
-    else {
-        return int(amount / ((double)t / 60));
-    }
+size_t Player::getLongestAffectedPlayerNameLength() const {
+    return affectedPlayers->getLongestNameLength();
+}
+
+std::vector<AffectedPlayer*>::size_type Player::nrOfAffectedPlayers() {
+    return affectedPlayers->size();
 }
 
 void Player::addDPM(std::vector<std::pair<std::string, Damage>>& v) const {
     for (auto& damagePair : v) {
-        int dpm = amountPerMinute(damagePair.second.getTotal());
+        int dpm = playerTime->amountPerMinute(damagePair.second.getTotal());
         damagePair.second.setDPM(dpm);
     }
 }

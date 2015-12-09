@@ -37,8 +37,10 @@ add_library(nano_programslib nano_programs.cpp)
 add_library(parserlib parser.cpp)
 target_link_libraries(parserlib loggerlib)
 add_library(playerlib player.cpp)
-target_link_libraries(playerlib affected_playerlib nano_programslib damagelib
-                      xplib my_timelib affected_player_vectorlib)
+target_link_libraries(playerlib affected_playerlib affected_player_vectorlib
+                      damagelib nano_programslib player_timelib xplib)
+add_library(player_timelib player_time.cpp)
+target_link_libraries(player_timelib my_timelib)
 add_library(player_vectorlib player_vector.cpp)
 target_link_libraries(player_vectorlib playerlib damagelib loggerlib)
 add_library(xplib xp.cpp)

@@ -25,10 +25,10 @@ these classes pass. */
 
 /* Test Player */
 
-class MockPlayer : public virtual PlayerInterface {
+class MockPlayer : public PlayerInterface {
 public:
-    MockPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
-    name(name), myTime(myTime) {
+    MockPlayer(std::string name, std::unique_ptr<PlayerTime> playerTime) :
+    name(name), playerTime(std::move(playerTime)) {
         std::unique_ptr<AffectedPlayerFactoryInterface>
             affectedPlayerFactory(new AffectedPlayerFactory());
         affectedPlayers = std::make_shared<AffectedPlayerVector>(std::move(affectedPlayerFactory));
@@ -70,9 +70,8 @@ public:
 
     MOCK_METHOD0(getXp, XP&(void));
 
-    MOCK_CONST_METHOD0(getTimeActive, std::time_t(void));
-    MOCK_CONST_METHOD0(getPauseDuration, std::time_t(void));
     MOCK_CONST_METHOD0(getStartTime, std::time_t(void));
+    MOCK_CONST_METHOD0(getTimeActive, std::time_t(void));
     MOCK_METHOD0(stopTimer, void(void));
     MOCK_METHOD0(resumeTimer, void(void));
 
@@ -82,16 +81,18 @@ public:
 private:
     std::string name;
     std::shared_ptr<AffectedPlayerVector> affectedPlayers;
-    std::shared_ptr<MyTimeInterface> myTime;
+    std::unique_ptr<PlayerTime> playerTime;
 };
 
 class MockPlayerFactory : public PlayerFactoryInterface {
 public:
     virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
+        std::shared_ptr<MyTimeInterface> myTime = std::make_shared<MyTime>();
+        std::unique_ptr<PlayerTime> playerTime(new PlayerTime(myTime));
         return std::unique_ptr<PlayerInterface>(
-            new ::testing::NiceMock<MockPlayer>(
+            new MockPlayer(
             name,
-            std::make_shared<MyTime>()));
+            std::move(playerTime)));
     }
 };
 
@@ -181,7 +182,7 @@ TEST_F(PlayerVectorTest, addToPlayers_noDealerNorReceiver) {
 TEST_F(PlayerVectorTest, addToPlayers_newDealerOnly) {
     /* Adds a line info object with only the dealer name defined.
     Verifies that only the dealer is added. */
-    std::string dealerName = "Dealer";
+    std::string dealerName = "Dealer";    
     addPlayersToVector(dealerName, "");
     EXPECT_EQ(1, playerVector->size());
 }

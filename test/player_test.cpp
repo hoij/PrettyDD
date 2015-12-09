@@ -7,6 +7,7 @@
 #include "line_info.h"
 #include "my_time_interface.h"
 #include "player.h"
+#include "player_time.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -70,15 +71,16 @@ public:
 class PlayerTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        // mockAffectedPlayerVector and mockMyTime will be deleted in Player
-        mockMyTime = std::make_shared<::testing::NiceMock<MockMyTime>>();
         std::unique_ptr<AffectedPlayerFactoryInterface>
             affectedPlayerFactory(new AffectedPlayerFactory());
         mockAffectedPlayerVector =
             std::make_shared<MockAffectedPlayerVector>(std::move(affectedPlayerFactory));
-        player = std::unique_ptr<Player>(new Player("You",
+        mockMyTime = std::make_shared<::testing::NiceMock<MockMyTime>>();
+        std::unique_ptr<PlayerTime> playerTime(new PlayerTime(mockMyTime));
+        player = std::unique_ptr<Player>(new Player(
+                            "You",
                             mockAffectedPlayerVector,
-                            mockMyTime));
+                            std::move(playerTime)));
 
         // Set up the return values.
         LineInfo li1;
@@ -117,103 +119,23 @@ bool operator==(const LineInfo& lhs, const LineInfo& rhs) {
     lhs.nanoProgramName == rhs.nanoProgramName;
 }
 
-TEST_F(PlayerTest, timerTest_normalUsage) {
-    /* Add LineInfo.
-    "Stop" time.
-    Resume time.
-    Add another LineInfo.
-    Verify the active time.
-    Stop time a second time.
-    Resume time a second time.
-    Verify the active time.
-    Add a third LineInfo
-    Verify the active time.
-    */
-    LineInfo li1;
-    li1.type = LineType::damage;
-    li1.time = startTime;
-    LineInfo li2;
-    li2.type = LineType::damage;
-    li2.time = resumeTime;
-    LineInfo li3;
-    li3.type = LineType::damage;
-    li3.time = resumeTime2 + 70;
+TEST_F(PlayerTest, add_time) {
+    /* Verifies that the time info is propagated to the
+    PlayerTime instance. Note: Uses PlayerTime
+    directly instead of a mock. */
 
-    // Before adding anything to the player the active time should be 0.
-    EXPECT_EQ(0, player->getTimeActive());
-
-    EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li1))
-        .Times(1);
-    player->add(li1);
-    // Active time is 0 until a line with a different time is added.
-    EXPECT_EQ(0, player->getTimeActive());
-
-    // Stop and resume
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(stopTime));
-    player->stopTimer();
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(resumeTime));
-    player->resumeTimer();
-
-    // Add a new line with the same time stamp as the resume time
-    EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li2))
-        .Times(1);
-    player->add(li2);
-    EXPECT_EQ(stopTime - startTime, player->getTimeActive());
-
-    // Stop and resume a second time
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(stopTime2));
-    player->stopTimer();
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(resumeTime2));
-    player->resumeTimer();
-
-    EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li3))
-        .Times(1);
-    player->add(li3);
-    std::time_t expected = stopTime - startTime +
-                           stopTime2 - resumeTime +
-                           li3.time - resumeTime2;
-    EXPECT_EQ(expected, player->getTimeActive());
-}
-
-TEST_F(PlayerTest, timerTest_instantStopResume) {
-    /* Stop and resume time on the same second */
+    std::time_t t = 1442318667;
     LineInfo li;
-    li.type = LineType::damage;
-    li.time = startTime;
+    li.time = t;
 
+    // Adding a type and expect all just to avoid the
+    // unexpected call warning.
+    li.type = LineType::damage;
     EXPECT_CALL(*mockAffectedPlayerVector, addToPlayers(li))
         .Times(1);
+
     player->add(li);
-
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(stopTime));
-    player->stopTimer();
-
-    EXPECT_CALL(*mockMyTime, currentTime())
-        .WillOnce(::testing::Return(stopTime));
-    player->resumeTimer();
-
-    EXPECT_EQ(0, player->getTimeActive());
-}
-
-TEST_F(PlayerTest, amountPerMinute) {
-
-    /* Test when the time is not stopped */
-    player->startTime = startTime;
-    player->timeOfLastAction = DPMTime;
-
-    // The active time is 200 s.
-    int expected1 = (int)(300001/((float)800/60));
-    EXPECT_EQ(expected1, player->amountPerMinute(300001));
-
-    /* Start and stop time are the same => an active time of 0. */
-    player->stopTime = startTime;
-    player->timeOfLastAction = startTime;
-    EXPECT_EQ(0, player->amountPerMinute(2000));
+    EXPECT_EQ(t, player->getStartTime());
 }
 
 TEST_F(PlayerTest, add_damage) {

@@ -3,13 +3,12 @@
 
 
 #include "affected_player_vector.h"
-#include "player_interface.h"
-#include "my_time_interface.h"
 #include "nano_programs.h"
+#include "player_interface.h"
+#include "player_time.h"
 #include "xp.h"
 
 #include <ctime>
-#include <gtest/gtest_prod.h>
 #include <map>
 #include <memory>
 #include <string>
@@ -30,11 +29,11 @@ class LineInfo;
 class Nano;
 
 class Player : public PlayerInterface {
-// TODO: Se if Player can be split into smaller classes.
+// TODO: See if Player can be split into smaller classes.
 public:
     Player(std::string name,
            std::shared_ptr<AffectedPlayerVector> affectedPlayers,
-           std::shared_ptr<MyTimeInterface> myTime);
+           std::unique_ptr<PlayerTime> playerTime);
     ~Player() {}
 
     void add(LineInfo& lineInfo);
@@ -84,32 +83,18 @@ public:
     /* XP */
     const XP& getXp();
 
-    /* Time. TODO: Move into its own class */
+    /* Time */
+    std::time_t getStartTime() const;
     std::time_t getTimeActive() const;
-    std::time_t getPauseDuration() const;
-    std::time_t getStartTime() const {return startTime;}
     void stopTimer();
     void resumeTimer();
 
     size_t getLongestAffectedPlayerNameLength() const;
-    std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers() {
-        return affectedPlayers->size();
-    }
+    std::vector<AffectedPlayer*>::size_type nrOfAffectedPlayers();
 
 private:
-    FRIEND_TEST(PlayerTest, amountPerMinute);
-
     std::string name;
-    std::time_t startTime = 0;
-    std::time_t timeOfLastAction = 0;
-    std::time_t stopTime = 0;
-    struct Pause {
-        std::time_t start;
-        std::time_t stop;
-    };
-    std::vector<Pause> pauses;
 
-    int amountPerMinute(int amount) const;
     void addDPM(std::vector<std::pair<std::string, Damage>>& v) const;
 
     void addXp(LineInfo& li);
@@ -117,7 +102,7 @@ private:
     Damage sumDamageType(const std::string damageType, bool nanobots);
 
     std::shared_ptr<AffectedPlayerVector> affectedPlayers = nullptr;
-    std::shared_ptr<MyTimeInterface> myTime = nullptr;
+    std::unique_ptr<PlayerTime> playerTime = nullptr;
 	NanoPrograms nanoPrograms;
     XP xp;
 };
