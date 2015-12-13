@@ -24,7 +24,6 @@ these classes pass. */
 
 
 /* Test Player */
-
 class MockPlayer : public PlayerInterface {
 public:
     MockPlayer(std::string name, std::unique_ptr<PlayerTime> playerTime) :
@@ -89,10 +88,14 @@ public:
     virtual std::unique_ptr<PlayerInterface> createPlayer(std::string name) {
         std::shared_ptr<MyTimeInterface> myTime = std::make_shared<MyTime>();
         std::unique_ptr<PlayerTime> playerTime(new PlayerTime(myTime));
-        return std::unique_ptr<PlayerInterface>(
-            new MockPlayer(
-            name,
-            std::move(playerTime)));
+
+		MockPlayer* mp = new MockPlayer(name, std::move(playerTime));
+		// The player vector should only create a new player if it
+		// has something to add to it.
+		EXPECT_CALL(*mp, add(::testing::_))
+			.Times(1);
+
+		return std::unique_ptr<PlayerInterface>(mp);
     }
 };
 
@@ -109,8 +112,6 @@ Damage createDamage(int amount) {
 /* Test fixture */
 
 class PlayerVectorTest : public ::testing::Test {
-/* NiceMock suppresses warnings about function calls not expected via an
-EXPECT_CALL(). */
 protected:
     virtual void SetUp() {
         playerVector = new PlayerVector(
