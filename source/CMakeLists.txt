@@ -1,5 +1,5 @@
-include_directories(SYSTEM ${GMOCK_DIR}/googletest/include
-                           ${GMOCK_DIR}/googlemock/include)
+include_directories(SYSTEM ${GMOCK_DIR}/gtest/include
+                           ${GMOCK_DIR}/include)
 
 # CMake cant make libraries out of headers only so they are added here
 add_executable(PrettyDD main.cpp

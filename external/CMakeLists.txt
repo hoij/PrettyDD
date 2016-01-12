@@ -7,5 +7,4 @@ if (MSVC)
            ON)
 endif()
 
-add_subdirectory(googletest)
-
+add_subdirectory(gmock-1.7.0 ${CMAKE_BINARY_DIR}/external/gmock-1.7.0)
