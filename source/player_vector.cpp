@@ -1,6 +1,7 @@
 #include "damage.h"
 #include "line_info.h"
 #include "player_vector.h"
+#include "player_vector_commons.h"
 
 
 /* Could take a reference to the factory but needs pointer
@@ -12,59 +13,22 @@ PlayerVector::PlayerVector(
     playerFactory(std::move(playerFactory)) {}
 
 void PlayerVector::addToPlayers(LineInfo& lineInfo) {
-    /* Adds the info found in a log line to dealer and receiver.
-    If a player with the same name is not found, a new one is created. */
-    bool dealerFound = false;
-    bool receiverFound = false;
-
-    if (!log) {  // Don't log when stopped.
-        return;
-    }
-
-    for (const auto& player : players) {
-        if (player->getName() == lineInfo.dealer_name) {
-            player->add(lineInfo);
-            dealerFound = true;
-        }
-        else if (player->getName() == lineInfo.receiver_name) {
-            player->add(lineInfo);
-            receiverFound = true;
-        }
-    }
-    if (!dealerFound && lineInfo.dealer_name != "") {
-        createPlayer(lineInfo.dealer_name, lineInfo);
-    }
-    if (!receiverFound && lineInfo.receiver_name != "") {
-        createPlayer(lineInfo.receiver_name, lineInfo);
-    }
+    playerVectorCommons::addToPlayers(lineInfo, players, playerFactory, log);
 }
 
-void PlayerVector::createPlayer(std::string name, LineInfo& lineInfo) {
-    std::unique_ptr<PlayerInterface> player = playerFactory->createPlayer(name);
+void PlayerVector::createPlayer(const std::string& name, LineInfo& lineInfo) {
+    std::unique_ptr<PlayerInterface> player =
+        playerFactory->createPlayer(name);
     player->add(lineInfo);
     players.push_back(std::move(player));
 }
 
 PlayerInterface* PlayerVector::getPlayer(std::string name) {
-    // Finds the player and returns it as a raw pointer.
-    // Reason for using a raw pointer is that the receiving end
-    // should not take ownership.
-    for (const auto& player : players) {
-        if (player->getName() == name) {
-            return player.get();
-        }
-    }
-    return nullptr;
+    return playerVectorCommons::getPlayer<PlayerInterface>(name, players);
 }
 
 size_t PlayerVector::getLongestNameLength() const {
-    size_t longestNameLength = 0;
-    for (const auto& player : players) {
-        if (player->getName().length() > longestNameLength) {
-            longestNameLength = player->getName().length();
-        }
-    }
-    return longestNameLength;
+    return playerVectorCommons::getLongestNameLength(players);
 }
 
 std::vector<std::pair<std::string, Damage>>

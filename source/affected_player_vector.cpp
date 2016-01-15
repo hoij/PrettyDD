@@ -3,32 +3,16 @@
 #include "heal.h"
 #include "line_info.h"
 #include "nano.h"
+#include "player_vector_commons.h"
 
 #include <algorithm>
 
 
 void AffectedPlayerVector::addToPlayers(LineInfo& lineInfo) {
-    // Adds the info found in a log line to dealer and receiver.
-    // If a player with the same name is not found, a new one is created.
-    bool dealerFound = false;
-    bool receiverFound = false;
-
-    for (auto player : players) {
-        if (player->getName() == lineInfo.dealer_name) {
-            player->add(lineInfo);
-            dealerFound = true;
-        }
-        else if (player->getName() == lineInfo.receiver_name) {
-            player->add(lineInfo);
-            receiverFound = true;
-        }
-    }
-    if (!dealerFound && lineInfo.dealer_name != "") {
-        createPlayer(lineInfo.dealer_name, lineInfo);
-    }
-    if (!receiverFound && lineInfo.receiver_name != "") {
-        createPlayer(lineInfo.receiver_name, lineInfo);
-    }
+    playerVectorCommons::addToPlayers(lineInfo,
+                                      players,
+                                      affectedPlayerFactory,
+                                      true);
 }
 
 void AffectedPlayerVector::createPlayer(std::string name,
@@ -40,27 +24,17 @@ void AffectedPlayerVector::createPlayer(std::string name,
 }
 
 size_t AffectedPlayerVector::getLongestNameLength() const {
-    size_t longestNameLength = 0;
-    for (const auto player : players) {
-        if (player->getName().length() > longestNameLength) {
-            longestNameLength = player->getName().length();
-        }
-    }
-    return longestNameLength;
+    return playerVectorCommons::getLongestNameLength(players);
 }
 
-std::shared_ptr<AffectedPlayerInterface> AffectedPlayerVector::getPlayer(std::string name) {
-    for (const auto player : players) {
-        if (player->getName() == name) {
-            return player;
-        }
-    }
-    return nullptr;
+AffectedPlayerInterface* AffectedPlayerVector::getPlayer(std::string name) {
+    return playerVectorCommons::getPlayer<AffectedPlayerInterface>(name,
+                                                                   players);
 }
 
 Damage
 AffectedPlayerVector::getTotalDamageReceivedFromPlayer(
-std::string callerName) const {
+    std::string callerName) const {
     /* Sums all AffectedPlayers damage to get the total damage
     received from the owning Player.
     The damage belonging to owning Player (caller) should not be
@@ -79,7 +53,7 @@ std::string callerName) const {
 
 Damage
 AffectedPlayerVector::getTotalDamageDealtOnPlayer(
-std::string callerName) const {
+    std::string callerName) const {
     /* Sums all AffectedPlayers damage to get the total damage dealt
     on the owning Player.
     The damage belonging to owning Player (caller) should not be
@@ -98,7 +72,7 @@ std::string callerName) const {
 
 std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector::getTotalDamageReceivedFromPlayerPerAffectedPlayer(
-std::string callerName) const {
+    std::string callerName) const {
     /* Returns a vector of pairs containing the Affected players name and their
     total damage (in the form of the Damage class). AffectedPlayers with
     an empty Damage are not included. */
@@ -115,7 +89,7 @@ std::string callerName) const {
 
 std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector::getTotalDamageDealtOnPlayerPerAffectedPlayer(
-std::string callerName) const {
+    std::string callerName) const {
     /* Returns a vector of pairs containing the Affected players name and their
     total damage (in the form of the Damage class). AffectedPlayers with
     an empty Damage are not included. */
@@ -132,7 +106,7 @@ std::string callerName) const {
 
 std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector::getTotalDamageReceivedFromPlayerPerDamageType(
-std::string callerName) const {
+    std::string callerName) const {
     /* Returns a vector of pairs containing the damage type name
     and it's summed damage. The Damage includes all damage types for both
     dealt and received damage. */
@@ -149,7 +123,7 @@ std::string callerName) const {
 
 std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector::getTotalDamageDealtOnPlayerPerDamageType(
-std::string callerName) const {
+    std::string callerName) const {
     /* Returns a vector of pairs containing the damage type name
     and it's summed damage. The Damage includes all damage types for both
     dealt and received damage. */
@@ -166,7 +140,7 @@ std::string callerName) const {
 
 std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector::getDamageReceivedFromPlayer(
-std::string affectedPlayerName) const {
+    std::string affectedPlayerName) const {
 
     for (const auto& ap : this->players) {
         if (ap->getName() == affectedPlayerName &&
@@ -186,7 +160,7 @@ std::string affectedPlayerName) const {
 
 std::vector<std::pair<std::string, Damage>>
 AffectedPlayerVector::getDamageDealtOnPlayer(
-std::string affectedPlayerName) const {
+    std::string affectedPlayerName) const {
 
     for (const auto& ap : this->players) {
         if (ap->getName() == affectedPlayerName &&
@@ -230,7 +204,7 @@ AffectedPlayerVector::getHealsPerAffectedPlayer() const {
 
 Heal
 AffectedPlayerVector::getHeal(
-std::string affectedPlayerName) const {
+    std::string affectedPlayerName) const {
 
     for (const auto& ap : this->players) {
         if (ap->getName() == affectedPlayerName) {
@@ -268,7 +242,7 @@ AffectedPlayerVector::getNanoPerAffectedPlayer() const {
 
 Nano
 AffectedPlayerVector::getNano(
-std::string affectedPlayerName) const {
+    std::string affectedPlayerName) const {
 
     for (const auto& ap : this->players) {
         if (ap->getName() == affectedPlayerName) {
@@ -283,8 +257,8 @@ std::string affectedPlayerName) const {
 
 void
 AffectedPlayerVector::addToVector(
-std::vector<std::pair<std::string, Damage>>& allDamageTypes,
-std::vector<std::pair<std::string, Damage>> apsDamageTypes) const {
+    std::vector<std::pair<std::string, Damage>>& allDamageTypes,
+    std::vector<std::pair<std::string, Damage>> apsDamageTypes) const {
     /* Adds a string/Damage pair in apsDamageTypes to allDamageTypes */
 
     for (const auto& damagePair : apsDamageTypes) {
@@ -307,8 +281,8 @@ std::vector<std::pair<std::string, Damage>> apsDamageTypes) const {
 
 bool
 AffectedPlayerVector::compareNanoDealt(
-const std::pair<std::string, Nano>& p1,
-const std::pair<std::string, Nano>& p2) {
+    const std::pair<std::string, Nano>& p1,
+    const std::pair<std::string, Nano>& p2) {
 
     return p1.second.getTotalDealtOnPlayer() >
         p2.second.getTotalDealtOnPlayer();
@@ -316,8 +290,8 @@ const std::pair<std::string, Nano>& p2) {
 
 bool
 AffectedPlayerVector::comparePotentialHeal(
-const std::pair<std::string, Heal>& p1,
-const std::pair<std::string, Heal>& p2) {
+    const std::pair<std::string, Heal>& p1,
+    const std::pair<std::string, Heal>& p2) {
 
     return p1.second.getPotentialDealtOnPlayer() >
         p2.second.getPotentialDealtOnPlayer();

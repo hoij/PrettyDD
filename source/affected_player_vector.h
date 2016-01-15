@@ -20,16 +20,12 @@ public:
     AffectedPlayerVector(std::unique_ptr<AffectedPlayerFactoryInterface> affectedPlayerFactory) :
         affectedPlayerFactory(std::move(affectedPlayerFactory)) {}
     virtual ~AffectedPlayerVector() {}
-    AffectedPlayerVector(const AffectedPlayerVector& other);
-    AffectedPlayerVector(AffectedPlayerVector&& other);
-    AffectedPlayerVector& operator=(AffectedPlayerVector rhs);
-    friend void swap(AffectedPlayerVector& first, AffectedPlayerVector& second);
 
     std::vector<AffectedPlayerInterface*>::size_type size() {return players.size();}
 
     virtual void addToPlayers(LineInfo& lineInfo);
     virtual size_t getLongestNameLength() const;
-    virtual std::shared_ptr<AffectedPlayerInterface> getPlayer(std::string name);
+    virtual AffectedPlayerInterface* getPlayer(std::string name);
 
     /* Damage */
     virtual Damage

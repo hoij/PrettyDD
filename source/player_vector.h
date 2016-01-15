@@ -63,7 +63,7 @@ public:
     const_PlayerVectorIterator end() const {return players.end();}
 
 private:
-    void createPlayer(std::string name, LineInfo& lineInfo);
+    void createPlayer(const std::string& name, LineInfo& lineInfo);
 
     bool log = false;
     std::string playerRunningProgram;

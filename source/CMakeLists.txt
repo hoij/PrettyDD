@@ -14,7 +14,8 @@ add_executable(PrettyDD main.cpp
                newline.h
                player_interface.h
                player_factory.h
-               player_factory_interface.h)
+               player_factory_interface.h
+               player_vector_commons.h)
 
 # These libraries are mainly made to make test case linking easier
 add_library(affected_playerlib affected_player.cpp)
