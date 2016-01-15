@@ -88,11 +88,6 @@ private:
         std::vector<std::pair<std::string, Damage>>& allDamageTypes,
         std::vector<std::pair<std::string, Damage>> apsDamageTypes) const;
 
-    static bool compareNanoDealt(const std::pair<std::string, Nano>& p1,
-                                 const std::pair<std::string, Nano>& p2);
-    static bool comparePotentialHeal(const std::pair<std::string, Heal>& p1,
-                                     const std::pair<std::string, Heal>& p2);
-
     std::unique_ptr<AffectedPlayerFactoryInterface> affectedPlayerFactory = nullptr;
     std::vector<std::shared_ptr<AffectedPlayerInterface>> players;
 };

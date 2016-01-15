@@ -196,9 +196,13 @@ AffectedPlayerVector::getHealsPerAffectedPlayer() const {
     for (const auto& ap : this->players) {
         healsPerPlayer.emplace_back(ap->getName(), ap->getHeal());
     }
-    std::sort(healsPerPlayer.begin(),
-        healsPerPlayer.end(),
-        comparePotentialHeal);
+    std::sort(healsPerPlayer.begin(), healsPerPlayer.end(),
+        [](const std::pair<std::string, Heal>& p1,
+           const std::pair<std::string, Heal>& p2) {
+               return p1.second.getPotentialDealtOnPlayer() >
+                      p2.second.getPotentialDealtOnPlayer();
+        });
+
     return healsPerPlayer;
 }
 
@@ -234,9 +238,13 @@ AffectedPlayerVector::getNanoPerAffectedPlayer() const {
     for (const auto& ap : this->players) {
         nanoPerPlayer.emplace_back(ap->getName(), ap->getNano());
     }
-    std::sort(nanoPerPlayer.begin(),
-        nanoPerPlayer.end(),
-        compareNanoDealt);
+    std::sort(nanoPerPlayer.begin(), nanoPerPlayer.end(),
+        [](const std::pair<std::string, Nano>& p1,
+           const std::pair<std::string, Nano>& p2) {
+               return p1.second.getTotalDealtOnPlayer() >
+                      p2.second.getTotalDealtOnPlayer();
+        });
+
     return nanoPerPlayer;
 }
 
@@ -279,20 +287,3 @@ AffectedPlayerVector::addToVector(
     }
 }
 
-bool
-AffectedPlayerVector::compareNanoDealt(
-    const std::pair<std::string, Nano>& p1,
-    const std::pair<std::string, Nano>& p2) {
-
-    return p1.second.getTotalDealtOnPlayer() >
-        p2.second.getTotalDealtOnPlayer();
-}
-
-bool
-AffectedPlayerVector::comparePotentialHeal(
-    const std::pair<std::string, Heal>& p1,
-    const std::pair<std::string, Heal>& p2) {
-
-    return p1.second.getPotentialDealtOnPlayer() >
-        p2.second.getPotentialDealtOnPlayer();
-}
