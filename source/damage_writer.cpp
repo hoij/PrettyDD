@@ -400,7 +400,7 @@ void DamageWriter::writeToFile(
                        writeDamagePointer);
 
             // To prevent AO's flood protection from kicking in
-            file << "/delay 1000" << std::endl;
+            file << "/delay 1000" << '\n';
         }
 
         writeExecutionOfNextScript(fileNr, nrOfFiles);
@@ -419,8 +419,8 @@ std::string DamageWriter::nameFile(int fileNr) {
 
 void DamageWriter::writeExecutionOfNextScript(int fileNr, int nrOfFiles) {
     if (fileNr < nrOfFiles) {
-        file << "/delay 3000" << std::endl;
-        file << "/pdd" << std::to_string(fileNr + 1) << std::endl;
+        file << "/delay 3000" << '\n';
+        file << "/pdd" << std::to_string(fileNr + 1) << '\n';
     }
 }
 

@@ -9,22 +9,24 @@
 
 class Logger {
 public:
-    template<typename T>
-    void write(const T& message, bool newline = true) {
-        std::ofstream logfile("pddlog.txt", std::ios::app);
-        if (logfile.is_open()) {
-            logfile << message;
-            if (newline) {
-                logfile << std::endl;
-            }
-        }
-        else {
+    Logger(std::string fileName) : fileName_(fileName) {}
+
+    void open() {
+        logfile.open("pddlog.txt", std::ios::app);
+        if (!logfile) {
             std::cerr << "Could not open pddlog.txt for writing." <<
-            std::endl;
+                         std::endl;
         }
     }
-private:
 
+    template<typename T>
+    void write(const T& message) {
+            logfile << message << '\n';
+    }
+
+private:
+    std::ofstream logfile;
+    const std::string fileName_;
 };
 
 extern Logger errorLog;

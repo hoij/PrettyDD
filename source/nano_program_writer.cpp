@@ -91,7 +91,7 @@ void NanoProgramWriter::createCastedDetailedList() {
             writeEndOfLink(title);
 
             // To prevent AO's flood protection from kicking in
-            file << "/delay 1000" << std::endl;
+            file << "/delay 1000" << '\n';
 
             place += nanosPerWindow;
         }
@@ -99,8 +99,8 @@ void NanoProgramWriter::createCastedDetailedList() {
         // Write the command to execute the next file
         // (if it exists) at the end of the current file.
         if (fileNr < nrOfFiles) {
-            file << "/delay 3000" << std::endl;
-            file << "/pdd" << std::to_string(fileNr + 1) << std::endl;
+            file << "/delay 3000" << '\n';
+            file << "/pdd" << std::to_string(fileNr + 1) << '\n';
         }
 
         closeFile();

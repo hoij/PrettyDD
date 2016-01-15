@@ -1,3 +1,3 @@
 #include "logger.h"
 
-Logger errorLog;
+Logger errorLog("pddLog.txt");

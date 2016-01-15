@@ -23,8 +23,9 @@ void Heal::addHealDealtOnPlayer(LineInfo& li) {
         dealtOnPlayer += hi;
     }
     else {
-        errorLog.write("Error: addHealDealtOnPlayer called with subtype ", false);
-        errorLog.write("\"" + li.subtype + "\"" + " when it should have been \"potential\"");
+        errorLog.write("Error: addHealDealtOnPlayer called with subtype " +
+                       '"' + li.subtype + '"' +
+                       " when it should have been \"potential\"");
     }
 }
 

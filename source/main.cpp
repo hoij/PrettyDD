@@ -38,6 +38,9 @@ int main(void) {
         return 1;
     }
 
+    // Open global errorLog
+    errorLog.open();
+
     // Instantiate classes
     Parser parser(config.getPlayerRunningProgram());
     PlayerVector playerVector(

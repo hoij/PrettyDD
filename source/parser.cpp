@@ -83,8 +83,8 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
         else {
             // Might want to remove this error message as it could print a lot
             // if the user choses to log many other messages not found in the map
-            errorLog.write("Warning: No match for description: ", false);
-            errorLog.write(formattedLine.getDescription());
+            errorLog.write("Warning: No match for description: " +
+                           formattedLine.getDescription());
             errorLog.write("Warning: Full line: " + formattedLine.getOriginalLine());
         }
     }

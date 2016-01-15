@@ -30,8 +30,7 @@ bool FormattedLine::format(std::string line) {
         // Only one catch statement because if any of the calls above fail
         // there is no point in running the rest.
         formatted = false;
-        errorLog.write("Error: ", false);
-        errorLog.write(e.what());
+        errorLog.write("Error: " + *e.what());
         errorLog.write("Error: Full line: " + line);
     }
     return formatted;
