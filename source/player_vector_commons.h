@@ -11,6 +11,16 @@
 namespace playerVectorCommons {
 
     template<typename TPlayerFactory, typename TSmartPointer>
+    void createPlayer(std::string& name,
+                      LineInfo& lineInfo,
+                      std::vector<TSmartPointer>& players,
+                      TPlayerFactory& playerFactory) {
+        TSmartPointer player = playerFactory->createPlayer(name);
+        player->add(lineInfo);
+        players.push_back(std::move(player));
+    }
+
+    template<typename TPlayerFactory, typename TSmartPointer>
     void addToPlayers(LineInfo& lineInfo,
                       std::vector<TSmartPointer>& players,
                       TPlayerFactory& playerFactory,
@@ -45,17 +55,6 @@ namespace playerVectorCommons {
             createPlayer(lineInfo.receiver_name, lineInfo, players, playerFactory);
         }
     }
-
-    template<typename TPlayerFactory, typename TSmartPointer>
-    void createPlayer(std::string& name,
-                      LineInfo& lineInfo,
-                      std::vector<TSmartPointer>& players,
-                      TPlayerFactory& playerFactory) {
-        TSmartPointer player = playerFactory->createPlayer(name);
-        player->add(lineInfo);
-        players.push_back(std::move(player));
-    }
-
 
     template<typename TPlayer, typename TSmartPointer>
     TPlayer* getPlayer(std::string name,

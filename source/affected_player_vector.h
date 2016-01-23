@@ -82,8 +82,6 @@ public:
     virtual const_PlayerVectorIterator end() const { return players.end(); }
 
 private:
-    void createPlayer(std::string name, LineInfo& lineInfo);
-
     void addToVector(
         std::vector<std::pair<std::string, Damage>>& allDamageTypes,
         std::vector<std::pair<std::string, Damage>> apsDamageTypes) const;

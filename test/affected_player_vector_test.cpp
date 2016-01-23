@@ -154,7 +154,7 @@ TEST_F(AffectedPlayerVectorTest, addToPlayers_noDealerNorReceiver) {
     /* Adds a line info object with no dealer and no receiver.
     Verifies that the total nr of players has not increased. */
     addPlayersToVector("", "");
-    EXPECT_EQ(0, affectedPlayerVector->size());
+    EXPECT_EQ(static_cast<size_t>(0), affectedPlayerVector->size());
 }
 
 TEST_F(AffectedPlayerVectorTest, addToPlayers_newDealerOnly) {
@@ -162,7 +162,7 @@ TEST_F(AffectedPlayerVectorTest, addToPlayers_newDealerOnly) {
     Verifies that only the dealer is added. */
     std::string dealerName = "Dealer";
     addPlayersToVector(dealerName, "");
-    EXPECT_EQ(1, affectedPlayerVector->size());
+    EXPECT_EQ(static_cast<size_t>(1), affectedPlayerVector->size());
 }
 
 TEST_F(AffectedPlayerVectorTest, addToPlayers_newReceiverOnly) {
@@ -170,7 +170,7 @@ TEST_F(AffectedPlayerVectorTest, addToPlayers_newReceiverOnly) {
     Verifies that only the receiver is added. */
     std::string receiverName = "Receiver";
     addPlayersToVector(receiverName, "");
-    EXPECT_EQ(1, affectedPlayerVector->size());
+    EXPECT_EQ(static_cast<size_t>(1), affectedPlayerVector->size());
 }
 
 TEST_F(AffectedPlayerVectorTest, addToPlayers_newDealerAndReceiver) {
@@ -179,7 +179,7 @@ TEST_F(AffectedPlayerVectorTest, addToPlayers_newDealerAndReceiver) {
     std::string dealerName = "Dealer";
     std::string receiverName = "Receiver";
     addPlayersToVector(dealerName, receiverName);
-    EXPECT_EQ(2, affectedPlayerVector->size());
+    EXPECT_EQ(static_cast<size_t>(2), affectedPlayerVector->size());
 }
 
 TEST_F(AffectedPlayerVectorTest, getLongestNameLength) {
@@ -207,7 +207,7 @@ TEST_F(AffectedPlayerVectorTest, addToPlayers_existingDealer) {
     MockAffectedPlayer* dealer2 = addDealerToVector("Dealer");
 
     EXPECT_EQ(dealer1, dealer2);
-    EXPECT_EQ(1, affectedPlayerVector->size());
+    EXPECT_EQ(static_cast<size_t>(1), affectedPlayerVector->size());
 }
 
 TEST_F(AffectedPlayerVectorTest, getTotalDamageDealtOnPlayer) {
@@ -268,7 +268,7 @@ TEST_F(AffectedPlayerVectorTest, getDamageDealtOnPlayer_notFound) {
 
     auto result = affectedPlayerVector->getDamageDealtOnPlayer(name);
 
-    EXPECT_EQ(1, result.size());
+    EXPECT_EQ(static_cast<size_t>(1), result.size());
     EXPECT_EQ("empty", result[0].first);
     EXPECT_EQ(0, result[0].second.getTotal());
 }
@@ -335,7 +335,7 @@ TEST_F(AffectedPlayerVectorTest, getHealsPerAffectedPlayer) {
     EXPECT_EQ(h2.getPotentialDealtOnPlayer(), result[1].second.getPotentialDealtOnPlayer());
     EXPECT_EQ(h3.getPotentialDealtOnPlayer(), result[2].second.getPotentialDealtOnPlayer());
     EXPECT_EQ(h4.getPotentialDealtOnPlayer(), result[3].second.getPotentialDealtOnPlayer());
-    EXPECT_EQ(4, result.size());
+    EXPECT_EQ(static_cast<size_t>(4), result.size());
 }
 
 TEST_F(AffectedPlayerVectorTest, getTotalNano) {
@@ -396,7 +396,7 @@ TEST_F(AffectedPlayerVectorTest, getNanoPerAffectedPlayer) {
     EXPECT_EQ(p4->getName(), result[1].first);
     EXPECT_EQ(p1->getName(), result[2].first);
     EXPECT_EQ(p2->getName(), result[3].first);
-    EXPECT_EQ(4, result.size());
+    EXPECT_EQ(static_cast<size_t>(4), result.size());
 }
 
 TEST_F(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
@@ -436,7 +436,7 @@ TEST_F(AffectedPlayerVectorTest, getTotalDamageForAllAffectedPlayers) {
     EXPECT_EQ(d4.getTotal(), result[1].second.getTotal());
     EXPECT_EQ(d5.getTotal(), result[2].second.getTotal());
     EXPECT_EQ(d6.getTotal(), result[3].second.getTotal());
-    EXPECT_EQ(4, result.size());
+    EXPECT_EQ(static_cast<size_t>(4), result.size());
 }
 
 //TEST_F(AffectedPlayerVectorTest, copyConstructor) {

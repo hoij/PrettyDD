@@ -1,7 +1,7 @@
 set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -w")
 
-include_directories(SYSTEM ${GMOCK_DIR}/googletest/include
-                           ${GMOCK_DIR}/googlemock/include)
+include_directories(${gtest_SOURCE_DIR}/include)
+
 include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/source")
 
 

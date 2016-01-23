@@ -24,7 +24,6 @@ these classes pass. */
 
 
 /* Test Player */
-
 class MockPlayer : public virtual PlayerInterface {
 public:
     MockPlayer(std::string name, std::shared_ptr<MyTimeInterface> myTime) :
@@ -175,7 +174,7 @@ TEST_F(PlayerVectorTest, addToPlayers_noDealerNorReceiver) {
     /* Adds a line info object with no dealer and no receiver.
     Verifies that the total nr of players has not increased. */
     addPlayersToVector("", "");
-    EXPECT_EQ(0, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(0), playerVector->size());
 }
 
 TEST_F(PlayerVectorTest, addToPlayers_newDealerOnly) {
@@ -183,7 +182,7 @@ TEST_F(PlayerVectorTest, addToPlayers_newDealerOnly) {
     Verifies that only the dealer is added. */
     std::string dealerName = "Dealer";
     addPlayersToVector(dealerName, "");
-    EXPECT_EQ(1, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(1), playerVector->size());
 }
 
 TEST_F(PlayerVectorTest, addToPlayers_newReceiverOnly) {
@@ -191,7 +190,7 @@ TEST_F(PlayerVectorTest, addToPlayers_newReceiverOnly) {
     Verifies that only the receiver is added. */
     std::string receiverName = "Receiver";
     addPlayersToVector(receiverName, "");
-    EXPECT_EQ(1, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(1), playerVector->size());
 }
 
 TEST_F(PlayerVectorTest, addToPlayers_newDealerAndReceiver) {
@@ -200,7 +199,7 @@ TEST_F(PlayerVectorTest, addToPlayers_newDealerAndReceiver) {
     std::string dealerName = "Dealer";
     std::string receiverName = "Receiver";
     addPlayersToVector(dealerName, receiverName);
-    EXPECT_EQ(2, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(2), playerVector->size());
 }
 
 TEST_F(PlayerVectorTest, addToPlayers_existingDealer) {
@@ -217,7 +216,7 @@ TEST_F(PlayerVectorTest, addToPlayers_existingDealer) {
     MockPlayer* dealer2 = addDealerToVector("Dealer");
 
     EXPECT_EQ(dealer1, dealer2);
-    EXPECT_EQ(1, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(1), playerVector->size());
 }
 
 TEST_F(PlayerVectorTest, getLongestNameLength) {
@@ -237,11 +236,11 @@ TEST_F(PlayerVectorTest, reset) {
     PlayerInterface* p2 = addDealerToVector("dealer2");
     // Reset to remove them
     playerVector->reset();
-    EXPECT_EQ(0, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(0), playerVector->size());
 
     // Reset an empty vector:
     playerVector->reset();
-    EXPECT_EQ(0, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(0), playerVector->size());
 
     // Add two players to make sure it still
     // can be done.
@@ -249,7 +248,7 @@ TEST_F(PlayerVectorTest, reset) {
     std::string p2Name = "dealerAfterReset2";
     p1 = addDealerToVector(p1Name);
     p2 = addDealerToVector(p2Name);
-    EXPECT_EQ(2, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(2), playerVector->size());
     EXPECT_EQ(p1Name, p1->getName());
     EXPECT_EQ(p2Name, p2->getName());
 }
@@ -280,7 +279,7 @@ TEST_F(PlayerVectorTest, getDamageDealtPerType) {
         .Times(0);
     EXPECT_CALL(*p1, getTotalDamageDealtPerType())
         .Times(0);
-    EXPECT_EQ(0, result.size());
+    EXPECT_EQ(static_cast<size_t>(0), result.size());
 }
 
 TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
@@ -329,7 +328,7 @@ TEST_F(PlayerVectorTest, getTotalDamageForEachPlayer) {
     for (const auto& p : result) {
         d += p.second;
     }
-    EXPECT_EQ(4, result.size());
+    EXPECT_EQ(static_cast<size_t>(4), result.size());
     EXPECT_EQ((d1 + d2 + d3 + d4).getTotal(), d.getTotal());
 }
 
@@ -367,7 +366,7 @@ TEST_F(PlayerVectorTest, stopAndStartLogging) {
     playerVector->stopLogging();
 
     playerVector->addToPlayers(li1);
-    EXPECT_EQ(2, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(2), playerVector->size());
 
     EXPECT_CALL(*p1, stopTimer())
         .Times(0);
@@ -376,7 +375,7 @@ TEST_F(PlayerVectorTest, stopAndStartLogging) {
     playerVector->stopLogging();
 
     playerVector->addToPlayers(li1);
-    EXPECT_EQ(2, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(2), playerVector->size());
 
     // Have to expect call to getStartTime instead
     // of resumeTimer() as getStartTime is checked for 0
@@ -387,7 +386,7 @@ TEST_F(PlayerVectorTest, stopAndStartLogging) {
     playerVector->startLogging();
 
     playerVector->addToPlayers(li1);
-    EXPECT_EQ(3, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(3), playerVector->size());
 
     EXPECT_CALL(*p1, getStartTime())
         .Times(0);
@@ -396,5 +395,5 @@ TEST_F(PlayerVectorTest, stopAndStartLogging) {
     playerVector->startLogging();
 
     playerVector->addToPlayers(li2);
-    EXPECT_EQ(4, playerVector->size());
+    EXPECT_EQ(static_cast<size_t>(4), playerVector->size());
 }

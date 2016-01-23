@@ -16,13 +16,6 @@ void PlayerVector::addToPlayers(LineInfo& lineInfo) {
     playerVectorCommons::addToPlayers(lineInfo, players, playerFactory, log);
 }
 
-void PlayerVector::createPlayer(const std::string& name, LineInfo& lineInfo) {
-    std::unique_ptr<PlayerInterface> player =
-        playerFactory->createPlayer(name);
-    player->add(lineInfo);
-    players.push_back(std::move(player));
-}
-
 PlayerInterface* PlayerVector::getPlayer(std::string name) {
     return playerVectorCommons::getPlayer<PlayerInterface>(name, players);
 }

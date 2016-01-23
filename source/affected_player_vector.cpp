@@ -15,14 +15,6 @@ void AffectedPlayerVector::addToPlayers(LineInfo& lineInfo) {
                                       true);
 }
 
-void AffectedPlayerVector::createPlayer(std::string name,
-                                        LineInfo& lineInfo) {
-    std::shared_ptr<AffectedPlayerInterface> affectedPlayer =
-        affectedPlayerFactory->createPlayer(name);
-    affectedPlayer->add(lineInfo);
-    players.push_back(affectedPlayer);
-}
-
 size_t AffectedPlayerVector::getLongestNameLength() const {
     return playerVectorCommons::getLongestNameLength(players);
 }

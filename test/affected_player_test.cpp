@@ -42,9 +42,9 @@ TEST_F(AffectedPlayerTest, addDamage_dealer) {
     std::vector<std::pair<std::string, Damage>> received =
         affectedPlayer->getDamageReceivedFromPlayer();
 
-    EXPECT_EQ(1, dealt.size());
+    EXPECT_EQ(static_cast<size_t>(1), dealt.size());
     EXPECT_EQ(li.amount, dealt[0].second.getTotal());
-    EXPECT_EQ(0, received.size());
+    EXPECT_EQ(static_cast<size_t>(0), received.size());
 }
 
 TEST_F(AffectedPlayerTest, addDamage_receiver) {
@@ -63,9 +63,9 @@ TEST_F(AffectedPlayerTest, addDamage_receiver) {
     std::vector<std::pair<std::string, Damage>> received =
         affectedPlayer->getDamageReceivedFromPlayer();
 
-    EXPECT_EQ(0, dealt.size());
+    EXPECT_EQ(static_cast<size_t>(0), dealt.size());
     EXPECT_EQ(li.amount, received[0].second.getTotal());
-    EXPECT_EQ(1, received.size());
+    EXPECT_EQ(static_cast<size_t>(1), received.size());
 }
 
 TEST_F(AffectedPlayerTest, addHeal_actual) {

@@ -252,14 +252,16 @@ TEST_F(PlayerTest, add_nanoCast) {
     li1.type = LineType::nanoCast;
     li1.nanoProgramName = "Test Program";
     player->add(li1);
-    EXPECT_EQ(0, player->getNanoPrograms().getNanoProgramNames().size());
+    EXPECT_EQ(static_cast<size_t>(0),
+              player->getNanoPrograms().getNanoProgramNames().size());
 
     LineInfo li2;
     li2.type = LineType::nanoCast;
     li2.subtype = "execute";
     li2.nanoProgramName = "";
     player->add(li2);
-    EXPECT_EQ(1, player->getNanoPrograms().getNanoProgramNames().size());
+    EXPECT_EQ(static_cast<size_t>(1),
+              player->getNanoPrograms().getNanoProgramNames().size());
     std::string storedNanoName =
         player->getNanoPrograms().getNanoProgramNames()[0];
     EXPECT_EQ(li1.nanoProgramName, storedNanoName);

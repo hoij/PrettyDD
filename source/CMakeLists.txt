@@ -1,7 +1,6 @@
-include_directories(SYSTEM ${GMOCK_DIR}/googletest/include
-                           ${GMOCK_DIR}/googlemock/include)
+include_directories(${gtest_SOURCE_DIR}/include)
 
-# CMake cant make libraries out of headers only so they are added here
+# CMake can't make libraries out of headers only so they are added here
 add_executable(PrettyDD main.cpp
                affected_player_factory.h
                affected_player_factory_interface.h
@@ -47,7 +46,6 @@ target_link_libraries(xplib loggerlib)
 
 # Write to file libs
 add_library(writer_helperlib writer_helper.cpp)
-
 add_library(command_handlerlib command_handler.cpp)
 target_link_libraries(command_handlerlib damage_writerlib help_writerlib
                       my_timelib nano_program_writerlib playerlib
