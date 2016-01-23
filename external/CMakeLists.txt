@@ -1,4 +1,3 @@
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 if (MSVC)
     # force this option to ON so that Google Test will use /MD instead of /MT
     # /MD is now the default for Visual Studio, so it should be our default, too

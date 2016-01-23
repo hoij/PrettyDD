@@ -21,12 +21,8 @@ endif()
 option(gtest_disable_pthreads "Disable uses of pthreads in gtest." ON)
 
 
-#set(GMOCK_DIR "${CMAKE_SOURCE_DIR}/external/googletest"
-#    CACHE PATH "The path to the GoogleMock test framework.")
-
 add_subdirectory(external)
 add_subdirectory(source)
-
 
 
 option(tests_on "Build and run all tests." ON) # Makes boolean 'test' available.
