@@ -102,6 +102,7 @@ int main(void) {
     }
 
     // Parse loop
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::streampos lastpos = logstream.tellg();
     std::streampos endpos = logstream.tellg();
     bool isRunning = true;
@@ -109,6 +110,12 @@ int main(void) {
     while (isRunning) {
         // If there are no more lines to read
         if (!std::getline(logstream, line) || logstream.eof()) {
+            if (!isInitialParsingDone) {
+                std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+                std::cout << "Parse time: " <<
+                    std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() <<
+                    " ms." << std::endl;
+            }
             // Set to true to signal to the console thread that parsing
             // is done and that it can start reading commands from the
             // console.
