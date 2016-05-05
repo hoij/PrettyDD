@@ -20,15 +20,18 @@ void AffectedPlayer::add(LineInfo& lineInfo) {
 }
 
 void AffectedPlayer::addDamage(LineInfo& li) {
+    bool match = false;
     if (li.dealer_name == getName()) {
         damageDealtOnPlayer[li.subtype].add(li);
+        match = true;
     }
     if (li.receiver_name == getName()) { // if (not else if) because dealer
                                          // and receiver can be the same person
                                          // or his pets.
         damageReceivedFromPlayer[li.subtype].add(li);
+        match = true;
     }
-    else {
+    if(!match) {
         errorLog.write("Error: Neither dealer nor receiver matches"
                        "AffectedPlayers name. Names were:");
         errorLog.write("\t Dealer: " + li.dealer_name + " Receiver: " +
