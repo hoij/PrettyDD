@@ -296,6 +296,10 @@ std::string Parser::findNanoCastSubtype(const std::string& message) {
     else if (message.find("You must") != std::string::npos) {
         return "";
     }
+    // The molecular structure of this creature prohibits the use of this technology.
+    else if (message.find("The molecular") != std::string::npos) {
+        return "";
+    }
 
     // "You can't execute nano programs on items."
     // This message is preceeded by "Executing Nano Program:"
