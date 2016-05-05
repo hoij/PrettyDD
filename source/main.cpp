@@ -29,6 +29,9 @@
 
 int main(void) {
     MyTime myTime;
+
+    // Open global errorLog
+    errorLog.open();
     errorLog.write("");
     errorLog.write("Info: Program started at: " + myTime.currentTimeString());
 
@@ -37,9 +40,6 @@ int main(void) {
     if(!config.read()) {
         return 1;
     }
-
-    // Open global errorLog
-    errorLog.open();
 
     // Instantiate classes
     Parser parser(config.getPlayerRunningProgram());
