@@ -6,6 +6,7 @@
 
 #include <gtest/gtest_prod.h>
 #include <map>
+#include <regex>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -13,6 +14,7 @@
 
 class FormattedLineInterface;
 class LineInfo;
+
 
 class Parser {
 public:
@@ -39,8 +41,6 @@ private:
     std::string findXPSubtype(const std::string& message);
     std::string findAIXPSubtype(const std::string& message);
     std::string renameSpecial(std::string subtype);
-
-    void logWhenPlayerNamesNotFound(LineInfo& lineInfo, FormattedLineInterface& formattedLine);
 
     std::string playerRunningProgram;
     typedef LineInfo (Parser::*pfunc)(const std::string& message);
@@ -71,6 +71,19 @@ private:
     LineInfo victoryPoints(const std::string& message);
     LineInfo system(const std::string& message);
     LineInfo chat(const std::string& message, const std::string& sender);
+
+    enum class regexNames {
+        nr_points,
+        nr_,
+        colon_nr,
+        hit_name_for,
+        name_absorbed,
+        name_shield_hit,
+        crit,
+        deflect
+    };
+
+    std::map<regexNames, std::regex> regexs;
 };
 
 

@@ -1,13 +1,32 @@
 #include "formatted_line.h"
 #include "logger.h"
 
-#include <regex>
 #include <stdexcept>
 
 
 using std::regex;
 using std::regex_search;
 
+
+std::map<FormattedLine::regexNames, std::regex> FormattedLine::regexs = {
+    // Match everything between ["# and #"
+    // Org names can contain both [] and a comma.
+    // But they can't contain " and # afaik (or maybe they just aren't used).
+    {FormattedLine::regexNames::code_with_hashtag, regex("(?:^\\[\"#)(.*?)(?=#\")")},
+    // Match everything between [" and "
+    {FormattedLine::regexNames::code_without_hashtag, regex("(?:^\\[\")(.*?)(?=\")")},
+
+    // Match everything from the start of the string until ","
+    // Assuming here that no org or character have a name containing ","
+    // (which might be untrue)
+    {FormattedLine::regexNames::description, regex("(^.*?)(?=\",\")")},
+
+    // Match everything from the start of the string until ",
+    {FormattedLine::regexNames::sender, regex("(^.*?)(?=\",)")},
+
+    // Match everything from the start of the string until ]
+    {FormattedLine::regexNames::time, regex("(^\\d*?)(?=\\])")}
+};
 
 bool FormattedLine::format(std::string line) {
     // Splits the log line into five parts and stores the original line.
@@ -40,16 +59,12 @@ std::string FormattedLine::findDescriptionCode(std::string& s) {
     // Needs to be the first function to call when extracting info.
     std::smatch m;
     std::string descriptionCode;
-    // Match everything between ["# and #"
-    // Org names can contain both [] and a comma.
-    // But they can't contain " and # afaik (or maybe they just aren't used).
-    if (regex_search(s, m, regex("(?:^\\[\"#)(.*?)(?=#\")"))) {
+    if (regex_search(s, m, regexs[regexNames::code_with_hashtag])) {
         descriptionCode = m[1];
         // Erase the match plus the surrounding chars ["# and #","
         s.erase(0, m[1].length() + 3 + 4);
     }
-    // Match everything between [" and "
-    else if (regex_search(s, m, regex("(?:^\\[\")(.*?)(?=\")"))) {
+    else if (regex_search(s, m, regexs[regexNames::code_without_hashtag])) {
         descriptionCode = m[1];
         // Erase the match plus the surrounding chars [" and ","
         s.erase(0, m[1].length() + 2 + 3);
@@ -65,10 +80,7 @@ std::string FormattedLine::findDescription(std::string& s) {
     // Pantheon [YOLO]","Sgtcuddle",1436182498]test
     std::smatch m;
     std::string description;
-    // Match everything from the start of the string until ","
-    // Assuming here that no org or character have a name containing ","
-    // (which might be untrue)
-    if (regex_search(s, m, regex("(^.*?)(?=\",\")"))) {
+    if (regex_search(s, m, regexs[regexNames::description])) {
         description = m[1];
          // Erase the match plus the next three chars (",").
         s.erase(0, m[0].length() + 3);
@@ -86,8 +98,7 @@ std::string FormattedLine::findSender(std::string& s) {
     // Sgtcuddle",1436182498]test
     std::smatch m;
     std::string sender;
-    // Match everything from the start of the string until ",
-    if (regex_search(s, m, regex("(^.*?)(?=\",)"))) {
+    if (regex_search(s, m, regexs[regexNames::sender])) {
         sender = m[1];
          // Erase the match plus the next two chars (",).
         s.erase(0, m[0].length() + 2);
@@ -101,7 +112,7 @@ std::string FormattedLine::findTime(std::string& s) {
     std::smatch m;
     std::string time;
     // Match everything from the start of the string until ]
-    if (regex_search(s, m, regex("(^\\d*?)(?=\\])"))) {
+    if (regex_search(s, m, regexs[regexNames::time])) {
         time = m[1];
          // Erase the match plus ]
         s.erase(0, m[0].length() + 1);

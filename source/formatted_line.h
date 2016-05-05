@@ -5,6 +5,8 @@
 #include "formatted_line_interface.h"
 
 #include <ctime>
+#include <map>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -31,6 +33,16 @@ private:
     bool formatted = true;
     std::string originalLine;
     std::vector<std::string> formattedLine;
+
+    enum class regexNames {
+        code_with_hashtag,
+        code_without_hashtag,
+        description,
+        sender,
+        time
+    };
+
+    static std::map<regexNames, std::regex> regexs;
 };
 
 

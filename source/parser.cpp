@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
-#include <regex>
 
 
 using std::cout;
@@ -28,6 +27,23 @@ Parser::Parser(std::string playerRunningProgram) :
     specials.emplace("Fling Shot");
     specials.emplace("Full Auto");
     specials.emplace("Sneak Atck");
+
+    regexs = {
+        {regexNames::nr_points, regex("(\\d+)( points)") },
+        {regexNames::nr_, regex("\\d+\\s")},
+        {regexNames::colon_nr, regex("(?::\\s)(\\d+)") },
+
+        {regexNames::hit_name_for, regex("(?:hit )"    // Find "hit ", but do not include it in the results
+                                        "(.*?)"        // match everything following, non-greedy
+                                                       // i.e. until first occurrence, of
+                                        "(?= for)" )}, // " for"
+        {regexNames::name_absorbed, regex("(.*?)(?= absorbed )") },
+        {regexNames::name_shield_hit,
+            regex("(.*?)(?='s reflect shield |'s damage shield | hit)") },
+
+        {regexNames::deflect, regex("damage. Glancing hit.") },
+        {regexNames::crit, regex("damage. Critical hit!|damage.Critical hit!") }
+    };
 }
 
 void Parser::createFunctionMap() {
@@ -96,15 +112,17 @@ LineInfo Parser::parse(FormattedLineInterface& formattedLine) {
 
 int Parser::findAmount(const std::string& message) {
     std::smatch d;
-    if (regex_search(message, d, regex("(\\d+)( points)"))) {
+    if (regex_search(message, d, regexs[regexNames::nr_points])) {
         return std::stoi(d[1]);
     }
-    else if (regex_search(message, d, regex("\\d+\\s"))) {
+    // TODO: What happens if a char has a name with a number?
+    else if (regex_search(message, d, regexs[regexNames::nr_])) {
         // For XP/SK/Reserach/PVP Score but might match some other line
         // I've missed.
         return std::stoi(d[0]);
     }
-    else if (regex_search(message, d, regex("(?::\\s)(\\d+)"))) {
+    else if (regex_search(message, d, regexs[regexNames::colon_nr])) {
+        // Tokens?
         return std::stoi(d[1]);
     }
     else {
@@ -342,18 +360,22 @@ std::string Parser::findAIXPSubtype(const std::string& message) {
 
 bool Parser::isCrit(const std::string& message) {
     std::smatch m;
-    if (regex_search(message, m, regex("damage. Critical hit!|damage.Critical hit!")))
+    if (regex_search(message, m, regexs[regexNames::crit])) {
         return true;
-    else
+    }
+    else {
         return false;
+    }
 }
 
 bool Parser::isDeflect(const std::string& message) {
     std::smatch m;
-    if (regex_search(message, m, regex("damage. Glancing hit.")))
+    if (regex_search(message, m, regexs[regexNames::deflect])) {
         return true;
-    else
+    }
+    else {
         return false;
+    }
 }
 
 std::string Parser::renameSpecial(std::string subtype) {
@@ -422,13 +444,10 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
     li.type = LineType::damage;
     std::smatch m;
     // Find receiver
-    if (regex_search(message, m, regex("(?:hit )"	    // Find "hit ", but do not include it in the results
-                                        "(.*?)"			// match everything following, non-greedy
-                                                        // i.e. until first occurrence, of
-                                        "(?= for)"))) {	// " for"
+    if (regex_search(message, m, regexs[regexNames::hit_name_for])) {
         li.receiver_name = m[1];
     }
-    else if (regex_search(message, m, regex("(.*?)(?= absorbed )"))) {
+    else if (regex_search(message, m, regexs[regexNames::name_absorbed])) {
         li.receiver_name = m[1];
     }
     else {
@@ -436,7 +455,7 @@ LineInfo Parser::otherAndYourPetHitByOther(const std::string& message) {
         errorLog.write("Error:\t" + message);
     }
     // Find dealer
-    if (regex_search(message, m, regex("(.*?)(?='s reflect shield |'s damage shield | hit)"))){
+    if (regex_search(message, m, regexs[regexNames::name_shield_hit])){
         if (m[0] == "Something") {
             li.dealer_name = "Unknown";
         }
