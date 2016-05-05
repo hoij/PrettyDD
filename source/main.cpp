@@ -70,6 +70,7 @@ int main(void) {
         errorLog.write("Error: " + config.getLogFilePath());
     }
     logstream.clear();
+	std::cout << "Opened: " << config.getLogFilePath() << '\n';
 
     // Create the help script on startup
     helpWriter.createHelp("pddhelp");
@@ -90,13 +91,14 @@ int main(void) {
 
     // Read from the end of the file if true,
     // otherwise read from the start.
+
     if (config.shouldParseFromEnd()) {
+		std::cout << "Parsing the log from the end.\n";
         logstream.seekg(0, logstream.end);
-        std::cout << "Parsing the log from the end." << std::endl;
         isInitialParsingDone = true;
     }
     else {
-        std::cout << "Parsing the log from the start." << std::endl;
+		std::cout << "Parsing the log from the start.\n";
     }
 
     // Parse loop
