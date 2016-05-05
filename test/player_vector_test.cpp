@@ -219,6 +219,28 @@ TEST_F(PlayerVectorTest, addToPlayers_existingDealer) {
     EXPECT_EQ(static_cast<size_t>(1), playerVector->size());
 }
 
+TEST_F(PlayerVectorTest, addToPlayers_selfDamage) {
+    /* Adds a line info object with identical dealer and receiver names.
+    Verifies that only one player is added. */
+
+    auto playerName = "Player1";
+    addPlayersToVector(playerName, playerName);
+    EXPECT_EQ(static_cast<size_t>(1), playerVector->size());
+}
+
+TEST_F(PlayerVectorTest, addToPlayers_existingPlayer_selfDamage) {
+    /* Adds a line info with identical receiver and dealer names to a vector
+    already containing that player.
+    Verifies that no new player is created. */
+
+    auto playerName = "Player1";
+    MockPlayer* player1 = addDealerToVector(playerName);
+    EXPECT_CALL(*player1, add(::testing::_))
+	    .Times(1);
+    addPlayersToVector(playerName, playerName);
+    EXPECT_EQ(static_cast<size_t>(1), playerVector->size());
+}
+
 TEST_F(PlayerVectorTest, getLongestNameLength) {
     /* Adds eigth players and gets the longest name length. */
     std::string theLongestName = "AReallyReallyLongName OfSomeone";

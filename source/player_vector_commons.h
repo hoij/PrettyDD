@@ -28,24 +28,40 @@ namespace playerVectorCommons {
         /* Adds the info found in a log line to dealer and receiver.
         If a player with the same name is not found, a new one is
         created by using the playerFactory. */
-        bool dealerFound = false;
-        bool receiverFound = false;
 
         if (!log) {  // Don't log when stopped.
             return;
         }
 
-        for (auto& player : players) {
-            if (player->getName() == lineInfo.dealer_name) {
-                player->add(lineInfo);
-                dealerFound = true;
+        bool dealerFound = false;
+        bool receiverFound = false;
+        // Self inflicted or pets with same name hit owner/eachother.
+        if (lineInfo.dealer_name == lineInfo.receiver_name) {
+            for (auto& player : players) {
+                if (player->getName() == lineInfo.dealer_name) {
+                    player->add(lineInfo);
+                    dealerFound = true;
+                    receiverFound = true;
+                    break;
+                }
             }
-            else if (player->getName() == lineInfo.receiver_name) {
-                player->add(lineInfo);
-                receiverFound = true;
+            // This ensures that only ony player will be created.
+            receiverFound = true;
+        }
+        else {
+            for (auto& player : players) {
+                if (dealerFound == false &&
+                    player->getName() == lineInfo.dealer_name) {
+                    player->add(lineInfo);
+                    dealerFound = true;
+                }
+                else if (receiverFound == false &&
+                    player->getName() == lineInfo.receiver_name) {
+                    player->add(lineInfo);
+                    receiverFound = true;
+                }
             }
         }
-
         /* Some log lines only contain dealer or receiver but not both,
         in which case the name of the non-existing one will be empty. */
         if (!dealerFound && lineInfo.dealer_name != "") {
@@ -82,7 +98,7 @@ namespace playerVectorCommons {
         return longestNameLength;
     }
 
-}
+} // namespace playerVectorCommons
 
 
 #endif  //PLAYER_VECTOR_COMMONS

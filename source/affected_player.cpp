@@ -23,7 +23,9 @@ void AffectedPlayer::addDamage(LineInfo& li) {
     if (li.dealer_name == getName()) {
         damageDealtOnPlayer[li.subtype].add(li);
     }
-    else if (li.receiver_name == getName()) {
+    if (li.receiver_name == getName()) { // if (not else if) because dealer
+                                         // and receiver can be the same person
+                                         // or his pets.
         damageReceivedFromPlayer[li.subtype].add(li);
     }
     else {
